@@ -19,10 +19,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.sql.Wrapper
 
 // Карточка мероприятий
 @Preview
@@ -32,7 +34,7 @@ fun MeetingCard () {
         modifier = Modifier
             .fillMaxWidth() // растягиваем на всю ширину
             .padding(10.dp) // отступ от краев экрана
-            .height(300.dp),
+            ,
         shape = RoundedCornerShape(15.dp), // shape - форма. Скругляем углы
         colors = CardDefaults.cardColors(Grey95), // цвет карточки под картинкой, по идее можно убрать
         elevation = CardDefaults.cardElevation(5.dp) // "левитация" над фоном
@@ -41,7 +43,7 @@ fun MeetingCard () {
 
         // начало работы с карточкой
 
-        Box(modifier = Modifier.fillMaxWidth()){
+        Box(modifier = Modifier.fillMaxWidth().height(300.dp)){
 
             // работа с картинкой
 
@@ -54,7 +56,7 @@ fun MeetingCard () {
                 contentDescription = "Изображение мероприятия" // описание изображения для слабовидящих
             )
 
-            // Помещаем еще контейнер
+            // Помещаем еще контейнер поверх картинки
 
             Box(modifier = Modifier
                 .fillMaxWidth() // занять максимальный размер
@@ -64,21 +66,68 @@ fun MeetingCard () {
                 // Колонка с содержимым 
 
                Column() {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 150.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
+
+                   // Верхняя панель, КАТЕГОРИЯ И ИЗБРАННОЕ
+
+                   Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 150.dp), // отступ до ЭЛЕМЕНТА НИЖЕ
+                        horizontalArrangement = Arrangement.SpaceBetween, // выравнивание - по краям
+                        verticalAlignment = Alignment.Top // вертикальное выравнивание - по верху
                     ) {
-                        CustomButton(buttonText = "Спорт")
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Отправить",
-                            modifier = Modifier.size(20.dp),
-                            tint = Grey00
-                        )
+
+                       // КНОПКА КАТЕГОРИИ
+
+                       Text(
+                           text = "Концерты", // потом сюда передавать категорию
+                           color = Grey00, // цвет текста
+                           style = Typography.bodySmall, // стиль текста
+                           modifier = Modifier
+                               .clip(shape = RoundedCornerShape(15.dp)) // скругленные углы
+                               .background(PrimaryColor) // цвет кнопки
+                               .padding(
+                                   horizontal = 8.dp, // отступ слева/справа
+                                   vertical = 4.dp // отступ снизу / сверху
+                               ),
+
+                       )
+
+                       // ИКОНКА ИЗБРАННОЕ
+
+                       Icon(
+                           imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
+                           contentDescription = "Отправить", // описание для слабовидящих
+                           modifier = Modifier.size(24.dp), // размер иконки
+                           tint = Grey00 // Цвет иконки
+                       )
                     }
-                    Spacer(Modifier.size(10.dp))
-                    CustomText(inputText = "Hi")
+
+                   // Заголовок мероприятия
+
+                   Text(
+                       text = "Концерт великолепной группы Korn", // потом сюда передавать заголовок мероприятия
+                       color = Grey00, // цвет текста
+                       style = Typography.titleLarge // стиль текста
+                   )
+
+                   // Панель под заголовком, ДАТА И ВРЕМЯ
+
+                   Row(
+                       modifier = Modifier
+                           .fillMaxWidth(),
+                       horizontalArrangement = Arrangement.SpaceBetween, // выравнивание - по краям
+                       verticalAlignment = Alignment.Top // вертикальное выравнивание - по верху
+                   ) {
+
+                       // КНОПКА дата
+
+
+
+                       // ИКОНКА время
+
+
+                   }
                 }
             }
         }
@@ -126,3 +175,21 @@ fun CustomButton (buttonText: String) {
         )*/
     }
 }
+
+/*Button(
+onClick = {  },
+colors = ButtonDefaults.buttonColors(
+containerColor = PrimaryColor,
+contentColor = Grey00),
+contentPadding = PaddingValues(
+start = 8.dp,
+top = 0.dp,
+end = 8.dp,
+bottom = 0.dp)
+) {
+    Text(
+        text = "Концерты",
+        color = Grey00,
+        style = Typography.bodySmall
+    )
+}*/
