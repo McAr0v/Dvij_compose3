@@ -26,7 +26,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var count = 0
+        
 
         // разметка создается в функции setContent
         setContent {
@@ -36,9 +36,11 @@ class MainActivity : ComponentActivity() {
                         .background(Grey100)
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Top
                 ) {
-                    MeetingCard()
+                    MeetingCard("Развлечение", "Куда-то мы пойдем сегодня", "21:00", "4 октября")
+                    MeetingCard("Хобби", "Выступление великолепной группы Korn", "11:00", "5 ноября")
+
                 }
             }
         }

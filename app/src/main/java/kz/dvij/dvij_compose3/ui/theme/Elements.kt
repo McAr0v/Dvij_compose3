@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.ui.theme
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,20 +20,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.WrappedDrawable
 import java.sql.Wrapper
 
-// Карточка мероприятий
-@Preview
+
 @Composable
-fun MeetingCard () {
+fun MeetingCard (category: String, title: String, time: String, date: String) {
+
+    // Принимаем категорию и заголовок. Надо еще принимать дату, время и картинку
+    // Карточка мероприятий
+
     Card(
         modifier = Modifier
-            .fillMaxWidth() // растягиваем на всю ширину
+            .fillMaxWidth() // растягиваем карточку на всю ширину экрана
             .padding(10.dp) // отступ от краев экрана
             ,
         shape = RoundedCornerShape(15.dp), // shape - форма. Скругляем углы
@@ -41,155 +47,142 @@ fun MeetingCard () {
         
     ) {
 
-        // начало работы с карточкой
+        // Помещаем в карточку Box чтобы туда вложить картинку мероприятия и сделать ее фоном
 
-        Box(modifier = Modifier.fillMaxWidth().height(300.dp)){
+        Box(modifier = Modifier
+            .fillMaxWidth() // растягиваем на всю ширину
+            .height(280.dp) // задаем высоту карточки. ЕСЛИ НЕ ВМЕЩАЕТСЯ КОНТЕНТ, СДЕЛАТЬ БОЛЬШЕ
+            ) {
 
-            // работа с картинкой
+            // Картинка - все настройки тут
 
             Image(
                 painter = painterResource(kz.dvij.dvij_compose3.R.drawable.korn_concert), // картинка карточки. Потом сюда надо подставлять картинку с базы данных
-                modifier = Modifier
-                    //.height(300.dp)
-                    .fillMaxSize(), // заполнить картинку максимально по контейнеру
-                contentScale = ContentScale.Crop, // обрезать картинку, если не вмещается
+                modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
+                contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
                 contentDescription = "Изображение мероприятия" // описание изображения для слабовидящих
             )
 
             // Помещаем еще контейнер поверх картинки
+            // В нем уже находится все ТЕКСТОВОЕ содержимое
+            // выбираем Column чтобы все элементы шли друг за другом по высоте
 
-            Box(modifier = Modifier
-                .fillMaxWidth() // занять максимальный размер
-                .padding(20.dp) // отступ от краев карточки
-            ){
+            Column(modifier = Modifier
+                .fillMaxSize() // занять всю карточку
+                .background(Grey100_50) // помещаем поверх картинки черный полупрозрачный цвет
+                .padding(20.dp), // отступ от краев карточки
+                verticalArrangement = Arrangement.SpaceBetween // раздвигаем элементы между собой к верху и низу
+            )
+            {
 
-                // Колонка с содержимым 
+                // Верхняя панель, КАТЕГОРИЯ И ИЗБРАННОЕ
+                // Row - чтобы элементы добавлялись друг за другом по ширине
 
-               Column() {
+                Row(
+                    modifier = Modifier.fillMaxWidth(), // Растянуть на всю ширину
+                    horizontalArrangement = Arrangement.SpaceBetween, // выравнивание - развести элементы по краям
+                    verticalAlignment = Alignment.Top // вертикальное выравнивание элементов - по верху
+                ) {
 
-                   // Верхняя панель, КАТЕГОРИЯ И ИЗБРАННОЕ
+                    // КНОПКА КАТЕГОРИИ
 
-                   Row(
+                    Text(
+                        text = category, // category - название категории. Нужно сюда передавать категорию из базы данных
+                        color = Grey00, // цвет текста
+                        style = Typography.bodySmall, // стиль текста
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 150.dp), // отступ до ЭЛЕМЕНТА НИЖЕ
-                        horizontalArrangement = Arrangement.SpaceBetween, // выравнивание - по краям
-                        verticalAlignment = Alignment.Top // вертикальное выравнивание - по верху
+                            .clip(shape = RoundedCornerShape(15.dp)) // скругляем углы
+                            .background(PrimaryColor) // цвет кнопки
+                            .padding(
+                                horizontal = 8.dp, // отступ слева/справа внутри категории
+                                vertical = 4.dp // отступ снизу / сверху внутри категории
+                            ),
+
+                        )
+
+                    // ИКОНКА ИЗБРАННОЕ
+
+                    Icon(
+                        imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
+                        contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
+                        modifier = Modifier.size(24.dp), // размер иконки
+                        tint = Grey00 // Цвет иконки
+                    )
+                }
+
+                // Заголовок, дата, время
+
+                Column() {
+
+                    // Заголовок мероприятия
+
+                    Text(
+                        text = title, // title - заголовок мероприятия, который должен приходить из базы данных
+                        color = Grey00, // цвет текста
+                        style = Typography.titleLarge // стиль текста
+                    )
+
+                    // Панель ДАТА И ВРЕМЯ
+
+                    Column(
+                        modifier = Modifier.padding(top=10.dp), // отступ сверху
                     ) {
 
-                       // КНОПКА КАТЕГОРИИ
+                        // Вывод даты мероприятия
+                        // date - дата проведения мероприятия.
+                        // date надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                       Text(
-                           text = "Концерты", // потом сюда передавать категорию
-                           color = Grey00, // цвет текста
-                           style = Typography.bodySmall, // стиль текста
-                           modifier = Modifier
-                               .clip(shape = RoundedCornerShape(15.dp)) // скругленные углы
-                               .background(PrimaryColor) // цвет кнопки
-                               .padding(
-                                   horizontal = 8.dp, // отступ слева/справа
-                                   vertical = 4.dp // отступ снизу / сверху
-                               ),
+                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_calendar, date)
 
-                       )
+                        // Вывод времени начала мероприятия
+                        // time - время начала мероприятия.
+                        // time надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                       // ИКОНКА ИЗБРАННОЕ
+                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, time)
 
-                       Icon(
-                           imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
-                           contentDescription = "Отправить", // описание для слабовидящих
-                           modifier = Modifier.size(24.dp), // размер иконки
-                           tint = Grey00 // Цвет иконки
-                       )
                     }
-
-                   // Заголовок мероприятия
-
-                   Text(
-                       text = "Концерт великолепной группы Korn", // потом сюда передавать заголовок мероприятия
-                       color = Grey00, // цвет текста
-                       style = Typography.titleLarge // стиль текста
-                   )
-
-                   // Панель под заголовком, ДАТА И ВРЕМЯ
-
-                   Row(
-                       modifier = Modifier
-                           .fillMaxWidth(),
-                       horizontalArrangement = Arrangement.SpaceBetween, // выравнивание - по краям
-                       verticalAlignment = Alignment.Top // вертикальное выравнивание - по верху
-                   ) {
-
-                       // КНОПКА дата
-
-
-
-                       // ИКОНКА время
-
-
-                   }
                 }
+
             }
+
         }
     }
 }
 
-
-
 @Composable
-fun CustomText (inputText: String) {
-    Text(
-        text = inputText,
-        color = Grey00)
-}
+fun IconText (icon: Int, inputText: String) {
 
+    // ИКОНКА С ТЕКСТОМ
+    // Размещаем в Row чтобы элементы распологались друг за другом по горизонтали
 
-@Composable
-fun CustomButton (buttonText: String) {
-    Button(
-        onClick = {  },
-        contentPadding = PaddingValues(
-            start = 20.dp,
-            top = 12.dp,
-            end = 20.dp,
-            bottom = 12.dp
-        ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryColor,
-            contentColor = Grey00
+    Row(
+        modifier = Modifier
+            .fillMaxWidth() // занять всю ширину
+            .padding(top = 10.dp), // отступ от ЭЛЕМЕНТА, который распологается ВЫШЕ IconText
+        horizontalArrangement = Arrangement.Start, // выравнивание - начало (слева)
+        verticalAlignment = Alignment.CenterVertically // вертикальное выравнивание элементов IconText - по центру
         )
+    {
 
-    ) {
-        /* Icon(
-            iconLeft,
-            contentDescription = "Отправить",
-            modifier = Modifier.size(ButtonDefaults.IconSize)
-        )
-        Spacer(Modifier.size(5.dp))*/
-        Text(buttonText)
-        /*Spacer(Modifier.size(5.dp))
+        // ИКОНКА
+
         Icon(
-            iconRight,
-            contentDescription = "Отправить",
-            modifier = Modifier.size(ButtonDefaults.IconSize)
-        )*/
+            imageVector = ImageVector.vectorResource(icon), // передаем сам векторный файл иконки !!! ПРИМЕР ИЗ ПАПКИ drawable - kz.dvij.dvij_compose3.R.drawable.ic_time
+            contentDescription = "Иконка", // описание для слабовидящих
+            modifier = Modifier.size(25.dp), // размер иконки
+            tint = Grey40 // Цвет иконки
+        )
+
+        // Текст
+
+        Text(
+            modifier = Modifier.padding(start = 10.dp), // отступ текста от иконки
+            text = inputText, // передаем сюда текст, который нужно написать
+            color = Grey40, // цвет текста
+            style = Typography.bodyMedium // стиль текста
+            )
+
+
     }
 }
 
-/*Button(
-onClick = {  },
-colors = ButtonDefaults.buttonColors(
-containerColor = PrimaryColor,
-contentColor = Grey00),
-contentPadding = PaddingValues(
-start = 8.dp,
-top = 0.dp,
-end = 8.dp,
-bottom = 0.dp)
-) {
-    Text(
-        text = "Концерты",
-        color = Grey00,
-        style = Typography.bodySmall
-    )
-}*/
