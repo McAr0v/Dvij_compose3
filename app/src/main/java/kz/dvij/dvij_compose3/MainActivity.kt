@@ -26,7 +26,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
 
         // разметка создается в функции setContent
         setContent {
