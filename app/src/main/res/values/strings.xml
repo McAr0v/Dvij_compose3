@@ -5,5 +5,8 @@
     <!-- Нижнее меню -->
 
     <string name="profile">Профиль</string>
+    <string name="meetings">Мероприятия</string>
+    <string name="places">Места</string>
+    <string name="stock">Акции</string>
 
 </resources>
