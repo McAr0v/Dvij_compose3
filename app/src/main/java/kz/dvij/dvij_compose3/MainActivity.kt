@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import kz.dvij.dvij_compose3.ui.theme.*
 
 
@@ -30,19 +33,30 @@ class MainActivity : ComponentActivity() {
 
         // разметка создается в функции setContent
         setContent {
-            CustomDvijTheme {
-                Column (
-                    modifier = Modifier
-                        .background(Grey100)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    MeetingCard("Развлечение", "Куда-то мы пойдем сегодня", "21:00", "4 октября")
-                    MeetingCard("Хобби", "Выступление великолепной группы Korn", "11:00", "5 ноября")
+            val navController = rememberNavController()
 
+            MeetingsScreen()
+
+            androidx.compose.material.Scaffold(bottomBar = { BottomNavigationMenu(navController = navController) })
+            { paddingValues ->
+                Column(Modifier.padding(paddingValues).fillMaxWidth())
+                {
+                    NavHost(
+                        navController = navController,
+                        startDestination = MEETINGS_ROOT
+                    ) {
+                        composable(MEETINGS_ROOT) { MeetingsScreen() }
+                        composable(PLACES_ROOT) { PlacesScreen() }
+                        composable(STOCK_ROOT) { StockScreen() }
+                        composable(PROFILE_ROOT) { ProfileScreen() }
+                    }
                 }
             }
+
+
+
+
+
         }
     }
 }
