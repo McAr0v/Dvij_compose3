@@ -2,5 +2,10 @@
 <resources>
 
     <style name="Theme.Dvij_compose3" parent="android:Theme.Material.Light.NoActionBar">
+
+        <!-- Окрашиваем статус бар в черный цвет -->
+
+        <item name="android:statusBarColor">@color/black</item>
+
     </style>
 </resources>

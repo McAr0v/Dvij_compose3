@@ -1,7 +1,8 @@
-package kz.dvij.dvij_compose3
+package kz.dvij.dvij_compose3.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import kz.dvij.dvij_compose3.R
 
 sealed class NavigationItem(
 

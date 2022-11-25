@@ -1,26 +1,17 @@
-package kz.dvij.dvij_compose3
+package kz.dvij.dvij_compose3.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 
-import androidx.navigation.compose.rememberNavController
-import kz.dvij.dvij_compose3.ui.theme.Grey100
+import kz.dvij.dvij_compose3.ui.theme.Grey95
 import kz.dvij.dvij_compose3.ui.theme.MeetingCard
-import kz.dvij.dvij_compose3.ui.theme.Primary10
 
 // функция превью экрана
+
 @Preview
 @Composable
 fun LookChangesMeetings () {
@@ -28,13 +19,13 @@ fun LookChangesMeetings () {
 }
 
 
-// экран профиля
+// экран мероприятий
 
 @Composable
 fun MeetingsScreen (){
     Column (
         modifier = Modifier
-            .background(Grey100)
+            .background(Grey95)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
