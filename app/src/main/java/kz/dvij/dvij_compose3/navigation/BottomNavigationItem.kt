@@ -7,7 +7,7 @@ import kz.dvij.dvij_compose3.R
 
 // Элементы НИЖНЕГО МЕНЮ BottomNavigationMenu
 
-sealed class NavigationItem(
+sealed class BottomNavigationItem(
 
     // создаем запечатанный класс (sealed class), в котором прописываем
     // что должен содержать элемент нижнего меню
@@ -23,16 +23,13 @@ sealed class NavigationItem(
 
     // создаем объекты меню согласно тем элементам, которые мы указали выше.
 
-    object Profile: NavigationItem(R.string.profile, R.drawable.ic_person, PROFILE_ROOT)
-    object Meetings: NavigationItem(R.string.meetings, R.drawable.ic_meetings_2, MEETINGS_ROOT)
-    object Places: NavigationItem(R.string.places, R.drawable.ic_baseline_places, PLACES_ROOT)
-    object Stock: NavigationItem(R.string.stock, R.drawable.ic_fire, STOCK_ROOT)
+    object Profile: BottomNavigationItem(R.string.profile, R.drawable.ic_person, PROFILE_ROOT)
+    object Meetings: BottomNavigationItem(R.string.meetings, R.drawable.ic_meetings_2, MEETINGS_TAPE_ROOT)
+    object Places: BottomNavigationItem(R.string.places, R.drawable.ic_baseline_places, PLACES_TAPE_ROOT)
+    object Stock: BottomNavigationItem(R.string.stock, R.drawable.ic_fire, STOCK_TAPE_ROOT)
 
 }
 
-// Константы путей navRoute
+// Константы путей navRoute (еще константы в TabItem)
 
-const val MEETINGS_ROOT = "meetingsScreen"
-const val PLACES_ROOT = "placesScreen"
-const val STOCK_ROOT = "stockScreen"
 const val PROFILE_ROOT = "profileScreen"

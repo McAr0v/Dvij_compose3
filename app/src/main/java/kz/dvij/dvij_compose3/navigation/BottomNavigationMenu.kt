@@ -27,7 +27,7 @@ fun BottomNavigationMenu (navController: NavController) {
     // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
 
     // Передаем список созданных кнопок для навигации
-    val navItems = listOf(NavigationItem.Profile, NavigationItem.Meetings, NavigationItem.Places, NavigationItem.Stock )
+    val navItems = listOf(BottomNavigationItem.Profile, BottomNavigationItem.Meetings, BottomNavigationItem.Places, BottomNavigationItem.Stock )
 
     // графически создаем непосредственно саму навигацию. Уже есть готовая составная функция BottomNavigation
 

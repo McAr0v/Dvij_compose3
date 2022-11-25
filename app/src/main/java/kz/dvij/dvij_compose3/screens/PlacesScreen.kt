@@ -16,14 +16,14 @@ import kz.dvij.dvij_compose3.ui.theme.Primary10
 @Preview
 @Composable
 fun LookChangesPlaces () {
-    PlacesScreen()
+    PlacesTapeScreen()
 }
 
 
 // экран заведений
 
 @Composable
-fun PlacesScreen (){
+fun PlacesTapeScreen (){
     Column (
         modifier = Modifier
             .background(Primary10)

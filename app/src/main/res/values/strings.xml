@@ -9,4 +9,10 @@
     <string name="places">Места</string>
     <string name="stock">Акции</string>
 
+    <!-- Табы -->
+
+    <string name="tab_my">Мои</string>
+    <string name="tab_tape">Лента</string>
+    <string name="tab_fav">Избранные</string>
+
 </resources>

@@ -16,14 +16,14 @@ import kz.dvij.dvij_compose3.ui.theme.Primary70
 @Preview
 @Composable
 fun LookChangesStock () {
-    StockScreen()
+    StockTapeScreen()
 }
 
 
 // экран акций
 
 @Composable
-fun StockScreen (){
+fun StockTapeScreen (){
     Column (
         modifier = Modifier
             .background(Primary70)

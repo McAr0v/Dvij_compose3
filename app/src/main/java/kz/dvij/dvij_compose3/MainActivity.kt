@@ -9,10 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kz.dvij.dvij_compose3.navigation.*
-import kz.dvij.dvij_compose3.screens.MeetingsScreen
-import kz.dvij.dvij_compose3.screens.PlacesScreen
-import kz.dvij.dvij_compose3.screens.ProfileScreen
-import kz.dvij.dvij_compose3.screens.StockScreen
+import kz.dvij.dvij_compose3.screens.*
 
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +36,10 @@ class MainActivity : ComponentActivity() {
 
             { paddingValues ->
                 // как я и писал - помещаем все в колонку
-                Column(Modifier.padding(paddingValues).fillMaxWidth())
+                Column(
+                    Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth())
                 {
 
                     // Навигационный хост. Здесь мы казываем,
@@ -47,14 +47,14 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = MEETINGS_TAPE_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) { MeetingsScreen() }
-                        composable(PLACES_ROOT) { PlacesScreen() }
-                        composable(STOCK_ROOT) { StockScreen() }
+                        composable(MEETINGS_TAPE_ROOT) { MeetingsTapeScreen()}
+                        composable(PLACES_TAPE_ROOT) { PlacesTapeScreen() }
+                        composable(STOCK_TAPE_ROOT) { StockTapeScreen() }
                         composable(PROFILE_ROOT) { ProfileScreen() }
                     }
                 }
