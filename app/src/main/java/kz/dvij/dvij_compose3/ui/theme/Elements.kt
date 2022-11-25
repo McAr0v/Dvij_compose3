@@ -81,8 +81,8 @@ fun MeetingCard (category: String, title: String, time: String, date: String) {
                             .clip(shape = RoundedCornerShape(15.dp)) // скругляем углы
                             .background(PrimaryColor) // цвет кнопки
                             .padding(
-                                horizontal = 8.dp, // отступ слева/справа внутри категории
-                                vertical = 4.dp // отступ снизу / сверху внутри категории
+                                horizontal = 10.dp, // отступ слева/справа внутри категории
+                                vertical = 5.dp // отступ снизу / сверху внутри категории
                             ),
 
                         )

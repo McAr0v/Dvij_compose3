@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kz.dvij.dvij_compose3.ui.theme.Grey10
+import kz.dvij.dvij_compose3.ui.theme.Typography
 
 // функция превью экрана
 
@@ -33,7 +34,15 @@ fun ProfileScreen (){
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = "ProfileScreen")
+        Text(text = "ProfileScreen", style = Typography.titleLarge)
+        Text(text = "ProfileScreen", style = Typography.titleMedium)
+        Text(text = "ProfileScreen", style = Typography.titleSmall)
+        Text(text = "ProfileScreen", style = Typography.bodyLarge)
+        Text(text = "ProfileScreen", style = Typography.bodyMedium)
+        Text(text = "ProfileScreen", style = Typography.bodySmall)
+        Text(text = "ProfileScreen", style = Typography.labelLarge)
+        Text(text = "ProfileScreen", style = Typography.labelMedium)
+        Text(text = "ProfileScreen", style = Typography.labelSmall)
 
     }
 }
