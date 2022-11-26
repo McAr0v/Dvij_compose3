@@ -1,10 +1,14 @@
 package kz.dvij.dvij_compose3
 
+import android.app.Activity
+import android.app.ListActivity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,6 +27,7 @@ class MainActivity : ComponentActivity() {
 
             // Непосредственно само нижнее меню:
             // Нижнее меню нужно поместить в Scaffold (это типа "пространство". Как Column, Row, только Scaffold)
+
 
             androidx.compose.material.Scaffold(
                 bottomBar = { BottomNavigationMenu(navController = navController) } // вызываем функцию, где рисуется наше нижнее меню и передаем туда navController

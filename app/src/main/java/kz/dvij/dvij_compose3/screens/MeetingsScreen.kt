@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kz.dvij.dvij_compose3.navigation.BottomNavigationItem
+import kz.dvij.dvij_compose3.navigation.TabLayoutMeetings
 
 import kz.dvij.dvij_compose3.ui.theme.Grey95
 import kz.dvij.dvij_compose3.ui.theme.MeetingCard
@@ -23,7 +24,7 @@ fun LookChangesMeetings () {
 
 
 // экран мероприятий
-
+/*
 @Composable
 fun MeetingsTapeScreen (){
     Column (
@@ -33,11 +34,13 @@ fun MeetingsTapeScreen (){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        TabLayoutMeetings()
         MeetingCard("Развлечение", "Куда-то мы пойдем сегодня", "21:00", "4 октября")
         MeetingCard("Хобби", "Выступление великолепной группы Korn", "11:00", "5 ноября")
     }
 }
-
+*/
+/*
 @Composable
 fun MeetingsMyScreen (){
     Column (
@@ -51,7 +54,8 @@ fun MeetingsMyScreen (){
 
     }
 }
-
+*/
+/*
 @Composable
 fun MeetingsFavScreen (){
     Column (
@@ -64,4 +68,4 @@ fun MeetingsFavScreen (){
         Text(text = "MeetingsFavScreen")
 
     }
-}
+}*/
