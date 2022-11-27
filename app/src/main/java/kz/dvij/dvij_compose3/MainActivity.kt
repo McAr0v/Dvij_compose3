@@ -1,14 +1,10 @@
 package kz.dvij.dvij_compose3
 
-import android.app.Activity
-import android.app.ListActivity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -52,14 +48,14 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = MEETINGS_TAPE_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_TAPE_ROOT) { MeetingsTapeScreen()}
-                        composable(PLACES_TAPE_ROOT) { PlacesTapeScreen() }
-                        composable(STOCK_TAPE_ROOT) { StockTapeScreen() }
+                        composable(MEETINGS_ROOT) { MeetingsScreen()}
+                        composable(PLACES_ROOT) { PlacesScreen() }
+                        composable(STOCK_ROOT) { StockScreen() }
                         composable(PROFILE_ROOT) { ProfileScreen() }
                     }
                 }

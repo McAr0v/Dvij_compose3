@@ -52,7 +52,7 @@ val Typography = Typography(
 
     bodySmall = TextStyle(fontFamily = sfProFont,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = 11.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp),
 
@@ -111,7 +111,7 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = sfProFont,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
+        fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
