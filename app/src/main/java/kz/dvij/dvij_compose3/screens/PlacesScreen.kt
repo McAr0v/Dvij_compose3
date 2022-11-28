@@ -8,9 +8,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
-import kz.dvij.dvij_compose3.navigation.TabMenu
+import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.navigation.TopBar
 import kz.dvij.dvij_compose3.ui.theme.Primary10
 
 // функция превью экрана
@@ -18,7 +19,10 @@ import kz.dvij.dvij_compose3.ui.theme.Primary10
 @Preview
 @Composable
 fun PlacesScreen () {
-    TabMenu(PLACES_ROOT) // передаем в меню PLACES_ROOT чтобы сработало условие и отобразилось нужное TabMenu
+    Column() {
+        TopBar(stringResource(id = R.string.places)) // вызываем верхнее меню, передаем название страницы
+        // ОТ НАЗВАНИЯ СТРАНИЦЫ ЗАВИСИТ ЗАГОЛОВОК МЕНЮ, ВЫЗОВ НУЖНОГО СОДЕРЖАНИЯ СТРАНИЦЫ И ПОКАЗ ЗНАЧКА ФИЛЬТРА!
+    }
 }
 
 

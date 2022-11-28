@@ -8,7 +8,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.navigation.TopBar
 import kz.dvij.dvij_compose3.ui.theme.Grey10
 import kz.dvij.dvij_compose3.ui.theme.Typography
 
@@ -16,15 +19,22 @@ import kz.dvij.dvij_compose3.ui.theme.Typography
 
 @Preview
 @Composable
-fun LookChangesProfile () {
-    ProfileScreen()
+fun ProfileScreen () {
+
+    Column() {
+        // создаем колонку, чтобы элементы отображались друг за другом
+        TopBar(stringResource(id = R.string.profile)) // вызываем верхнее меню, передаем название страницы
+        // ОТ НАЗВАНИЯ СТРАНИЦЫ ЗАВИСИТ ЗАГОЛОВОК МЕНЮ, ВЫЗОВ НУЖНОГО СОДЕРЖАНИЯ СТРАНИЦЫ И ПОКАЗ ЗНАЧКА ФИЛЬТРА!
+
+    }
+
 }
 
 
 // экран профиля
 
 @Composable
-fun ProfileScreen (){
+fun ProfileScreenContent (){
 
     Column (
         modifier = Modifier

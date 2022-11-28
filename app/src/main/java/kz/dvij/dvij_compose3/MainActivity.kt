@@ -11,7 +11,6 @@ import androidx.navigation.compose.rememberNavController
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
             // Непосредственно само нижнее меню:
             // Нижнее меню нужно поместить в Scaffold (это типа "пространство". Как Column, Row, только Scaffold)
+
 
 
             androidx.compose.material.Scaffold(
