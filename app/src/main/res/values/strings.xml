@@ -15,4 +15,15 @@
     <string name="tab_tape">Лента</string>
     <string name="tab_fav">Избранные</string>
 
+    <!-- Боковое меню -->
+
+    <string name="side_about">О приложении</string>
+    <string name="side_private_policy">Политика конфиденциальности</string>
+    <string name="side_ad">Реклама</string>
+    <string name="side_report_bug">Сообщить об ошибке</string>
+    <string name="city">Город</string>
+    <string name="subscribe">Подпишись на Движ</string>
+
+
+
 </resources>
