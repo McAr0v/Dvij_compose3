@@ -26,20 +26,37 @@ import kz.dvij.dvij_compose3.ui.theme.Typography
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TopBar(
-    topBarName: String
+    topBarName: String,
+    onNavigationIconClick: () -> Unit
 ){
 
+    TopAppBar(
+        title = {
+            Text(text = topBarName, color = Grey10)
+        },
+        backgroundColor = Grey100,
+        contentColor = Grey10,
+        navigationIcon = {
+            IconButton(onClick = onNavigationIconClick) {
+                Icon(painter = painterResource(id = R.drawable.ic_menu), contentDescription = "")
+
+            }
+        }
+    )
+
+}
+
+/*@Composable
+fun Example () {
     // Создаем верхнее меню для главных страниц
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val sideNavigationItemsList = listOf<SideNavigationItems>(SideNavigationItems.About, SideNavigationItems.PrivatePolicy, SideNavigationItems.Ads, SideNavigationItems.Bugs)
 
-    val navControllerSide = rememberNavController()
-
     // помещаем верхнее меню в Scaffold
 
-    Scaffold(
+    /*Scaffold(
         scaffoldState = scaffoldState,
         topBar = { // Код самого верхнего меню
             TopAppBar(
@@ -51,7 +68,7 @@ fun TopBar(
                     IconButton(
                         onClick = {coroutineScope.launch { scaffoldState.drawerState.open() }} // действие на нажатие. СЮДА ВСТАВИТЬ КОД ВЫЗОВА ВЫДВИГАЮЩЕГОСЯ МЕНЮ
                     ) {
-                            Icon(painter = painterResource(id = R.drawable.ic_menu), contentDescription = "") // Сама иконка меню
+                        Icon(painter = painterResource(id = R.drawable.ic_menu), contentDescription = "") // Сама иконка меню
                     }
                 },
 
@@ -60,19 +77,19 @@ fun TopBar(
 
                     // условие показа дополнительных иконок - если не равно Профиль, то показывать
 
-                            if (topBarName != stringResource(id = R.string.profile)){
-                                Row() { // помещаем в строку, чтобы элементы были друг за другом по горизонтали
-                                    Icon( // добавляем иконку фильтра
-                                        painter = painterResource(id = R.drawable.ic_filter), // сам ресурс иконки
-                                        contentDescription = "", // описание для слабовидящих
-                                        modifier = Modifier.padding(end = 12.dp), // паддинг справа
-                                        tint = Grey00 // цвет иконки
-                                    )
-                                }
-                            }
+                    if (topBarName != stringResource(id = R.string.profile)){
+                        Row() { // помещаем в строку, чтобы элементы были друг за другом по горизонтали
+                            Icon( // добавляем иконку фильтра
+                                painter = painterResource(id = R.drawable.ic_filter), // сам ресурс иконки
+                                contentDescription = "", // описание для слабовидящих
+                                modifier = Modifier.padding(end = 12.dp), // паддинг справа
+                                tint = Grey00 // цвет иконки
+                            )
                         }
-                    )
-                 },
+                    }
+                }
+            )
+        },
         drawerContent = {
             HeaderSideNavigation()
             BodySideNavigation(items = sideNavigationItemsList, onItemClick = {
@@ -82,14 +99,14 @@ fun TopBar(
         content = { // наполнение под топ меню
             // создаем колонку для паддингов (как всегда, без них не работает)
             Column(
-            modifier = Modifier
-                .padding(PaddingValues()) // указываем как раз паддинги
-                .fillMaxWidth(), // занять максимальную ширину
-            verticalArrangement = Arrangement.Center, // вертикальное выравнивание по центру
-            horizontalAlignment = Alignment.CenterHorizontally // Горизонтальное выравнивание по центру
-        ) {
+                modifier = Modifier
+                    .padding(PaddingValues()) // указываем как раз паддинги
+                    .fillMaxWidth(), // занять максимальную ширину
+                verticalArrangement = Arrangement.Center, // вертикальное выравнивание по центру
+                horizontalAlignment = Alignment.CenterHorizontally // Горизонтальное выравнивание по центру
+            ) {
                 // само наполнение. Условие отображения нужных страниц
-               when (topBarName) { // если название X, то показываем соответствующую страницу
+                when (topBarName) { // если название X, то показываем соответствующую страницу
 
                     stringResource(id = R.string.meetings) -> TabMenu(bottomPage = MEETINGS_ROOT)
                     stringResource(id = R.string.stock) -> TabMenu(bottomPage = STOCK_ROOT)
@@ -97,7 +114,6 @@ fun TopBar(
                     stringResource(id = R.string.profile) -> ProfileScreenContent()
                 }
             }
-       }
+        }
     )
-}
-
+}*/

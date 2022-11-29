@@ -13,31 +13,31 @@ sealed class SideNavigationItems (
     object About: SideNavigationItems (
         title = R.string.side_about,
         icon = R.drawable.ic_info,
-        navRoute = ABOUT,
+        navRoute = ABOUT_ROOT,
         contentDescription = R.string.cd_about
             )
 
     object PrivatePolicy: SideNavigationItems (
         title = R.string.side_private_policy,
         icon = R.drawable.ic_security,
-        navRoute = POLICY,
+        navRoute = POLICY_ROOT,
         contentDescription = R.string.cd_private_policy
             )
     object Ads: SideNavigationItems (
         title = R.string.side_ad,
         icon = R.drawable.ic_ads,
-        navRoute = ADS,
+        navRoute = ADS_ROOT,
         contentDescription = R.string.cd_ads
             )
     object Bugs: SideNavigationItems (
         title = R.string.side_report_bug,
         icon = R.drawable.ic_bug,
-        navRoute = BUGS,
+        navRoute = BUGS_ROOT,
         contentDescription = R.string.cd_bugs
             )
 }
 
-const val ABOUT = "About"
-const val POLICY = "Private_Policy"
-const val ADS = "Ads"
-const val BUGS = "Bugs"
+const val ABOUT_ROOT = "About"
+const val POLICY_ROOT = "Private_Policy"
+const val ADS_ROOT = "Ads"
+const val BUGS_ROOT = "Bugs"

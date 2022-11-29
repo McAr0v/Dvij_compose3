@@ -16,10 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.navigation.BodySideNavigation
-import kz.dvij.dvij_compose3.navigation.HeaderSideNavigation
-import kz.dvij.dvij_compose3.navigation.SideNavigationItems
-import kz.dvij.dvij_compose3.navigation.TopBar
+import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.Primary70
 
 // функция превью экрана
@@ -30,9 +27,9 @@ fun StockScreen () {
 
     Column() {
         // создаем колонку, чтобы элементы отображались друг за другом
-        TopBar(stringResource(id = R.string.stock)) // вызываем верхнее меню, передаем название страницы
+        //TopBar(stringResource(id = R.string.stock)) // вызываем верхнее меню, передаем название страницы
         // ОТ НАЗВАНИЯ СТРАНИЦЫ ЗАВИСИТ ЗАГОЛОВОК МЕНЮ, ВЫЗОВ НУЖНОГО СОДЕРЖАНИЯ СТРАНИЦЫ И ПОКАЗ ЗНАЧКА ФИЛЬТРА!
-
+        TabMenu(bottomPage = STOCK_ROOT)
     }
 
 }

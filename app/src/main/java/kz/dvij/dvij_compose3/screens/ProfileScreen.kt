@@ -29,11 +29,11 @@ import kz.dvij.dvij_compose3.ui.theme.Typography
 @Composable
 fun ProfileScreen () {
 
-    Column() {
+    Column {
         // создаем колонку, чтобы элементы отображались друг за другом
-        TopBar(stringResource(id = R.string.profile)) // вызываем верхнее меню, передаем название страницы
+        //TopBar(stringResource(id = R.string.profile)) // вызываем верхнее меню, передаем название страницы
         // ОТ НАЗВАНИЯ СТРАНИЦЫ ЗАВИСИТ ЗАГОЛОВОК МЕНЮ, ВЫЗОВ НУЖНОГО СОДЕРЖАНИЯ СТРАНИЦЫ И ПОКАЗ ЗНАЧКА ФИЛЬТРА!
-
+        ProfileScreenContent()
     }
 
 
