@@ -1,16 +1,22 @@
 package kz.dvij.dvij_compose3.navigation
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.screens.AboutScreen
 import kz.dvij.dvij_compose3.screens.ProfileScreenContent
 import kz.dvij.dvij_compose3.ui.theme.Grey00
 import kz.dvij.dvij_compose3.ui.theme.Grey10
@@ -19,15 +25,22 @@ import kz.dvij.dvij_compose3.ui.theme.Typography
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun TopBar(topBarName: String){
+fun TopBar(
+    topBarName: String
+){
 
     // Создаем верхнее меню для главных страниц
 
-    // val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+    val sideNavigationItemsList = listOf<SideNavigationItems>(SideNavigationItems.About, SideNavigationItems.PrivatePolicy, SideNavigationItems.Ads, SideNavigationItems.Bugs)
+
+    val navControllerSide = rememberNavController()
 
     // помещаем верхнее меню в Scaffold
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = { // Код самого верхнего меню
             TopAppBar(
                 title = { Text(text = topBarName, color = Grey10, style = Typography.titleSmall) }, // заголовок. Текст заголовка - topBarName.
@@ -36,7 +49,7 @@ fun TopBar(topBarName: String){
                 contentColor = Grey10, // цвет контента
                 navigationIcon = { // Иконка навигации
                     IconButton(
-                        onClick = { /*СЮДА ВСТАВВИТЬ КОД*/ } // действие на нажатие. СЮДА ВСТАВИТЬ КОД ВЫЗОВА ВЫДВИГАЮЩЕГОСЯ МЕНЮ
+                        onClick = {coroutineScope.launch { scaffoldState.drawerState.open() }} // действие на нажатие. СЮДА ВСТАВИТЬ КОД ВЫЗОВА ВЫДВИГАЮЩЕГОСЯ МЕНЮ
                     ) {
                             Icon(painter = painterResource(id = R.drawable.ic_menu), contentDescription = "") // Сама иконка меню
                     }
@@ -60,7 +73,12 @@ fun TopBar(topBarName: String){
                         }
                     )
                  },
+        drawerContent = {
+            HeaderSideNavigation()
+            BodySideNavigation(items = sideNavigationItemsList, onItemClick = {
 
+            })
+        },
         content = { // наполнение под топ меню
             // создаем колонку для паддингов (как всегда, без них не работает)
             Column(
@@ -71,7 +89,7 @@ fun TopBar(topBarName: String){
             horizontalAlignment = Alignment.CenterHorizontally // Горизонтальное выравнивание по центру
         ) {
                 // само наполнение. Условие отображения нужных страниц
-                when (topBarName) { // если название X, то показываем соответствующую страницу
+               when (topBarName) { // если название X, то показываем соответствующую страницу
 
                     stringResource(id = R.string.meetings) -> TabMenu(bottomPage = MEETINGS_ROOT)
                     stringResource(id = R.string.stock) -> TabMenu(bottomPage = STOCK_ROOT)
@@ -79,6 +97,7 @@ fun TopBar(topBarName: String){
                     stringResource(id = R.string.profile) -> ProfileScreenContent()
                 }
             }
-        }
+       }
     )
 }
+
