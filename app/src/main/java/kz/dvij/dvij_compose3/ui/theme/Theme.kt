@@ -46,9 +46,9 @@ fun CustomDvijTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
     // условие - если темная тема, то используй цвета из темного набора, если светлая - из светлого
     val colors = if (darkTheme) {
         // как дойду до темы смены цветов, прописать ниже NightDvijThemeColors. Пока одна тема и там и там
-        LightDvijThemeColors
+        NightDvijThemeColors
     } else {
-        LightDvijThemeColors
+        NightDvijThemeColors
     }
 
     // Цвет статус бара

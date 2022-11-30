@@ -56,6 +56,12 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp),
 
+displaySmall = TextStyle(fontFamily = sfProFont,
+    fontWeight = FontWeight.Normal,
+    fontSize = 9.sp,
+    lineHeight = 15.sp,
+    letterSpacing = 0.5.sp),
+
     // ЗАГОЛОВКИ
 
     // Заголовок БОЛЬШОЙ

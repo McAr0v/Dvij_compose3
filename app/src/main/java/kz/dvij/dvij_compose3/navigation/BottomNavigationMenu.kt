@@ -55,7 +55,7 @@ fun BottomNavigationMenu (navController: NavController) {
 
                 selected = currentRoute == item.navRoute, // передаем сюда текущий путь экрана, который выбран
                 onClick = { navController.navigate(item.navRoute) }, // при нажатии на элемент срабатывает, куда нужно перейти
-                label = { Text(text = stringResource(id = item.title), style = Typography.labelSmall)}, // подпись под иконкой
+                label = { Text(text = stringResource(id = item.title), style = Typography.displaySmall)}, // подпись под иконкой
                 icon = { // сама иконка
                     Icon(painter = painterResource(id = item.icon),
                         tint = if (item.navRoute == currentRoute){PrimaryColor} else {Grey10}, // условие цвета, без него будет просто статично окрашена

@@ -93,7 +93,6 @@ fun Example () {
         drawerContent = {
             HeaderSideNavigation()
             BodySideNavigation(items = sideNavigationItemsList, onItemClick = {
-
             })
         },
         content = { // наполнение под топ меню
