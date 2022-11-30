@@ -8,7 +8,7 @@ sealed class SideNavigationItems (
     @StringRes val title: Int, // заголовок. Чтобы обращаться к String-ресурсам, надо написать @StringRes
     @StringRes val contentDescription: Int, // Описание для слабовидящих. Чтобы обращаться к String-ресурсам, надо написать @StringRes
     @DrawableRes val icon: Int, // Иконка. Чтобы обращаться к Drawable-папке, нужно прописать @DrawableRes
-    val navRoute: String
+    val navRoute: String // путь для NavController
 ) {
     object About: SideNavigationItems (
         title = R.string.side_about,

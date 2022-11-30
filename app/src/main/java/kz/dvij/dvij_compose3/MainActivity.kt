@@ -3,7 +3,6 @@ package kz.dvij.dvij_compose3
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
@@ -17,7 +16,6 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
-import kz.dvij.dvij_compose3.ui.theme.Grey100
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,25 +23,34 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню работало. Инициализируем navController
+            val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
 
-            // Непосредственно само нижнее меню:
-            // Нижнее меню нужно поместить в Scaffold (это типа "пространство". Как Column, Row, только Scaffold)
-            val coroutineScope = rememberCoroutineScope()
-            val scaffoldState = rememberScaffoldState()
-            val sideNavigationItemsList = listOf<SideNavigationItems>(SideNavigationItems.About, SideNavigationItems.PrivatePolicy, SideNavigationItems.Ads, SideNavigationItems.Bugs)
-            val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
-            val currentRoute = navBackStackEntry?.destination?.route
+            val coroutineScope = rememberCoroutineScope() // инициализируем Корутину
+            val scaffoldState = rememberScaffoldState() // Инициализируем состояние Scaffold
 
+            val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
+            val currentRoute = navBackStackEntry?.destination?.route // Получаем доступ к корню страницы
+
+            // Помещаем все меню в Scaffold
 
             androidx.compose.material.Scaffold(
 
-                scaffoldState = scaffoldState,
-                bottomBar = { BottomNavigationMenu(navController = navController) },
+                scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
+                bottomBar = {
+                    BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
+                            },
                 topBar = {
+
+                        // в секцию верхнего меню вызываем наше созданное верхнее меню
+
                          TopBar(
-                             topBarName = stringResource(id = when (currentRoute) {
+                             topBarName = stringResource(id =
+                             //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
+                             // какая страница открыта
+
+                             // Условие выбора заголовка
+                             when (currentRoute) {
                                  null -> R.string.meetings
                                  MEETINGS_ROOT -> R.string.meetings
                                  PLACES_ROOT -> R.string.places
@@ -56,25 +63,29 @@ class MainActivity : ComponentActivity() {
                                  else -> R.string.app_name
                              }),
                              onNavigationIconClick = {
+                                 // в действие на клик передаем корутину для запуска открытия бокового меню
                                  coroutineScope.launch { scaffoldState.drawerState.open() }
                              }
                          )
                          },
 
                 drawerContent = {
-                    HeaderSideNavigation()
-                    BodySideNavigation(items = sideNavigationItemsList, navController = navController, scaffoldState)
-                }// вызываем функцию, где рисуется наше нижнее меню и передаем туда navController
-                // параметр paddingValues обычно находится тоже в круглых скобках,
-                // но можно вынести его отдельно, как лямбда (см.ниже)
+                    // собственно содержимое бокового меню
+                    HeaderSideNavigation() // вызываем Header
+                    BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
+                        navController = navController, // Передаем NavController
+                        scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
+                    )
+                }
                 )
+
             // начиная с какой то версии materials требуется указывать паддинги.
             // Это реализуется путем передачи через лямду paddingValues (т.е вынести в фигурные скобки как будет ниже), а затем
             // в paddingValues мы передаем Column.
-            // Т.е мы помещаем элементы нижнего меню в Column
+
 
             { paddingValues ->
-                // как я и писал - помещаем все в колонку
+
                 Column(
                     Modifier
                         .padding(paddingValues)

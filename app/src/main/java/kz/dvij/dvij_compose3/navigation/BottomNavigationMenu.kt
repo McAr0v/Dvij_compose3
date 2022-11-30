@@ -27,7 +27,12 @@ fun BottomNavigationMenu (navController: NavController) {
     // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
 
     // Передаем список созданных кнопок для навигации
-    val navItems = listOf(BottomNavigationItem.Profile, BottomNavigationItem.Meetings, BottomNavigationItem.Places, BottomNavigationItem.Stock )
+    val navItems = listOf(
+        BottomNavigationItem.Profile,
+        BottomNavigationItem.Meetings,
+        BottomNavigationItem.Places,
+        BottomNavigationItem.Stock
+    )
 
     // графически создаем непосредственно саму навигацию. Уже есть готовая составная функция BottomNavigation
 
@@ -35,7 +40,6 @@ fun BottomNavigationMenu (navController: NavController) {
         // Здесь обычная настройка, как у текста, Column и тд. Я передал только цвет фона
         backgroundColor = Grey100
             ) {
-
 
         // определяем текущий маршрут как состояние, он не может быть статичным.
         // Т.е ведь если мы перейдем на другой экран, текущий маршрут изменится
@@ -54,14 +58,24 @@ fun BottomNavigationMenu (navController: NavController) {
             BottomNavigationItem(
 
                 selected = currentRoute == item.navRoute, // передаем сюда текущий путь экрана, который выбран
-                onClick = { navController.navigate(item.navRoute) }, // при нажатии на элемент срабатывает, куда нужно перейти
-                label = { Text(text = stringResource(id = item.title), style = Typography.displaySmall)}, // подпись под иконкой
-                icon = { // сама иконка
+
+                onClick = {
+                    navController.navigate(item.navRoute) // при нажатии на элемент срабатывает, куда нужно перейти
+                          },
+
+                label = {
+                    // подпись под иконкой
+                    Text(text = stringResource(id = item.title),
+                        style = Typography.displaySmall)},
+
+                icon = {
+                    // сама иконка
                     Icon(painter = painterResource(id = item.icon),
                         tint = if (item.navRoute == currentRoute){PrimaryColor} else {Grey10}, // условие цвета, без него будет просто статично окрашена
-                        contentDescription = "${item.title}", // если не ошибаюсь, описание иконки для слабовидящих
-                        modifier = Modifier.size(24.dp). // размер иконки
-                        padding(bottom = 2.dp)) // отступ от текста под иконкой
+                        contentDescription = stringResource(id = item.title), // описание иконки для слабовидящих. Сделаем здесь текст заголовка итема
+                        modifier = Modifier
+                            .size(24.dp) // размер иконки
+                            .padding(bottom = 2.dp)) // отступ от текста под иконкой
                        },
                 selectedContentColor = PrimaryColor, // цвет выбранного элемента
                 unselectedContentColor = Grey10 // цвет невыбранного элемента

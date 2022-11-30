@@ -29,5 +29,6 @@
     <string name="cd_private_policy">Перейти на страницу "Политика конфиденциальности"</string>
     <string name="cd_ads">Перейти на страницу "Реклама"</string>
     <string name="cd_bugs">Перейти на страницу "Сообщить об ошибке"</string>
+    <string name="cd_side_menu">Открыть боковое меню</string>
 
 </resources>

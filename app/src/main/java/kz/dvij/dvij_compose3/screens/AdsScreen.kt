@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import kz.dvij.dvij_compose3.ui.theme.Primary10
 import kz.dvij.dvij_compose3.ui.theme.Primary30
 
 @Composable

@@ -30,7 +30,7 @@ sealed class BottomNavigationItem(
 
 }
 
-// Константы путей navRoute. Так же используются в TabMenu
+// Константы путей navRoute. Так же используются в TabMenu и боковой навигации
 
 const val PROFILE_ROOT = "profileScreen"
 const val MEETINGS_ROOT = "meetingsScreen"

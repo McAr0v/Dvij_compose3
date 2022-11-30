@@ -10,8 +10,8 @@ import kz.dvij.dvij_compose3.R
 sealed class TabName (
 
     // Прописываем, что должны содержать элементы меню табов
-
     @StringRes val title: Int
+
         )
     {
         // создаем сами табы

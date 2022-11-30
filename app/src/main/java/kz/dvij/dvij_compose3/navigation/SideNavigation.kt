@@ -1,6 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
-import android.view.MenuItem
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.launch
-import kz.dvij.dvij_compose3.ui.theme.Typography
+import kz.dvij.dvij_compose3.ui.theme.*
 
 
 // https://semicolonspace.com/jetpack-compose-navigation-drawer/
@@ -38,39 +38,69 @@ fun HeaderSideNavigation(){
     }
 }
 
+// Функция с элементами бокового меню
 @Composable
 fun BodySideNavigation(
-    items: List<SideNavigationItems>,
-    navController: NavController,
-    scaffoldState: ScaffoldState
+    navController: NavController, // принимаем НавКонтроллер
+    scaffoldState: ScaffoldState // Принимаем состояние скаффолда для реализации закрытия бокового меню после нажатия на элемент
 ) {
+    // Инициализируем список элементов бокового меню
+    val sideNavigationItemsList = listOf<SideNavigationItems>(
+        SideNavigationItems.About,
+        SideNavigationItems.PrivatePolicy,
+        SideNavigationItems.Ads,
+        SideNavigationItems.Bugs
+    )
 
-    val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope() // инициализируем корутину
     val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination?.route // получаем доступ к корню открытой страницы
 
-    LazyColumn {
-        items(items) { item ->
+    LazyColumn (
+        Modifier
+            .background(color = Grey100) // окрашиваем в черный
+            //.fillMaxHeight() // занимаем весь размер
+            .padding(vertical = 20.dp)
+            ) {
+        // Помещаем все в "ленивую" колонку
+
+        // Начинаем создавать элемент меню
+
+        items(sideNavigationItemsList) { item -> // для каждого итема в списке sideNavigationItemsList
+
+            // Создаем строку (иконка и текст должны идти друг за другом по горизонтали)
+
             Row (
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth() // строка должна занимать всю ширину
                     .clickable {
-                        navController.navigate(item.navRoute)
+                        // действие на клик
+                        navController.navigate(item.navRoute) // открываем нужную страницу
+
+                        // запускаем в корутине действие, чтобы после нажатия на элемент, боковое меню закрывалось
                         coroutineScope.launch{
                             scaffoldState.drawerState.close()
                         }
                     }
-                    .padding(16.dp)
+                    .padding(vertical = 15.dp, horizontal = 20.dp) // паддинги элементов
                     ){
+
+                // Иконка возле текста
                 Icon(
-                    painter = painterResource(id = item.icon), 
-                    contentDescription = stringResource(id = item.contentDescription)
+                    tint = if (item.navRoute == currentRoute) PrimaryColor else Grey40, // цвет иконки
+                    painter = painterResource(id = item.icon), // задаем иконку, прописанную в sealed class
+                    contentDescription = stringResource(id = item.contentDescription) // описание для слабовидящих - вшито тоже в sealed class
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+
+                // разделитель между текстом и иконкой
+                Spacer(modifier = Modifier.width(15.dp))
+
+                // Сам текст "Кнопки"
                 Text(
-                    text = stringResource(id = item.title),
-                    style = Typography.labelMedium,
-                    modifier = Modifier.weight(1f)
+                    text = stringResource(id = item.title), // берем заголовок
+                    style = Typography.labelLarge, // Стиль текста
+                    modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                    color = if (item.navRoute == currentRoute) PrimaryColor else Grey40 // цвет текста
                 )
             }
         }
