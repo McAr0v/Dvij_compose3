@@ -30,5 +30,16 @@
     <string name="cd_ads">Перейти на страницу "Реклама"</string>
     <string name="cd_bugs">Перейти на страницу "Сообщить об ошибке"</string>
     <string name="cd_side_menu">Открыть боковое меню</string>
+    <string name="cd_logo">Логотип приложения Dvij</string>
+    <string name="cd_location">Иконка выбора города</string>
+    <string name="cd_avatar">Аватарка пользователя</string>
+
+    <!-- Действия -->
+    <string name="to_change">Изменить</string>
+    <string name="to_change_location">Изменить город</string>
+
+    <!-- Авторизация -->
+    <string name="guest">Гость</string>
+    <string name="login_or_register">Войдите или зарегистрируйтесь</string>
 
 </resources>
