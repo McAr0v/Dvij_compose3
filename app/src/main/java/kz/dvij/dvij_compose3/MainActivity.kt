@@ -72,13 +72,13 @@ class MainActivity : ComponentActivity() {
                 drawerContent = {
                     // собственно содержимое бокового меню
                     HeaderSideNavigation() // вызываем Header
-                    AvatarBoxSideNavigation(false)
+                    AvatarBoxSideNavigation(true, navController, scaffoldState)
                     CityHeaderSideNavigation("Усть-Каменогорск")
-
                     BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                         navController = navController, // Передаем NavController
                         scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
                     )
+                    SubscribeBoxSideNavigation()
                 }
                 )
 

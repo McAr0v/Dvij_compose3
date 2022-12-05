@@ -37,6 +37,9 @@
     <!-- Действия -->
     <string name="to_change">Изменить</string>
     <string name="to_change_location">Изменить город</string>
+    <string name="subscribe_to_telegram">Подписаться на канал в Telegram</string>
+    <string name="subscribe_to_whatsapp">Подписаться на канал в Whatsapp</string>
+    <string name="subscribe_to_instagram">Подписаться на канал в Instagram</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>

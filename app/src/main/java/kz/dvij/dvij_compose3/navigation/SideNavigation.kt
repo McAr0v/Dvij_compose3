@@ -1,8 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
-import android.media.Image
-import android.widget.ImageButton
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,149 +30,278 @@ import kz.dvij.dvij_compose3.ui.theme.*
 // https://semicolonspace.com/jetpack-compose-navigation-drawer/
 // https://www.youtube.com/watch?v=JLICaBEiJS0
 
+
 @Composable
 fun HeaderSideNavigation(){
-    Box(
+
+    // Логотип Движа в боковой навигации
+
+    Box( // создаем контейнер для логотипа
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Grey100)
-            .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp),
-        contentAlignment = Alignment.CenterStart
+            .fillMaxWidth() // говорим, чтобы занял всю ширину
+            .background(Grey100) // цвет фона контейнера
+            .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp), // паддинги контейнера
+        contentAlignment = Alignment.CenterStart // выравнивание
     ){
-        IconButton(onClick = {}) {
-            Icon(
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.dvij_logo),
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_logo),
-                tint = PrimaryColor
-            )
+        Icon( // помещаем логотип как векторную иконку
+            painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.dvij_logo), // задаем логотип
+            contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_logo), // задаем описание для слабослышаших
+            tint = PrimaryColor // окрашиваем логотип
+        )
+    }
+}
+
+@Composable
+fun SubscribeBoxSideNavigation(){
+
+    // Раздел ПОДПИШИСЬ НА ДВИЖ
+
+    Column( // создаем контейнер-стобец
+        modifier = Modifier
+            .fillMaxSize() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
+            .background(Grey100) // цвет фона
+            .padding(20.dp), // отступы со всех сторон
+        verticalArrangement = Arrangement.Top, // выравнивание по вертикали
+        horizontalAlignment = Alignment.Start // выравнивание по горизонтали (слева)
+
+    ) {
+
+        // Заголовок ПОДПИШИСЬ НА ДВИЖ
+
+        Text(
+            text = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe), // текст заголовка
+            color = Grey00, // цвет заголовка
+            style = Typography.titleMedium // стиль заголовка
+        )
+
+        // Создаем строку, в строку поместим иконки с ссылками на соц сети
+
+        Row(
+            modifier = Modifier
+                .padding(top = 15.dp, bottom = 10.dp) // отступы сверху и снизу
+        ) {
+            val context = LocalContext.current // инициализируем контекст для отображения ТОСТОВ. Когда уберу тосты, можно удалить по идее
+
+            // ИКОНКА ИНСТАГРАМ
+
+            IconButton(
+                onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
+                Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
+            }
+            ) {
+                Icon( // Сама иконка инстаграма
+                    modifier = Modifier
+                        .clip(CircleShape) // делаем круглый фон
+                        .background(Grey95) // фон иконки
+                        .padding(10.dp) // отступ внутри до иконки
+                        .size(25.dp), // размер иконки
+                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.instagram), // сама иконка
+                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_instagram), // описание для слабовидящих
+                    tint = Grey00 // цвет иконки
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp)) // разделитель между иконками
+
+            // ИКОНКА ТЕЛЕГРАМА
+
+            IconButton(
+                onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
+                    Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
+                }
+            ) {
+
+                // Сама иконка Телеграма
+
+                Icon(
+                    modifier = Modifier
+                        .clip(CircleShape) // делаем круглый фон
+                        .background(Grey95) // фон иконки
+                        .padding(10.dp) // отступ внутри до иконки
+                        .size(25.dp), // размер иконки
+                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.telegram), // сама иконка
+                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_telegram), // описание для слабовидящих
+                    tint = Grey00 // цвет иконки
+                )
+
+            }
+
+            Spacer(modifier = Modifier.width(10.dp)) // разделитель между иконками
+
+            // Иконка WHATSAPP
+
+            IconButton(
+                onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
+                    Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
+                }
+            ) {
+
+                // Сама иконка
+
+                Icon(
+                    modifier = Modifier
+                        .clip(CircleShape) // делаем круглый фон
+                        .background(Grey95) // фон иконки
+                        .padding(10.dp) // отступ внутри до иконки
+                        .size(25.dp), // размер иконки
+                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.whatsapp), // сама иконка
+                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_whatsapp), // описание для слабовидящих
+                    tint = Grey00 // цвет иконки
+                )
+            }
         }
-
-
     }
 }
 
 @Composable
 fun AvatarBoxSideNavigation(
-    auth: Boolean
-){
-    if (auth) {
-        Row(
+    auth: Boolean, // принимаем параметр - авторизирован или нет
+    navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
+    scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
+    ) {
+
+    // РАЗДЕЛ С АВАТАРКОЙ
+
+    val coroutineScope = rememberCoroutineScope() // инициализируем корутину
+    val context = LocalContext.current // инициализируем контекст для ТОСТОВ
+
+    // УСЛОВИЕ - ЕСЛИ АВТОРИЗОВАН, ТО КОНТЕНТ ОДИН, ЕСЛИ НЕТ, ТО ДРУГОЙ
+
+    if (auth) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
+
+        Row( // используем строку
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Grey100)
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth() // занимаем всю ширину
+                .background(Grey100) // цвет фона
+                .padding(20.dp) // отступы
+                .clickable { // действие на нажатие
+
+                    navController.navigate(PROFILE_ROOT) // переходим на страницу пользователя
+
+                    coroutineScope.launch {
+                        scaffoldState.drawerState.close() // закрываем боковое меню
+                    }
+                },
+
+            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали (ПО ЦЕНТРУ)
+
         ) {
+
+            // АВАТАРКА ПОЛЬЗОВАТЕЛЯ
             androidx.compose.foundation.Image(
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.zhanna_avatar),
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar),
+                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.zhanna_avatar), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
+                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar), // описание для слабовидящих
                 modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
+                    .size(60.dp) // размер аватарки
+                    .clip(CircleShape) // делаем ее круглой
             )
 
+            // КОЛОНКА С ИМЕНЕМ И EMAIL
+
             Column(
                 modifier = Modifier
-                    .padding(start = 20.dp)
-                    .weight(1f)
+                    .padding(start = 10.dp) // паддинг слева
+                    .weight(1f) // ширина - колонка займет оставшуюся ширину среди всех элементов
             ) {
                 Text(
-                    text = "Макарова Жанна",
-                    color = Grey40,
-                    style = Typography.titleMedium
+                    text = "Макарова Жанна", // сюда нужно передавать имя пользователя из БД
+                    color = Grey40, // цвет имени
+                    style = Typography.titleSmall // стиль текста
                 )
                 Text(
-                    text = "makarovazhanna@mail.ru",
-                    color = Grey40,
-                    style = Typography.labelMedium
-                )
-
-            }
-
-            IconButton(onClick = {}) {
-                Icon(
-                    tint = Grey40, // цвет иконки
-                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // задаем иконку
-                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location) // описание для слабовидящих
+                    text = "makarovazhanna@mail.ru", // сюда нужно передавать email пользователя из БД
+                    color = Grey40, // цвет Email
+                    style = Typography.labelSmall // стиль текста
                 )
             }
 
+            Spacer(modifier = Modifier.width(10.dp)) // разделитель между именем и кнопкой редактировать
 
+            // ИКОНКА РЕДАКТИРОВАТЬ
 
+            Icon(
+                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // сама иконка
+                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location), // описание для слабовидящих
+                tint = Grey40 // цвет иконки
+            )
         }
-    } else {
-        Row(
+
+    } else { // КОНТЕНТ если не авторизован пользователь
+
+        Row( // используем строку
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Grey100)
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth() // занимаем всю ширину
+                .background(Grey100) // цвет фона
+                .padding(20.dp) // отступы
+                .clickable { // действие на нажатие. По идее потом надо вести на страницу авторизации
+                    Toast
+                        .makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG)
+                        .show()
+                },
+            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
+
         ) {
-            /*Icon(
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_person),
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar),
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(Grey95),
-                tint = Grey40,
 
-            )*/
-
+            // ТЕКСТ ГОСТЬ
 
             Column(
-                modifier = Modifier
-                    //.padding(start = 20.dp)
-                    .weight(1f)
+                modifier = Modifier.weight(1f) // колонка займет всю ширину, которая останется после добавления элементов
             ) {
-                Text(
-                    text = stringResource(id = kz.dvij.dvij_compose3.R.string.guest),
-                    color = Grey40,
-                    style = Typography.titleMedium
+                Text( // текст ГОСТЬ
+                    text = stringResource(id = kz.dvij.dvij_compose3.R.string.guest), // сам текст
+                    color = Grey40, // цвет текста
+                    style = Typography.titleMedium // стиль текста
                 )
-                Text(
-                    text = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register),
-                    color = Grey40,
-                    style = Typography.labelSmall
-                )
-
-            }
-
-            IconButton(onClick = {}) {
-                Icon(
-                    tint = Grey40, // цвет иконки
-                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_login), // задаем иконку
-                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register) // описание для слабовидящих
+                Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
+                    text = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register), // сам текст
+                    color = Grey40, // цвет текста
+                    style = Typography.labelSmall // стиль текста
                 )
             }
 
+            // ИКОНКА ВХОД
 
+            Icon(
+                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_login), // сама иконка
+                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register), // описание для слабовидящих
+                tint = Grey40 // цвет иконки
+            )
         }
-
     }
-    
-
 }
 
 @Composable
 fun CityHeaderSideNavigation (city: String) {
-    Column(
+
+    // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
+
+    Column( // ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КОЛОКНКУ
         modifier = Modifier
-            .background(Grey100)
-            .fillMaxWidth()
-            .padding(20.dp)
+            .background(Grey100) // цвет фона
+            .fillMaxWidth() // занимаем всю ширину
+            .padding(20.dp) // отступы
     ) {
-        Text(
-            text = stringResource(id = kz.dvij.dvij_compose3.R.string.city),
-            color = Grey10,
-            style = Typography.bodyMedium
+        val context = LocalContext.current // инициализируем контекст для ТОСТОВ
+
+        Text( // ЗАГОЛОВОК ГОРОД
+            text = stringResource(id = kz.dvij.dvij_compose3.R.string.city), // текст заголовка
+            color = Grey40, // цвет заголовка
+            style = Typography.labelMedium // стиль заголовка
         )
+
+        Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и городом
+
+        // СТРОКА С ИКОНКАМИ И НАЗВАНИЕМ ГОРОДА
 
         Row (
             modifier = Modifier
-                .fillMaxWidth(), // строка должна занимать всю ширину
-                //.padding(vertical = 10.dp), // паддинги элементов
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth() // строка должна занимать всю ширину
+                .clickable { // действие на нажатие. ВООБЩЕ ДОЛЖНО ВЕСТИ НА СТРАНИЦУ ВЫБОРА ГОРОДА
+                    Toast
+                        .makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG)
+                        .show()
+                },
+            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали по центру
 
         ) {
 
@@ -198,13 +326,11 @@ fun CityHeaderSideNavigation (city: String) {
             // разделитель между текстом и иконкой
             Spacer(modifier = Modifier.width(15.dp))
 
-            IconButton(onClick = {}) {
-                Icon(
-                    tint = Grey40, // цвет иконки
-                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // задаем иконку
-                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location) // описание для слабовидящих
-                )
-            }
+            Icon(
+                tint = Grey40, // цвет иконки
+                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // задаем иконку
+                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location) // описание для слабовидящих
+            )
         }
     }
 }
@@ -225,8 +351,7 @@ fun BodySideNavigation(
 
     val coroutineScope = rememberCoroutineScope() // инициализируем корутину
     val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
-    val currentRoute =
-        navBackStackEntry?.destination?.route // получаем доступ к корню открытой страницы
+    val currentRoute = navBackStackEntry?.destination?.route // получаем доступ к корню открытой страницы
 
     LazyColumn(
         Modifier
@@ -254,7 +379,8 @@ fun BodySideNavigation(
                             scaffoldState.drawerState.close()
                         }
                     }
-                    .padding(vertical = 10.dp, horizontal = 20.dp) // паддинги элементов
+                    .padding(vertical = 10.dp, horizontal = 20.dp), // паддинги элементов
+                verticalAlignment = Alignment.CenterVertically // вертикальное выравнивание элементов по центру
             ) {
 
                 // Иконка возле текста
