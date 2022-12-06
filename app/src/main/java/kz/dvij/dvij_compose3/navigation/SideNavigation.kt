@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
@@ -403,5 +404,22 @@ fun BodySideNavigation(
             }
         }
     }
+}
+
+@Composable
+fun SideGoogleButton (
+    signInClicked: ()-> Unit
+) {
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Grey100)) {
+
+        Button(onClick = { signInClicked }) {
+            Text(text = "Вход через гугл")
+        }
+
+    }
+
 }
 

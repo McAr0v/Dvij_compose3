@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "616414424667",
+    "project_id": "dvij-compose3-1cf6a",
+    "storage_bucket": "dvij-compose3-1cf6a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616414424667:android:c49e958f7757664f7a197e",
+        "android_client_info": {
+          "package_name": "kz.dvij.dvij_compose3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616414424667-otboi10fcuo7qmcib4c8fiffgk6t79an.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kz.dvij.dvij_compose3",
+            "certificate_hash": "663851a943ac2367b01de0887d35dfb0294341e2"
+          }
+        },
+        {
+          "client_id": "616414424667-4p49d45dprmdttg8de29hej8dlughpek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKJRPBAVcAqTvuEZmXlH4txTf8Whi4acg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616414424667-4p49d45dprmdttg8de29hej8dlughpek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

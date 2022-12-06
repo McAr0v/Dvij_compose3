@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -9,7 +10,7 @@ android {
     defaultConfig {
         applicationId "kz.dvij.dvij_compose3"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -53,6 +54,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:1.3.1"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation 'androidx.activity:activity-compose:1.6.1'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
@@ -69,4 +71,9 @@ dependencies {
     // зависимость для создания Tabs
     implementation "com.google.accompanist:accompanist-pager:0.14.0"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
+
+
+    // зависимости для авторизации через гугл плей
+    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
+    implementation 'com.google.android.gms:play-services-auth:20.4.0'
 }
