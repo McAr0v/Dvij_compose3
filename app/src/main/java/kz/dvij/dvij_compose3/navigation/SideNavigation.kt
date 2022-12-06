@@ -406,20 +406,5 @@ fun BodySideNavigation(
     }
 }
 
-@Composable
-fun SideGoogleButton (
-    signInClicked: ()-> Unit
-) {
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(Grey100)) {
-
-        Button(onClick = { signInClicked }) {
-            Text(text = "Вход через гугл")
-        }
-
-    }
-
-}
 
