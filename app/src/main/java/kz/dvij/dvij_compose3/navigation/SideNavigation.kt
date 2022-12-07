@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -402,6 +403,28 @@ fun BodySideNavigation(
                     color = if (item.navRoute == currentRoute) PrimaryColor else Grey40 // цвет текста
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LogInButton (
+    navController: NavController,
+    scaffoldState: ScaffoldState
+) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Grey100)) {
+        Button(onClick = {
+            navController.navigate("LoginScreen")
+            coroutineScope.launch {
+                scaffoldState.drawerState.close()
+            }
+        }){
+            Text(text = "Перейти на страницу логина")
         }
     }
 }

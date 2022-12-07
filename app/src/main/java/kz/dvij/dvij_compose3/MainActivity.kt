@@ -1,9 +1,6 @@
 package kz.dvij.dvij_compose3
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -16,12 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
@@ -34,29 +25,8 @@ import kz.dvij.dvij_compose3.screens.*
 
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        const val RC_SIGN_IN = 100
-    }
-
-    private lateinit var mAuth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // firebase auth instance
-
-        mAuth = FirebaseAuth.getInstance()
-
-        // Configure Google Sign In
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
 
         setContent {
 
@@ -110,15 +80,6 @@ class MainActivity : ComponentActivity() {
                     // собственно содержимое бокового меню
                     HeaderSideNavigation() // вызываем Header
 
-                    if (mAuth.currentUser == null) {
-                        SideGoogleButton {
-                            signIn()
-                        }
-                    } else {
-                        AvatarBoxSideNavigation(true, navController, scaffoldState)
-                    }
-
-
                     CityHeaderSideNavigation("Усть-Каменогорск")
                     BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                         navController = navController, // Передаем NavController
@@ -164,52 +125,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private  fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // result returned from launching the intent from GoogleSignInApi.getSignInIntent()
-
-        if(requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            val exception = task.exception
-            if (task.isSuccessful){
-                try {
-                    // Google Sign In was successful, authebticate with firebase
-                    val account = task.getResult(ApiException::class.java)!!
-                    firebaseAuthWithGoogle(account.idToken!!)
-
-                } catch (e: Exception) {
-                    // Google SignIn Failed
-                    Log.d("MyLog", "Google Sign In is failed")
-                }
-            } else {
-                Log.d("MyLog", exception.toString())
-            }
-        }
-
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        mAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this){ task ->
-                if (task.isSuccessful){
-                    // SignIn Successful
-                    Toast.makeText(this, "SignIn Done", Toast.LENGTH_SHORT).show()
-                } else {
-                    // Sign In Failed
-                    Toast.makeText(this, "SignIn Failed", Toast.LENGTH_SHORT).show()
-                }
-
-            }
     }
 
 }
