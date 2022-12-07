@@ -44,5 +44,7 @@
     <!-- Авторизация -->
     <string name="guest">Гость</string>
     <string name="login_or_register">Войдите или зарегистрируйтесь</string>
+    <string name="login_in_app">Вход в приложение</string>
+    <string name="enter_email">Введите ваш Email</string>
 
 </resources>
