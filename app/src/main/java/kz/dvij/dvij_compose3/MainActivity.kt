@@ -1,23 +1,33 @@
 package kz.dvij.dvij_compose3
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
+import kz.dvij.dvij_compose3.ui.theme.Grey00
+import kz.dvij.dvij_compose3.ui.theme.Grey100
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -29,23 +39,30 @@ import kz.dvij.dvij_compose3.screens.*
 // ОТПРАВКА ИМЕЙЛА (ДЛЯ РЕАЛИЗАЦИИ ОБРАТНОЙ СВЯЗИ) https://www.geeksforgeeks.org/send-email-in-an-android-application-using-jetpack-compose/
 
 class MainActivity : ComponentActivity() {
+
     val mAuth = FirebaseAuth.getInstance() // берем из файрбаз аутентикейшн
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
 
+            val context = LocalContext.current
+
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
+
+
 
             val coroutineScope = rememberCoroutineScope() // инициализируем Корутину
             val scaffoldState = rememberScaffoldState() // Инициализируем состояние Scaffold
 
             val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
             val currentRoute = navBackStackEntry?.destination?.route // Получаем доступ к корню страницы
+
 
             // Помещаем все меню в Scaffold
 
@@ -87,13 +104,39 @@ class MainActivity : ComponentActivity() {
                 drawerContent = {
                     // собственно содержимое бокового меню
                     HeaderSideNavigation() // вызываем Header
-                    AvatarBoxSideNavigation(auth = true, navController = navController, scaffoldState = scaffoldState)
+
+                    if (mAuth.currentUser == null) { Text ("Null")} else {
+                        Text(text = "Login")}
+
+                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
                     CityHeaderSideNavigation("Усть-Каменогорск")
                     BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                         navController = navController, // Передаем NavController
                         scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
                     )
                     SubscribeBoxSideNavigation()
+
+                    Button(
+                        onClick = {
+                            mAuth.signOut()
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
+                            navController.navigate(PLACES_ROOT)
+                            Toast.makeText(context, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show()
+
+                                  },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Grey00,
+                            contentColor = Grey100
+                        )) {
+
+                        Text(text = "Выйти из аккаунта")
+
+                    }
+
                 }
                 )
 
@@ -128,12 +171,14 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
-                        composable("RegistrRoot") {accountScreens.RegistrScreen()}
+                        composable("RegistrRoot") {accountScreens.RegistrScreen(navController, scaffoldState)}
+                        composable("LoginRoot") {accountScreens.LoginScreen(navController)}
 
                     }
                 }
             }
         }
+
     }
 
 }

@@ -36,13 +36,13 @@ import kz.dvij.dvij_compose3.ui.theme.*
 @Preview
 @Composable
 fun PreviewLoginScreen(){
-    LoginScreen()
+    LoginScreen1()
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(){
+fun LoginScreen1(){
     
     Column(modifier = Modifier
         .fillMaxSize()

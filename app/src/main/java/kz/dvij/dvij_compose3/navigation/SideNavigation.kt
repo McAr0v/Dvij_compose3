@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -60,7 +62,7 @@ fun SubscribeBoxSideNavigation(){
 
     Column( // создаем контейнер-стобец
         modifier = Modifier
-            .fillMaxSize() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
+            .fillMaxWidth() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
             .background(Grey100) // цвет фона
             .padding(20.dp), // отступы со всех сторон
         verticalArrangement = Arrangement.Top, // выравнивание по вертикали
@@ -157,7 +159,7 @@ fun SubscribeBoxSideNavigation(){
 
 @Composable
 fun AvatarBoxSideNavigation(
-    auth: Boolean, // принимаем параметр - авторизирован или нет
+    user: FirebaseUser?, // принимаем параметр - авторизирован или нет
     navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
     scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
     ) {
@@ -169,7 +171,7 @@ fun AvatarBoxSideNavigation(
 
     // УСЛОВИЕ - ЕСЛИ АВТОРИЗОВАН, ТО КОНТЕНТ ОДИН, ЕСЛИ НЕТ, ТО ДРУГОЙ
 
-    if (auth) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
+    if (user != null) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
 
         Row( // используем строку
             modifier = Modifier
@@ -178,14 +180,16 @@ fun AvatarBoxSideNavigation(
                 .padding(20.dp) // отступы
                 .clickable { // действие на нажатие
 
-                    navController.navigate("RegistrRoot") // переходим на страницу пользователя
-
                     coroutineScope.launch {
                         scaffoldState.drawerState.close() // закрываем боковое меню
                     }
+                    navController.navigate(PROFILE_ROOT) // переходим на страницу пользователя
+
+
                 },
 
-            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали (ПО ЦЕНТРУ)
+            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали (ПО ЦЕНТРУ),
+
 
         ) {
 
@@ -199,22 +203,46 @@ fun AvatarBoxSideNavigation(
             )
 
             // КОЛОНКА С ИМЕНЕМ И EMAIL
+            if (user.displayName == null || user.displayName == ""){
 
-            Column(
-                modifier = Modifier
-                    .padding(start = 10.dp) // паддинг слева
-                    .weight(1f) // ширина - колонка займет оставшуюся ширину среди всех элементов
-            ) {
-                Text(
-                    text = "Макарова Жанна", // сюда нужно передавать имя пользователя из БД
-                    color = Grey40, // цвет имени
-                    style = Typography.titleSmall // стиль текста
-                )
-                Text(
-                    text = "makarovazhanna@mail.ru", // сюда нужно передавать email пользователя из БД
-                    color = Grey40, // цвет Email
-                    style = Typography.labelSmall // стиль текста
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(start = 10.dp) // паддинг слева
+                        .weight(1f),// ширина - колонка займет оставшуюся ширину среди всех элементов
+                    verticalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = user.email!!, // сюда нужно передавать email пользователя из БД
+                        color = Grey40, // цвет Email
+                        style = Typography.labelMedium // стиль текста
+                    )
+                }
+
+            }  else {
+
+                Column(
+                    modifier = Modifier
+                        .padding(start = 10.dp) // паддинг слева
+                        .weight(1f),// ширина - колонка займет оставшуюся ширину среди всех элементов
+                    verticalArrangement = Arrangement.Center
+                ){
+
+                        Text(
+                            text = user.displayName!!, // сюда нужно передавать имя пользователя из БД
+                            color = Grey40, // цвет имени
+                            style = Typography.titleSmall // стиль текста
+                        )
+
+
+
+                    Text(
+                        text = user.email!!, // сюда нужно передавать email пользователя из БД
+                        color = Grey40, // цвет Email
+                        style = Typography.labelSmall // стиль текста
+                    )
+                }
+
+
             }
 
             Spacer(modifier = Modifier.width(10.dp)) // разделитель между именем и кнопкой редактировать
@@ -236,9 +264,11 @@ fun AvatarBoxSideNavigation(
                 .background(Grey100) // цвет фона
                 .padding(20.dp) // отступы
                 .clickable { // действие на нажатие. По идее потом надо вести на страницу авторизации
-                    Toast
-                        .makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG)
-                        .show()
+                    coroutineScope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                    navController.navigate("RegistrRoot")
+
                 },
             verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
 
@@ -428,6 +458,7 @@ fun LogInButton (
         }
     }
 }
+
 
 
 
