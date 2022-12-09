@@ -46,5 +46,6 @@
     <string name="login_or_register">Войдите или зарегистрируйтесь</string>
     <string name="login_in_app">Вход в приложение</string>
     <string name="enter_email">Введите ваш Email</string>
+    <string name="registr_error">Произошла ошибка при регистрации</string>
 
 </resources>

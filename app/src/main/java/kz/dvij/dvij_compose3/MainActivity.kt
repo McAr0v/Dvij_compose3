@@ -13,7 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
 
@@ -23,7 +25,13 @@ import kz.dvij.dvij_compose3.screens.*
 // https://www.youtube.com/watch?v=fEFuF1dnWNk
 // https://firebase.blog/posts/2022/05/adding-firebase-auth-to-jetpack-compose-app
 
+
+// ОТПРАВКА ИМЕЙЛА (ДЛЯ РЕАЛИЗАЦИИ ОБРАТНОЙ СВЯЗИ) https://www.geeksforgeeks.org/send-email-in-an-android-application-using-jetpack-compose/
+
 class MainActivity : ComponentActivity() {
+    val mAuth = FirebaseAuth.getInstance() // берем из файрбаз аутентикейшн
+    private val accountScreens = AccountScreens(act = this)
+    private val accountHelper = AccountHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 drawerContent = {
                     // собственно содержимое бокового меню
                     HeaderSideNavigation() // вызываем Header
-
+                    AvatarBoxSideNavigation(auth = true, navController = navController, scaffoldState = scaffoldState)
                     CityHeaderSideNavigation("Усть-Каменогорск")
                     BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                         navController = navController, // Передаем NavController
@@ -120,6 +128,7 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
+                        composable("RegistrRoot") {accountScreens.RegistrScreen()}
 
                     }
                 }

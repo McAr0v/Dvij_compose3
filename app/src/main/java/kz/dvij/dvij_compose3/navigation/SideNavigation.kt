@@ -178,7 +178,7 @@ fun AvatarBoxSideNavigation(
                 .padding(20.dp) // отступы
                 .clickable { // действие на нажатие
 
-                    navController.navigate(PROFILE_ROOT) // переходим на страницу пользователя
+                    navController.navigate("RegistrRoot") // переходим на страницу пользователя
 
                     coroutineScope.launch {
                         scaffoldState.drawerState.close() // закрываем боковое меню
