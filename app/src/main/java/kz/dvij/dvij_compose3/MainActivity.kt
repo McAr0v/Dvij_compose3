@@ -5,10 +5,12 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
+import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
 import kz.dvij.dvij_compose3.ui.theme.Grey00
@@ -70,73 +74,82 @@ class MainActivity : ComponentActivity() {
 
                 scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
                 bottomBar = {
-                    BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
+
+                    if (currentRoute == "RegRoot" || currentRoute =="LoginRoot"){
+
+                    } else {
+                        BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
+                    }
+
+
                             },
                 topBar = {
 
+                    if (currentRoute == "RegRoot" || currentRoute =="LoginRoot"){
+
+                    } else {
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
 
-                         TopBar(
-                             topBarName = stringResource(id =
-                             //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
-                             // какая страница открыта
+                        TopBar(
+                            topBarName = stringResource(id =
+                            //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
+                            // какая страница открыта
 
-                             // Условие выбора заголовка
-                             when (currentRoute) {
-                                 null -> R.string.meetings
-                                 MEETINGS_ROOT -> R.string.meetings
-                                 PLACES_ROOT -> R.string.places
-                                 STOCK_ROOT -> R.string.stock
-                                 PROFILE_ROOT -> R.string.profile
-                                 ABOUT_ROOT -> R.string.side_about
-                                 POLICY_ROOT -> R.string.side_private_policy
-                                 ADS_ROOT -> R.string.side_ad
-                                 BUGS_ROOT -> R.string.side_report_bug
-                                 else -> R.string.app_name
-                             }),
-                             onNavigationIconClick = {
-                                 // в действие на клик передаем корутину для запуска открытия бокового меню
-                                 coroutineScope.launch { scaffoldState.drawerState.open() }
-                             }
-                         )
+                            // Условие выбора заголовка
+                            when (currentRoute) {
+                                null -> R.string.meetings
+                                MEETINGS_ROOT -> R.string.meetings
+                                PLACES_ROOT -> R.string.places
+                                STOCK_ROOT -> R.string.stock
+                                PROFILE_ROOT -> R.string.profile
+                                ABOUT_ROOT -> R.string.side_about
+                                POLICY_ROOT -> R.string.side_private_policy
+                                ADS_ROOT -> R.string.side_ad
+                                BUGS_ROOT -> R.string.side_report_bug
+                                else -> R.string.app_name
+                            }),
+                            onNavigationIconClick = {
+                                // в действие на клик передаем корутину для запуска открытия бокового меню
+                                coroutineScope.launch { scaffoldState.drawerState.open() }
+                            }
+                        )
+                    }
+
+
                          },
 
                 drawerContent = {
-                    // собственно содержимое бокового меню
-                    HeaderSideNavigation() // вызываем Header
 
-                    if (mAuth.currentUser == null) { Text ("Null")} else {
-                        Text(text = "Login")}
+                        // собственно содержимое бокового меню
+                        HeaderSideNavigation() // вызываем Header
+                        AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
+                        CityHeaderSideNavigation("Усть-Каменогорск")
+                        BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
+                            navController = navController, // Передаем NavController
+                            scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
+                        )
+                        SubscribeBoxSideNavigation()
 
-                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
-                    CityHeaderSideNavigation("Усть-Каменогорск")
-                    BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
-                        navController = navController, // Передаем NavController
-                        scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
-                    )
-                    SubscribeBoxSideNavigation()
+                        Button(
+                            onClick = {
+                                mAuth.signOut()
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                                navController.navigate(MEETINGS_ROOT)
+                                Toast.makeText(context, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show()
 
-                    Button(
-                        onClick = {
-                            mAuth.signOut()
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.close()
-                            }
-                            navController.navigate(PLACES_ROOT)
-                            Toast.makeText(context, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Grey00,
+                                contentColor = Grey100
+                            )) {
 
-                                  },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Grey00,
-                            contentColor = Grey100
-                        )) {
+                            Text(text = "Выйти из аккаунта")
 
-                        Text(text = "Выйти из аккаунта")
-
-                    }
-
+                        }
                 }
                 )
 
@@ -171,8 +184,9 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
-                        composable("RegistrRoot") {accountScreens.RegistrScreen(navController, scaffoldState)}
-                        composable("LoginRoot") {accountScreens.LoginScreen(navController)}
+                        composable("RegRoot") {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
+                        composable("LoginRoot") {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
+                        composable("thankyou") {accountScreens.thankYou(navController = navController)}
 
                     }
                 }

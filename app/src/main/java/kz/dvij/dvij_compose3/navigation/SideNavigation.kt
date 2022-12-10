@@ -1,16 +1,17 @@
 package kz.dvij.dvij_compose3.navigation
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.IconButton
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -267,7 +269,7 @@ fun AvatarBoxSideNavigation(
                     coroutineScope.launch {
                         scaffoldState.drawerState.close()
                     }
-                    navController.navigate("RegistrRoot")
+                    navController.navigate("RegRoot")
 
                 },
             verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали

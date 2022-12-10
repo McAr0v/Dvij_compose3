@@ -33,6 +33,7 @@
     <string name="cd_logo">Логотип приложения Dvij</string>
     <string name="cd_location">Иконка выбора города</string>
     <string name="cd_avatar">Аватарка пользователя</string>
+    <string name="cd_email_icon">Иконка Email</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -40,6 +41,7 @@
     <string name="subscribe_to_telegram">Подписаться на канал в Telegram</string>
     <string name="subscribe_to_whatsapp">Подписаться на канал в Whatsapp</string>
     <string name="subscribe_to_instagram">Подписаться на канал в Instagram</string>
+    <string name="close_page">Закрыть экран</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>
@@ -47,5 +49,6 @@
     <string name="login_in_app">Вход в приложение</string>
     <string name="enter_email">Введите ваш Email</string>
     <string name="registr_error">Произошла ошибка при регистрации</string>
+    <string name="email_example">youremail@domain.ru</string>
 
 </resources>
