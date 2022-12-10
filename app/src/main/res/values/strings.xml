@@ -34,9 +34,15 @@
     <string name="cd_location">Иконка выбора города</string>
     <string name="cd_avatar">Аватарка пользователя</string>
     <string name="cd_email_icon">Иконка Email</string>
+    <string name="cd_password_icon">Иконка пароля</string>
+    <string name="cd_icon">Иконка</string>
+    <string name="cd_show_password">Показать пароль</string>
+    <string name="cd_hide_password">Скрыть пароль</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
+    <string name="to_registration">Зарегистрироваться</string>
+    <string name="to_login">Войти</string>
     <string name="to_change_location">Изменить город</string>
     <string name="subscribe_to_telegram">Подписаться на канал в Telegram</string>
     <string name="subscribe_to_whatsapp">Подписаться на канал в Whatsapp</string>
@@ -48,7 +54,19 @@
     <string name="login_or_register">Войдите или зарегистрируйтесь</string>
     <string name="login_in_app">Вход в приложение</string>
     <string name="enter_email">Введите ваш Email</string>
+    <string name="enter_password">Введи пароль</string>
     <string name="registr_error">Произошла ошибка при регистрации</string>
+    <string name="sign_in_error">Произошла ошибка при входе</string>
     <string name="email_example">youremail@domain.ru</string>
+    <string name="log_in_successful">Ты вошел в свой аккаунт</string>
+    <string name="have_google_acc">Есть аккаунт Google?</string>
+    <string name="reg_google_acc">Зарегистрироваться через Google</string>
+    <string name="log_in_google_acc">Войти через Google</string>
+    <string name="registration">Регистрация</string>
+    <string name="log_in">Вход</string>
+    <string name="have_account">Уже есть аккаунт? </string>
+    <string name="no_have_account">Нет аккаунта? </string>
+    <string name="using_app">Используя приложение Dvij.kz ты автоматически соглашаешься</string>
+    <string name="private_policy_agree">C ПОЛИТИКОЙ КОНФИДЕНЦИАЛЬНОСТИ </string>
 
 </resources>

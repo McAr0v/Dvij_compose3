@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.Grey10
 import kz.dvij.dvij_compose3.ui.theme.Grey100
@@ -27,7 +28,10 @@ fun TopBar(
             Text(
                 text = topBarName, // Передаем полученный заголовок панели
                 color = Grey10, // цвет заголовка
-                style = Typography.titleMedium // Стиль текста заголовка
+                style = Typography.titleMedium, // Стиль текста заголовка
+                maxLines = 1, // максимальное количество строк
+                overflow = TextOverflow.Ellipsis // если не влазит текст в контейнер, обрезается точками
+
             )
         },
         backgroundColor = Grey100, // цвет панели

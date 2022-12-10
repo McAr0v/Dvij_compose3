@@ -70,12 +70,12 @@ class MainActivity : ComponentActivity() {
 
             // Помещаем все меню в Scaffold
 
-            androidx.compose.material.Scaffold(
+            Scaffold(
 
                 scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
                 bottomBar = {
 
-                    if (currentRoute == "RegRoot" || currentRoute =="LoginRoot"){
+                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT){
 
                     } else {
                         BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                             },
                 topBar = {
 
-                    if (currentRoute == "RegRoot" || currentRoute =="LoginRoot"){
+                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT){
 
                     } else {
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
@@ -107,7 +107,8 @@ class MainActivity : ComponentActivity() {
                                 ADS_ROOT -> R.string.side_ad
                                 BUGS_ROOT -> R.string.side_report_bug
                                 else -> R.string.app_name
-                            }),
+                                }
+                            ),
                             onNavigationIconClick = {
                                 // в действие на клик передаем корутину для запуска открытия бокового меню
                                 coroutineScope.launch { scaffoldState.drawerState.open() }
@@ -184,15 +185,13 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
-                        composable("RegRoot") {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
-                        composable("LoginRoot") {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
-                        composable("thankyou") {accountScreens.thankYou(navController = navController)}
+                        composable(REG_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
+                        composable(LOG_IN_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
+                        composable(THANK_YOU_PAGE_ROOT) {accountScreens.thankYou(navController = navController)}
 
                     }
                 }
             }
         }
-
     }
-
 }

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "616414424667-dbdpdtc2lq8a1um8lfutec4kqhdb5ag6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kz.dvij.dvij_compose3",
+            "certificate_hash": "1b2cf8b08651aa1343e5734bf475e32ea6bcc237"
+          }
+        },
+        {
           "client_id": "616414424667-otboi10fcuo7qmcib4c8fiffgk6t79an.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
