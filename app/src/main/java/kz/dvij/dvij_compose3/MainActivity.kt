@@ -187,7 +187,8 @@ class MainActivity : ComponentActivity() {
                         composable(BUGS_ROOT) { BugsScreen() }
                         composable(REG_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
                         composable(LOG_IN_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
-                        composable(THANK_YOU_PAGE_ROOT) {accountScreens.thankYou(navController = navController)}
+                        composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYou(navController = navController)}
+                        composable(FORGOT_PASSWORD_ROOT) {accountScreens.RememberPasswordPage(navController = navController)}
 
                     }
                 }

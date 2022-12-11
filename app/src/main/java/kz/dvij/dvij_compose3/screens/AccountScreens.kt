@@ -404,7 +404,45 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
+                // ----------- ЗАБЫЛИ ПАРОЛЬ? -----------------------
+
+                if (switch != REGISTRATION) {
+
+                    Spacer(modifier = Modifier.height(20.dp)) // Разделитель
+
+                    Row(modifier = Modifier // создаем колонку
+                        .fillMaxWidth(), // на всю ширину
+                        verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
+                        horizontalArrangement = Arrangement.Center // выравнивание по центру
+                    ) {
+                        Text( // 1й текст (НЕ ГИПЕРССЫЛКА)
+
+                            text = stringResource(id = R.string.forgot_password),
+                            style = Typography.labelMedium, // стиль текста
+                            color = Grey40 // цвет текста
+                        )
+
+                        Spacer(modifier = Modifier.width(7.dp)) // разделитель между словами
+
+                        Text( // 2й текст, который КЛИКАБЕЛЬНЫЙ
+
+                            text = stringResource(id = R.string.help_change_password),
+
+                            style = Typography.labelMedium, // стиль текста
+                            color = PrimaryColor, // цвет текста
+                            modifier = Modifier.clickable { // действие на клик
+
+                                // перейти на страницу
+
+                                navController.navigate(FORGOT_PASSWORD_ROOT)
+                            }
+                        )
+                    }
+
+                }
+
                 Spacer(modifier = Modifier.height(40.dp)) // Разделитель
+
 
                 // -------- строка ЕСТЬ АККАУНТ ГУГЛ с полосами -------------
 
@@ -521,11 +559,119 @@ class AccountScreens(act: MainActivity) {
 
 
     @Composable
-    fun thankYou (navController: NavController){
+    fun ThankYou (navController: NavController){
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Grey100), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Спасибо", color = Grey00)
+        }
+    }
+
+    @Composable
+    fun RememberPasswordPage (navController: NavController) {
+
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(Grey100), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        ){
+
+            var email = remember{ mutableStateOf("") }
+
+            // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
+            // при фокусе на них окрашивались в нужные цвета
+
+            var focusColorEmail = remember { mutableStateOf(Grey40) }
+
+            Text(text = "Восстановить пароль", color = Grey00)
+
+            // ТЕКСТОВОЕ ПОЛЕ EMAIL
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                        if (it.isFocused) focusColorEmail.value =
+                            PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                        else focusColorEmail.value =
+                            Grey40 // если нет, то в переменные с цветами передать серый
+                    }
+                    .border( // настройки самих границ
+                        2.dp, // толщина границы
+                        color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
+                        shape = RoundedCornerShape(50.dp) // скругление границ
+                    ),
+                value = email.value, // значение email
+                onValueChange = {newText -> email.value = newText}, // когда значение меняется, оно отсюда передается в value
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    // цвета
+                    textColor = Grey40,
+                    backgroundColor = Grey95,
+                    placeholderColor = Grey60,
+                    focusedBorderColor = Grey95,
+                    unfocusedBorderColor = Grey95,
+                    cursorColor = Grey00
+                ),
+                textStyle = Typography.bodyLarge, // стиль текста
+                keyboardOptions = KeyboardOptions(
+                    // опции клавиатуры, которая появляется при вводе
+                    keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
+                    imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
+
+                ),
+                placeholder = {
+                    // подсказка для пользователей
+                    Text(
+                        text = stringResource(id = R.string.email_example), // значение подсказки
+                        style = Typography.bodyLarge // стиль текста в холдере
+                    )
+                },
+                leadingIcon = {
+                    // иконка, расположенная слева от надписи плейсхолдера
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_email), // сама иконка
+                        contentDescription = stringResource(id = R.string.cd_email_icon), // описание для слабовидящих
+                        tint = Grey60, // цвет иконки
+                        modifier = Modifier.size(20.dp) // размер иконки
+                    )
+                },
+            )
+
+            Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
+
+            Button(
+
+                onClick = { // действия при нажатии
+                    act.mAuth.sendPasswordResetEmail(email.value)
+                },
+
+                // Остальные настройки кнопки
+
+                modifier = Modifier
+                    .fillMaxWidth() // кнопка на всю ширину
+                    .height(50.dp),// высота - 50
+                shape = RoundedCornerShape(50), // скругление углов
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = PrimaryColor, // цвет кнопки
+                    contentColor = Grey100 // цвет контента на кнопке
+                )
+            )
+            {
+
+                // СОДЕРЖИМОЕ КНОПКИ
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_login), // иконка
+                    contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                    tint = Grey100 // цвет иконки
+                )
+
+                Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                Text(
+                    text = "Восстановить пароль"
+                )
+            }
+
         }
     }
 
