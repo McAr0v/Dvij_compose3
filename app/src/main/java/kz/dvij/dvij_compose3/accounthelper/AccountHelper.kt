@@ -1,11 +1,13 @@
 package kz.dvij.dvij_compose3.accounthelper
 
 import android.widget.Toast
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.navigation.BUGS_ROOT
-import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 
 class AccountHelper (act: MainActivity) {
 
@@ -13,75 +15,7 @@ class AccountHelper (act: MainActivity) {
 
 
     private val act = act // инициализируем Main Activity
-
-
-
-
-    fun registrWithEmail(email: String, password: String){
-
-        if (email.isNotEmpty() && password.isNotEmpty()) {
-
-            // запускаем существующую функцию от FireBase создание пользователя с имейл и паролем.
-            // addOnCompleteListener слушает - успешно ли прошла регистрация
-
-
-            act.mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    //  если регистрация прошла успешно
-                    if (task.isSuccessful) {
-                        // если пользователь успешно зарегистрировался, mAuth будет содержать всю информацию о пользователе user
-                        sendEmailVerification(task.result.user!!)
-                        //отправляем письмо с подтверждением Email. task.result.user можно взять act.mAuth.currentUser
-
-
-                    } else { // если регистрация не выполнилась
-
-                        Toast.makeText(
-                            act,
-                            act.resources.getString(R.string.registr_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                    }
-
-                }
-        }
-    }
-
-    fun signInWithEmail(email: String, password: String){
-
-        if (email.isNotEmpty() && password.isNotEmpty()) {
-
-            // запускаем существующую функцию от FireBase создание пользователя с имейл и паролем.
-            // addOnCompleteListener слушает - успешно ли прошла регистрация
-
-
-            act.mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    //  если регистрация прошла успешно
-                    if (task.isSuccessful) {
-                        // если пользователь успешно зарегистрировался, mAuth будет содержать всю информацию о пользователе user
-                        Toast.makeText(
-                            act,
-                            "Вход успешно выполнен",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        //отправляем письмо с подтверждением Email. task.result.user можно взять act.mAuth.currentUser
-
-
-                    } else { // если регистрация не выполнилась
-
-                        Toast.makeText(
-                            act,
-                            act.resources.getString(R.string.registr_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                    }
-
-                }
-        }
-    }
+    private lateinit var signInClient: GoogleSignInClient
 
     fun sendEmailVerification(user: FirebaseUser){
         // функция отправки письма с подтверждением Email при регистрации
@@ -104,6 +38,55 @@ class AccountHelper (act: MainActivity) {
 
     private fun resetPassword(email: String){
         act.mAuth.sendPasswordResetEmail(email)
+    }
+
+
+    // GOOGLE вход ------------------------------------
+
+    // 1 действие - нужно получить гуглсингинклиент
+
+    fun getSignInClient (): GoogleSignInClient {
+
+        // функция получает доступ приложения к аккаунту гугл с телефона
+
+        // то, что мы возвращаем, GoogleSignInClient - этот класс позволяет нам отправить интент (специальное сообщение системе) -
+        // так как аккаунт лежит не в приложении, а на смартфоне, нам надо отправить специальный запрос в систему и ждать результат -
+        // система должна вернуть данные об аккаунте
+
+        // gso = google sign in options
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(act.getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        return GoogleSignIn.getClient(act, gso)
+
+    }
+
+    // 2 действие создаем функцию, которая будет запускаться когда при нажатии на кнопку гугла
+
+    fun signInWithGoogle(){
+        signInClient = getSignInClient() // sign in Client - переменная, которая инициализируется не сразу. Мы ее создали как lateinit  и она вверху mainActivity
+
+        val intent = signInClient.signInIntent
+        act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
+
+    }
+
+    fun signOutGoogle(){
+        getSignInClient().signOut()
+    }
+
+    fun signInFirebaseWithGoogle (token: String) {
+        val credential = GoogleAuthProvider.getCredential(token, null)
+        act.mAuth.signInWithCredential(credential).addOnCompleteListener{ task ->
+
+            if (task.isSuccessful) {
+                Toast.makeText(act, "Вход через гугл зашел", Toast.LENGTH_SHORT).show()
+            }
+
+        }
     }
 
 }

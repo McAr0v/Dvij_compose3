@@ -1,31 +1,31 @@
 package kz.dvij.dvij_compose3
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.navigation.*
@@ -48,6 +48,25 @@ class MainActivity : ComponentActivity() {
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE){
+            //Log.d("MyLog", "SignInDone")
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+
+            try {
+
+                val account = task.getResult(ApiException::class.java)
+                if (account != null) {
+                    accountHelper.signInFirebaseWithGoogle(account.idToken!!)
+                }
+
+            } catch (e: ApiException) {
+                Log.d("MyLog", "ApiError: ${e.message}")
+            }
+
+        }
+            super.onActivityResult(requestCode, resultCode, data)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,6 +153,7 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 mAuth.signOut()
+                                accountHelper.signOutGoogle()
                                 coroutineScope.launch {
                                     scaffoldState.drawerState.close()
                                 }
@@ -194,5 +214,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }

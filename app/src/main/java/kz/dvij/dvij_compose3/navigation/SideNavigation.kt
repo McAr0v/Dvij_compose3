@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
@@ -196,13 +197,25 @@ fun AvatarBoxSideNavigation(
         ) {
 
             // АВАТАРКА ПОЛЬЗОВАТЕЛЯ
-            androidx.compose.foundation.Image(
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.zhanna_avatar), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar), // описание для слабовидящих
-                modifier = Modifier
-                    .size(60.dp) // размер аватарки
-                    .clip(CircleShape) // делаем ее круглой
-            )
+
+            if (user.photoUrl != null) {
+                AsyncImage(
+                    model = user.photoUrl,
+                    contentDescription = "",
+                    modifier = Modifier.size(60.dp).clip(CircleShape))
+            } else {
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.zhanna_avatar), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
+                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar), // описание для слабовидящих
+                    modifier = Modifier
+                        .size(60.dp) // размер аватарки
+                        .clip(CircleShape) // делаем ее круглой
+                )
+            }
+
+
+
+
 
             // КОЛОНКА С ИМЕНЕМ И EMAIL
             if (user.displayName == null || user.displayName == ""){

@@ -481,7 +481,7 @@ class AccountScreens(act: MainActivity) {
                 // -------------- КНОПКА ВХОДА ЧЕРЕЗ GOOGLE ------------------
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { accountHelper.signInWithGoogle() },
                     modifier = Modifier
                         .fillMaxWidth() // На всю ширину
                         .height(50.dp), // высота кнопки
