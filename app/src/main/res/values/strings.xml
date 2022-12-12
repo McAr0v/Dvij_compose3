@@ -70,5 +70,7 @@
     <string name="private_policy_agree">C ПОЛИТИКОЙ КОНФИДЕНЦИАЛЬНОСТИ </string>
     <string name="forgot_password">Забыли пароль? </string>
     <string name="help_change_password">Сбросить пароль </string>
+    <string name="verify_email">Подтверди почту </string>
+    <string name="verify_email_text">На твою почту мы отправили письмо. Нам нужно убедиться, что ты не спамер. Подтверди Email и после подтверждения просто зайди в аккаунт. </string>
 
 </resources>

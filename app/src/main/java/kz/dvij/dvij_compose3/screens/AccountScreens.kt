@@ -34,6 +34,7 @@ class AccountScreens(act: MainActivity) {
     private val act = act // Инициализируем MainActivity
     private val accountHelper = AccountHelper(act) // инициализируем класс AccountHelper
 
+
     @Composable
     fun RegistrScreen(
         navController: NavController,

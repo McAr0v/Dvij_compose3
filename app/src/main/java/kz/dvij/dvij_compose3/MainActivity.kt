@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE){
             //Log.d("MyLog", "SignInDone")
@@ -150,27 +151,7 @@ class MainActivity : ComponentActivity() {
                         )
                         SubscribeBoxSideNavigation()
 
-                        Button(
-                            onClick = {
-                                mAuth.signOut()
-                                accountHelper.signOutGoogle()
-                                coroutineScope.launch {
-                                    scaffoldState.drawerState.close()
-                                }
-                                navController.navigate(MEETINGS_ROOT)
-                                Toast.makeText(context, "Вы успешно вышли из системы", Toast.LENGTH_SHORT).show()
 
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Grey00,
-                                contentColor = Grey100
-                            )) {
-
-                            Text(text = "Выйти из аккаунта")
-
-                        }
                 }
                 )
 
@@ -200,7 +181,7 @@ class MainActivity : ComponentActivity() {
                         composable(MEETINGS_ROOT) { MeetingsScreen()}
                         composable(PLACES_ROOT) { PlacesScreen()}
                         composable(STOCK_ROOT) { StockScreen()}
-                        composable(PROFILE_ROOT) { ProfileScreen()}
+                        composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }

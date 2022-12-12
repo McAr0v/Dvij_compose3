@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 
 
@@ -65,7 +66,7 @@ fun SubscribeBoxSideNavigation(){
 
     Column( // создаем контейнер-стобец
         modifier = Modifier
-            .fillMaxWidth() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
+            .fillMaxSize() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
             .background(Grey100) // цвет фона
             .padding(20.dp), // отступы со всех сторон
         verticalArrangement = Arrangement.Top, // выравнивание по вертикали
@@ -167,14 +168,14 @@ fun AvatarBoxSideNavigation(
     scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
     ) {
 
-    // РАЗДЕЛ С АВАТАРКОЙ
+    // РАЗДЕЛ С АВАТАРКОй
 
     val coroutineScope = rememberCoroutineScope() // инициализируем корутину
     val context = LocalContext.current // инициализируем контекст для ТОСТОВ
 
     // УСЛОВИЕ - ЕСЛИ АВТОРИЗОВАН, ТО КОНТЕНТ ОДИН, ЕСЛИ НЕТ, ТО ДРУГОЙ
 
-    if (user != null) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
+    if (user != null && user.isEmailVerified) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
 
         Row( // используем строку
             modifier = Modifier
@@ -202,7 +203,9 @@ fun AvatarBoxSideNavigation(
                 AsyncImage(
                     model = user.photoUrl,
                     contentDescription = "",
-                    modifier = Modifier.size(60.dp).clip(CircleShape))
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape))
             } else {
                 androidx.compose.foundation.Image(
                     painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.zhanna_avatar), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
@@ -212,10 +215,6 @@ fun AvatarBoxSideNavigation(
                         .clip(CircleShape) // делаем ее круглой
                 )
             }
-
-
-
-
 
             // КОЛОНКА С ИМЕНЕМ И EMAIL
             if (user.displayName == null || user.displayName == ""){
@@ -248,8 +247,6 @@ fun AvatarBoxSideNavigation(
                             style = Typography.titleSmall // стиль текста
                         )
 
-
-
                     Text(
                         text = user.email!!, // сюда нужно передавать email пользователя из БД
                         color = Grey40, // цвет Email
@@ -271,6 +268,46 @@ fun AvatarBoxSideNavigation(
             )
         }
 
+    } else if (user != null && !user.isEmailVerified){
+
+    // если пользователь зарегистрировался, но еще не верифицировал email
+        // КОНТЕНТ если не авторизован пользователь
+
+            Row( // используем строку
+                modifier = Modifier
+                    .fillMaxWidth() // занимаем всю ширину
+                    .background(Grey100) // цвет фона
+                    .padding(20.dp) // отступы
+                    .clickable { // действие на нажатие. По идее потом надо вести на страницу авторизации
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+                        navController.navigate(LOG_IN_ROOT)
+
+                    },
+                verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
+
+            ) {
+
+                // ТЕКСТ ГОСТЬ
+
+                Column(
+                    modifier = Modifier.weight(1f) // колонка займет всю ширину, которая останется после добавления элементов
+                ) {
+
+                    Text( // текст ГОСТЬ
+                        text = stringResource(id = R.string.verify_email), // сам текст
+                        color = Grey40, // цвет текста
+                        style = Typography.titleMedium // стиль текста
+                    )
+                    Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
+                        text = stringResource(id = R.string.verify_email_text), // сам текст
+                        color = Grey40, // цвет текста
+                        style = Typography.labelSmall // стиль текста
+                    )
+                }
+            }
+
     } else { // КОНТЕНТ если не авторизован пользователь
 
         Row( // используем строку
@@ -282,7 +319,7 @@ fun AvatarBoxSideNavigation(
                     coroutineScope.launch {
                         scaffoldState.drawerState.close()
                     }
-                    navController.navigate("RegRoot")
+                    navController.navigate(REG_ROOT)
 
                 },
             verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
