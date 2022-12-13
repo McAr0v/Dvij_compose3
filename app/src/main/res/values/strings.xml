@@ -73,4 +73,11 @@
     <string name="verify_email">Подтверди почту </string>
     <string name="verify_email_text">На твою почту мы отправили письмо. Нам нужно убедиться, что ты не спамер. Подтверди Email и после подтверждения просто зайди в аккаунт. </string>
 
+    <!-- Страница профиля -->
+    <string name="icon_user_image">Изображение аватарки пользователя</string>
+    <string name="sign_out_success">Ты успешно вышел из аккаунта.</string>
+    <string name="sign_out_button">Выйти из аккаунта</string>
+    <string name="email_verify_toast">Страница аккаунта станет доступна после того, как ты подтвердишь Email. Проверь почту и активируй аккаунт</string>
+    <string name="need_registration_toast">Страница аккаунта станет доступна после того, как ты зарегистрируешься</string>
+
 </resources>
