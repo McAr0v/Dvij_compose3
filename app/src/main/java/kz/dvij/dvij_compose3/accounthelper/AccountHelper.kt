@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.accounthelper
 
 import android.widget.Toast
+import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -8,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.screens.AccountScreens
 
 class AccountHelper (act: MainActivity) {
 
@@ -17,26 +19,29 @@ class AccountHelper (act: MainActivity) {
     private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
 
+
+    // Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ
     fun sendEmailVerification(user: FirebaseUser){
         // функция отправки письма с подтверждением Email при регистрации
         // данные зарегистрированного user находвтся в mAuth
 
         user.sendEmailVerification().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-
                 Toast.makeText(act, "На вашу почту был отправлен Email", Toast.LENGTH_SHORT).show()
-
-
-
             } else {
-
                 Toast.makeText(act, "Не удалось отправить письмо", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
-    private fun resetPassword(email: String){
+
+    // выход из аккаунта гугл. НЕ УДАЛЯТЬ ФУНКЦИЮ
+    fun signOutGoogle(){
+        getSignInClient().signOut()
+    }
+
+    // функция сброса пароля НЕ УДАЛЯТЬ ФУНКЦИЮ
+    fun resetPassword(email: String){
         act.mAuth.sendPasswordResetEmail(email)
     }
 
@@ -74,9 +79,7 @@ class AccountHelper (act: MainActivity) {
 
     }
 
-    fun signOutGoogle(){
-        getSignInClient().signOut()
-    }
+
 
     fun signInFirebaseWithGoogle (token: String) {
         val credential = GoogleAuthProvider.getCredential(token, null)
@@ -89,4 +92,6 @@ class AccountHelper (act: MainActivity) {
         }
     }
 
+
 }
+

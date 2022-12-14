@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -13,13 +14,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
@@ -89,8 +89,16 @@ class AccountScreens(act: MainActivity) {
                 // в зависимости от того, что введет пользователь и это содержимое будет
                 // отправляться в Firebase
 
-                var email = remember{ mutableStateOf("") }
-                var password = remember{ mutableStateOf("") }
+                var email = remember { mutableStateOf("") }
+                var password = remember { mutableStateOf("") }
+
+                // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
+
+                var isErrorEmail = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+                var errorEmailMassage = remember { mutableStateOf("") } // сообщение об ошибке
+
+
+                val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
                 // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
                 // при фокусе на них окрашивались в нужные цвета
@@ -109,24 +117,30 @@ class AccountScreens(act: MainActivity) {
                 регистрации или входа
                 */
 
-                // ЗАГОЛОВОК
+
+
+                // -------------  ЗАГОЛОВОК ---------------
 
                 Text(  // заголовок зависит от switch
-                    text = if (switch == REGISTRATION){
+                    text = if (switch == REGISTRATION) {
                         stringResource(id = R.string.registration)
                     } else {
                         stringResource(id = R.string.log_in)
-                           },
+                    },
                     style = Typography.titleLarge, // стиль заголовка
                     color = Grey00 // цвет заголовка
                 )
 
+
                 Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и полями для ввода
+
+
 
                 // --------------- Переключатель между регистрацией и входом --------------------------
 
-                Row(modifier = Modifier // создаем колонку
-                    .fillMaxWidth(), // на всю ширину
+                Row(
+                    modifier = Modifier // создаем колонку
+                        .fillMaxWidth(), // на всю ширину
                     verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
                     horizontalArrangement = Arrangement.Center // выравнивание по центру
                 ) {
@@ -136,12 +150,12 @@ class AccountScreens(act: MainActivity) {
                             stringResource(id = R.string.have_account)
                         } else {
                             stringResource(id = R.string.no_have_account)
-                               },
+                        },
 
                         style = Typography.labelMedium, // стиль текста
                         color = Grey40 // цвет текста
                     )
-                    
+
                     Spacer(modifier = Modifier.width(7.dp)) // разделитель между словами
 
                     Text( // 2й текст, который КЛИКАБЕЛЬНЫЙ
@@ -150,7 +164,7 @@ class AccountScreens(act: MainActivity) {
                             stringResource(id = R.string.to_login)
                         } else {
                             stringResource(id = R.string.to_registration)
-                               },
+                        },
 
                         style = Typography.labelMedium, // стиль текста
                         color = PrimaryColor, // цвет текста
@@ -171,7 +185,10 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель между 
 
-                // ТЕКСТОВОЕ ПОЛЕ EMAIL
+
+
+
+                // -------- ТЕКСТОВОЕ ПОЛЕ EMAIL -----------------
 
                 TextField(
                     modifier = Modifier
@@ -187,8 +204,41 @@ class AccountScreens(act: MainActivity) {
                             color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
                             shape = RoundedCornerShape(50.dp) // скругление границ
                         ),
-                    value = email.value, // значение email
-                    onValueChange = {newText -> email.value = newText}, // когда значение меняется, оно отсюда передается в value
+                    value = email.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
+
+                    // on valueChange - это действие при изменении значения
+                    onValueChange = { newText ->
+                        email.value = newText // помещаем в переменную email новый введенный текст
+
+                        // проверяем вводимый текст на соответствие правилам:
+
+                        // если не содежрит @
+                        if (!newText.contains("@")) {
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value = act.resources.getString(R.string.em_dog) // передаем текст ошибки
+
+                        } else if (!newText.contains(".")){ // если не содежрит .
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value = act.resources.getString(R.string.em_dot) // передаем текст ошибки
+
+                        } else if (newText.contains(" ")){ // если содержит пробел
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value = act.resources.getString(R.string.em_space) // передаем текст ошибки
+
+                        } else { // когда все нормально
+
+                            isErrorEmail.value = false // объявляем, что ошибки нет
+                            focusColorEmail.value = PrimaryColor // цвет фокуса переводим в нормальный
+                        }
+
+                    },
+
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         // цвета
                         textColor = Grey40,
@@ -196,8 +246,24 @@ class AccountScreens(act: MainActivity) {
                         placeholderColor = Grey60,
                         focusedBorderColor = Grey95,
                         unfocusedBorderColor = Grey95,
-                        cursorColor = Grey00
+                        cursorColor = Grey00,
+                        errorBorderColor = Grey95
+
                     ),
+
+                    // иконка справа от текста
+                    trailingIcon = {
+                        // условие, если состояние ошибки
+                        if (isErrorEmail.value) {
+
+                            Icon(
+                            painter = painterResource(R.drawable.ic_error), // иконка ошибки
+                            contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
+                            tint = AttentionColor, // цвет иконки
+                            modifier = Modifier.size(20.dp) // размер иконки
+                            )
+                        }
+                    },
                     textStyle = Typography.bodyLarge, // стиль текста
                     keyboardOptions = KeyboardOptions(
                         // опции клавиатуры, которая появляется при вводе
@@ -205,13 +271,19 @@ class AccountScreens(act: MainActivity) {
                         imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
                     ),
+                    keyboardActions = KeyboardActions(
+                        // При нажатии на кнопку onDone - снимает фокус с формы
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
                     placeholder = {
                         // подсказка для пользователей
                         Text(
                             text = stringResource(id = R.string.email_example), // значение подсказки
                             style = Typography.bodyLarge // стиль текста в холдере
                         )
-                                  },
+                    },
                     leadingIcon = {
                         // иконка, расположенная слева от надписи плейсхолдера
                         Icon(
@@ -220,12 +292,27 @@ class AccountScreens(act: MainActivity) {
                             tint = Grey60, // цвет иконки
                             modifier = Modifier.size(20.dp) // размер иконки
                         )
-                                  },
-                    )
+                    },
+                    singleLine = true, // говорим, что текст в форме будет однострочный
+                    isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
+                )
+
+                // --------- ТЕКСТ ОШИБКИ ----------------
+
+                // условие - если состояние ошибки
+                if (isErrorEmail.value) {
+                    Text(
+                        text = errorEmailMassage.value, // текст ошибки
+                    color = AttentionColor, // цвет текста ошибки
+                    style = Typography.bodySmall, // стиль текста
+                    modifier = Modifier.padding(top = 5.dp)) // отступы
+                }
+
+
 
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
 
-                // ТЕКСТОВОЕ ПОЛЕ С ПАРОЛЕМ
+                // ------------    ТЕКСТОВОЕ ПОЛЕ С ПАРОЛЕМ ----------------
 
                 TextField(
                     modifier = Modifier
@@ -249,6 +336,12 @@ class AccountScreens(act: MainActivity) {
                         focusedBorderColor = Grey95,
                         unfocusedBorderColor = Grey95,
                         cursorColor = Grey00
+                    ),
+                    keyboardActions = KeyboardActions(
+                        // При нажатии на кнопку onDone - снимает фокус с формы
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
                     ),
                     trailingIcon = { // иконка ОТКРЫТЬ/СКРЫТЬ пароль
                         IconButton(
@@ -299,9 +392,14 @@ class AccountScreens(act: MainActivity) {
                             modifier = Modifier.size(20.dp) // размер иконки
                         )
                                   },
+                    singleLine = true, // говорим, что текст в форме будет однострочный
                     )
 
+
+
                 Spacer(modifier = Modifier.height(20.dp)) // раздетиль между формой и кнопкой
+
+
 
                 // ------------------- КНОПКА ---------------------------------
 
@@ -482,7 +580,9 @@ class AccountScreens(act: MainActivity) {
                 // -------------- КНОПКА ВХОДА ЧЕРЕЗ GOOGLE ------------------
 
                 Button(
-                    onClick = { accountHelper.signInWithGoogle() },
+                    onClick = {
+                        accountHelper.signInWithGoogle()
+                              },
                     modifier = Modifier
                         .fillMaxWidth() // На всю ширину
                         .height(50.dp), // высота кнопки
@@ -521,6 +621,8 @@ class AccountScreens(act: MainActivity) {
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
+
+
 
                 // ---------- СТРОКА С ПОЛИТИКОЙ КОНФИДЕНЦИАЛЬНОСТИ ----------------------
 
@@ -583,6 +685,12 @@ class AccountScreens(act: MainActivity) {
 
             var focusColorEmail = remember { mutableStateOf(Grey40) }
 
+            var isErrorEmail = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+            var errorEmailMassage = remember { mutableStateOf("") } // сообщение об ошибке
+
+
+            val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+
             Text(text = "Восстановить пароль", color = Grey00)
 
             // ТЕКСТОВОЕ ПОЛЕ EMAIL
@@ -601,8 +709,41 @@ class AccountScreens(act: MainActivity) {
                         color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
                         shape = RoundedCornerShape(50.dp) // скругление границ
                     ),
-                value = email.value, // значение email
-                onValueChange = {newText -> email.value = newText}, // когда значение меняется, оно отсюда передается в value
+                value = email.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
+
+                // on valueChange - это действие при изменении значения
+                onValueChange = { newText ->
+                    email.value = newText // помещаем в переменную email новый введенный текст
+
+                    // проверяем вводимый текст на соответствие правилам:
+
+                    // если не содежрит @
+                    if (!newText.contains("@")) {
+
+                        isErrorEmail.value = true // объявляем состояние ошибки
+                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                        errorEmailMassage.value = act.resources.getString(R.string.em_dog) // передаем текст ошибки
+
+                    } else if (!newText.contains(".")){ // если не содежрит .
+
+                        isErrorEmail.value = true // объявляем состояние ошибки
+                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                        errorEmailMassage.value = act.resources.getString(R.string.em_dot) // передаем текст ошибки
+
+                    } else if (newText.contains(" ")){ // если содержит пробел
+
+                        isErrorEmail.value = true // объявляем состояние ошибки
+                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
+                        errorEmailMassage.value = act.resources.getString(R.string.em_space) // передаем текст ошибки
+
+                    } else { // когда все нормально
+
+                        isErrorEmail.value = false // объявляем, что ошибки нет
+                        focusColorEmail.value = PrimaryColor // цвет фокуса переводим в нормальный
+                    }
+
+                },
+
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     // цвета
                     textColor = Grey40,
@@ -610,14 +751,36 @@ class AccountScreens(act: MainActivity) {
                     placeholderColor = Grey60,
                     focusedBorderColor = Grey95,
                     unfocusedBorderColor = Grey95,
-                    cursorColor = Grey00
+                    cursorColor = Grey00,
+                    errorBorderColor = Grey95
+
                 ),
+
+                // иконка справа от текста
+                trailingIcon = {
+                    // условие, если состояние ошибки
+                    if (isErrorEmail.value) {
+
+                        Icon(
+                            painter = painterResource(R.drawable.ic_error), // иконка ошибки
+                            contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
+                            tint = AttentionColor, // цвет иконки
+                            modifier = Modifier.size(20.dp) // размер иконки
+                        )
+                    }
+                },
                 textStyle = Typography.bodyLarge, // стиль текста
                 keyboardOptions = KeyboardOptions(
                     // опции клавиатуры, которая появляется при вводе
                     keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
                     imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
+                ),
+                keyboardActions = KeyboardActions(
+                    // При нажатии на кнопку onDone - снимает фокус с формы
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
                 ),
                 placeholder = {
                     // подсказка для пользователей
@@ -635,7 +798,22 @@ class AccountScreens(act: MainActivity) {
                         modifier = Modifier.size(20.dp) // размер иконки
                     )
                 },
+                singleLine = true, // говорим, что текст в форме будет однострочный
+                isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
             )
+
+            // --------- ТЕКСТ ОШИБКИ ----------------
+
+            // условие - если состояние ошибки
+            if (isErrorEmail.value) {
+                Text(
+                    text = errorEmailMassage.value, // текст ошибки
+                    color = AttentionColor, // цвет текста ошибки
+                    style = Typography.bodySmall, // стиль текста
+                    modifier = Modifier.padding(top = 5.dp)) // отступы
+            }
+
+
 
             Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
 

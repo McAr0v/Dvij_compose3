@@ -45,9 +45,9 @@ val GradientPrimary = Brush.verticalGradient(
 
 // Secondary Colors - цвета из дизайн-файла Figma
 
-val attentionColor = Color(0xFFFF6577)
-val successColor = Color(0xFF24BA96)
-val warningColor = Color(0xFFF0A900)
+val AttentionColor = Color(0xFFFF6577)
+val SuccessColor = Color(0xFF24BA96)
+val WarningColor = Color(0xFFF0A900)
 
 
 val Purple80 = Color(0xFFD0BCFF)

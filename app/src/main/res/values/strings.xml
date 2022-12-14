@@ -38,6 +38,7 @@
     <string name="cd_icon">Иконка</string>
     <string name="cd_show_password">Показать пароль</string>
     <string name="cd_hide_password">Скрыть пароль</string>
+    <string name="cd_error_icon">Иконка ошибки</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -79,5 +80,10 @@
     <string name="sign_out_button">Выйти из аккаунта</string>
     <string name="email_verify_toast">Страница аккаунта станет доступна после того, как ты подтвердишь Email. Проверь почту и активируй аккаунт</string>
     <string name="need_registration_toast">Страница аккаунта станет доступна после того, как ты зарегистрируешься</string>
+
+    <!-- Ошибки -->
+    <string name="em_dog">Email должен содержать собаку -@-</string>
+    <string name="em_dot">Email должен содержать точку -.-</string>
+    <string name="em_space">Email не должен содержать пробел - -</string>
 
 </resources>
