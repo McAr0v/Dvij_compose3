@@ -3,14 +3,10 @@ package kz.dvij.dvij_compose3
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -30,8 +26,6 @@ import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
-import kz.dvij.dvij_compose3.ui.theme.Grey00
-import kz.dvij.dvij_compose3.ui.theme.Grey100
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -95,7 +89,7 @@ class MainActivity : ComponentActivity() {
                 scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
                 bottomBar = {
 
-                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT){
+                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT || currentRoute == FORGOT_PASSWORD_ROOT || currentRoute == THANK_YOU_PAGE_ROOT) {
 
                     } else {
                         BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
@@ -105,7 +99,7 @@ class MainActivity : ComponentActivity() {
                             },
                 topBar = {
 
-                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT){
+                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT || currentRoute == FORGOT_PASSWORD_ROOT || currentRoute == THANK_YOU_PAGE_ROOT){
 
                     } else {
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
@@ -188,8 +182,8 @@ class MainActivity : ComponentActivity() {
                         composable(BUGS_ROOT) { BugsScreen() }
                         composable(REG_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
                         composable(LOG_IN_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
-                        composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYou(navController = navController)}
-                        composable(FORGOT_PASSWORD_ROOT) {accountScreens.RememberPasswordPage(navController = navController)}
+                        composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
+                        composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
 
                     }
                 }

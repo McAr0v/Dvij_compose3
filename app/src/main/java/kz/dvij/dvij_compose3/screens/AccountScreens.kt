@@ -19,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toLowerCase
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
@@ -30,6 +30,8 @@ import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class AccountScreens(act: MainActivity) {
+
+    // https://storyset.com/illustration/forgot-password/bro -- картинки
 
     private val act = act // Инициализируем MainActivity
     private val accountHelper = AccountHelper(act) // инициализируем класс AccountHelper
@@ -117,7 +119,22 @@ class AccountScreens(act: MainActivity) {
                 регистрации или входа
                 */
 
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
+                // -------------- ИЛЛЮСТРАЦИЯ ------------------
+
+                Image(
+                    //modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(
+                        id = if (switch == REGISTRATION){
+                            R.drawable.sign_up_illustration
+                        } else (R.drawable.sign_in_illustration)
+
+                    ),
+                    contentDescription = stringResource(id = R.string.cd_illustration)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
                 // -------------  ЗАГОЛОВОК ---------------
 
@@ -234,7 +251,7 @@ class AccountScreens(act: MainActivity) {
                         } else { // когда все нормально
 
                             isErrorEmail.value = false // объявляем, что ошибки нет
-                            focusColorEmail.value = PrimaryColor // цвет фокуса переводим в нормальный
+                            focusColorEmail.value = SuccessColor // цвет фокуса переводим в нормальный
                         }
 
                     },
@@ -261,6 +278,13 @@ class AccountScreens(act: MainActivity) {
                             contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
                             tint = AttentionColor, // цвет иконки
                             modifier = Modifier.size(20.dp) // размер иконки
+                            )
+                        } else if (!isErrorEmail.value && email.value != "") {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_check), // иконка ошибки
+                                contentDescription = stringResource(R.string.cd_right_icon), // описание для слабослышащих
+                                tint = SuccessColor, // цвет иконки
+                                modifier = Modifier.size(20.dp) // размер иконки
                             )
                         }
                     },
@@ -306,7 +330,7 @@ class AccountScreens(act: MainActivity) {
                     color = AttentionColor, // цвет текста ошибки
                     style = Typography.bodySmall, // стиль текста
                     modifier = Modifier.padding(top = 5.dp)) // отступы
-                }
+                }  else {}
 
 
 
@@ -340,7 +364,9 @@ class AccountScreens(act: MainActivity) {
                     keyboardActions = KeyboardActions(
                         // При нажатии на кнопку onDone - снимает фокус с формы
                         onDone = {
+
                             focusManager.clearFocus()
+
                         }
                     ),
                     trailingIcon = { // иконка ОТКРЫТЬ/СКРЫТЬ пароль
@@ -540,7 +566,7 @@ class AccountScreens(act: MainActivity) {
 
                 }
 
-                Spacer(modifier = Modifier.height(40.dp)) // Разделитель
+                Spacer(modifier = Modifier.height(20.dp)) // Разделитель
 
 
                 // -------- строка ЕСТЬ АККАУНТ ГУГЛ с полосами -------------
@@ -612,7 +638,7 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(60.dp)) // разделитель между кнопкой ГУГЛ
+                Spacer(modifier = Modifier.height(30.dp)) // разделитель между кнопкой ГУГЛ
 
                 Divider(
                     modifier = Modifier.fillMaxWidth(),
@@ -660,198 +686,393 @@ class AccountScreens(act: MainActivity) {
         }
     }
 
-
     @Composable
-    fun ThankYou (navController: NavController){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(Grey100), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Спасибо", color = Grey00)
+    fun ThankYouPage (navController: NavController){
+        Column(
+
+        ) {
+
+            // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
+
+            // создаем строку, чтобы задать положение кнопки "Закрыть"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey95),
+                verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание кнопки
+                horizontalArrangement = Arrangement.End // выравнивание кнопки по правому краю
+            ) {
+
+                // сама кнопка Закрыть
+                IconButton(
+                    onClick = {
+                        navController.navigate(MEETINGS_ROOT) // действие если нажать на кнопку
+                    }
+                ) {
+                    // содержимое кнопки (в теории слева можно добавить надпись текстом "Закрыть")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close),
+                        contentDescription = stringResource(id = R.string.close_page),
+                        tint = Grey00
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Grey95)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            )
+
+            {
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+                Image(
+                    //modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.send_email_illustration),
+                    contentDescription = stringResource(id = R.string.cd_illustration)
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+                // -------------  ЗАГОЛОВОК ---------------
+
+                Text(  // заголовок зависит от switch
+                    text = "Проверь свой Email и активируй аккаунт",
+                    style = Typography.titleLarge, // стиль заголовка
+                    color = Grey00, // цвет заголовка
+                    textAlign = TextAlign.Center
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
+
+                Text(  // заголовок зависит от switch
+                    text = "Спасибо за регистрацию! Теперь открой свою почту - мы отправили туда письмо с подтверждением " +
+                            "твоего адреса электронной почты. Следуй инструкциям в письме и активируй аккаунт!",
+                    style = Typography.bodyMedium, // стиль заголовка
+                    color = Grey40, // цвет заголовка
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель между полями
+
+                Button(
+
+                    onClick = { // действия при нажатии
+                        navController.navigate(MEETINGS_ROOT)
+                    },
+
+                    // Остальные настройки кнопки
+
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp),// высота - 50
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                )
+                {
+
+                    // СОДЕРЖИМОЕ КНОПКИ
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_home), // иконка
+                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                        tint = Grey100 // цвет иконки
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                    Text(
+                        text = "Вернуться на главную страницу",
+                        style = Typography.labelMedium
+                    )
+                }
+
+            }
         }
+
     }
 
     @Composable
-    fun RememberPasswordPage (navController: NavController) {
+    fun ForgotPasswordPage (navController: NavController) {
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(Grey100), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        Column(
 
-            var email = remember{ mutableStateOf("") }
+        ) {
+
+            // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
+
+            // создаем строку, чтобы задать положение кнопки "Закрыть"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey95),
+                verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание кнопки
+                horizontalArrangement = Arrangement.End // выравнивание кнопки по правому краю
+            ) {
+
+                // сама кнопка Закрыть
+                IconButton(
+                    onClick = {
+                        navController.navigate(LOG_IN_ROOT) // действие если нажать на кнопку
+                    }
+                ) {
+                    // содержимое кнопки (в теории слева можно добавить надпись текстом "Закрыть")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close),
+                        contentDescription = stringResource(id = R.string.close_page),
+                        tint = Grey00
+                    )
+                }
+            }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Grey95)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            var email = remember { mutableStateOf("") }
 
             // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
             // при фокусе на них окрашивались в нужные цвета
 
             var focusColorEmail = remember { mutableStateOf(Grey40) }
 
-            var isErrorEmail = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+            var isErrorEmail =
+                remember { mutableStateOf(false) } // состояние формы - ошибка или нет
             var errorEmailMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
 
-            val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+            val focusManager =
+                LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
-            Text(text = "Восстановить пароль", color = Grey00)
 
-            // ТЕКСТОВОЕ ПОЛЕ EMAIL
 
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                        if (it.isFocused) focusColorEmail.value =
-                            PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
-                        else focusColorEmail.value =
-                            Grey40 // если нет, то в переменные с цветами передать серый
-                    }
-                    .border( // настройки самих границ
-                        2.dp, // толщина границы
-                        color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
-                        shape = RoundedCornerShape(50.dp) // скругление границ
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+                // -------------- ИЛЛЮСТРАЦИЯ ------------------
+
+                Image(
+                    //modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.forgot_password_illustration),
+                    contentDescription = stringResource(id = R.string.cd_illustration)
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+                // -------------  ЗАГОЛОВОК ---------------
+
+                Text(  // заголовок зависит от switch
+                    text = stringResource(id = R.string.help_change_password),
+                    style = Typography.titleLarge, // стиль заголовка
+                    color = Grey00 // цвет заголовка
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
+
+
+                // -------------  ЗАГОЛОВОК ---------------
+
+                Text(  // заголовок зависит от switch
+                    text = stringResource(id = R.string.forgot_password_text),
+                    style = Typography.bodyMedium, // стиль заголовка
+                    color = Grey40, // цвет заголовка
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+                // ТЕКСТОВОЕ ПОЛЕ EMAIL
+
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                            if (it.isFocused) focusColorEmail.value =
+                                PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                            else focusColorEmail.value =
+                                Grey40 // если нет, то в переменные с цветами передать серый
+                        }
+                        .border( // настройки самих границ
+                            2.dp, // толщина границы
+                            color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
+                            shape = RoundedCornerShape(50.dp) // скругление границ
+                        ),
+                    value = email.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
+
+                    // on valueChange - это действие при изменении значения
+                    onValueChange = { newText ->
+                        email.value = newText // помещаем в переменную email новый введенный текст
+
+                        // проверяем вводимый текст на соответствие правилам:
+
+                        // если не содежрит @
+                        if (!newText.contains("@")) {
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value =
+                                AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value =
+                                act.resources.getString(R.string.em_dog) // передаем текст ошибки
+
+                        } else if (!newText.contains(".")) { // если не содежрит .
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value =
+                                AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value =
+                                act.resources.getString(R.string.em_dot) // передаем текст ошибки
+
+                        } else if (newText.contains(" ")) { // если содержит пробел
+
+                            isErrorEmail.value = true // объявляем состояние ошибки
+                            focusColorEmail.value =
+                                AttentionColor // красим границы формы в цвет ошибки
+                            errorEmailMassage.value =
+                                act.resources.getString(R.string.em_space) // передаем текст ошибки
+
+                        } else { // когда все нормально
+
+                            isErrorEmail.value = false // объявляем, что ошибки нет
+                            focusColorEmail.value =
+                                SuccessColor // цвет фокуса переводим в нормальный
+                        }
+
+                    },
+
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        // цвета
+                        textColor = Grey40,
+                        backgroundColor = Grey95,
+                        placeholderColor = Grey60,
+                        focusedBorderColor = Grey95,
+                        unfocusedBorderColor = Grey95,
+                        cursorColor = Grey00,
+                        errorBorderColor = Grey95
+
                     ),
-                value = email.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
 
-                // on valueChange - это действие при изменении значения
-                onValueChange = { newText ->
-                    email.value = newText // помещаем в переменную email новый введенный текст
+                    // иконка справа от текста
+                    trailingIcon = {
+                        // условие, если состояние ошибки
+                        if (isErrorEmail.value) {
 
-                    // проверяем вводимый текст на соответствие правилам:
+                            Icon(
+                                painter = painterResource(R.drawable.ic_error), // иконка ошибки
+                                contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
+                                tint = AttentionColor, // цвет иконки
+                                modifier = Modifier.size(20.dp) // размер иконки
+                            )
+                        } else if (!isErrorEmail.value && email.value != "") {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_check), // иконка ошибки
+                                contentDescription = stringResource(R.string.cd_right_icon), // описание для слабослышащих
+                                tint = SuccessColor, // цвет иконки
+                                modifier = Modifier.size(20.dp) // размер иконки
+                            )
+                        }
+                    },
+                    textStyle = Typography.bodyLarge, // стиль текста
+                    keyboardOptions = KeyboardOptions(
+                        // опции клавиатуры, которая появляется при вводе
+                        keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
+                        imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
-                    // если не содежрит @
-                    if (!newText.contains("@")) {
-
-                        isErrorEmail.value = true // объявляем состояние ошибки
-                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
-                        errorEmailMassage.value = act.resources.getString(R.string.em_dog) // передаем текст ошибки
-
-                    } else if (!newText.contains(".")){ // если не содежрит .
-
-                        isErrorEmail.value = true // объявляем состояние ошибки
-                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
-                        errorEmailMassage.value = act.resources.getString(R.string.em_dot) // передаем текст ошибки
-
-                    } else if (newText.contains(" ")){ // если содержит пробел
-
-                        isErrorEmail.value = true // объявляем состояние ошибки
-                        focusColorEmail.value = AttentionColor // красим границы формы в цвет ошибки
-                        errorEmailMassage.value = act.resources.getString(R.string.em_space) // передаем текст ошибки
-
-                    } else { // когда все нормально
-
-                        isErrorEmail.value = false // объявляем, что ошибки нет
-                        focusColorEmail.value = PrimaryColor // цвет фокуса переводим в нормальный
-                    }
-
-                },
-
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    // цвета
-                    textColor = Grey40,
-                    backgroundColor = Grey95,
-                    placeholderColor = Grey60,
-                    focusedBorderColor = Grey95,
-                    unfocusedBorderColor = Grey95,
-                    cursorColor = Grey00,
-                    errorBorderColor = Grey95
-
-                ),
-
-                // иконка справа от текста
-                trailingIcon = {
-                    // условие, если состояние ошибки
-                    if (isErrorEmail.value) {
-
+                    ),
+                    keyboardActions = KeyboardActions(
+                        // При нажатии на кнопку onDone - снимает фокус с формы
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    placeholder = {
+                        // подсказка для пользователей
+                        Text(
+                            text = stringResource(id = R.string.email_example), // значение подсказки
+                            style = Typography.bodyLarge // стиль текста в холдере
+                        )
+                    },
+                    leadingIcon = {
+                        // иконка, расположенная слева от надписи плейсхолдера
                         Icon(
-                            painter = painterResource(R.drawable.ic_error), // иконка ошибки
-                            contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
-                            tint = AttentionColor, // цвет иконки
+                            painter = painterResource(id = R.drawable.ic_email), // сама иконка
+                            contentDescription = stringResource(id = R.string.cd_email_icon), // описание для слабовидящих
+                            tint = Grey60, // цвет иконки
                             modifier = Modifier.size(20.dp) // размер иконки
                         )
-                    }
-                },
-                textStyle = Typography.bodyLarge, // стиль текста
-                keyboardOptions = KeyboardOptions(
-                    // опции клавиатуры, которая появляется при вводе
-                    keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
-                    imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
+                    },
+                    singleLine = true, // говорим, что текст в форме будет однострочный
+                    isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
+                )
 
-                ),
-                keyboardActions = KeyboardActions(
-                    // При нажатии на кнопку onDone - снимает фокус с формы
-                    onDone = {
-                        focusManager.clearFocus()
-                    }
-                ),
-                placeholder = {
-                    // подсказка для пользователей
+                // --------- ТЕКСТ ОШИБКИ ----------------
+
+                // условие - если состояние ошибки
+                if (isErrorEmail.value) {
                     Text(
-                        text = stringResource(id = R.string.email_example), // значение подсказки
-                        style = Typography.bodyLarge // стиль текста в холдере
+                        text = errorEmailMassage.value, // текст ошибки
+                        color = AttentionColor, // цвет текста ошибки
+                        style = Typography.bodySmall, // стиль текста
+                        modifier = Modifier.padding(top = 5.dp)
+                    ) // отступы
+                }
+
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
+
+                Button(
+
+                    onClick = { // действия при нажатии
+                        act.mAuth.sendPasswordResetEmail(email.value)
+                    },
+
+                    // Остальные настройки кнопки
+
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp),// высота - 50
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
                     )
-                },
-                leadingIcon = {
-                    // иконка, расположенная слева от надписи плейсхолдера
+                )
+                {
+
+                    // СОДЕРЖИМОЕ КНОПКИ
+
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_email), // сама иконка
-                        contentDescription = stringResource(id = R.string.cd_email_icon), // описание для слабовидящих
-                        tint = Grey60, // цвет иконки
-                        modifier = Modifier.size(20.dp) // размер иконки
+                        painter = painterResource(id = R.drawable.ic_key), // иконка
+                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                        tint = Grey100 // цвет иконки
                     )
-                },
-                singleLine = true, // говорим, что текст в форме будет однострочный
-                isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
-            )
 
-            // --------- ТЕКСТ ОШИБКИ ----------------
+                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
 
-            // условие - если состояние ошибки
-            if (isErrorEmail.value) {
-                Text(
-                    text = errorEmailMassage.value, // текст ошибки
-                    color = AttentionColor, // цвет текста ошибки
-                    style = Typography.bodySmall, // стиль текста
-                    modifier = Modifier.padding(top = 5.dp)) // отступы
+                    Text(
+                        text = stringResource(id = R.string.help_change_password),
+                        style = Typography.labelMedium
+                    )
+                }
+
             }
-
-
-
-            Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
-
-            Button(
-
-                onClick = { // действия при нажатии
-                    act.mAuth.sendPasswordResetEmail(email.value)
-                },
-
-                // Остальные настройки кнопки
-
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка на всю ширину
-                    .height(50.dp),// высота - 50
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = PrimaryColor, // цвет кнопки
-                    contentColor = Grey100 // цвет контента на кнопке
-                )
-            )
-            {
-
-                // СОДЕРЖИМОЕ КНОПКИ
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_login), // иконка
-                    contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                    tint = Grey100 // цвет иконки
-                )
-
-                Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
-
-                Text(
-                    text = "Восстановить пароль"
-                )
-            }
-
         }
     }
-
 }
+
+
+
