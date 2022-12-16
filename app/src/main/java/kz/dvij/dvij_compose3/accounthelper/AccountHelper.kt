@@ -87,6 +87,7 @@ class AccountHelper (act: MainActivity) {
 
             if (task.isSuccessful) {
                 Toast.makeText(act, "Вход через гугл зашел", Toast.LENGTH_SHORT).show()
+
             }
 
         }

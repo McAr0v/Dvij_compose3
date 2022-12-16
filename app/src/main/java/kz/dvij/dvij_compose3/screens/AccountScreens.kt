@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,6 +30,7 @@ import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import okhttp3.internal.wait
 
 class AccountScreens(act: MainActivity) {
 
@@ -46,9 +49,16 @@ class AccountScreens(act: MainActivity) {
 
         val coroutine = rememberCoroutineScope() // инициализируем корутину
 
+        // --------- СОДЕРЖИМОЕ СТРАНИЦЫ -------------
+
         Column() {
 
-            // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
+            // помещаем все содержимое страницы в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
+
+
+
+            // ------- КНОПКА ЗАКРЫТЬ ЭКРАН ---------
+
 
             // создаем строку, чтобы задать положение кнопки "Закрыть"
             Row(
@@ -75,7 +85,7 @@ class AccountScreens(act: MainActivity) {
             }
 
 
-            // Колонка с остальным содержимым страницы.
+            // ------ КОЛОНКА С ОСТАВШИМСЯ СОДЕРЖИМЫМ СТРАНИЦЫ ----------
 
             Column(
                 modifier = Modifier
@@ -112,29 +122,37 @@ class AccountScreens(act: MainActivity) {
 
                 var passwordVisible = remember { mutableStateOf(false) }
 
+
+
                 // --------------- САМ КОНТЕНТ СТРАНИЦЫ ------------------
+
+
 
                 /* Так как страница меняется в зависимости от переключателя switch
                 будет много условий, какой switch передан в функцию. Т.е выбрана страница
                 регистрации или входа
                 */
 
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
 
                 // -------------- ИЛЛЮСТРАЦИЯ ------------------
 
                 Image(
-                    //modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(
                         id = if (switch == REGISTRATION){
-                            R.drawable.sign_up_illustration
-                        } else (R.drawable.sign_in_illustration)
+                            R.drawable.sign_up_illustration // если регистрация, то иллюстрация регистрации
+                        } else {
+                            R.drawable.sign_in_illustration // если вход, то иллюстрация входа
+                        }
 
                     ),
-                    contentDescription = stringResource(id = R.string.cd_illustration)
+                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
+
                 )
 
+
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
 
                 // -------------  ЗАГОЛОВОК ---------------
 
@@ -149,7 +167,7 @@ class AccountScreens(act: MainActivity) {
                 )
 
 
-                Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и полями для ввода
+                //Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и полями для ввода
 
 
 
@@ -200,7 +218,7 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(40.dp)) // разделитель между 
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между
 
 
 
@@ -334,7 +352,7 @@ class AccountScreens(act: MainActivity) {
 
 
 
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
+                Spacer(modifier = Modifier.height(10.dp)) // разделитель между полями
 
                 // ------------    ТЕКСТОВОЕ ПОЛЕ С ПАРОЛЕМ ----------------
 
@@ -608,6 +626,8 @@ class AccountScreens(act: MainActivity) {
                 Button(
                     onClick = {
                         accountHelper.signInWithGoogle()
+
+                        navController.navigate(MEETINGS_ROOT)
                               },
                     modifier = Modifier
                         .fillMaxWidth() // На всю ширину
@@ -638,7 +658,7 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(30.dp)) // разделитель между кнопкой ГУГЛ
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между кнопкой ГУГЛ
 
                 Divider(
                     modifier = Modifier.fillMaxWidth(),
@@ -801,6 +821,7 @@ class AccountScreens(act: MainActivity) {
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @Composable
     fun ForgotPasswordPage (navController: NavController) {
 
@@ -823,6 +844,7 @@ class AccountScreens(act: MainActivity) {
                 IconButton(
                     onClick = {
                         navController.navigate(LOG_IN_ROOT) // действие если нажать на кнопку
+
                     }
                 ) {
                     // содержимое кнопки (в теории слева можно добавить надпись текстом "Закрыть")
@@ -1038,6 +1060,7 @@ class AccountScreens(act: MainActivity) {
 
                     onClick = { // действия при нажатии
                         act.mAuth.sendPasswordResetEmail(email.value)
+                        navController.navigate(RESET_PASSWORD_SUCCESS)
                     },
 
                     // Остальные настройки кнопки
@@ -1071,6 +1094,121 @@ class AccountScreens(act: MainActivity) {
 
             }
         }
+    }
+
+    @Composable
+    fun ResetPasswordSuccess (navController: NavController){
+        Column(
+
+        ) {
+
+            // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
+
+            // создаем строку, чтобы задать положение кнопки "Закрыть"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey95),
+                verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание кнопки
+                horizontalArrangement = Arrangement.End // выравнивание кнопки по правому краю
+            ) {
+
+                // сама кнопка Закрыть
+                IconButton(
+                    onClick = {
+                        navController.navigate(MEETINGS_ROOT) // действие если нажать на кнопку
+                    }
+                ) {
+                    // содержимое кнопки (в теории слева можно добавить надпись текстом "Закрыть")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close),
+                        contentDescription = stringResource(id = R.string.close_page),
+                        tint = Grey00
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Grey95)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            )
+
+            {
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+                Image(
+                    //modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.send_email_illustration),
+                    contentDescription = stringResource(id = R.string.cd_illustration)
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+                // -------------  ЗАГОЛОВОК ---------------
+
+                Text(  // заголовок зависит от switch
+                    text = "Проверь свой Email и сбрось пароль",
+                    style = Typography.titleLarge, // стиль заголовка
+                    color = Grey00, // цвет заголовка
+                    textAlign = TextAlign.Center
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
+
+                Text(  // заголовок зависит от switch
+                    text = "Мы отправили тебе на почту инструкцию по сбросу пароля. " +
+                            "Следуй инструкции и у тебя все получится!",
+                    style = Typography.bodyMedium, // стиль заголовка
+                    color = Grey40, // цвет заголовка
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(40.dp)) // разделитель между полями
+
+                Button(
+
+                    onClick = { // действия при нажатии
+                        navController.navigate(MEETINGS_ROOT)
+                    },
+
+                    // Остальные настройки кнопки
+
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp),// высота - 50
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                )
+                {
+
+                    // СОДЕРЖИМОЕ КНОПКИ
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_home), // иконка
+                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                        tint = Grey100 // цвет иконки
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                    Text(
+                        text = "Вернуться на главную страницу",
+                        style = Typography.labelMedium
+                    )
+                }
+
+            }
+        }
+
     }
 }
 

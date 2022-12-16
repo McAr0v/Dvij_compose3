@@ -89,7 +89,13 @@ class MainActivity : ComponentActivity() {
                 scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
                 bottomBar = {
 
-                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT || currentRoute == FORGOT_PASSWORD_ROOT || currentRoute == THANK_YOU_PAGE_ROOT) {
+                    if (
+                        currentRoute == REG_ROOT
+                        || currentRoute == LOG_IN_ROOT
+                        || currentRoute == FORGOT_PASSWORD_ROOT
+                        || currentRoute == THANK_YOU_PAGE_ROOT
+                        || currentRoute == RESET_PASSWORD_SUCCESS
+                    ) {
 
                     } else {
                         BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
@@ -99,7 +105,13 @@ class MainActivity : ComponentActivity() {
                             },
                 topBar = {
 
-                    if (currentRoute == REG_ROOT || currentRoute == LOG_IN_ROOT || currentRoute == FORGOT_PASSWORD_ROOT || currentRoute == THANK_YOU_PAGE_ROOT){
+                    if (
+                        currentRoute == REG_ROOT
+                        || currentRoute == LOG_IN_ROOT
+                        || currentRoute == FORGOT_PASSWORD_ROOT
+                        || currentRoute == THANK_YOU_PAGE_ROOT
+                        || currentRoute == RESET_PASSWORD_SUCCESS
+                    ){
 
                     } else {
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
@@ -184,6 +196,7 @@ class MainActivity : ComponentActivity() {
                         composable(LOG_IN_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
+                        composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
 
                     }
                 }
