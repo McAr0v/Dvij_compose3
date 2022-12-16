@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
     val mAuth = FirebaseAuth.getInstance() // берем из файрбаз аутентикейшн
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
+
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -82,12 +82,13 @@ class AccountHelper (act: MainActivity) {
 
 
     fun signInFirebaseWithGoogle (token: String) {
+
         val credential = GoogleAuthProvider.getCredential(token, null)
         act.mAuth.signInWithCredential(credential).addOnCompleteListener{ task ->
 
             if (task.isSuccessful) {
+                act.recreate()
                 Toast.makeText(act, "Вход через гугл зашел", Toast.LENGTH_SHORT).show()
-
             }
 
         }

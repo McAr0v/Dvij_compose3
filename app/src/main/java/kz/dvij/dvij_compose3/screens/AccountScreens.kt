@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.Transliterator.Position
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -23,14 +24,17 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.navigation.NavController
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
-import okhttp3.internal.wait
 
 class AccountScreens(act: MainActivity) {
 
@@ -393,14 +397,14 @@ class AccountScreens(act: MainActivity) {
                         ) {
                         Icon(
                             painter = painterResource( // разные иконки в зависимости от того, скрыт пароль или открыт
-                                if (passwordVisible.value == false) {
+                                if (!passwordVisible.value) {
                                     R.drawable.ic_visibility_off // скрыт
                                 } else {
                                     R.drawable.ic_visibility // открыт
                                 }
                             ),
                             contentDescription = stringResource( // разные иконки в зависимости от того, скрыт пароль или открыт
-                                if (passwordVisible.value == false) {
+                                if (!passwordVisible.value) {
                                     R.string.cd_show_password // скрыт, но иконка о том, что показать пароль
                                 } else {
                                     R.string.cd_hide_password // открыт, но иконка о том, чтобы закрыть видимость
@@ -626,7 +630,6 @@ class AccountScreens(act: MainActivity) {
                 Button(
                     onClick = {
                         accountHelper.signInWithGoogle()
-
                         navController.navigate(MEETINGS_ROOT)
                               },
                     modifier = Modifier
