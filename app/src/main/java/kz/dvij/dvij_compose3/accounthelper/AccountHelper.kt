@@ -1,12 +1,12 @@
 package kz.dvij.dvij_compose3.accounthelper
 
+import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.screens.AccountScreens
@@ -18,6 +18,77 @@ class AccountHelper (act: MainActivity) {
 
     private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
+
+    fun errorInSignInAndUp (error: Exception) {
+
+        Log.d("MyLog", "Exception: $error") // выводим класс ошибки (ниже это FirebaseAuthUserCollisionException)
+
+        if (error is FirebaseAuthUserCollisionException) {
+            val exception = error as FirebaseAuthUserCollisionException
+            Log.d("MyLog", "Exception: ${exception.errorCode}") // уже конкретно уточняем код ошибки ERROR_EMAIL_ALREADY_IN_USE
+
+            // создаем в константах константу для обозначения ошибки
+
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
+                Toast.makeText(
+                    act,
+                    "Пользователь с таким Email уже существует",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        if (error is FirebaseAuthInvalidUserException) {
+
+            val exception = error as FirebaseAuthInvalidUserException
+
+            // Log.d("MyLog", "Exception: ${exception.errorCode}") // уже конкретно уточняем код ошибки
+
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_USER_NOT_FOUND) {
+                Toast.makeText(
+                    act,
+                    "Пользователя с таким Email адресом не существует",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        if (error is FirebaseAuthInvalidCredentialsException) {
+
+            val exception = error as FirebaseAuthInvalidCredentialsException
+            // Log.d("MyLog", "Exception: ${exception.errorCode}") // уже конкретно уточняем код ошибки
+
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
+                Toast.makeText(
+                    act,
+                    "Ты ввел неправильный формат Email адреса. Проверь, правильно ли ты ввел Email?",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
+                Toast.makeText(
+                    act,
+                    "Неверный пароль",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        if (error is FirebaseAuthWeakPasswordException) {
+
+            val exception = error as FirebaseAuthWeakPasswordException
+            // Log.d("MyLog", "Exception: ${exception.errorCode}") // уже конкретно уточняем код ошибки
+
+            if (exception.errorCode == FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
+                Toast.makeText(
+                    act,
+                    "Пароль должен содержать больше 6 символов",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
 
     // Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ
@@ -38,11 +109,6 @@ class AccountHelper (act: MainActivity) {
     // выход из аккаунта гугл. НЕ УДАЛЯТЬ ФУНКЦИЮ
     fun signOutGoogle(){
         getSignInClient().signOut()
-    }
-
-    // функция сброса пароля НЕ УДАЛЯТЬ ФУНКЦИЮ
-    fun resetPassword(email: String){
-        act.mAuth.sendPasswordResetEmail(email)
     }
 
 

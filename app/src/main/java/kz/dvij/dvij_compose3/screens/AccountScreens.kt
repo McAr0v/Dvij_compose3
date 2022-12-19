@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.screens
 
 import android.annotation.SuppressLint
 import android.icu.text.Transliterator.Position
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -27,11 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.accounthelper.FirebaseAuthConstants
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -477,12 +481,12 @@ class AccountScreens(act: MainActivity) {
 
                                         navController.navigate(THANK_YOU_PAGE_ROOT) // переходим на страницу СПАСИБО ЗА РЕГИСТРАЦИЮ
 
-                                    } else { // если регистрация не выполнилась
-                                        Toast.makeText(
-                                            act,
-                                            act.resources.getString(R.string.registr_error),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                    } else {
+
+                                        // если регистрация не выполнилась
+
+                                        task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию вывода нужной информации
+
                                     }
                                 }
 
@@ -505,11 +509,8 @@ class AccountScreens(act: MainActivity) {
 
                                 } else { // если вход не выполнен
 
-                                    Toast.makeText(
-                                        act,
-                                        act.resources.getString(R.string.sign_in_error),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию вывода нужной информации
+
                                 }
                             }
                         }
@@ -1062,8 +1063,14 @@ class AccountScreens(act: MainActivity) {
                 Button(
 
                     onClick = { // действия при нажатии
-                        act.mAuth.sendPasswordResetEmail(email.value)
-                        navController.navigate(RESET_PASSWORD_SUCCESS)
+                        act.mAuth.sendPasswordResetEmail(email.value).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                navController.navigate(RESET_PASSWORD_SUCCESS)
+                            } else {
+                                Toast.makeText(act, R.string.forgot_password_error, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
                     },
 
                     // Остальные настройки кнопки

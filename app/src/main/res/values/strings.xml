@@ -73,6 +73,7 @@
     <string name="private_policy_agree">C ПОЛИТИКОЙ КОНФИДЕНЦИАЛЬНОСТИ </string>
     <string name="forgot_password">Забыли пароль? </string>
     <string name="help_change_password">Восстановить пароль </string>
+    <string name="forgot_password_error">Не удалось отправить Email с ссылкой на восстановление пароля </string>
     <string name="verify_email">Подтверди почту </string>
     <string name="verify_email_text">На твою почту мы отправили письмо. Нам нужно убедиться, что ты не спамер. Подтверди Email и после подтверждения просто зайди в аккаунт. </string>
     <string name="forgot_password_text">Если ты забыл пароль, введи Email, на который зарегистрирован твой аккаунт. Мы отправим письмо с инструкцией, как восстановить пароль</string>
