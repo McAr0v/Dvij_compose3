@@ -80,10 +80,13 @@
     <string name="forgot_password_text">Если ты забыл пароль, введи Email, на который зарегистрирован твой аккаунт. Мы отправим письмо с инструкцией, как восстановить пароль</string>
     <string name="reset_password_title">Проверь почту и сбрось пароль</string>
     <string name="reset_password_text">Мы отправили тебе на почту инструкцию по сбросу пароля. Следуй инструкции и у тебя все получится!</string>
+    <string name="send_email_verification_success">Письмо с ссылкой на активацию аккаунта успешно отправлено</string>
+    <string name="send_email_verification_error">Не удалось отправить письмо с ссылкой на активацию аккаунта</string>
 
     <!-- Страница профиля -->
     <string name="icon_user_image">Изображение аватарки пользователя</string>
     <string name="sign_out_success">Ты успешно вышел из аккаунта.</string>
+    <string name="sign_in_google_success">Ты успешно вошел через Google-аккаунт</string>
     <string name="sign_out_button">Выйти из аккаунта</string>
     <string name="email_verify_toast">Страница аккаунта станет доступна после того, как ты подтвердишь Email. Проверь почту и активируй аккаунт</string>
     <string name="need_registration_toast">Страница аккаунта станет доступна после того, как ты зарегистрируешься</string>
@@ -93,5 +96,10 @@
     <string name="em_dot">Email должен содержать точку -.-</string>
     <string name="em_space">Email не должен содержать пробел - -</string>
     <string name="em_right_email">Введен корректный Email</string>
+    <string name="exception_user_exist">Пользователь с таким Email уже существует</string>
+    <string name="exception_user_not_exist">Пользователя с таким Email не существует</string>
+    <string name="exception_wrong_format_email">Неверный формат Email-адреса. Проверь, правильно ли ты написал Email?</string>
+    <string name="exception_wrong_password">Неверный пароль</string>
+    <string name="exception_password_need_more_letters">Пароль должен содержать больше 6 символов</string>
 
 </resources>

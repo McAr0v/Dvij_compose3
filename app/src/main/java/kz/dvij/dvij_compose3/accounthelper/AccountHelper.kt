@@ -21,22 +21,36 @@ class AccountHelper (act: MainActivity) {
 
     fun errorInSignInAndUp (error: Exception) {
 
-        Log.d("MyLog", "Exception: $error") // выводим класс ошибки (ниже это FirebaseAuthUserCollisionException)
+        // ---- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ОШИБКИ И ВЫВОДА СООБЩЕНИЯ ПРИ РЕГИСТРАЦИИ И ВХОДЕ --------
+
+        Log.d("MyLog", "Exception: $error") // определяем класс ошибки (ниже это FirebaseAuthUserCollisionException)
+
+        // При возникновении ошибки, нужно смотреть LogCat
+
+
+        // ---- ЕСЛИ ОШИБКА КЛАССА FirebaseAuthUserCollisionException
 
         if (error is FirebaseAuthUserCollisionException) {
-            val exception = error as FirebaseAuthUserCollisionException
-            Log.d("MyLog", "Exception: ${exception.errorCode}") // уже конкретно уточняем код ошибки ERROR_EMAIL_ALREADY_IN_USE
+            val exception = error as FirebaseAuthUserCollisionException // Указываем ошибку как ошибку нужного класса
+            Log.d("MyLog", "Exception: ${exception.errorCode}") // Выводим в ЛОГ уже конкретный код ошибки - ERROR_EMAIL_ALREADY_IN_USE
 
-            // создаем в константах константу для обозначения ошибки
+            // создаем в константах AccountConst константу для обозначения ошибки
+
+            // Прописываем условие, если наш код ошибки равняется коду ошибки из констант - то выводим ТОСТ
 
             if (exception.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
                 Toast.makeText(
                     act,
-                    "Пользователь с таким Email уже существует",
+                    R.string.exception_user_exist,
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
+
+        // ----------- ДАЛЕЕ ВСЕ СДЕЛАНО ПО АНАЛОГИИ, КОММЕНТИРОВАТЬ НЕ БУДУ --------------
+
+
+        // ---- ЕСЛИ ОШИБКА КЛАССА FirebaseAuthInvalidUserException
 
         if (error is FirebaseAuthInvalidUserException) {
 
@@ -47,11 +61,13 @@ class AccountHelper (act: MainActivity) {
             if (exception.errorCode == FirebaseAuthConstants.ERROR_USER_NOT_FOUND) {
                 Toast.makeText(
                     act,
-                    "Пользователя с таким Email адресом не существует",
+                    R.string.exception_user_not_exist,
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
+
+        // ---- ЕСЛИ ОШИБКА КЛАССА FirebaseAuthInvalidCredentialsException
 
         if (error is FirebaseAuthInvalidCredentialsException) {
 
@@ -61,7 +77,7 @@ class AccountHelper (act: MainActivity) {
             if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
                 Toast.makeText(
                     act,
-                    "Ты ввел неправильный формат Email адреса. Проверь, правильно ли ты ввел Email?",
+                    R.string.exception_wrong_format_email,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -69,11 +85,13 @@ class AccountHelper (act: MainActivity) {
             if (exception.errorCode == FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
                 Toast.makeText(
                     act,
-                    "Неверный пароль",
+                    R.string.exception_wrong_password,
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
+
+        // ---- ЕСЛИ ОШИБКА КЛАССА FirebaseAuthWeakPasswordException
 
         if (error is FirebaseAuthWeakPasswordException) {
 
@@ -83,7 +101,7 @@ class AccountHelper (act: MainActivity) {
             if (exception.errorCode == FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
                 Toast.makeText(
                     act,
-                    "Пароль должен содержать больше 6 символов",
+                    R.string.exception_password_need_more_letters,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -98,9 +116,9 @@ class AccountHelper (act: MainActivity) {
 
         user.sendEmailVerification().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(act, "На вашу почту был отправлен Email", Toast.LENGTH_SHORT).show()
+                Toast.makeText(act, R.string.send_email_verification_success, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(act, "Не удалось отправить письмо", Toast.LENGTH_SHORT).show()
+                Toast.makeText(act, R.string.send_email_verification_error, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -154,7 +172,7 @@ class AccountHelper (act: MainActivity) {
 
             if (task.isSuccessful) {
                 act.recreate()
-                Toast.makeText(act, "Вход через гугл зашел", Toast.LENGTH_SHORT).show()
+                Toast.makeText(act, R.string.sign_in_google_success, Toast.LENGTH_SHORT).show()
             }
 
         }

@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -150,15 +152,14 @@ class MainActivity : ComponentActivity() {
                 drawerContent = {
 
                         // собственно содержимое бокового меню
-                        HeaderSideNavigation() // вызываем Header
-                        AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
-                        CityHeaderSideNavigation("Усть-Каменогорск")
-                        BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
-                            navController = navController, // Передаем NavController
-                            scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
-                        )
-                        SubscribeBoxSideNavigation()
-
+                    HeaderSideNavigation() // вызываем Header
+                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
+                    CityHeaderSideNavigation("Усть-Каменогорск")
+                    BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
+                        navController = navController, // Передаем NavController
+                        scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
+                    )
+                    SubscribeBoxSideNavigation()
                 }
                 )
 

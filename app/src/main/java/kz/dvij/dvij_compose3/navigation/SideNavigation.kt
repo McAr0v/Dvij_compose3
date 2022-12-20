@@ -31,23 +31,6 @@ import kz.dvij.dvij_compose3.ui.theme.*
 // https://semicolonspace.com/jetpack-compose-navigation-drawer/
 // https://www.youtube.com/watch?v=JLICaBEiJS0
 
-@Composable
-fun DrawerContent () {
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-        HeaderSideNavigation()
-
-
-    }
-}
 
 @Composable
 fun HeaderSideNavigation(){
@@ -58,7 +41,7 @@ fun HeaderSideNavigation(){
         modifier = Modifier
             .fillMaxWidth() // говорим, чтобы занял всю ширину
             .background(Grey100) // цвет фона контейнера
-            .padding(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 20.dp), // паддинги контейнера
+            .padding(start = 20.dp, end = 20.dp, top = 30.dp, bottom = 20.dp), // паддинги контейнера
         contentAlignment = Alignment.CenterStart // выравнивание
     ){
         Icon( // помещаем логотип как векторную иконку
@@ -88,8 +71,8 @@ fun SubscribeBoxSideNavigation(){
 
         Text(
             text = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe), // текст заголовка
-            color = Grey00, // цвет заголовка
-            style = Typography.titleMedium // стиль заголовка
+            color = Grey40, // цвет заголовка
+            style = Typography.labelMedium // стиль заголовка
         )
 
         // Создаем строку, в строку поместим иконки с ссылками на соц сети
@@ -314,9 +297,9 @@ fun AvatarBoxSideNavigation(
                         color = Grey40, // цвет текста
                         style = Typography.titleMedium // стиль текста
                     )
-                    
+
                     Spacer(modifier = Modifier.height(5.dp))
-                    
+
                     Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
                         text = stringResource(id = R.string.verify_email_text), // сам текст
                         color = Grey40, // цвет текста
@@ -458,7 +441,7 @@ fun BodySideNavigation(
         Modifier
             .background(color = Grey100) // окрашиваем в черный
             //.fillMaxHeight() // занимаем весь размер
-            .padding(vertical = 20.dp)
+            .padding(vertical = 10.dp)
     ) {
         // Помещаем все в "ленивую" колонку
 
