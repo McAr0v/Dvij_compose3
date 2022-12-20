@@ -48,6 +48,8 @@ class AccountScreens(act: MainActivity) {
     private val accountHelper = AccountHelper(act) // инициализируем класс AccountHelper
 
 
+    // ------ СТРАНИЦА РЕГИСТРАЦИЯ / ВХОД
+
     @Composable
     fun RegistrScreen(
         navController: NavController,
@@ -57,7 +59,9 @@ class AccountScreens(act: MainActivity) {
 
         val coroutine = rememberCoroutineScope() // инициализируем корутину
 
+
         // --------- СОДЕРЖИМОЕ СТРАНИЦЫ -------------
+
 
         Column() {
 
@@ -77,7 +81,10 @@ class AccountScreens(act: MainActivity) {
                     horizontalArrangement = Arrangement.End // выравнивание кнопки по правому краю
             ) {
 
-                // сама кнопка Закрыть
+
+                // ------- сама кнопка Закрыть ---------
+
+
                 IconButton(
                     onClick = {
                         navController.navigate(MEETINGS_ROOT) // действие если нажать на кнопку
@@ -99,7 +106,7 @@ class AccountScreens(act: MainActivity) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Grey95)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()) // Делаем колонку с вертикальным скролом
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
@@ -162,7 +169,9 @@ class AccountScreens(act: MainActivity) {
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
 
+
                 // -------------  ЗАГОЛОВОК ---------------
+
 
                 Text(  // заголовок зависит от switch
                     text = if (switch == REGISTRATION) {
@@ -175,11 +184,10 @@ class AccountScreens(act: MainActivity) {
                 )
 
 
-                //Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и полями для ввода
+
+                // --------------- ПЕРЕКЛЮЧАТЕЛЬ МЕЖДУ ВХОДОМ И РЕГИСТРАЦИЕЙ --------------------------
 
 
-
-                // --------------- Переключатель между регистрацией и входом --------------------------
 
                 Row(
                     modifier = Modifier // создаем колонку
@@ -187,7 +195,12 @@ class AccountScreens(act: MainActivity) {
                     verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
                     horizontalArrangement = Arrangement.Center // выравнивание по центру
                 ) {
-                    Text( // 1й текст (НЕ ГИПЕРССЫЛКА)
+
+
+                    // ------ 1й ТЕКСТ - НЕ ГИПЕРССЫЛКА ----------
+
+
+                    Text(
 
                         text = if (switch == REGISTRATION) {
                             stringResource(id = R.string.have_account)
@@ -199,9 +212,15 @@ class AccountScreens(act: MainActivity) {
                         color = Grey40 // цвет текста
                     )
 
+
                     Spacer(modifier = Modifier.width(7.dp)) // разделитель между словами
 
-                    Text( // 2й текст, который КЛИКАБЕЛЬНЫЙ
+
+
+                    // ------ 2й ТЕКСТ - ГИПЕРССЫЛКА ------------
+
+
+                    Text(
 
                         text = if (switch == REGISTRATION) {
                             stringResource(id = R.string.to_login)
@@ -226,14 +245,17 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель между
 
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель между
 
 
 
                 // -------- ТЕКСТОВОЕ ПОЛЕ EMAIL -----------------
 
+
                 TextField(
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
@@ -247,6 +269,7 @@ class AccountScreens(act: MainActivity) {
                             color = focusColorEmail.value, // цвет - для этого выше мы создавали переменные с цветом
                             shape = RoundedCornerShape(50.dp) // скругление границ
                         ),
+
                     value = email.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
 
                     // on valueChange - это действие при изменении значения
@@ -314,19 +337,23 @@ class AccountScreens(act: MainActivity) {
                             )
                         }
                     },
+
                     textStyle = Typography.bodyLarge, // стиль текста
+
                     keyboardOptions = KeyboardOptions(
                         // опции клавиатуры, которая появляется при вводе
                         keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
                         imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
                     ),
+
                     keyboardActions = KeyboardActions(
                         // При нажатии на кнопку onDone - снимает фокус с формы
                         onDone = {
                             focusManager.clearFocus()
                         }
                     ),
+
                     placeholder = {
                         // подсказка для пользователей
                         Text(
@@ -334,6 +361,7 @@ class AccountScreens(act: MainActivity) {
                             style = Typography.bodyLarge // стиль текста в холдере
                         )
                     },
+
                     leadingIcon = {
                         // иконка, расположенная слева от надписи плейсхолдера
                         Icon(
@@ -343,11 +371,16 @@ class AccountScreens(act: MainActivity) {
                             modifier = Modifier.size(20.dp) // размер иконки
                         )
                     },
+
                     singleLine = true, // говорим, что текст в форме будет однострочный
+
                     isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
                 )
 
+
+
                 // --------- ТЕКСТ ОШИБКИ ----------------
+
 
                 // условие - если состояние ошибки
                 if (isErrorEmail.value) {
@@ -362,7 +395,10 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(10.dp)) // разделитель между полями
 
+
+
                 // ------------    ТЕКСТОВОЕ ПОЛЕ С ПАРОЛЕМ ----------------
+
 
                 TextField(
                     modifier = Modifier
@@ -377,8 +413,11 @@ class AccountScreens(act: MainActivity) {
                             color = focusColorPassword.value, // цвет границы
                             shape = RoundedCornerShape(50.dp) // скругление углов
                         ),
+
                     value = password.value, // значение пароля
+
                     onValueChange = {newText -> password.value = newText}, // вводимое значение
+
                     colors = TextFieldDefaults.outlinedTextFieldColors( // цвета поля
                         textColor = Grey40,
                         backgroundColor = Grey95,
@@ -387,6 +426,7 @@ class AccountScreens(act: MainActivity) {
                         unfocusedBorderColor = Grey95,
                         cursorColor = Grey00
                     ),
+
                     keyboardActions = KeyboardActions(
                         // При нажатии на кнопку onDone - снимает фокус с формы
                         onDone = {
@@ -395,10 +435,13 @@ class AccountScreens(act: MainActivity) {
 
                         }
                     ),
+
                     trailingIcon = { // иконка ОТКРЫТЬ/СКРЫТЬ пароль
+
                         IconButton(
                             onClick = {passwordVisible.value = !passwordVisible.value}
                         ) {
+
                         Icon(
                             painter = painterResource( // разные иконки в зависимости от того, скрыт пароль или открыт
                                 if (!passwordVisible.value) {
@@ -419,6 +462,7 @@ class AccountScreens(act: MainActivity) {
                             )
                         }
                     },
+
                     textStyle = Typography.bodyLarge, // стиль текста
 
                     keyboardOptions = KeyboardOptions( // опции всплывающей клавиатуры
@@ -453,7 +497,7 @@ class AccountScreens(act: MainActivity) {
 
 
 
-                // ------------------- КНОПКА ---------------------------------
+                // ------------------- КНОПКА РЕГИСТРАЦИЯ / ВХОД ---------------------------------
 
                 Button(
 
@@ -485,7 +529,7 @@ class AccountScreens(act: MainActivity) {
 
                                         // если регистрация не выполнилась
 
-                                        task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию вывода нужной информации
+                                        task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию отслеживания ошибки и вывода нужной информации
 
                                     }
                                 }
@@ -509,7 +553,7 @@ class AccountScreens(act: MainActivity) {
 
                                 } else { // если вход не выполнен
 
-                                    task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию вывода нужной информации
+                                    task.exception?.let { accountHelper.errorInSignInAndUp(it) } // отправляем в функцию отслеживания ошибки и вывода нужной информации
 
                                 }
                             }
@@ -517,7 +561,9 @@ class AccountScreens(act: MainActivity) {
                     }
                 },
 
+
                     // ------------------ ДЕЙСТВИЕ НА КНОПКУ КОНЧАЕТСЯ ЗДЕСЬ XD --------------------
+
 
                     // Остальные настройки кнопки
 
@@ -552,7 +598,8 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
-                // ----------- ЗАБЫЛИ ПАРОЛЬ? -----------------------
+
+                // ----------- НАДПИСЬ ЗАБЫЛИ ПАРОЛЬ? -----------------------
 
                 if (switch != REGISTRATION) {
 
@@ -592,7 +639,9 @@ class AccountScreens(act: MainActivity) {
                 Spacer(modifier = Modifier.height(20.dp)) // Разделитель
 
 
+
                 // -------- строка ЕСТЬ АККАУНТ ГУГЛ с полосами -------------
+
 
                 Row(
                     // помещаем все в строку
@@ -624,7 +673,10 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
+
                 Spacer(modifier = Modifier.height(15.dp)) // разделитель между мини заголовком и кнопкой
+
+
 
                 // -------------- КНОПКА ВХОДА ЧЕРЕЗ GOOGLE ------------------
 
@@ -662,6 +714,7 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
 
+
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель между кнопкой ГУГЛ
 
                 Divider(
@@ -674,7 +727,9 @@ class AccountScreens(act: MainActivity) {
 
 
 
+
                 // ---------- СТРОКА С ПОЛИТИКОЙ КОНФИДЕНЦИАЛЬНОСТИ ----------------------
+
 
                 Column(modifier = Modifier // создаем колонку
                     .fillMaxWidth(), // на всю ширину
@@ -710,8 +765,11 @@ class AccountScreens(act: MainActivity) {
         }
     }
 
+    // ------ СТРАНИЦА "СПАСИБО ЗА РЕГИСТРАЦИЮ" --------------
+
     @Composable
     fun ThankYouPage (navController: NavController){
+
         Column(
 
         ) {
@@ -719,6 +777,7 @@ class AccountScreens(act: MainActivity) {
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 
             // создаем строку, чтобы задать положение кнопки "Закрыть"
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -727,7 +786,8 @@ class AccountScreens(act: MainActivity) {
                 horizontalArrangement = Arrangement.End // выравнивание кнопки по правому краю
             ) {
 
-                // сама кнопка Закрыть
+                // ------- сама кнопка Закрыть -----------
+
                 IconButton(
                     onClick = {
                         navController.navigate(MEETINGS_ROOT) // действие если нажать на кнопку
@@ -742,6 +802,9 @@ class AccountScreens(act: MainActivity) {
                 }
             }
 
+
+            // ------------ САМ КОНТЕНТ СТРАНИЦЫ -----------------
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -755,18 +818,25 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
+
+                // ---------------- ИЛЛЮСТРАЦИЯ -----------------
+
+
                 Image(
-                    //modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(id = R.drawable.send_email_illustration),
                     contentDescription = stringResource(id = R.string.cd_illustration)
                 )
 
+
+
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
-                // -------------  ЗАГОЛОВОК ---------------
 
-                Text(  // заголовок зависит от switch
-                    text = "Проверь свой Email и активируй аккаунт",
+
+                // -------------  ЗАГОЛОВОК ПРОВЕРЬ ПОЧТУ И АКТИВИРУЙ АККАУНТ ---------------
+
+                Text(
+                    text = stringResource(id = R.string.verify_email_title), //"Проверь свой Email и активируй аккаунт"
                     style = Typography.titleLarge, // стиль заголовка
                     color = Grey00, // цвет заголовка
                     textAlign = TextAlign.Center
@@ -775,15 +845,21 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
 
-                Text(  // заголовок зависит от switch
-                    text = "Спасибо за регистрацию! Теперь открой свою почту - мы отправили туда письмо с подтверждением " +
-                            "твоего адреса электронной почты. Следуй инструкциям в письме и активируй аккаунт!",
-                    style = Typography.bodyMedium, // стиль заголовка
-                    color = Grey40, // цвет заголовка
+
+                // ------ ДОПОЛНИТЕЛЬНОЕ ОПИСАНИЕ ПОД ЗАГОЛОВКОМ ДЛЯ ПОДТВЕРЖДЕНИЯ ПОЧТЫ ---------------
+
+                Text(
+                    text = stringResource(id = R.string.verify_email_text),
+                    style = Typography.bodyMedium, // стиль текста
+                    color = Grey40, // цвет текста
                     textAlign = TextAlign.Center
                 )
 
+
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель между полями
+
+
+                // ------ КНОПКА ВЕРНУТЬСЯ НА ГЛАВНУЮ ----------------
 
                 Button(
 
@@ -814,16 +890,20 @@ class AccountScreens(act: MainActivity) {
 
                     Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
 
+
+                    // ТЕКСТ КНОПКИ ВЕРНУТЬСЯ НА ГЛАВНУЮ СТРАНИЦУ
+
                     Text(
-                        text = "Вернуться на главную страницу",
+                        text = stringResource(id = R.string.go_to_home),
                         style = Typography.labelMedium
                     )
                 }
-
             }
         }
-
     }
+
+
+    // -------- СТРАНИЦА "ЗАБЫЛИ ПАРОЛЬ?" --------------
 
     @SuppressLint("SuspiciousIndentation")
     @Composable
@@ -836,6 +916,7 @@ class AccountScreens(act: MainActivity) {
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 
             // создаем строку, чтобы задать положение кнопки "Закрыть"
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -859,6 +940,8 @@ class AccountScreens(act: MainActivity) {
                     )
                 }
             }
+
+            // ---- САМ КОНТЕНТ СТРАНИЦЫ ---------
 
         Column(
             modifier = Modifier
@@ -888,7 +971,11 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
-                // -------------- ИЛЛЮСТРАЦИЯ ------------------
+
+
+
+            // -------------- ИЛЛЮСТРАЦИЯ ------------------
+
 
                 Image(
                     //modifier = Modifier.fillMaxWidth(),
@@ -896,9 +983,13 @@ class AccountScreens(act: MainActivity) {
                     contentDescription = stringResource(id = R.string.cd_illustration)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
-                // -------------  ЗАГОЛОВОК ---------------
+
+            Spacer(modifier = Modifier.height(40.dp)) // разделитель
+
+
+
+                // -------------  ЗАГОЛОВОК ВОССТАНОВИТЬ ПАРОЛЬ  ---------------
 
                 Text(  // заголовок зависит от switch
                     text = stringResource(id = R.string.help_change_password),
@@ -907,10 +998,14 @@ class AccountScreens(act: MainActivity) {
                 )
 
 
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
 
 
-                // -------------  ЗАГОЛОВОК ---------------
+            Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
+
+
+
+
+            // -------------  ДОПОЛНИТЕЛЬНЫЙ ТЕКСТ ПОД ЗАГОЛОВКОМ ---------------
 
                 Text(  // заголовок зависит от switch
                     text = stringResource(id = R.string.forgot_password_text),
@@ -921,7 +1016,9 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
-                // ТЕКСТОВОЕ ПОЛЕ EMAIL
+
+
+            // ТЕКСТОВОЕ ПОЛЕ EMAIL
 
                 TextField(
                     modifier = Modifier
@@ -1011,19 +1108,23 @@ class AccountScreens(act: MainActivity) {
                             )
                         }
                     },
+
                     textStyle = Typography.bodyLarge, // стиль текста
+
                     keyboardOptions = KeyboardOptions(
                         // опции клавиатуры, которая появляется при вводе
                         keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
                         imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
                     ),
+
                     keyboardActions = KeyboardActions(
                         // При нажатии на кнопку onDone - снимает фокус с формы
                         onDone = {
                             focusManager.clearFocus()
                         }
                     ),
+
                     placeholder = {
                         // подсказка для пользователей
                         Text(
@@ -1031,6 +1132,7 @@ class AccountScreens(act: MainActivity) {
                             style = Typography.bodyLarge // стиль текста в холдере
                         )
                     },
+
                     leadingIcon = {
                         // иконка, расположенная слева от надписи плейсхолдера
                         Icon(
@@ -1040,7 +1142,9 @@ class AccountScreens(act: MainActivity) {
                             modifier = Modifier.size(20.dp) // размер иконки
                         )
                     },
+
                     singleLine = true, // говорим, что текст в форме будет однострочный
+
                     isError = isErrorEmail.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
                 )
 
@@ -1057,8 +1161,11 @@ class AccountScreens(act: MainActivity) {
                 }
 
 
-
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель между полями
+
+
+
+            // ---------- КНОПКА ВОССТАНОВИТЬ ПАРОЛЬ -------------------
 
                 Button(
 
@@ -1067,10 +1174,9 @@ class AccountScreens(act: MainActivity) {
                             if (task.isSuccessful) {
                                 navController.navigate(RESET_PASSWORD_SUCCESS)
                             } else {
-                                Toast.makeText(act, R.string.forgot_password_error, Toast.LENGTH_SHORT).show()
+                                task.exception?.let { accountHelper.errorInSignInAndUp(it) }
                             }
                         }
-
                     },
 
                     // Остальные настройки кнопки
@@ -1101,13 +1207,16 @@ class AccountScreens(act: MainActivity) {
                         style = Typography.labelMedium
                     )
                 }
-
             }
         }
     }
 
+
+    // ------- СТРАНИЦА "МЫ ОТПРАВИЛИ ССЫЛКУ НА ВОССТАНОВЛЕНИЕ ПАРОЛЯ"
+
     @Composable
     fun ResetPasswordSuccess (navController: NavController){
+
         Column(
 
         ) {
@@ -1115,6 +1224,7 @@ class AccountScreens(act: MainActivity) {
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 
             // создаем строку, чтобы задать положение кнопки "Закрыть"
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1138,6 +1248,8 @@ class AccountScreens(act: MainActivity) {
                 }
             }
 
+            // ---------- САМ КОНТЕНТ СТРАНИЦЫ ---------------
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -1151,18 +1263,24 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
+
+                // ----- ИЛЛЮСТРАЦИЯ ---------
+
                 Image(
                     //modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(id = R.drawable.send_email_illustration),
                     contentDescription = stringResource(id = R.string.cd_illustration)
                 )
 
+
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
-                // -------------  ЗАГОЛОВОК ---------------
 
-                Text(  // заголовок зависит от switch
-                    text = "Проверь свой Email и сбрось пароль",
+
+                // -------------  ЗАГОЛОВОК "Проверь почту и сбрось пароль" ---------------
+
+                Text(  // заголовок
+                    text = stringResource(id = R.string.reset_password_title),
                     style = Typography.titleLarge, // стиль заголовка
                     color = Grey00, // цвет заголовка
                     textAlign = TextAlign.Center
@@ -1171,15 +1289,21 @@ class AccountScreens(act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp)) // разделитель между заголовком и полями для ввода
 
-                Text(  // заголовок зависит от switch
-                    text = "Мы отправили тебе на почту инструкцию по сбросу пароля. " +
-                            "Следуй инструкции и у тебя все получится!",
-                    style = Typography.bodyMedium, // стиль заголовка
-                    color = Grey40, // цвет заголовка
+
+                // ---------- ВСПОМОГАТЕЛЬНЫЙ ТЕКСТ ПОД ИНСТРУКЦИИ ------------
+
+                Text(
+                    text = stringResource(id = R.string.reset_password_text),
+                    style = Typography.bodyMedium, // стиль текста
+                    color = Grey40, // цвет текста
                     textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(40.dp)) // разделитель между полями
+
+
+
+                // -------- КНОПКА "ПЕРЕЙТИ НА ГЛАВНУЮ СТРАНИЦУ" --------
 
                 Button(
 
@@ -1211,14 +1335,12 @@ class AccountScreens(act: MainActivity) {
                     Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
 
                     Text(
-                        text = "Вернуться на главную страницу",
+                        text = stringResource(id = R.string.go_to_home),
                         style = Typography.labelMedium
                     )
                 }
-
             }
         }
-
     }
 }
 

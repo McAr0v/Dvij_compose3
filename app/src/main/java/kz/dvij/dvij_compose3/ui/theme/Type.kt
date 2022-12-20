@@ -80,7 +80,7 @@ displaySmall = TextStyle(fontFamily = sfProFont,
         fontFamily = sfProFont,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
-        lineHeight = 28.sp,
+        lineHeight = 22.sp,
         letterSpacing = 0.sp
     ),
 

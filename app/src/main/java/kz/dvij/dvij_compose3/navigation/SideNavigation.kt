@@ -1,9 +1,7 @@
 package kz.dvij.dvij_compose3.navigation
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,12 +20,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -36,6 +31,23 @@ import kz.dvij.dvij_compose3.ui.theme.*
 // https://semicolonspace.com/jetpack-compose-navigation-drawer/
 // https://www.youtube.com/watch?v=JLICaBEiJS0
 
+@Composable
+fun DrawerContent () {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+        HeaderSideNavigation()
+
+
+    }
+}
 
 @Composable
 fun HeaderSideNavigation(){
@@ -298,10 +310,13 @@ fun AvatarBoxSideNavigation(
                 ) {
 
                     Text( // текст ГОСТЬ
-                        text = stringResource(id = R.string.verify_email), // сам текст
+                        text = stringResource(id = R.string.verify_email_title), // сам текст
                         color = Grey40, // цвет текста
                         style = Typography.titleMedium // стиль текста
                     )
+                    
+                    Spacer(modifier = Modifier.height(5.dp))
+                    
                     Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
                         text = stringResource(id = R.string.verify_email_text), // сам текст
                         color = Grey40, // цвет текста

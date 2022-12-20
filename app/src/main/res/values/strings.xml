@@ -51,6 +51,7 @@
     <string name="subscribe_to_whatsapp">Подписаться на канал в Whatsapp</string>
     <string name="subscribe_to_instagram">Подписаться на канал в Instagram</string>
     <string name="close_page">Закрыть экран</string>
+    <string name="go_to_home">Вернуться на главную страницу</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>
@@ -74,9 +75,11 @@
     <string name="forgot_password">Забыли пароль? </string>
     <string name="help_change_password">Восстановить пароль </string>
     <string name="forgot_password_error">Не удалось отправить Email с ссылкой на восстановление пароля </string>
-    <string name="verify_email">Подтверди почту </string>
-    <string name="verify_email_text">На твою почту мы отправили письмо. Нам нужно убедиться, что ты не спамер. Подтверди Email и после подтверждения просто зайди в аккаунт. </string>
+    <string name="verify_email_title">Проверь свою почту и активируй аккаунт </string>
+    <string name="verify_email_text">Спасибо за регистрацию! Мы отправили на твою почту письмо с ссылкой на активацию аккаунта. Следуй инструкциям в письме и активируй аккаунт! </string>
     <string name="forgot_password_text">Если ты забыл пароль, введи Email, на который зарегистрирован твой аккаунт. Мы отправим письмо с инструкцией, как восстановить пароль</string>
+    <string name="reset_password_title">Проверь почту и сбрось пароль</string>
+    <string name="reset_password_text">Мы отправили тебе на почту инструкцию по сбросу пароля. Следуй инструкции и у тебя все получится!</string>
 
     <!-- Страница профиля -->
     <string name="icon_user_image">Изображение аватарки пользователя</string>

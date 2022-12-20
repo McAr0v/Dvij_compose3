@@ -159,7 +159,6 @@ class MainActivity : ComponentActivity() {
                         )
                         SubscribeBoxSideNavigation()
 
-
                 }
                 )
 
