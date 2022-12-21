@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +23,8 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.dialogs.CitiesList
+import kz.dvij.dvij_compose3.dialogs.CityChooseDialog
 import kz.dvij.dvij_compose3.ui.theme.*
 
 
@@ -356,6 +356,7 @@ fun AvatarBoxSideNavigation(
 
 @Composable
 fun CityHeaderSideNavigation (city: String) {
+    val cities = listOf<CitiesList>(CitiesList.Almaty, CitiesList.UKa, CitiesList.Altay, CitiesList.Astana, CitiesList.Ridder)
 
     // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
 
@@ -366,6 +367,9 @@ fun CityHeaderSideNavigation (city: String) {
             .padding(20.dp) // отступы
     ) {
         val context = LocalContext.current // инициализируем контекст для ТОСТОВ
+        var openDialog = remember {
+            mutableStateOf(false)
+        }
 
         Text( // ЗАГОЛОВОК ГОРОД
             text = stringResource(id = kz.dvij.dvij_compose3.R.string.city), // текст заголовка
@@ -381,13 +385,19 @@ fun CityHeaderSideNavigation (city: String) {
             modifier = Modifier
                 .fillMaxWidth() // строка должна занимать всю ширину
                 .clickable { // действие на нажатие. ВООБЩЕ ДОЛЖНО ВЕСТИ НА СТРАНИЦУ ВЫБОРА ГОРОДА
-                    Toast
-                        .makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG)
-                        .show()
+                    openDialog.value = true
+
                 },
             verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали по центру
 
         ) {
+
+
+            if (openDialog.value) {
+                CityChooseDialog {
+                    openDialog.value = false
+                }
+            }
 
             // Иконка возле текста
             Icon(

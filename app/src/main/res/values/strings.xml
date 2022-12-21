@@ -102,4 +102,12 @@
     <string name="exception_wrong_password">Неверный пароль</string>
     <string name="exception_password_need_more_letters">Пароль должен содержать больше 6 символов</string>
 
+    <!-- Города -->
+    <string name="astana">Астана</string>
+    <string name="ust_kamenogorsk">Усть-Каменогорск</string>
+    <string name="semey">Семей</string>
+    <string name="ridder">Риддер</string>
+    <string name="altay">Зыряновск</string>
+    <string name="almaty">Алматы</string>
+
 </resources>
