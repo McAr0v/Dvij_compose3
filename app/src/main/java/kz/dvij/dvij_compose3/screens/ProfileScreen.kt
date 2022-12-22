@@ -138,6 +138,7 @@ fun ProfileScreen (
 
                         navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
 
+
                         // показываем ТОСТ что все готово
 
                         Toast.makeText(

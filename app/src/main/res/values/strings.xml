@@ -52,6 +52,7 @@
     <string name="subscribe_to_instagram">Подписаться на канал в Instagram</string>
     <string name="close_page">Закрыть экран</string>
     <string name="go_to_home">Вернуться на главную страницу</string>
+    <string name="choose_city">Выбери город:</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>

@@ -24,7 +24,6 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CitiesList
-import kz.dvij.dvij_compose3.dialogs.CityChooseDialog
 import kz.dvij.dvij_compose3.ui.theme.*
 
 
@@ -354,80 +353,7 @@ fun AvatarBoxSideNavigation(
     }
 }
 
-@Composable
-fun CityHeaderSideNavigation (city: String) {
-    val cities = listOf<CitiesList>(CitiesList.Almaty, CitiesList.UKa, CitiesList.Altay, CitiesList.Astana, CitiesList.Ridder)
 
-    // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
-
-    Column( // ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КОЛОКНКУ
-        modifier = Modifier
-            .background(Grey100) // цвет фона
-            .fillMaxWidth() // занимаем всю ширину
-            .padding(20.dp) // отступы
-    ) {
-        val context = LocalContext.current // инициализируем контекст для ТОСТОВ
-        var openDialog = remember {
-            mutableStateOf(false)
-        }
-
-        Text( // ЗАГОЛОВОК ГОРОД
-            text = stringResource(id = kz.dvij.dvij_compose3.R.string.city), // текст заголовка
-            color = Grey40, // цвет заголовка
-            style = Typography.labelMedium // стиль заголовка
-        )
-
-        Spacer(modifier = Modifier.height(10.dp)) // разделитель между заголовком и городом
-
-        // СТРОКА С ИКОНКАМИ И НАЗВАНИЕМ ГОРОДА
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth() // строка должна занимать всю ширину
-                .clickable { // действие на нажатие. ВООБЩЕ ДОЛЖНО ВЕСТИ НА СТРАНИЦУ ВЫБОРА ГОРОДА
-                    openDialog.value = true
-
-                },
-            verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали по центру
-
-        ) {
-
-
-            if (openDialog.value) {
-                CityChooseDialog {
-                    openDialog.value = false
-                }
-            }
-
-            // Иконка возле текста
-            Icon(
-                tint = Grey40, // цвет иконки
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_baseline_places), // задаем иконку
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_location) // описание для слабовидящих
-            )
-
-            // разделитель между текстом и иконкой
-            Spacer(modifier = Modifier.width(15.dp))
-
-            // Сам текст
-            Text(
-                text = city, // берем заголовок
-                style = Typography.labelLarge, // Стиль текста
-                modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
-                color = Grey40 // цвет текста
-            )
-
-            // разделитель между текстом и иконкой
-            Spacer(modifier = Modifier.width(15.dp))
-
-            Icon(
-                tint = Grey40, // цвет иконки
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // задаем иконку
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location) // описание для слабовидящих
-            )
-        }
-    }
-}
 
 // Функция с элементами бокового меню
 @Composable

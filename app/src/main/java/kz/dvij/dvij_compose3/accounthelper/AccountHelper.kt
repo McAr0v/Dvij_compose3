@@ -110,6 +110,7 @@ class AccountHelper (act: MainActivity) {
 
 
     // Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ
+
     fun sendEmailVerification(user: FirebaseUser){
         // функция отправки письма с подтверждением Email при регистрации
         // данные зарегистрированного user находвтся в mAuth
@@ -159,7 +160,10 @@ class AccountHelper (act: MainActivity) {
         signInClient = getSignInClient() // sign in Client - переменная, которая инициализируется не сразу. Мы ее создали как lateinit  и она вверху mainActivity
 
         val intent = signInClient.signInIntent
-        act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
+
+        act.googleSignInResultLauncher?.launch(intent)
+
+        //act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
 
     }
 

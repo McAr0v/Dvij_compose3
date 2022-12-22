@@ -3,11 +3,13 @@ package kz.dvij.dvij_compose3
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,15 +20,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
+import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
 
@@ -44,10 +47,13 @@ class MainActivity : ComponentActivity() {
     val mAuth = FirebaseAuth.getInstance() // берем из файрбаз аутентикейшн
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
+    private val chooseCityNavigation = ChooseCityNavigation (this)
+    var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE){
             //Log.d("MyLog", "SignInDone")
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -65,10 +71,29 @@ class MainActivity : ComponentActivity() {
 
         }
             super.onActivityResult(requestCode, resultCode, data)
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        googleSignInResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+            result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+                try {
+
+                    val account = task.getResult(ApiException::class.java)
+                    if (account != null) {
+                        accountHelper.signInFirebaseWithGoogle(account.idToken!!)
+                    }
+
+                } catch (e: ApiException) {
+                    Log.d("MyLog", "ApiError: ${e.message}")
+                }
+            }
+        }
 
         setContent {
 
@@ -76,7 +101,6 @@ class MainActivity : ComponentActivity() {
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
-
 
 
             val coroutineScope = rememberCoroutineScope() // инициализируем Корутину
@@ -91,9 +115,10 @@ class MainActivity : ComponentActivity() {
             Scaffold(
 
                 scaffoldState = scaffoldState, // Передаем инициализированный ScaffoldState
-                bottomBar = {
 
-                    if (
+                bottomBar = { // ------- НА ОПРЕДЕЛЕННЫХ СТРАНИЦАХ НЕ ПОКАЗЫВАТЬ НИЖНЕЕ МЕНЮ ----------
+
+                    if ( // если текущий путь - хоть одна из эти страниц
                         currentRoute == REG_ROOT
                         || currentRoute == LOG_IN_ROOT
                         || currentRoute == FORGOT_PASSWORD_ROOT
@@ -101,15 +126,18 @@ class MainActivity : ComponentActivity() {
                         || currentRoute == RESET_PASSWORD_SUCCESS
                     ) {
 
-                    } else {
+                            // ------- ТО НИЧЕ НЕ ДЕЛАТЬ))) -----------
+
+                    } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
+
                         BottomNavigationMenu(navController = navController) // в секции нижнего меню вызываем наше созданное нижнее меню и передаем туда NavController
+
                     }
+                },
 
+                topBar = { // ------- НА ОПРЕДЕЛЕННЫХ СТРАНИЦАХ НЕ ПОКАЗЫВАТЬ ТОПБАР ----------
 
-                            },
-                topBar = {
-
-                    if (
+                    if ( // если текущий путь - хоть одна из эти страниц
                         currentRoute == REG_ROOT
                         || currentRoute == LOG_IN_ROOT
                         || currentRoute == FORGOT_PASSWORD_ROOT
@@ -117,7 +145,10 @@ class MainActivity : ComponentActivity() {
                         || currentRoute == RESET_PASSWORD_SUCCESS
                     ){
 
-                    } else {
+                            // ------- ТО НИЧЕ НЕ ДЕЛАТЬ))) -----------
+
+                    } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
+
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
 
                         TopBar(
@@ -145,21 +176,22 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                },
 
+                drawerContent = { // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
 
-                         },
+                    HeaderSideNavigation() // HEADER - Логотип
 
-                drawerContent = {
+                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState) // Аватарка
 
-                        // собственно содержимое бокового меню
-                    HeaderSideNavigation() // вызываем Header
-                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState)
-                    CityHeaderSideNavigation("Усть-Каменогорск")
+                    chooseCityNavigation.CityHeaderSideNavigation() // Меню с выбором города находится теперь в отдельном классе
+
                     BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                         navController = navController, // Передаем NavController
                         scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
                     )
-                    SubscribeBoxSideNavigation()
+
+                    SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
                 }
                 )
 
@@ -204,6 +236,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 }
