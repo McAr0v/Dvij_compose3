@@ -30,9 +30,11 @@ import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
+import kz.dvij.dvij_compose3.createscreens.CreateMeetingScreen
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
+import java.lang.reflect.Field
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -233,6 +235,7 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
+                        composable(CREATE_MEETINGS_SCREEN) { CreateMeetingScreen(activity = this@MainActivity)}
 
                     }
                 }
