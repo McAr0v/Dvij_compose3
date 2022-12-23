@@ -132,11 +132,15 @@ fun ProfileScreen (
                     onClick = {
                         // функции на нажатие
 
-                        activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+                        navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
 
                         accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
 
-                        navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
+                        activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+
+
+
+
 
 
                         // показываем ТОСТ что все готово

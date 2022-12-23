@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.coroutineScope
@@ -684,8 +685,17 @@ class AccountScreens(act: MainActivity) {
                 Button(
                     onClick = {
                         accountHelper.signInWithGoogle()
-                        navController.navigate(MEETINGS_ROOT)
-                              },
+                        //navController.navigate(MEETINGS_ROOT)
+                        act.mAuth.addAuthStateListener {
+                            if (act.mAuth.currentUser == null) {
+                                navController.navigate(MEETINGS_ROOT)
+                            } else {
+                                navController.navigate(PROFILE_ROOT)
+                            }
+                        }
+
+
+                    },
                     modifier = Modifier
                         .fillMaxWidth() // На всю ширину
                         .height(50.dp), // высота кнопки

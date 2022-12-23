@@ -175,7 +175,7 @@ class AccountHelper (act: MainActivity) {
         act.mAuth.signInWithCredential(credential).addOnCompleteListener{ task ->
 
             if (task.isSuccessful) {
-                act.recreate()
+                //act.recreate()
                 Toast.makeText(act, R.string.sign_in_google_success, Toast.LENGTH_SHORT).show()
             }
 

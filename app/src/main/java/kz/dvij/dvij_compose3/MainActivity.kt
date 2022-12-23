@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,7 +45,7 @@ import kz.dvij.dvij_compose3.screens.*
 
 class MainActivity : ComponentActivity() {
 
-    val mAuth = FirebaseAuth.getInstance() // берем из файрбаз аутентикейшн
+    val mAuth = FirebaseAuth.getInstance()  // берем из файрбаз аутентикейшн
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
     private val chooseCityNavigation = ChooseCityNavigation (this)
@@ -87,6 +88,7 @@ class MainActivity : ComponentActivity() {
                     val account = task.getResult(ApiException::class.java)
                     if (account != null) {
                         accountHelper.signInFirebaseWithGoogle(account.idToken!!)
+
                     }
 
                 } catch (e: ApiException) {

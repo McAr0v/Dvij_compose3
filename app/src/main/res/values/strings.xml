@@ -110,5 +110,6 @@
     <string name="ridder">Риддер</string>
     <string name="altay">Зыряновск</string>
     <string name="almaty">Алматы</string>
+    <string name="title_activity_google">googleActivity</string>
 
 </resources>
