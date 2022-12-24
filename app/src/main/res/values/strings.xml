@@ -112,4 +112,8 @@
     <string name="almaty">Алматы</string>
     <string name="title_activity_google">googleActivity</string>
 
+    <!-- МЕРОПРИЯТИЯ -->
+    <string name="input_headline">Введите заголовок (max 40 символов)</string>
+    <string name="input_description">Введите описание</string>
+
 </resources>

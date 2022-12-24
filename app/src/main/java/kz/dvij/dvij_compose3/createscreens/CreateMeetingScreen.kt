@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.createscreens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -11,7 +12,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.MainActivity
-import kz.dvij.dvij_compose3.elements.fieldComponent
+import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 @Preview
@@ -20,6 +22,7 @@ fun ViewCreateMeetingScreen(){
     //CreateMeetingScreen()
 }
 
+@SuppressLint("ResourceType")
 @Composable
 fun CreateMeetingScreen (activity: MainActivity) {
 
@@ -66,7 +69,7 @@ fun CreateMeetingScreen (activity: MainActivity) {
 
         // ------------    ТЕКСТОВОЕ ПОЛЕ С ПАРОЛЕМ ----------------
 
-        title = fieldComponent(act = activity, dataType = "Email")
+        title = fieldEmailComponent(act = activity)
 
         Text(
             text = title,
@@ -74,7 +77,9 @@ fun CreateMeetingScreen (activity: MainActivity) {
             color = Grey40
         )
 
-        title2 = fieldComponent(activity, dataType = "Phone")
+        Spacer(modifier = Modifier.height(10.dp))
+
+        title2 = fieldPhoneComponent(act = activity)
 
         Text(
             text = title2,
