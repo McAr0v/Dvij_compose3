@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.createscreens
 
 import kz.dvij.dvij_compose3.MainActivity
 import android.annotation.SuppressLint
+import android.widget.CalendarView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,11 +17,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.util.Calendar
 
 class CreateMeeting (act: MainActivity) {
 
@@ -205,6 +208,9 @@ class CreateMeeting (act: MainActivity) {
             Spacer(modifier = Modifier.height(10.dp))
 
             price = fieldPriceComponent(act = activity)
+
+            // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
+            // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
 
         }
     }
