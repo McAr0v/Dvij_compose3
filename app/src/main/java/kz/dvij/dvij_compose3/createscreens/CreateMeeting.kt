@@ -2,7 +2,9 @@ package kz.dvij.dvij_compose3.createscreens
 
 import kz.dvij.dvij_compose3.MainActivity
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.widget.CalendarView
+import android.widget.DatePicker
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -23,15 +26,47 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.util.Calendar
+import java.util.*
 
 class CreateMeeting (act: MainActivity) {
 
     private var chosenCategory: CategoriesList = CategoriesList.DefaultCat
 
+
+
+
+
     @SuppressLint("ResourceType")
     @Composable
     fun CreateMeetingScreen (activity: MainActivity) {
+
+        val mContext = LocalContext.current
+
+        // Declaring integer values
+        // for year, month and day
+        val mYear: Int
+        val mMonth: Int
+        val mDay: Int
+
+        // Initializing a Calendar
+        val mCalendar = Calendar.getInstance()
+
+        // Fetching current year, month and day
+        mYear = mCalendar.get(Calendar.YEAR)
+        mMonth = mCalendar.get(Calendar.MONTH)
+        mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+        mCalendar.time = Date()
+
+        val mDate = remember{ mutableStateOf("") }
+
+        val mDatePickerDialog = DatePickerDialog(
+            mContext,
+            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
+            }, mYear, mMonth, mDay
+        )
+
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") }
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") }
@@ -86,6 +121,15 @@ class CreateMeeting (act: MainActivity) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            Button(onClick = { mDatePickerDialog.show()}) {
+                Text ("Выбрать дату")
+            }
+
+            Text(
+                text = mDate.value,
+                style = Typography.labelMedium,
+                color = Grey40
+            )
 
             // ----- КАТЕГОРИЯ ---------
 
