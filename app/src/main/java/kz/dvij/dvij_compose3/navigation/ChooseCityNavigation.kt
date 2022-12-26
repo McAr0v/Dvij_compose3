@@ -205,7 +205,8 @@ class ChooseCityNavigation (act: MainActivity) {
                             Grey100, // цвет фона
                             shape = RoundedCornerShape(10.dp) // скругление углов
                         )
-                        .padding(20.dp) // отступ
+                        .padding(20.dp), // отступ
+                verticalArrangement = Arrangement.spacedBy(20.dp)
 
                 ){
 
@@ -219,7 +220,7 @@ class ChooseCityNavigation (act: MainActivity) {
 
                         Column(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 10.dp)
+                            //.padding(vertical = 10.dp)
                             .clickable {
                             // действие на нажатие на элемент
                             chosenCity = city // выбранный город теперь тот, который выбрали, а не по умолчанию

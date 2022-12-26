@@ -30,7 +30,8 @@ import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
-import kz.dvij.dvij_compose3.createscreens.CreateMeetingScreen
+import kz.dvij.dvij_compose3.createscreens.CreateMeeting
+
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity() {
     private val accountScreens = AccountScreens(act = this)
     private val accountHelper = AccountHelper(this)
     private val chooseCityNavigation = ChooseCityNavigation (this)
+    private val createMeeting = CreateMeeting (this)
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
@@ -171,6 +173,7 @@ class MainActivity : ComponentActivity() {
                                 POLICY_ROOT -> R.string.side_private_policy
                                 ADS_ROOT -> R.string.side_ad
                                 BUGS_ROOT -> R.string.side_report_bug
+                                CREATE_MEETINGS_SCREEN -> R.string.create_meeting
                                 else -> R.string.app_name
                                 }
                             ),
@@ -235,7 +238,7 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(CREATE_MEETINGS_SCREEN) { CreateMeetingScreen(activity = this@MainActivity)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(activity = this@MainActivity)}
 
                     }
                 }

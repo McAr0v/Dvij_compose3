@@ -16,14 +16,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
+import androidx.compose.ui.text.buildAnnotatedString
+
+
 
 @Composable
 fun fieldEmailComponent (
@@ -455,7 +456,7 @@ fun fieldHeadlineComponent (
             Text(
                 text = counter,
             style = Typography.bodySmall,
-            color = Grey40)
+            color = Grey60)
         },
 
         textStyle = Typography.bodyLarge, // стиль текста
@@ -568,7 +569,7 @@ fun fieldDescriptionComponent (
             Text(
                 text = counter,
                 style = Typography.bodySmall,
-                color = Grey40)
+                color = Grey60)
         },
 
         textStyle = Typography.bodyLarge, // стиль текста
@@ -605,22 +606,96 @@ fun fieldDescriptionComponent (
 }
 
 @Composable
-fun fieldPhoneComponent (
+fun fieldPhoneComponent(
+    phone: String,
+    mask: String = "+7 (XXX) XXX XX XX",
+    maskNumber: Char = 'X',
+    onPhoneChanged: (String) -> Unit,
+    icon: Painter = painterResource(id = R.drawable.ic_phone)
+): String {
+    var focusColor = remember { mutableStateOf(Grey40) }
+    val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+
+    var returnText = "+7$phone"
+
+    TextField(
+        value = phone,
+
+        onValueChange = { it ->
+            onPhoneChanged(it.take(mask.count { it == maskNumber }))
+        },
+
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Phone,
+            imeAction = ImeAction.Done
+        ),
+
+        visualTransformation = PhoneVisualTransformation(mask, maskNumber),
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (it.isFocused) focusColor.value =
+                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                else focusColor.value =
+                    Grey40 // если нет, то в переменные с цветами передать серый
+            }
+            .border( // настройки самих границ
+                2.dp, // толщина границы
+                color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
+                shape = RoundedCornerShape(50.dp) // скругление границ
+            ),
+
+        singleLine = true,
+
+        keyboardActions = KeyboardActions(
+            // При нажатии на кнопку onDone - снимает фокус с формы
+            onDone = {
+                focusManager.clearFocus()
+            }
+        ),
+
+        textStyle = Typography.bodyLarge, // стиль текста
+
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            // цвета
+            textColor = Grey40,
+            backgroundColor = Grey95,
+            placeholderColor = Grey60,
+            focusedBorderColor = Grey95,
+            unfocusedBorderColor = Grey95,
+            cursorColor = Grey00,
+            errorBorderColor = Grey95
+
+        ),
+
+        leadingIcon = {
+            Icon(
+                painter = icon,
+                contentDescription = stringResource(id = R.string.cd_phone_icon),
+                tint = Grey60,
+                modifier = Modifier.size(20.dp) // размер иконки
+            )
+        }
+
+    )
+
+    return returnText
+}
+
+
+@Composable
+fun fieldPriceComponent (
     act: MainActivity
 ): String {
-
-    // https://ngengesenior.medium.com/how-to-usevisualtransformation-to-create-phone-number-textfield-and-others-in-jetpack-compose-f7a62f8fbe95
 
     // создаем переменные email и password - содержимое их будет меняться
     // в зависимости от того, что введет пользователь и это содержимое будет
     // отправляться в Firebase
 
-    var number = "+7"
-    var inputText = ""
-
-    var text = number + inputText
-
-    val maxChar = 10
+    var text = remember { mutableStateOf("") }
+    val maxChar = 8
+    var counter = "${text.value.length} / ${maxChar.toString()}"
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -658,14 +733,14 @@ fun fieldPhoneComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text, // значение email // lowerCase() - делает все буквы строчными
+        value = text.value, // значение email // lowerCase() - делает все буквы строчными
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
 
             if (newText.length <= maxChar) {
                 isTextError.value = false
-                inputText = newText
+                text.value = newText
             }
         },
 
@@ -681,12 +756,20 @@ fun fieldPhoneComponent (
 
         ),
 
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_tenge),
+                contentDescription = stringResource(id = R.string.cd_phone_icon),
+                tint = Grey60,
+                modifier = Modifier.size(15.dp) // размер иконки
+            )
+                      },
 
         textStyle = Typography.bodyLarge, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
-            keyboardType = KeyboardType.Phone, // тип клавиатуры (типа удобнее для ввода Email)
+            keyboardType = KeyboardType.Number, // тип клавиатуры (типа удобнее для ввода Email)
             imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
         ),
@@ -701,7 +784,7 @@ fun fieldPhoneComponent (
         placeholder = {
             // подсказка для пользователей
             Text(
-                text = act.resources.getString(R.string.input_headline), // значение подсказки
+                text = stringResource(id = R.string.input_price), // значение подсказки
                 style = Typography.bodyLarge // стиль текста в холдере
             )
         },
@@ -711,6 +794,66 @@ fun fieldPhoneComponent (
         isError = isTextError.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
     )
 
-    return text
+    return text.value
 
+}
+
+
+
+
+
+
+
+class PhoneVisualTransformation(val mask: String, val maskNumber: Char) : VisualTransformation {
+
+    private val maxLength = mask.count { it == maskNumber }
+
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = if (text.length > maxLength) text.take(maxLength) else text
+
+        val annotatedString = buildAnnotatedString {
+            if (trimmed.isEmpty()) return@buildAnnotatedString
+
+            var maskIndex = 0
+            var textIndex = 0
+            while (textIndex < trimmed.length && maskIndex < mask.length) {
+                if (mask[maskIndex] != maskNumber) {
+                    val nextDigitIndex = mask.indexOf(maskNumber, maskIndex)
+                    append(mask.substring(maskIndex, nextDigitIndex))
+                    maskIndex = nextDigitIndex
+                }
+                append(trimmed[textIndex++])
+                maskIndex++
+            }
+        }
+
+        return TransformedText(annotatedString, PhoneOffsetMapper(mask, maskNumber))
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        //if (other !is PhonedVisualTransformation) return false
+        //if (mask != other.mask) return false
+        // (maskNumber != other.maskNumber) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return mask.hashCode()
+    }
+}
+
+private class PhoneOffsetMapper(val mask: String, val numberChar: Char) : OffsetMapping {
+
+    override fun originalToTransformed(offset: Int): Int {
+        var noneDigitCount = 0
+        var i = 0
+        while (i < offset + noneDigitCount) {
+            if (mask[i++] != numberChar) noneDigitCount++
+        }
+        return offset + noneDigitCount
+    }
+
+    override fun transformedToOriginal(offset: Int): Int =
+        offset - mask.take(offset).count { it != numberChar }
 }
