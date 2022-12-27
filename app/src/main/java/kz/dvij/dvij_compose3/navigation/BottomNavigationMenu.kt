@@ -1,19 +1,23 @@
 package kz.dvij.dvij_compose3.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Text
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.Grey10
 import kz.dvij.dvij_compose3.ui.theme.Grey100
 import kz.dvij.dvij_compose3.ui.theme.PrimaryColor
@@ -82,5 +86,25 @@ fun BottomNavigationMenu (navController: NavController) {
 
             )
         }
+    }
+}
+
+@Composable
+fun FloatingButton(){
+    val contextForToast = LocalContext.current.applicationContext
+
+    Box(modifier = Modifier.fillMaxSize().fillMaxWidth().fillMaxHeight()){
+
+        FloatingActionButton(
+            onClick = {
+                Toast.makeText(contextForToast, "Кнопка работает", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(alignment = Alignment.BottomEnd)
+        ) {
+            Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "")
+        }
+
     }
 }

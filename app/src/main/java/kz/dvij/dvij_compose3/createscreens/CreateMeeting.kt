@@ -130,28 +130,17 @@ class CreateMeeting(act: MainActivity) {
 
             Row(modifier = Modifier.fillMaxWidth()) {
 
-                Button(
+
+                TextButton(
                     onClick = { /*TODO*/ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.5f),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = AttentionColor,
-                        contentColor = Grey00
-                    ),
-                    shape = RoundedCornerShape(50)
+                        .weight(0.3f),
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = "",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(10.dp))
-
                     Text(
                         text = "Отмена",
-                        style = Typography.labelMedium
+                        style = Typography.labelMedium,
+                        color = AttentionColor
                     )
                 }
 
@@ -161,7 +150,7 @@ class CreateMeeting(act: MainActivity) {
                     onClick = { /*TODO*/ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.5f),
+                        .weight(0.7f),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = SuccessColor,
                         contentColor = Grey00
