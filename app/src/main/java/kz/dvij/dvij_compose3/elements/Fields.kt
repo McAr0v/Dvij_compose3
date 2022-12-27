@@ -47,7 +47,7 @@ fun fieldEmailComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey40) }
+    var focusColor = remember { mutableStateOf(Grey60) }
 
     // создаем переменную для скрытия или отображения пароля
 
@@ -70,7 +70,7 @@ fun fieldEmailComponent (
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
@@ -225,7 +225,7 @@ fun fieldPasswordComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey40) }
+    var focusColor = remember { mutableStateOf(Grey60) }
 
     // создаем переменную для скрытия или отображения пароля
 
@@ -248,7 +248,7 @@ fun fieldPasswordComponent (
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
@@ -402,7 +402,7 @@ fun fieldHeadlineComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey40) }
+    var focusColor = remember { mutableStateOf(Grey60) }
 
     Column(modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
@@ -420,7 +420,7 @@ fun fieldHeadlineComponent (
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
@@ -515,7 +515,7 @@ fun fieldDescriptionComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey40) }
+    var focusColor = remember { mutableStateOf(Grey60) }
 
     Column(modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
@@ -533,7 +533,7 @@ fun fieldDescriptionComponent (
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
@@ -638,7 +638,7 @@ fun fieldPhoneComponent(
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
@@ -707,7 +707,7 @@ fun fieldPriceComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey40) }
+    var focusColor = remember { mutableStateOf(Grey60) }
 
     Column(modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
@@ -725,7 +725,7 @@ fun fieldPriceComponent (
                 if (it.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey40 // если нет, то в переменные с цветами передать серый
+                    Grey60 // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
