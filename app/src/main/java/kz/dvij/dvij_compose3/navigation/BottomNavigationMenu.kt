@@ -90,14 +90,14 @@ fun BottomNavigationMenu (navController: NavController) {
 }
 
 @Composable
-fun FloatingButton(){
-    val contextForToast = LocalContext.current.applicationContext
+fun FloatingButton(onClick: () -> Unit ){
+
 
     Box(modifier = Modifier.fillMaxSize().fillMaxWidth().fillMaxHeight()){
 
         FloatingActionButton(
             onClick = {
-                Toast.makeText(contextForToast, "Кнопка работает", Toast.LENGTH_SHORT).show()
+                onClick()
             },
             modifier = Modifier
                 .padding(16.dp)

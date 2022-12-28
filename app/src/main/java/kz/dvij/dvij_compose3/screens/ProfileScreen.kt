@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
@@ -132,11 +134,18 @@ fun ProfileScreen (
                     onClick = {
                         // функции на нажатие
 
-                        navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
+                        try {
+                            navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
 
-                        accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
+                            accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
 
-                        activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+                            activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+
+                        } catch (e: ApiException) {
+                            Log.d("MyLog", "ApiError: ${e.message}")
+                        }
+
+
 
 
 

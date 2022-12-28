@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseUser
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.Grey95
 import kz.dvij.dvij_compose3.ui.theme.MeetingCard
@@ -18,13 +21,12 @@ import kz.dvij.dvij_compose3.ui.theme.Primary10
 
 // функция превью экрана
 
-@Preview
+
 @Composable
-fun MeetingsScreen () {
+fun MeetingsScreen (navController: NavController, user: FirebaseUser?) {
     Column {
 
-        TabMenu(bottomPage = MEETINGS_ROOT)
-
+        TabMenu(bottomPage = MEETINGS_ROOT, navController, user)
 
     }
 
@@ -34,7 +36,7 @@ fun MeetingsScreen () {
 // экран мероприятий
 
 @Composable
-fun MeetingsTapeScreen (){
+fun MeetingsTapeScreen (navController: NavController){
     Column (
         modifier = Modifier
             .background(Grey95)
@@ -51,7 +53,7 @@ fun MeetingsTapeScreen (){
 }
 
 @Composable
-fun MeetingsMyScreen (){
+fun MeetingsMyScreen (navController: NavController, user: FirebaseUser?){
 
     Surface(modifier = Modifier.fillMaxSize()) {
 
@@ -71,17 +73,14 @@ fun MeetingsMyScreen (){
 
         }
 
-        FloatingButton()
-
+        if (user != null && user.isEmailVerified) {
+            FloatingButton { navController.navigate(CREATE_MEETINGS_SCREEN) }
+        }
     }
-
-
-
-
 }
 
 @Composable
-fun MeetingsFavScreen (){
+fun MeetingsFavScreen (navController: NavController){
     Column (
         modifier = Modifier
             .background(Primary10)

@@ -161,7 +161,15 @@ class AccountHelper (act: MainActivity) {
 
         val intent = signInClient.signInIntent
 
-        act.googleSignInResultLauncher?.launch(intent)
+        try {
+            act.googleSignInResultLauncher?.launch(intent)
+        } catch (e: Exception) {
+
+            Log.d("MyLog", "ApiError: ${e.message}")
+
+        }
+
+
 
         //act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
 
@@ -177,7 +185,7 @@ class AccountHelper (act: MainActivity) {
             if (task.isSuccessful) {
                 //act.recreate()
                 Toast.makeText(act, R.string.sign_in_google_success, Toast.LENGTH_SHORT).show()
-            }
+            } else {Toast.makeText(act, "Произошла ошибка в signInFirebaseWithGoogle", Toast.LENGTH_SHORT).show()}
 
         }
     }

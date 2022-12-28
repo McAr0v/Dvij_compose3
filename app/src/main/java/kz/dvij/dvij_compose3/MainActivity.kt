@@ -220,14 +220,14 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = CREATE_MEETINGS_SCREEN //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = MEETINGS_ROOT //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) { MeetingsScreen()}
-                        composable(PLACES_ROOT) { PlacesScreen()}
-                        composable(STOCK_ROOT) { StockScreen()}
+                        composable(MEETINGS_ROOT) { MeetingsScreen(navController, mAuth.currentUser)}
+                        composable(PLACES_ROOT) { PlacesScreen(navController, mAuth.currentUser)}
+                        composable(STOCK_ROOT) { StockScreen(navController, mAuth.currentUser)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}

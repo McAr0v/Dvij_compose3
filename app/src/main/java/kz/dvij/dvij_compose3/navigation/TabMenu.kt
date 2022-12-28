@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.screens.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -25,7 +27,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН И ФУНКЦИОНАЛ ТАБОВ (МОИ, ИЗБРАННЫЕ, ЛЕНТА) В РАЗДЕЛАХ МЕРОПРИЯТИЯ, ЗАВЕДЕНИЯ, АКЦИИ
 
-fun TabMenu (bottomPage: String){
+fun TabMenu (bottomPage: String, navController: NavController, user: FirebaseUser?){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
     // (Смотри Horizontal Pager)
@@ -87,9 +89,9 @@ fun TabMenu (bottomPage: String){
                 MEETINGS_ROOT -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> MeetingsTapeScreen() // мероприятия Лента
-                        1 -> MeetingsFavScreen() // мероприятия Избранные
-                        else -> MeetingsMyScreen() // мероприятия Мои
+                        0 -> MeetingsTapeScreen(navController) // мероприятия Лента
+                        1 -> MeetingsFavScreen(navController) // мероприятия Избранные
+                        else -> MeetingsMyScreen(navController, user) // мероприятия Мои
                 }
                 }
 
