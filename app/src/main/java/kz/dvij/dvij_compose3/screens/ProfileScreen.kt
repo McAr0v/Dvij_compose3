@@ -145,13 +145,6 @@ fun ProfileScreen (
                             Log.d("MyLog", "ApiError: ${e.message}")
                         }
 
-
-
-
-
-
-
-
                         // показываем ТОСТ что все готово
 
                         Toast.makeText(

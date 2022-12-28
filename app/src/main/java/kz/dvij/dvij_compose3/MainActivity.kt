@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -31,10 +32,13 @@ import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
+import kz.dvij.dvij_compose3.dialogs.SignDialogs
 
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
+import kz.dvij.dvij_compose3.ui.theme.Grey10
+import kz.dvij.dvij_compose3.ui.theme.Grey40
 import java.lang.reflect.Field
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
@@ -49,34 +53,15 @@ import java.lang.reflect.Field
 class MainActivity : ComponentActivity() {
 
     val mAuth = FirebaseAuth.getInstance()  // берем из файрбаз аутентикейшн
-    private val accountScreens = AccountScreens(act = this)
-    private val accountHelper = AccountHelper(this)
-    private val chooseCityNavigation = ChooseCityNavigation (this)
-    private val createMeeting = CreateMeeting (this)
+
+    val accountScreens = AccountScreens(act = this)
+    val accountHelper = AccountHelper(this)
+    val chooseCityNavigation = ChooseCityNavigation (this)
+    val createMeeting = CreateMeeting (this)
+    val signDialogs = SignDialogs(this)
+    val sideComponents = SideComponents (this)
+
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
-
-
-
-
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE){
-            //Log.d("MyLog", "SignInDone")
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-
-            try {
-
-                val account = task.getResult(ApiException::class.java)
-                if (account != null) {
-                    accountHelper.signInFirebaseWithGoogle(account.idToken!!)
-                }
-
-            } catch (e: ApiException) {
-                Log.d("MyLog", "ApiError: ${e.message}")
-            }
-
-        }
-            super.onActivityResult(requestCode, resultCode, data)
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,18 +172,21 @@ class MainActivity : ComponentActivity() {
 
                 drawerContent = { // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
 
-                    HeaderSideNavigation() // HEADER - Логотип
+                        sideComponents.HeaderSideNavigation() // HEADER - Логотип
 
-                    AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState) // Аватарка
+                        sideComponents.AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState) // Аватарка
 
-                    chooseCityNavigation.CityHeaderSideNavigation() // Меню с выбором города находится теперь в отдельном классе
+                        chooseCityNavigation.CityHeaderSideNavigation() // Меню с выбором города находится теперь в отдельном классе
 
-                    BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
-                        navController = navController, // Передаем NavController
-                        scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
-                    )
+                        sideComponents.BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
+                            navController = navController, // Передаем NavController
+                            scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
+                        )
 
-                    SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
+                        sideComponents.SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
+
+
+
                 }
                 )
 
@@ -233,8 +221,6 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
-                        composable(REG_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, REGISTRATION)}
-                        composable(LOG_IN_ROOT) {accountScreens.RegistrScreen(navController, scaffoldState, SIGN_IN)}
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
