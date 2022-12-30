@@ -1,10 +1,8 @@
 package kz.dvij.dvij_compose3
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
@@ -13,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,21 +22,15 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
-import kz.dvij.dvij_compose3.accounthelper.GOOGLE_SIGN_IN_REQUEST_CODE
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
-import kz.dvij.dvij_compose3.dialogs.SignDialogs
 
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
-import kz.dvij.dvij_compose3.ui.theme.Grey10
-import kz.dvij.dvij_compose3.ui.theme.Grey40
-import java.lang.reflect.Field
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -58,10 +49,14 @@ class MainActivity : ComponentActivity() {
     val accountHelper = AccountHelper(this)
     val chooseCityNavigation = ChooseCityNavigation (this)
     val createMeeting = CreateMeeting (this)
-    val signDialogs = SignDialogs(this)
     val sideComponents = SideComponents (this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
+
+
+    override fun onContentChanged() {
+        super.onContentChanged()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,6 +167,7 @@ class MainActivity : ComponentActivity() {
 
                 drawerContent = { // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
 
+
                         sideComponents.HeaderSideNavigation() // HEADER - Логотип
 
                         sideComponents.AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState) // Аватарка
@@ -221,6 +217,8 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen() }
+                        composable(REG_ROOT) {accountScreens.SignInUpPage(switch = REGISTRATION, navController = navController)}
+                        composable(LOG_IN_ROOT) {accountScreens.SignInUpPage(switch = SIGN_IN, navController = navController)}
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}

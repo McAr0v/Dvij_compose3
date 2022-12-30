@@ -26,13 +26,10 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
-import kz.dvij.dvij_compose3.dialogs.CitiesList
-import kz.dvij.dvij_compose3.dialogs.SignDialogs
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class SideComponents (act: MainActivity) {
-    //private val act = act
-    private val signDialogs = act.signDialogs
+    private val act = act
 
     @Composable
     fun HeaderSideNavigation(){
@@ -161,6 +158,7 @@ class SideComponents (act: MainActivity) {
         user: FirebaseUser?, // принимаем параметр - авторизирован или нет
         navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
         scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
+
     ) {
 
         // РАЗДЕЛ С АВАТАРКОй
@@ -284,17 +282,12 @@ class SideComponents (act: MainActivity) {
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
                         }
-                        openSignInDialog.value = true
+                        navController.navigate(THANK_YOU_PAGE_ROOT) {popUpTo(0)}
 
                     },
                 verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
 
             ) {
-
-                if (openSignInDialog.value){
-                    signDialogs.SignDialog(onDismiss = { openSignInDialog.value = false }, switch = SIGN_IN, navController)
-                }
-
 
                 // ТЕКСТ ГОСТЬ
 
@@ -330,7 +323,7 @@ class SideComponents (act: MainActivity) {
                             scaffoldState.drawerState.close()
                         }
 
-                        openRegistrationDialog.value = true
+                        navController.navigate(LOG_IN_ROOT)
 
 
 
@@ -338,11 +331,6 @@ class SideComponents (act: MainActivity) {
                 verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
 
             ) {
-
-                if (openRegistrationDialog.value){
-                    signDialogs.SignDialog(onDismiss = { openRegistrationDialog.value = false }, switch = REGISTRATION, navController)
-                }
-
 
                 // ТЕКСТ ГОСТЬ
 

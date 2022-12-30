@@ -135,11 +135,14 @@ fun ProfileScreen (
                         // функции на нажатие
 
                         try {
-                            navController.navigate(MEETINGS_ROOT) // после выхода отправляем на страницу мероприятий
+
+                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // после выхода отправляем на страницу мероприятий
 
                             accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
 
                             activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+
+
 
                         } catch (e: ApiException) {
                             Log.d("MyLog", "ApiError: ${e.message}")
