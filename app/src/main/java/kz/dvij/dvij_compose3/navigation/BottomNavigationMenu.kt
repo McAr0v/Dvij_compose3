@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.navigation
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Text
@@ -18,10 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.ui.theme.Grey10
-import kz.dvij.dvij_compose3.ui.theme.Grey100
-import kz.dvij.dvij_compose3.ui.theme.PrimaryColor
-import kz.dvij.dvij_compose3.ui.theme.Typography
+import kz.dvij.dvij_compose3.ui.theme.*
 
 // Рисуем через обычную @Composable функцию нижнее меню BottomNavigationMenu
 @Composable
@@ -99,11 +97,14 @@ fun FloatingButton(onClick: () -> Unit ){
             onClick = {
                 onClick()
             },
+            shape = CircleShape,
+            contentColor = Grey00,
+            containerColor = SuccessColor,
             modifier = Modifier
                 .padding(16.dp)
                 .align(alignment = Alignment.BottomEnd)
         ) {
-            Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "")
+            Icon(painter = painterResource(id = R.drawable.ic_add), contentDescription = "")
         }
 
     }

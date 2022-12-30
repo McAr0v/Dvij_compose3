@@ -1,16 +1,12 @@
 package kz.dvij.dvij_compose3.createscreens
 
 import kz.dvij.dvij_compose3.MainActivity
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Typography
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,27 +22,39 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.util.*
 
 class CreateMeeting(act: MainActivity) {
 
-    private var chosenCategory: CategoriesList = CategoriesList.DefaultCat
+    // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
+
+    private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
+
+
+    // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
     @Composable
     fun CreateMeetingScreen(activity: MainActivity) {
 
-        var phoneNumber by rememberSaveable { mutableStateOf("7") }
-        var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") }
-        var openDialog = remember { mutableStateOf(false) }
+        // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
+        // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
 
-        var headline = ""
-        var description = ""
-        var price = ""
-        var phone = ""
-        var whatsapp = ""
+        var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
+        var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
+        var openDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
 
-        var dataResult = ""
-        var timeResult = ""
+        var headline = "" // инициализируем заголовок
+        var description = "" // инициализируем описание
+        var price = "" // инициализируем цену
+        var phone = "" // инициализируем телефон
+        var whatsapp = "" // инициализируем whatsapp
+
+        var dataResult = "" // инициализируем выбор даты
+        var timeStartResult = "" // инициализируем выбор времени начала мероприятия
+        var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
+
+
+
+        // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
         Column(
             modifier = Modifier
@@ -62,7 +70,10 @@ class CreateMeeting(act: MainActivity) {
 
             Image(
                 modifier = Modifier
-                    .background(shape = RoundedCornerShape(20.dp), color = Grey95)
+                    .background(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Grey95
+                    )
                     .fillMaxWidth()
                     .height(200.dp),
                 painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.korn_concert),
@@ -72,11 +83,13 @@ class CreateMeeting(act: MainActivity) {
                 alignment = Alignment.Center
             )
 
-            SpacerTextWithLine(headline = "Заголовок")
+            SpacerTextWithLine(headline = "Заголовок") // подпись перед формой
 
-            headline = fieldHeadlineComponent(act = activity)
+            headline = fieldHeadlineComponent(act = activity) // форма заголовка
 
-            SpacerTextWithLine(headline = "Выбери категорию")
+            SpacerTextWithLine(headline = "Выбери категорию") // подпись перед формой
+
+            // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
             if (openDialog.value) {
                 CategoryChooseDialog {
@@ -84,16 +97,16 @@ class CreateMeeting(act: MainActivity) {
                 }
             }
 
-            CategorySelectButton { openDialog.value = true }
+            CategorySelectButton { openDialog.value = true } // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ
+
+            SpacerTextWithLine(headline = "Телефон для кнопки Позвонить") // подпись перед формой
+
+            phone = fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+
+            SpacerTextWithLine(headline = "Телефон для кнопки Whatsapp") // подпись перед формой
 
 
-
-            SpacerTextWithLine(headline = "Телефон для кнопки Позвонить")
-
-            phone = fieldPhoneComponent(phoneNumber,
-                onPhoneChanged = { phoneNumber = it })
-
-            SpacerTextWithLine(headline = "Телефон для кнопки Whatsapp")
+            // --- ФОРМА WHATSAPP ----
 
             whatsapp = fieldPhoneComponent(
                 phoneNumberWhatsapp,
@@ -101,32 +114,31 @@ class CreateMeeting(act: MainActivity) {
                 icon = painterResource(id = R.drawable.whatsapp)
             )
 
-            SpacerTextWithLine(headline = "Выберите дату")
+            SpacerTextWithLine(headline = "Выберите дату") // подпись перед формой
 
-            dataResult = dataPicker()
+            dataResult = dataPicker() // ВЫБОР ДАТЫ
+
+            SpacerTextWithLine(headline = "Начало мероприятия") // подпись перед формой
+
+            timeStartResult = timePicker() // ВЫБОР ВРЕМЕНИ - Начало мероприятия
+
+            SpacerTextWithLine(headline = "Конец мероприятия") // подпись перед формой
+
+            timeFinishResult = timePicker() // ВЫБОР ВРЕМЕНИ - Конец мероприятия
+
+            SpacerTextWithLine(headline = "Цена билета") // подпись перед формой
+
+            price = fieldPriceComponent(act = activity) // Форма цены за билет
+
+            SpacerTextWithLine(headline = "Описание") // подпись перед формой
+
+            description = fieldDescriptionComponent(act = activity) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+
+            Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 
 
 
-
-            SpacerTextWithLine(headline = "Начало мероприятия")
-
-            timeResult = timePicker()
-
-            SpacerTextWithLine(headline = "Конец мероприятия")
-
-            timeResult = timePicker()
-
-            SpacerTextWithLine(headline = "Цена билета")
-
-            price = fieldPriceComponent(act = activity)
-
-
-
-            SpacerTextWithLine(headline = "Описание")
-
-            description = fieldDescriptionComponent(act = activity)
-
-            Spacer(modifier = Modifier.height(30.dp))
+            // -------------- КНОПКИ ОТМЕНА И ОПУБЛИКОВАТЬ ------------
 
             Row(modifier = Modifier.fillMaxWidth()) {
 
@@ -170,16 +182,12 @@ class CreateMeeting(act: MainActivity) {
                         modifier = Modifier.size(20.dp)
                     )
                 }
-
             }
-
-
-
-            // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
-            // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
-
         }
     }
+
+
+    // -------- КНОПКА ВЫБОРА КАТЕГОРИИ -----------
 
     @Composable
     fun CategorySelectButton(onClick: ()-> Unit) {
@@ -188,6 +196,8 @@ class CreateMeeting(act: MainActivity) {
             onClick = {
                 onClick()
             },
+
+            // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
                 width = if (chosenCategory == CategoriesList.DefaultCat) {
@@ -201,6 +211,8 @@ class CreateMeeting(act: MainActivity) {
                 }
             ),
 
+            // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = if (chosenCategory == CategoriesList.DefaultCat) {
                     Grey95
@@ -213,18 +225,20 @@ class CreateMeeting(act: MainActivity) {
                     Grey100
                 },
             ),
-            shape = RoundedCornerShape(50)
+            shape = RoundedCornerShape(50) // скругленные углы кнопки
         ) {
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
 
             Text(
-                text = stringResource(id = chosenCategory.categoryName),
-                style = Typography.labelMedium
+                text = stringResource(id = chosenCategory.categoryName), // текст кнопки
+                style = Typography.labelMedium // стиль текста
             )
         }
-
     }
+
+
+    // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
     @Composable
     fun CategoryChooseDialog(onDismiss: () -> Unit) {
@@ -262,7 +276,8 @@ class CreateMeeting(act: MainActivity) {
             ) {
 
 
-                // ------- ЗАГЛОВОК ВЫБЕРИТЕ ГОРОД и КНОПКА ЗАКРЫТЬ -----------
+                // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -279,7 +294,7 @@ class CreateMeeting(act: MainActivity) {
                         modifier = Modifier.weight(1f)
                     ) // занять всю оставшуюся ширину
 
-                    Spacer(modifier = Modifier.height(20.dp)) // разделител
+                    Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
                     // ------------- ИКОНКА ЗАКРЫТЬ ----------------
 
@@ -310,24 +325,23 @@ class CreateMeeting(act: MainActivity) {
 
                     // наполнение ленивой колонки
 
-                    // берем каждый item из списка citiesList и заполняем шаблон
+                    // берем каждый item из списка categoriesList и заполняем шаблон
 
                     items(categoriesList) { category ->
 
-                        // ------------ строка с названием города -------------
+                        // ------------ строка с названием категории -------------
 
                         Column(modifier = Modifier
                             .fillMaxWidth()
-                            //.padding(vertical = 10.dp)
                             .clickable {
                                 // действие на нажатие на элемент
                                 chosenCategory =
-                                    category // выбранный город теперь тот, который выбрали, а не по умолчанию
+                                    category // выбранная категория теперь та, которую выбрали, а не по умолчанию
                                 onDismiss() // закрыть диалог
                             }
                         ) {
                             androidx.compose.material3.Text(
-                                text = stringResource(id = category.categoryName), // само название города
+                                text = stringResource(id = category.categoryName), // само название категории
                                 color = Grey40, // цвет текста
                                 style = Typography.bodyMedium // стиль текста
                             )

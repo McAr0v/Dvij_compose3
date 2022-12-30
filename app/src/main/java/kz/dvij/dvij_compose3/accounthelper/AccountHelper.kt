@@ -2,14 +2,12 @@ package kz.dvij.dvij_compose3.accounthelper
 
 import android.util.Log
 import android.widget.Toast
-import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.screens.AccountScreens
 
 class AccountHelper (act: MainActivity) {
 
@@ -18,6 +16,8 @@ class AccountHelper (act: MainActivity) {
 
     private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
+
+    // ---- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ОШИБКИ И ВЫВОДА СООБЩЕНИЯ ПРИ РЕГИСТРАЦИИ И ВХОДЕ --------
 
     fun errorInSignInAndUp (error: Exception) {
 
@@ -109,7 +109,7 @@ class AccountHelper (act: MainActivity) {
     }
 
 
-    // Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ
+    // --- Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ ------
 
     fun sendEmailVerification(user: FirebaseUser){
         // функция отправки письма с подтверждением Email при регистрации
@@ -125,15 +125,14 @@ class AccountHelper (act: MainActivity) {
     }
 
 
-    // выход из аккаунта гугл. НЕ УДАЛЯТЬ ФУНКЦИЮ
+    // -------- ВЫХОД ИЗ АККАУНТА ГУГЛ. НЕ УДАЛЯТЬ ФУНКЦИЮ ------------
+
     fun signOutGoogle(){
         getSignInClient().signOut()
     }
 
 
-    // GOOGLE вход ------------------------------------
-
-    // 1 действие - нужно получить гуглсингинклиент
+    // --------- ФУНКЦИЯ ПОЛУЧЕНИЯ ДОСТУПА К АККАУНТУ ГУГЛ НА ТЕЛЕФОНЕ ------------
 
     fun getSignInClient (): GoogleSignInClient {
 
@@ -154,7 +153,9 @@ class AccountHelper (act: MainActivity) {
 
     }
 
-    // 2 действие создаем функцию, которая будет запускаться когда при нажатии на кнопку гугла
+
+
+    // ------- ФУНКЦИЯ, ЗАПУСКАЮШАЯСЯ ПРИ НАЖАТИИ НА КНОПКУ GOOGLE
 
     fun signInWithGoogle(){
         signInClient = getSignInClient() // sign in Client - переменная, которая инициализируется не сразу. Мы ее создали как lateinit  и она вверху mainActivity
@@ -164,18 +165,12 @@ class AccountHelper (act: MainActivity) {
         try {
             act.googleSignInResultLauncher?.launch(intent)
         } catch (e: Exception) {
-
             Log.d("MyLog", "ApiError: ${e.message}")
-
         }
-
-
-
-        //act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
-
     }
 
 
+    // ------- ФУНКЦИЯ НЕПОСРЕДСТВЕННО ВХОДА/РЕГИСТРАЦИИ В FIREBASE ЧЕРЕЗ GOOGLE -----------
 
     fun signInFirebaseWithGoogle (token: String) {
 
@@ -191,7 +186,6 @@ class AccountHelper (act: MainActivity) {
 
         }
     }
-
 
 }
 

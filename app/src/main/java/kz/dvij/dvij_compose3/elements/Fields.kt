@@ -31,9 +31,7 @@ fun fieldEmailComponent (
     act: MainActivity
 ): String {
 
-    // создаем переменные email и password - содержимое их будет меняться
-    // в зависимости от того, что введет пользователь и это содержимое будет
-    // отправляться в Firebase
+    // функция вовзвращает переменную текст, в которую записывается вводимое в поле значение
 
     var text = remember { mutableStateOf("") }
 
@@ -49,18 +47,8 @@ fun fieldEmailComponent (
 
     var focusColor = remember { mutableStateOf(Grey60) }
 
-    // создаем переменную для скрытия или отображения пароля
-
-    var passwordVisible = remember { mutableStateOf(false) }
-
-
-    Column(modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.Top,
-    horizontalAlignment = Alignment.Start) {
-    }
 
     // -------- ТЕКСТОВОЕ ПОЛЕ EMAIL -----------------
-
 
     TextField(
 
@@ -78,11 +66,12 @@ fun fieldEmailComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value.lowercase(), // значение email // lowerCase() - делает все буквы строчными
+        value = text.value.lowercase(), // значение text // lowerCase() - делает все буквы строчными
 
         // on valueChange - это действие при изменении значения
+
         onValueChange = { newText ->
-            text.value = newText // помещаем в переменную email новый введенный текст
+            text.value = newText // помещаем в переменную text новый введенный текст
 
             // проверяем вводимый текст на соответствие правилам:
 
@@ -126,8 +115,11 @@ fun fieldEmailComponent (
         ),
 
         // иконка справа от текста
+
         trailingIcon = {
+
             // условие, если состояние ошибки
+
             if (isTextError.value) {
 
                 Icon(
@@ -149,21 +141,27 @@ fun fieldEmailComponent (
         textStyle = Typography.bodyLarge, // стиль текста
 
         keyboardOptions = KeyboardOptions(
+
             // опции клавиатуры, которая появляется при вводе
+
             keyboardType = KeyboardType.Email, // тип клавиатуры (типа удобнее для ввода Email)
             imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
         ),
 
         keyboardActions = KeyboardActions(
+
             // При нажатии на кнопку onDone - снимает фокус с формы
+
             onDone = {
                 focusManager.clearFocus()
             }
         ),
 
         placeholder = {
+
             // подсказка для пользователей
+
             Text(
                 text = stringResource(id = R.string.email_example), // значение подсказки
                 style = Typography.bodyLarge // стиль текста в холдере
@@ -171,7 +169,9 @@ fun fieldEmailComponent (
         },
 
         leadingIcon = {
+
             // иконка, расположенная слева от надписи плейсхолдера
+
             Icon(
                 painter = painterResource(id = R.drawable.ic_email), // сама иконка
                 contentDescription = stringResource(id = R.string.cd_email_icon), // описание для слабовидящих
@@ -186,12 +186,11 @@ fun fieldEmailComponent (
     )
 
 
-
-
     // --------- ТЕКСТ ОШИБКИ ----------------
 
 
     // условие - если состояние ошибки
+
     if (isTextError.value) {
         Text(
             text = errorMassage.value, // текст ошибки
@@ -209,9 +208,7 @@ fun fieldPasswordComponent (
     act: MainActivity
 ): String {
 
-    // создаем переменные email и password - содержимое их будет меняться
-    // в зависимости от того, что введет пользователь и это содержимое будет
-    // отправляться в Firebase
+    // создаем переменную text - она возвращает значение
 
     var text = remember { mutableStateOf("") }
 
@@ -232,11 +229,6 @@ fun fieldPasswordComponent (
     var passwordVisible = remember { mutableStateOf(false) }
 
 
-    Column(modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start) {
-    }
-
     // -------- ТЕКСТОВОЕ ПОЛЕ PASSWORD -----------------
 
 
@@ -256,11 +248,12 @@ fun fieldPasswordComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение email // lowerCase() - делает все буквы строчными
+        value = text.value, // значение text
 
         // on valueChange - это действие при изменении значения
+
         onValueChange = { newText ->
-            text.value = newText // помещаем в переменную email новый введенный текст
+            text.value = newText // помещаем в переменную text новый введенный текст
 
             // проверяем вводимый текст на соответствие правилам:
 
@@ -294,7 +287,7 @@ fun fieldPasswordComponent (
         // иконка справа от текста
         trailingIcon = {
             IconButton(
-                onClick = {passwordVisible.value = !passwordVisible.value}
+                onClick = {passwordVisible.value = !passwordVisible.value} // действие на нажатие на иконку видимости
             ) {
 
                 Icon(
@@ -316,7 +309,6 @@ fun fieldPasswordComponent (
                     modifier = Modifier.size(20.dp) // размер иконки
                 )
             }
-
         },
 
         textStyle = Typography.bodyLarge, // стиль текста
@@ -335,7 +327,7 @@ fun fieldPasswordComponent (
             }
         ),
 
-        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(), // визуальная трансформация, которая скрывает пароль
 
         placeholder = {
             // подсказка для пользователей
@@ -360,9 +352,6 @@ fun fieldPasswordComponent (
         isError = isTextError.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
     )
 
-
-
-
     // --------- ТЕКСТ ОШИБКИ ----------------
 
 
@@ -384,13 +373,13 @@ fun fieldHeadlineComponent (
     act: MainActivity
 ): String {
 
-    // создаем переменные email и password - содержимое их будет меняться
-    // в зависимости от того, что введет пользователь и это содержимое будет
-    // отправляться в Firebase
+    // создаем переменную текст - это значение функция возвращает
 
     var text = remember { mutableStateOf("") }
-    val maxChar = 40
-    var counter = "${text.value.length} / ${maxChar.toString()}"
+
+    val maxChar = 40 // максимальное количество символов
+
+    var counter = maxChar - text.value.length // счетчик, который считает сколько осталось символов
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -454,7 +443,7 @@ fun fieldHeadlineComponent (
         // иконка справа от текста
         trailingIcon = {
             Text(
-                text = counter,
+                text = counter.toString(),
             style = Typography.bodySmall,
             color = Grey60)
         },
