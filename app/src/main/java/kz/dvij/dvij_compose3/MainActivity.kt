@@ -27,7 +27,6 @@ import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
-
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
@@ -54,10 +53,6 @@ class MainActivity : ComponentActivity() {
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
-    override fun onContentChanged() {
-        super.onContentChanged()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -83,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val context = LocalContext.current
+            val context = LocalContext.current // контекст для тостов
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.

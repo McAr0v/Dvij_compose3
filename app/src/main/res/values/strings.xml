@@ -42,6 +42,7 @@
     <string name="cd_right_icon">Иконка - введен корректный Email</string>
     <string name="cd_illustration">Иллюстрация</string>
     <string name="cd_phone_icon">Иконка поля ввода телефона</string>
+    <string name="cd_create">Кнопка "Создать"</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -123,5 +124,9 @@
     <string name="input_headline">Введите заголовок (max 40 символов)</string>
     <string name="input_description">Введите описание</string>
     <string name="input_price">Введите стоимость билета</string>
+
+    <!-- PICKERS -->
+    <string name="piker_date">Выбери дату</string>
+    <string name="piker_time">Выбери время</string>
 
 </resources>

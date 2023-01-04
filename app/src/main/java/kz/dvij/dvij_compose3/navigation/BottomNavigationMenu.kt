@@ -1,6 +1,5 @@
 package kz.dvij.dvij_compose3.navigation
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
@@ -12,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,8 +20,8 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // Рисуем через обычную @Composable функцию нижнее меню BottomNavigationMenu
-@Composable
 
+@Composable
 fun BottomNavigationMenu (navController: NavController) {
     // для работы нужно извне передать нам NavController. NavController инициализируется на MainActivity
     // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
@@ -50,7 +48,7 @@ fun BottomNavigationMenu (navController: NavController) {
         val currentRoute = navBackStackEntry?.destination?.route // теперь мы можем получить текущий путь
 
         // проходимся по каждому элементу из списка navItems и для каждого создаем внешний вид
-        // forEach - это как раз функция, чтобы прошелска по каждому элементу
+        // forEach - это как раз функция, чтобы прошелся по каждому элементу
 
         navItems.forEach { item ->
 
@@ -67,8 +65,11 @@ fun BottomNavigationMenu (navController: NavController) {
 
                 label = {
                     // подпись под иконкой
-                    Text(text = stringResource(id = item.title),
-                        style = Typography.displaySmall)},
+                    Text(
+                        text = stringResource(id = item.title),
+                        style = Typography.displaySmall
+                    )
+                        },
 
                 icon = {
                     // сама иконка
@@ -87,25 +88,40 @@ fun BottomNavigationMenu (navController: NavController) {
     }
 }
 
+
+
+// ----- ЛЕТАЮЩАЯ КНОПКА ДОБАВИТЬ -----------
+
 @Composable
 fun FloatingButton(onClick: () -> Unit ){
 
+    // помещаем кнопку в BOX
+    Box(
+        modifier = Modifier
+            .fillMaxSize() // занять полный размер
+            .fillMaxWidth() // занять всю ширину
+            .fillMaxHeight() // занять всю высоту
+    ) {
 
-    Box(modifier = Modifier.fillMaxSize().fillMaxWidth().fillMaxHeight()){
+        // --- САМА КНОПКА -------
 
         FloatingActionButton(
-            onClick = {
+
+            onClick = { // действие на нажатие
                 onClick()
             },
-            shape = CircleShape,
-            contentColor = Grey00,
-            containerColor = SuccessColor,
+            shape = CircleShape, // форма кнопки
+            contentColor = Grey00, // цвет содержимого кнопки
+            containerColor = SuccessColor, // цвет фона кнопки
             modifier = Modifier
-                .padding(16.dp)
-                .align(alignment = Alignment.BottomEnd)
+                .padding(16.dp) // отступы
+                .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
         ) {
-            Icon(painter = painterResource(id = R.drawable.ic_add), contentDescription = "")
+            // ------- СОДЕРЖИМОЕ КНОПКИ --------
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add), // сама иконка
+                contentDescription = stringResource(id = R.string.cd_create) // описание для слабовидящих
+            )
         }
-
     }
 }

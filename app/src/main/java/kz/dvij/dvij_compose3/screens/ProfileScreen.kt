@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,8 +40,7 @@ fun ProfileScreen (
     navController: NavController,
     activity: MainActivity
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState()
+
     val accountHelper = AccountHelper(activity)
 
     // ------ ЕСЛИ USER НЕ РАВЕН NULL И  ПОДТВЕРДИЛ EMAIL ------
@@ -78,7 +76,7 @@ fun ProfileScreen (
 
                 // ------- ЕСЛИ НЕТ ФОТОГРАФИИ -------------
 
-                androidx.compose.foundation.Image(
+                Image(
                     painter = painterResource(id = R.drawable.no_user_image), // заглушка
                     contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
                     contentDescription = stringResource(id = R.string.cd_avatar), // описание для слабовидящих

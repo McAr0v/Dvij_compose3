@@ -24,12 +24,9 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
-import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class SideComponents (act: MainActivity) {
-    private val act = act
 
     @Composable
     fun HeaderSideNavigation(){

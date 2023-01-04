@@ -3,8 +3,6 @@ package kz.dvij.dvij_compose3.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
-import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 
 sealed class SideNavigationItems (
     @StringRes val title: Int, // заголовок. Чтобы обращаться к String-ресурсам, надо написать @StringRes

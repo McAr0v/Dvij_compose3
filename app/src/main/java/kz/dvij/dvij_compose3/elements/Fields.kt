@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.painter.Painter
@@ -393,11 +392,6 @@ fun fieldHeadlineComponent (
 
     var focusColor = remember { mutableStateOf(Grey60) }
 
-    Column(modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start) {
-    }
-
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
 
 
@@ -417,7 +411,7 @@ fun fieldHeadlineComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение email // lowerCase() - делает все буквы строчными
+        value = text.value, // значение поля
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -440,7 +434,7 @@ fun fieldHeadlineComponent (
 
         ),
 
-        // иконка справа от текста
+        // счетчик символов справа от текста
         trailingIcon = {
             Text(
                 text = counter.toString(),
@@ -452,7 +446,7 @@ fun fieldHeadlineComponent (
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
-            keyboardType = KeyboardType.Text, // тип клавиатуры (типа удобнее для ввода Email)
+            keyboardType = KeyboardType.Text, // тип клавиатуры
             imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
         ),
@@ -486,18 +480,17 @@ fun fieldDescriptionComponent (
     act: MainActivity
 ): String {
 
-    // создаем переменные email и password - содержимое их будет меняться
-    // в зависимости от того, что введет пользователь и это содержимое будет
-    // отправляться в Firebase
+    // переменная text возвращает значение при вызове функции
 
     var text = remember { mutableStateOf("") }
-    val maxChar = 300
-    var counter = "${text.value.length} / ${maxChar.toString()}"
+
+    val maxChar = 300 // максимальное количество вводимых символов
+
+    var counter = "${text.value.length} / ${maxChar.toString()}" // счетчик. Считает, сколько осталось символов для ввода
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
     var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
-    //var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
@@ -506,13 +499,8 @@ fun fieldDescriptionComponent (
 
     var focusColor = remember { mutableStateOf(Grey60) }
 
-    Column(modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start) {
-    }
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
-
 
     TextField(
 
@@ -530,7 +518,7 @@ fun fieldDescriptionComponent (
                 shape = RoundedCornerShape(30.dp) // скругление границ
             ),
 
-        value = text.value, // значение email // lowerCase() - делает все буквы строчными
+        value = text.value, // значение поля
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -553,7 +541,7 @@ fun fieldDescriptionComponent (
 
         ),
 
-        // иконка справа от текста
+        // счетчик символов
         trailingIcon = {
             Text(
                 text = counter,
@@ -565,8 +553,8 @@ fun fieldDescriptionComponent (
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
-            keyboardType = KeyboardType.Text, // тип клавиатуры (типа удобнее для ввода Email)
-            imeAction = ImeAction.Default // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
+            keyboardType = KeyboardType.Text, // тип клавиатуры
+            imeAction = ImeAction.Default // кнопка действия (перевод на следующую строку)
 
         ),
 
@@ -602,24 +590,25 @@ fun fieldPhoneComponent(
     onPhoneChanged: (String) -> Unit,
     icon: Painter = painterResource(id = R.drawable.ic_phone)
 ): String {
-    var focusColor = remember { mutableStateOf(Grey40) }
+
+    var focusColor = remember { mutableStateOf(Grey40) } // изначальный цвет фокуса
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
-    var returnText = "+7$phone"
+    var returnText = "+7$phone" // переменная, которая возвращается из функции
 
     TextField(
-        value = phone,
+        value = phone, // значение поля
 
         onValueChange = { it ->
             onPhoneChanged(it.take(mask.count { it == maskNumber }))
         },
 
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Phone,
-            imeAction = ImeAction.Done
+            keyboardType = KeyboardType.Phone, // тип клавиатуры
+            imeAction = ImeAction.Done // кнопка действия
         ),
 
-        visualTransformation = PhoneVisualTransformation(mask, maskNumber),
+        visualTransformation = PhoneVisualTransformation(mask, maskNumber), // визуальное изменение. Передаем маску и символ, который нужно заменять в маске
 
         modifier = Modifier
             .fillMaxWidth()
@@ -635,7 +624,7 @@ fun fieldPhoneComponent(
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        singleLine = true,
+        singleLine = true, // говорим, что в поле только 1 строка
 
         keyboardActions = KeyboardActions(
             // При нажатии на кнопку onDone - снимает фокус с формы
@@ -658,6 +647,8 @@ fun fieldPhoneComponent(
 
         ),
 
+        // иконка слева
+
         leadingIcon = {
             Icon(
                 painter = icon,
@@ -678,13 +669,12 @@ fun fieldPriceComponent (
     act: MainActivity
 ): String {
 
-    // создаем переменные email и password - содержимое их будет меняться
-    // в зависимости от того, что введет пользователь и это содержимое будет
-    // отправляться в Firebase
+    // переменная текст - та, которая возвращается из функции
 
     var text = remember { mutableStateOf("") }
-    val maxChar = 8
-    var counter = "${text.value.length} / ${maxChar.toString()}"
+
+    val maxChar = 8 // максимальное количество символов
+
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -698,10 +688,6 @@ fun fieldPriceComponent (
 
     var focusColor = remember { mutableStateOf(Grey60) }
 
-    Column(modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start) {
-    }
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
 
@@ -722,7 +708,7 @@ fun fieldPriceComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение email // lowerCase() - делает все буквы строчными
+        value = text.value, // значение введенного текста
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -745,6 +731,7 @@ fun fieldPriceComponent (
 
         ),
 
+        // иконка слева цены
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_tenge),
@@ -790,10 +777,10 @@ fun fieldPriceComponent (
 
 
 
+// --------- ПРЕОБРАЗОВАНИЕ ТЕЛЕФОНА В НУЖНЫЙ ФОРМАТ ------------
 
 
-
-class PhoneVisualTransformation(val mask: String, val maskNumber: Char) : VisualTransformation {
+class PhoneVisualTransformation(private val mask: String, private val maskNumber: Char) : VisualTransformation {
 
     private val maxLength = mask.count { it == maskNumber }
 

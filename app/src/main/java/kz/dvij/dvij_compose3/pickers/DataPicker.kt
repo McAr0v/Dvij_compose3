@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.util.*
 
@@ -24,21 +24,26 @@ import java.util.*
 @Composable
 fun dataPicker(): String{
 
-    var dataResult = ""
-    val mContext = LocalContext.current
+    var dataResult = "" // возвращаемая переменная
+    val mContext = LocalContext.current // инициализируем контекст
 
-    val mCalendar = Calendar.getInstance()
+    val mCalendar = Calendar.getInstance() // инициализируем календарь
 
-    val mYear: Int = mCalendar.get(Calendar.YEAR)
-    val mMonth: Int = mCalendar.get(Calendar.MONTH)
-    val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)
+    val mYear: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
+    val mMonth: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
+    val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
 
-    mCalendar.time = Date()
+    mCalendar.time = Date() // берем из календаря текущую дату
 
-    val mDate = remember{ mutableStateOf("") }
+    val mDate = remember{ mutableStateOf("") } // создам переменную дата
+
+    // создаем переменную с диалогом выбора даты
 
     val mDatePickerDialog = DatePickerDialog(
-        mContext,
+        mContext, // передаем контекст
+
+        // дополнительные настройки
+
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
             mDate.value = "$mDayOfMonth ${
                 when (mMonth+1) {
@@ -59,25 +64,36 @@ fun dataPicker(): String{
         }, mYear, mMonth, mDay
     )
 
-    mDatePickerDialog.datePicker.minDate = mCalendar.timeInMillis
+    mDatePickerDialog.datePicker.minDate = mCalendar.timeInMillis // берем минимальную дату для возможности выбора (сегодня)
+
+    // ---- КНОПКА ЗАПУСКА ВЫБОРА ДАТЫ -----
+
+    // Идея в том, чтобы сделать кнопку, которая видоизменяется в зависимости от того, выбрана дата или нет
+    // если выбрана, то будет выглядеть как ТАГ, а если не выбрана - то как кнопка Secondary
 
     Button(
         onClick = {
-            mDatePickerDialog.show()
+            mDatePickerDialog.show() // при нажатии запускаем диалог
         },
 
+        // настройки границы
+
         border = BorderStroke(
+            // толщина границы
             width = if (mDate.value == "") {
                 2.dp
             } else {
                 0.dp
-            }, color = if (mDate.value == "") {
+            },
+            // цвет границы
+            color = if (mDate.value == "") {
                 Grey60
             } else {
                 Grey95
             }
         ),
 
+        // цвета кнопки
         colors = ButtonDefaults.buttonColors(
             backgroundColor = if (mDate.value == "") {
                 Grey95
@@ -90,18 +106,22 @@ fun dataPicker(): String{
                 Grey100
             },
         ),
-        shape = RoundedCornerShape(50)
+        shape = RoundedCornerShape(50) // скругление углов
     ) {
+
+        // ------ СОДЕРЖИМОЕ КНОПКИ --------
 
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = if (mDate.value == "") {"Выберите дату"} else {mDate.value},
+            text = if (mDate.value == "") {
+                stringResource(id = R.string.piker_date)
+            } else {mDate.value},
             style = Typography.labelMedium
         )
     }
 
-    dataResult = mDate.value
+    dataResult = mDate.value // помещаем в возвращаемую переменную выбранную дату
 
     return dataResult
 }
