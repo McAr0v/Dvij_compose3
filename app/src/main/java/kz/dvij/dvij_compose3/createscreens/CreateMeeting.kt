@@ -40,7 +40,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         val activity = act
         val context = LocalContext.current
-        val databaseManager = DatabaseManager(activity, activity) // инициализируем класс с функциями базы данных
+        val databaseManager = DatabaseManager(activity) // инициализируем класс с функциями базы данных
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker

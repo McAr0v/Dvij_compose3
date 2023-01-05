@@ -1,7 +1,9 @@
 package kz.dvij.dvij_compose3.firebase
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -9,7 +11,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 
-class DatabaseManager (val readDataCallback: ReadDataCallback, val activity: MainActivity) {
+class DatabaseManager (val activity: MainActivity) {
 
 
 
@@ -45,7 +47,7 @@ class DatabaseManager (val readDataCallback: ReadDataCallback, val activity: Mai
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
 
-    fun readMeetingDataFromDb(){
+    fun readMeetingDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
         // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
         // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
@@ -82,12 +84,10 @@ class DatabaseManager (val readDataCallback: ReadDataCallback, val activity: Mai
 
                     if (meeting != null) {meetingArray.add(meeting)}
 
-                    activity.meetingsScreens.list = meetingArray
-
                     //Log.d("MyLog", "Data: $item")
                 }
 
-                //readDataCallback.readData(meetingArray)
+                meetingsList.value = meetingArray
 
             }
 
@@ -97,6 +97,4 @@ class DatabaseManager (val readDataCallback: ReadDataCallback, val activity: Mai
         }
         )
     }
-
-
 }

@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseUser
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.navigation.TabMenu
@@ -25,7 +24,7 @@ class PlacesScreens (val act: MainActivity) {
 
         Column() {
 
-            TabMenu(bottomPage = PLACES_ROOT, navController, activity = act)
+            TabMenu(bottomPage = PLACES_ROOT, navController, activity = act, null)
 
         }
     }

@@ -7,15 +7,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.Grey95
@@ -25,48 +23,43 @@ import kz.dvij.dvij_compose3.ui.theme.Primary10
 class MeetingsScreens (private val act: MainActivity) {
 
     private val user = act.mAuth.currentUser
-
-    var list = listOf<MeetingsAdsClass>()
+    private val databaseManager = act.databaseManager
 
     @Composable
-    fun MeetingsScreen (navController: NavController) {
+    fun MeetingsScreen (navController: NavController, meetingsList: MutableState<List<MeetingsAdsClass>>) {
         Column {
 
-            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act)
+            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act, meetingsList)
 
         }
-
-
     }
 
 // экран мероприятий
 
     @Composable
-    fun MeetingsTapeScreen (navController: NavController){
+    fun MeetingsTapeScreen (navController: NavController, meetingsList: MutableState<List<MeetingsAdsClass>>){
 
-        if (list.isNotEmpty()){
+        if (meetingsList.value.isNotEmpty()){
             LazyColumn{
-                items(list){ item ->
+                items(meetingsList.value){ item ->
                     MeetingCard(meetingItem = item)
                 }
             }
         } else {
 
-        }
-
-
-
-
-
-        Column (
-            modifier = Modifier
-                .background(Grey95)
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-
+            Column (
+                modifier = Modifier
+                    .background(Grey95)
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                    Button(onClick = { navController.navigate(MEETINGS_ROOT)}) {
+                        Text(text = "Идет загрузка. Обновить?")
+                    }
+            }
         }
     }
 

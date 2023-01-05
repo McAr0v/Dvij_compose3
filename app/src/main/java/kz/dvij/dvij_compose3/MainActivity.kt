@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,8 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,7 +44,7 @@ import okhttp3.internal.wait
 
 // ОТПРАВКА ИМЕЙЛА (ДЛЯ РЕАЛИЗАЦИИ ОБРАТНОЙ СВЯЗИ) https://www.geeksforgeeks.org/send-email-in-an-android-application-using-jetpack-compose/
 
-class MainActivity : ComponentActivity(), ReadDataCallback {
+class MainActivity : ComponentActivity() {
 
     val mAuth = FirebaseAuth.getInstance()  // берем из файрбаз аутентикейшн
 
@@ -53,19 +53,17 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
     val chooseCityNavigation = ChooseCityNavigation (this)
     val createMeeting = CreateMeeting (this)
     val sideComponents = SideComponents (this)
-    val databaseManager = DatabaseManager(this, this)
+    val databaseManager = DatabaseManager( this)
     val meetingsScreens = MeetingsScreens(this)
     val stockScreen = StockScreen(this)
     val placesScreens = PlacesScreens(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
-    var meetingsList = listOf<MeetingsAdsClass>()
 
+    @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        databaseManager.readMeetingDataFromDb()
 
         googleSignInResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
@@ -89,6 +87,12 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
 
         setContent {
 
+            val meetingsList = remember {
+                mutableStateOf(listOf<MeetingsAdsClass>())
+            }
+
+            databaseManager.readMeetingDataFromDb(meetingsList)
+
             val context = LocalContext.current // контекст для тостов
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
@@ -100,7 +104,6 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
 
             val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
             val currentRoute = navBackStackEntry?.destination?.route // Получаем доступ к корню страницы
-
 
             // Помещаем все меню в Scaffold
 
@@ -173,7 +176,6 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
 
                 drawerContent = { // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
 
-
                         sideComponents.HeaderSideNavigation() // HEADER - Логотип
 
                         sideComponents.AvatarBoxSideNavigation(
@@ -219,7 +221,7 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingsList)}
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController)}
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
@@ -238,11 +240,5 @@ class MainActivity : ComponentActivity(), ReadDataCallback {
                 }
             }
         }
-    }
-
-    override fun readData(list: List<MeetingsAdsClass>) {
-
-        meetingsScreens.list = list
-
     }
 }
