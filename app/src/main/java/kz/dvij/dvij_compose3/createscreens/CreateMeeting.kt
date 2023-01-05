@@ -23,9 +23,10 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
+import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class CreateMeeting(act: MainActivity) {
+class CreateMeeting(private val act: MainActivity) {
 
     // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
 
@@ -35,10 +36,11 @@ class CreateMeeting(act: MainActivity) {
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
     @Composable
-    fun CreateMeetingScreen(activity: MainActivity) {
+    fun CreateMeetingScreen() {
 
+        val activity = act
         val context = LocalContext.current
-        val databaseManager = DatabaseManager()
+        val databaseManager = DatabaseManager(activity, activity) // инициализируем класс с функциями базы данных
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
@@ -56,7 +58,7 @@ class CreateMeeting(act: MainActivity) {
         var dataResult = "" // инициализируем выбор даты
         var timeStartResult = "" // инициализируем выбор времени начала мероприятия
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
-
+        var category = "" // категория
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -102,7 +104,7 @@ class CreateMeeting(act: MainActivity) {
                 }
             }
 
-            CategorySelectButton { openDialog.value = true } // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ
+            category = activity.getString(categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
             SpacerTextWithLine(headline = "Телефон для кнопки Позвонить") // подпись перед формой
 
@@ -165,7 +167,23 @@ class CreateMeeting(act: MainActivity) {
 
                 Button(
                     onClick = {
-                        databaseManager.publishAd()
+
+                        // заполняем в переменную значения, согласно классу мероприятий
+
+                        val filledMeeting = MeetingsAdsClass(
+                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                            category = category,
+                            headline = headline,
+                            description = description,
+                            price = price,
+                            phone = phone,
+                            whatsapp = whatsapp,
+                            data = dataResult,
+                            startTime = timeStartResult,
+                            finishTime = timeFinishResult
+                        )
+
+                        databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
 
                     },
                     modifier = Modifier
@@ -194,11 +212,10 @@ class CreateMeeting(act: MainActivity) {
         }
     }
 
-
     // -------- КНОПКА ВЫБОРА КАТЕГОРИИ -----------
 
     @Composable
-    fun CategorySelectButton(onClick: ()-> Unit) {
+    fun categorySelectButton(onClick: ()-> Unit): CategoriesList {
 
         Button(
             onClick = {
@@ -243,6 +260,7 @@ class CreateMeeting(act: MainActivity) {
                 style = Typography.labelMedium // стиль текста
             )
         }
+        return chosenCategory
     }
 
 

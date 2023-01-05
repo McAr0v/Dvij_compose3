@@ -33,7 +33,6 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // функция превью экрана
 
-
 @Composable
 fun ProfileScreen (
     user: FirebaseUser?,

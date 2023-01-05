@@ -22,18 +22,18 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.options
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
+import kz.dvij.dvij_compose3.firebase.DatabaseManager
+import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.ReadDataCallback
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
+import okhttp3.internal.wait
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -44,7 +44,7 @@ import kz.dvij.dvij_compose3.screens.*
 
 // ОТПРАВКА ИМЕЙЛА (ДЛЯ РЕАЛИЗАЦИИ ОБРАТНОЙ СВЯЗИ) https://www.geeksforgeeks.org/send-email-in-an-android-application-using-jetpack-compose/
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), ReadDataCallback {
 
     val mAuth = FirebaseAuth.getInstance()  // берем из файрбаз аутентикейшн
 
@@ -53,14 +53,19 @@ class MainActivity : ComponentActivity() {
     val chooseCityNavigation = ChooseCityNavigation (this)
     val createMeeting = CreateMeeting (this)
     val sideComponents = SideComponents (this)
+    val databaseManager = DatabaseManager(this, this)
+    val meetingsScreens = MeetingsScreens(this)
+    val stockScreen = StockScreen(this)
+    val placesScreens = PlacesScreens(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
-
-
+    var meetingsList = listOf<MeetingsAdsClass>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        databaseManager.readMeetingDataFromDb()
 
         googleSignInResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
@@ -171,7 +176,9 @@ class MainActivity : ComponentActivity() {
 
                         sideComponents.HeaderSideNavigation() // HEADER - Логотип
 
-                        sideComponents.AvatarBoxSideNavigation(user = mAuth.currentUser, navController = navController, scaffoldState = scaffoldState) // Аватарка
+                        sideComponents.AvatarBoxSideNavigation(
+                            //user = mAuth.currentUser,
+                            navController = navController, scaffoldState = scaffoldState) // Аватарка
 
                         chooseCityNavigation.CityHeaderSideNavigation() // Меню с выбором города находится теперь в отдельном классе
 
@@ -212,9 +219,9 @@ class MainActivity : ComponentActivity() {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) { MeetingsScreen(navController, mAuth.currentUser)}
-                        composable(PLACES_ROOT) { PlacesScreen(navController, mAuth.currentUser)}
-                        composable(STOCK_ROOT) { StockScreen(navController, mAuth.currentUser)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController)}
+                        composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController)}
+                        composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
@@ -225,11 +232,17 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(activity = this@MainActivity)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen()}
 
                     }
                 }
             }
         }
+    }
+
+    override fun readData(list: List<MeetingsAdsClass>) {
+
+        meetingsScreens.list = list
+
     }
 }

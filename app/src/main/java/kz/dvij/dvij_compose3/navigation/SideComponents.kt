@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class SideComponents (act: MainActivity) {
+class SideComponents (private val act: MainActivity) {
 
     @Composable
     fun HeaderSideNavigation(){
@@ -152,14 +152,13 @@ class SideComponents (act: MainActivity) {
 
     @Composable
     fun AvatarBoxSideNavigation(
-        user: FirebaseUser?, // принимаем параметр - авторизирован или нет
         navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
         scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
 
     ) {
 
         // РАЗДЕЛ С АВАТАРКОй
-
+        val user = act.mAuth.currentUser // получаем пользователя - авторизован он или нет
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину
         val context = LocalContext.current // инициализируем контекст для ТОСТОВ
 

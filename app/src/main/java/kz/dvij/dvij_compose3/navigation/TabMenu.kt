@@ -17,6 +17,7 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
+import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.screens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -27,7 +28,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН И ФУНКЦИОНАЛ ТАБОВ (МОИ, ИЗБРАННЫЕ, ЛЕНТА) В РАЗДЕЛАХ МЕРОПРИЯТИЯ, ЗАВЕДЕНИЯ, АКЦИИ
 
-fun TabMenu (bottomPage: String, navController: NavController, user: FirebaseUser?){
+fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
     // (Смотри Horizontal Pager)
@@ -89,26 +90,26 @@ fun TabMenu (bottomPage: String, navController: NavController, user: FirebaseUse
                 MEETINGS_ROOT -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> MeetingsTapeScreen(navController) // мероприятия Лента
-                        1 -> MeetingsFavScreen(navController) // мероприятия Избранные
-                        else -> MeetingsMyScreen(navController, user) // мероприятия Мои
+                        0 -> activity.meetingsScreens.MeetingsTapeScreen(navController = navController) // мероприятия Лента
+                        1 -> activity.meetingsScreens.MeetingsFavScreen(navController) // мероприятия Избранные
+                        else -> activity.meetingsScreens.MeetingsMyScreen(navController) // мероприятия Мои
                 }
                 }
 
                 PLACES_ROOT -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> PlacesTapeScreen() // заведения Лента
-                        1 -> PlacesFavScreen() // заведения Избранные
-                        else -> PlacesMyScreen() // заведения Мои
+                        0 -> activity.placesScreens.PlacesTapeScreen() // заведения Лента
+                        1 -> activity.placesScreens.PlacesFavScreen() // заведения Избранные
+                        else -> activity.placesScreens.PlacesMyScreen() // заведения Мои
                     }
                 }
                 else -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> StockTapeScreen() // Акции Лента
-                        1 -> StockFavScreen() // Акции Избранные
-                        else -> StockMyScreen() // Акции МОИ
+                        0 -> activity.stockScreen.StockTapeScreen() // Акции Лента
+                        1 -> activity.stockScreen.StockFavScreen() // Акции Избранные
+                        else -> activity.stockScreen.StockMyScreen() // Акции МОИ
                     }
                 }
             }

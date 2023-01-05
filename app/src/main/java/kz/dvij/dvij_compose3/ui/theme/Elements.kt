@@ -16,9 +16,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 
 @Composable
-fun MeetingCard (category: String, title: String, time: String, date: String) {
+fun MeetingCard (meetingItem: MeetingsAdsClass) {
 
     // Принимаем категорию и заголовок. Надо еще принимать дату, время и картинку
     // Карточка мероприятий
@@ -72,9 +73,8 @@ fun MeetingCard (category: String, title: String, time: String, date: String) {
                 ) {
 
                     // КНОПКА КАТЕГОРИИ
-
-                    Text(
-                        text = category, // category - название категории. Нужно сюда передавать категорию из базы данных
+                    if (meetingItem.category != null) Text(
+                        text = meetingItem.category, // category - название категории. Нужно сюда передавать категорию из базы данных
                         color = Grey00, // цвет текста
                         style = Typography.bodySmall, // стиль текста
                         modifier = Modifier
@@ -86,6 +86,7 @@ fun MeetingCard (category: String, title: String, time: String, date: String) {
                             ),
 
                         )
+
 
                     // ИКОНКА ИЗБРАННОЕ
 
@@ -103,11 +104,13 @@ fun MeetingCard (category: String, title: String, time: String, date: String) {
 
                     // Заголовок мероприятия
 
+                    if (meetingItem.headline!=null){
                     Text(
-                        text = title, // title - заголовок мероприятия, который должен приходить из базы данных
+                        text = meetingItem.headline, // title - заголовок мероприятия, который должен приходить из базы данных
                         color = Grey00, // цвет текста
                         style = Typography.titleLarge // стиль текста
                     )
+                    }
 
                     // Панель ДАТА И ВРЕМЯ
 
@@ -119,13 +122,15 @@ fun MeetingCard (category: String, title: String, time: String, date: String) {
                         // date - дата проведения мероприятия.
                         // date надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_calendar, date)
+                        if (meetingItem.data != null) IconText(kz.dvij.dvij_compose3.R.drawable.ic_calendar, meetingItem.data)
+
+
 
                         // Вывод времени начала мероприятия
                         // time - время начала мероприятия.
                         // time надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, time)
+                        if (meetingItem.startTime != null) IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, meetingItem.startTime)
 
                     }
                 }

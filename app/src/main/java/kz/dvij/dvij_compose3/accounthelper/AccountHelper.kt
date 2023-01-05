@@ -8,6 +8,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import okhttp3.internal.notify
 
 class AccountHelper (act: MainActivity) {
 
@@ -178,7 +179,6 @@ class AccountHelper (act: MainActivity) {
         act.mAuth.signInWithCredential(credential).addOnCompleteListener{ task ->
 
             if (task.isSuccessful) {
-
                 act.recreate()
                 Toast.makeText(act, R.string.sign_in_google_success, Toast.LENGTH_SHORT).show()
 
