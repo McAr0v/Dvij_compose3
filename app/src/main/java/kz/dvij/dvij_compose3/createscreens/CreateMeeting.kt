@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
+import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateMeeting(act: MainActivity) {
@@ -34,6 +36,9 @@ class CreateMeeting(act: MainActivity) {
 
     @Composable
     fun CreateMeetingScreen(activity: MainActivity) {
+
+        val context = LocalContext.current
+        val databaseManager = DatabaseManager()
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
@@ -159,7 +164,10 @@ class CreateMeeting(act: MainActivity) {
                 Spacer(modifier = Modifier.width(20.dp))
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        databaseManager.publishAd()
+
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.7f),

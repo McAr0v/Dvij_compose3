@@ -22,6 +22,10 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.options
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
@@ -51,6 +55,8 @@ class MainActivity : ComponentActivity() {
     val sideComponents = SideComponents (this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +193,8 @@ class MainActivity : ComponentActivity() {
 
 
             { paddingValues ->
+
+
 
                 Column(
                     Modifier
