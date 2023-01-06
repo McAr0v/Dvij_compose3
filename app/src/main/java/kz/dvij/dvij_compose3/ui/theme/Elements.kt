@@ -1,9 +1,11 @@
 package kz.dvij.dvij_compose3.ui.theme
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
@@ -11,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,6 +27,8 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
 
     // Принимаем категорию и заголовок. Надо еще принимать дату, время и картинку
     // Карточка мероприятий
+
+    val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100))
 
     Card(
         modifier = Modifier
@@ -55,9 +61,10 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
             // В нем уже находится все ТЕКСТОВОЕ содержимое
             // выбираем Column чтобы все элементы шли друг за другом по высоте
 
-            Column(modifier = Modifier
+            Column(
+                modifier = Modifier
                 .fillMaxSize() // занять всю карточку
-                .background(Grey100_50) // помещаем поверх картинки черный полупрозрачный цвет
+                .background(linear) // помещаем поверх картинки черный полупрозрачный цвет
                 .padding(20.dp), // отступ от краев карточки
                 verticalArrangement = Arrangement.SpaceBetween // раздвигаем элементы между собой к верху и низу
             )
@@ -75,7 +82,7 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
                     // КНОПКА КАТЕГОРИИ
                     if (meetingItem.category != null) Text(
                         text = meetingItem.category, // category - название категории. Нужно сюда передавать категорию из базы данных
-                        color = Grey00, // цвет текста
+                        color = Grey95, // цвет текста
                         style = Typography.bodySmall, // стиль текста
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(15.dp)) // скругляем углы
@@ -122,19 +129,20 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
                         // date - дата проведения мероприятия.
                         // date надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                        if (meetingItem.data != null) IconText(kz.dvij.dvij_compose3.R.drawable.ic_calendar, meetingItem.data)
-
+                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_calendar, meetingItem.data!!)
 
 
                         // Вывод времени начала мероприятия
                         // time - время начала мероприятия.
                         // time надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                        if (meetingItem.startTime != null) IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, meetingItem.startTime)
+                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, "${meetingItem.startTime} - ${meetingItem.finishTime}")
+
+                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_tenge, "${meetingItem.price} тенге")
+
 
                     }
                 }
-
             }
 
         }
@@ -161,7 +169,7 @@ fun IconText (icon: Int, inputText: String) {
         Icon(
             imageVector = ImageVector.vectorResource(icon), // передаем сам векторный файл иконки !!! ПРИМЕР ИЗ ПАПКИ drawable - kz.dvij.dvij_compose3.R.drawable.ic_time
             contentDescription = "Иконка", // описание для слабовидящих
-            modifier = Modifier.size(25.dp), // размер иконки
+            modifier = Modifier.size(20.dp), // размер иконки
             tint = Grey40 // Цвет иконки
         )
 

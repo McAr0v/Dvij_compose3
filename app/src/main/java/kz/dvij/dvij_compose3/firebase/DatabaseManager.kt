@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.firebase
 
 import android.util.Log
+import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
@@ -23,6 +24,10 @@ class DatabaseManager (val activity: MainActivity) {
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
+    val default = MeetingsAdsClass (
+        description = "def"
+    )
+
 
 
     // --- ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЙ -------
@@ -36,7 +41,7 @@ class DatabaseManager (val activity: MainActivity) {
 
         if (auth.uid != null) {
             meetingDatabase // записываем в базу данных
-                .child(meeting.category ?: "Без категории") // создаем путь категорий
+                //.child(meeting.category ?: "Без категории") // создаем путь категорий
                 .child(meeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
                 .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
                 .child("meetingData")
@@ -76,8 +81,7 @@ class DatabaseManager (val activity: MainActivity) {
 
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. Тут будут названия категорий
-                        .children.iterator().next() // добираемся до следующей папки внутри категорий - путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                         .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
                         .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
@@ -87,7 +91,11 @@ class DatabaseManager (val activity: MainActivity) {
                     //Log.d("MyLog", "Data: $item")
                 }
 
-                meetingsList.value = meetingArray
+                if (meetingArray.isEmpty()){
+                    meetingsList.value = listOf(default)
+                } else {
+                    meetingsList.value = meetingArray
+                }
 
             }
 
@@ -97,4 +105,65 @@ class DatabaseManager (val activity: MainActivity) {
         }
         )
     }
+
+    fun readMeetingMyDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
+
+        // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
+        // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
+        // Есть другие типы слушателей, которые работают в режиме реального времени, т.е постоянно обращаются к БД
+        // Это приводит к нагрузке на сервер и соответственно будем платить за большое количество обращений к БД
+
+        // У самого объекта слушателя ValueEventListener есть 2 стандартные функции - onDataChange и onCancelled
+        // их нужно обязательно добавить и заполнить нужным кодом
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            // функция при изменении данных в БД
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val meetingArray = ArrayList<MeetingsAdsClass>()
+
+                // запускаем цикл и пытаемся добраться до наших данных
+                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
+                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
+                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
+                // где знаем точный путь (как в "meetingData"), там пишем .child()
+
+                // добираемся
+
+                for (item in snapshot.children){
+
+                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+
+                    if (auth.uid !=null) {
+                        val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                            .child(auth.uid!!) // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                        if (meeting != null) {meetingArray.add(meeting)}
+                    }
+
+                    //Log.d("MyLog", "Data: $item")
+                }
+
+                if (meetingArray.isEmpty()){
+                    meetingsList.value = listOf(default)
+                } else {
+                    meetingsList.value = meetingArray
+                }
+
+
+
+
+
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+
+        }
+        )
+    }
+
 }

@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -61,9 +62,24 @@ class MainActivity : ComponentActivity() {
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
+
+
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // слушатель выбора картинок
+
+        createMeeting.pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(3)){ uris ->
+
+            if (uris.isNotEmpty()) {
+                Log.d("MyLog", "Выбранно фото: ${uris.size}")
+            } else {
+                Log.d("MyLog", "Не выбрано ниодно фото")
+            }
+        }
+
+        // слушатель регистрации через гугл синг ин
 
         googleSignInResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result: ActivityResult ->
@@ -87,11 +103,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val meetingsList = remember {
-                mutableStateOf(listOf<MeetingsAdsClass>())
-            }
 
-            databaseManager.readMeetingDataFromDb(meetingsList)
+
+
 
             val context = LocalContext.current // контекст для тостов
 
@@ -221,7 +235,7 @@ class MainActivity : ComponentActivity() {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingsList)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController)}
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController)}
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}

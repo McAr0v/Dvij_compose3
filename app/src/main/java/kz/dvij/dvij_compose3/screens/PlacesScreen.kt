@@ -24,7 +24,7 @@ class PlacesScreens (val act: MainActivity) {
 
         Column() {
 
-            TabMenu(bottomPage = PLACES_ROOT, navController, activity = act, null)
+            TabMenu(bottomPage = PLACES_ROOT, navController, activity = act)
 
         }
     }

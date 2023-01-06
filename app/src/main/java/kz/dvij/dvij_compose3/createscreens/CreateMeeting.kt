@@ -1,5 +1,9 @@
 package kz.dvij.dvij_compose3.createscreens
 
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -17,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -31,12 +36,19 @@ class CreateMeeting(private val act: MainActivity) {
     // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
 
     private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
+    var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null // Слушатель выбора картинок
+
+
 
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
     @Composable
     fun CreateMeetingScreen() {
+
+        var uris1 = remember {
+            mutableStateOf(listOf<Uri>())
+        }
 
         val activity = act
         val context = LocalContext.current
@@ -61,6 +73,7 @@ class CreateMeeting(private val act: MainActivity) {
         var category = "" // категория
 
 
+
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
         Column(
@@ -82,7 +95,10 @@ class CreateMeeting(private val act: MainActivity) {
                         color = Grey95
                     )
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(200.dp)
+                    .clickable {
+                        // вызываем выборщика картинок
+                        pickMedia?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.korn_concert),
                 contentDescription = "",
 

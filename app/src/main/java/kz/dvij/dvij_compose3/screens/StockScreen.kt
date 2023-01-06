@@ -23,7 +23,7 @@ class StockScreen(act: MainActivity) {
 
         Column {
 
-            TabMenu(bottomPage = STOCK_ROOT, navController, act, null)
+            TabMenu(bottomPage = STOCK_ROOT, navController, act)
         }
 
     }

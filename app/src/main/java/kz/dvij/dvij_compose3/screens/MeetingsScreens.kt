@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.screens
 
+import androidx.compose.foundation.Image
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,29 +8,33 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
-import kz.dvij.dvij_compose3.ui.theme.Grey95
-import kz.dvij.dvij_compose3.ui.theme.MeetingCard
-import kz.dvij.dvij_compose3.ui.theme.Primary10
+import kz.dvij.dvij_compose3.ui.theme.*
 
-class MeetingsScreens (private val act: MainActivity) {
+class MeetingsScreens (val act: MainActivity) {
 
-    private val user = act.mAuth.currentUser
     private val databaseManager = act.databaseManager
 
+    private val default = MeetingsAdsClass (
+        description = "def"
+    )
+
     @Composable
-    fun MeetingsScreen (navController: NavController, meetingsList: MutableState<List<MeetingsAdsClass>>) {
+    fun MeetingsScreen (navController: NavController) {
         Column {
 
-            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act, meetingsList)
+            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act)
 
         }
     }
@@ -37,28 +42,64 @@ class MeetingsScreens (private val act: MainActivity) {
 // экран мероприятий
 
     @Composable
-    fun MeetingsTapeScreen (navController: NavController, meetingsList: MutableState<List<MeetingsAdsClass>>){
+    fun MeetingsTapeScreen (navController: NavController){
 
-        if (meetingsList.value.isNotEmpty()){
-            LazyColumn{
-                items(meetingsList.value){ item ->
-                    MeetingCard(meetingItem = item)
-                }
-            }
-        } else {
+        val meetingsList = remember {
+            mutableStateOf(listOf<MeetingsAdsClass>())
+        }
 
-            Column (
-                modifier = Modifier
-                    .background(Grey95)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                    Button(onClick = { navController.navigate(MEETINGS_ROOT)}) {
-                        Text(text = "Идет загрузка. Обновить?")
+        databaseManager.readMeetingDataFromDb(meetingsList)
+
+        Column (
+            modifier = Modifier
+                .background(Grey95)
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey95),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+                    items(meetingsList.value){ item ->
+                        MeetingCard(meetingItem = item)
                     }
+                }
+            } else if (meetingsList.value == listOf(default)){
+                Text(
+                    text = "Пусто",
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                ) } else {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        color = PrimaryColor,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(40.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.ss_loading),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                }
             }
         }
     }
@@ -66,24 +107,77 @@ class MeetingsScreens (private val act: MainActivity) {
     @Composable
     fun MeetingsMyScreen (navController: NavController){
 
-        val user = act.mAuth.currentUser
+        val myMeetingsList = remember {
+            mutableStateOf(listOf<MeetingsAdsClass>())
+        }
+
+        databaseManager.readMeetingMyDataFromDb(myMeetingsList)
 
         Surface(modifier = Modifier.fillMaxSize()) {
 
             Column (
                 modifier = Modifier
-                    .background(Primary10)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    .background(Grey95)
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(default)){
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Grey95),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ){
+                        items(myMeetingsList.value){ item ->
+                            MeetingCard(meetingItem = item)
+                        }
+                    }
+                } else if (myMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+                    Text(
+                        text = "Пусто",
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+                } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
-                Text(text = "MeetingsMyScreen")
+                    Text(
+                        text = "Сначала зарегайся",
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
 
+                } else {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        CircularProgressIndicator(
+                            color = PrimaryColor,
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(40.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.ss_loading),
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+
+                    }
+
+
+                }
             }
 
-            if (user != null && user.isEmailVerified) {
+            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
                 FloatingButton { navController.navigate(CREATE_MEETINGS_SCREEN) }
             }
         }

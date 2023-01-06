@@ -129,4 +129,6 @@
     <string name="piker_date">Выбери дату</string>
     <string name="piker_time">Выбери время</string>
 
+    <!-- SYSTEM STRINGS -->
+    <string name="ss_loading">Идет загрузка</string>
 </resources>
