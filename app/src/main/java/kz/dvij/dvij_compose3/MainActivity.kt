@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         createMeeting.pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(3)){ uris ->
 
             if (uris.isNotEmpty()) {
-                Log.d("MyLog", "Выбранно фото: ${uris.size}")
+                Log.d("MyLog", "Выбранно фото: $uris")
             } else {
                 Log.d("MyLog", "Не выбрано ниодно фото")
             }
