@@ -10,9 +10,6 @@ import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,12 +21,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType.Companion.Uri
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -81,13 +75,8 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
         var category = "" // категория
 
-        var selectImages = remember { mutableStateOf<Uri?>(null) }
-
-        val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
-            if (it != null) {
-                selectImages.value = it
-            }
-        }
+        var image: Uri?
+        var image2: Uri?
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -106,26 +95,9 @@ class CreateMeeting(private val act: MainActivity) {
 
             // -------- ИЗОБРАЖЕНИЕ МЕРОПРИЯТИЯ -----------
 
-            Image(
-                modifier = Modifier
-                    .background(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Grey95
-                    )
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clickable {
-                        // вызываем выборщика картинок
-                        //pickMedia?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        galleryLauncher.launch("image/*")
-                    },
-                painter = rememberAsyncImagePainter(model = selectImages.value)
-                ,
-                contentDescription = "",
+            image = meetingImage()
 
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            )
+            if (image != null){ image2 = meetingImage() }
 
 
 
@@ -300,6 +272,46 @@ class CreateMeeting(private val act: MainActivity) {
             )
         }
         return chosenCategory
+    }
+
+    @Composable
+    fun meetingImage (): Uri? {
+
+        var selectImage = remember { mutableStateOf<Uri?>(null) }
+
+        val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
+            selectImage.value = it
+        }
+
+        Image(
+            modifier = Modifier
+                .background(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Grey95
+                )
+                .fillMaxWidth()
+                .height(200.dp)
+                .clickable {
+                    // вызываем выборщика картинок
+                    //pickMedia?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    galleryLauncher.launch("image/*")
+                },
+            painter = (
+                    if (selectImage.value == null) {
+                        painterResource(id = R.drawable.korn_concert)
+            } else {
+                rememberAsyncImagePainter(model = selectImage.value)
+            }
+                    ),
+            contentDescription = "",
+
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center
+        )
+
+        return selectImage.value
+
+
     }
 
 
