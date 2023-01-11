@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,6 +78,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         var image: Uri?
         var image2: Uri?
+        var image3: Uri?
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -88,16 +90,33 @@ class CreateMeeting(private val act: MainActivity) {
                 .fillMaxSize()
                 .background(Grey95)
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+                .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp)
+            ,
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
 
             // -------- ИЗОБРАЖЕНИЕ МЕРОПРИЯТИЯ -----------
 
+            SpacerTextWithLine(headline = "Главное изображение") // подпись перед формой
+
             image = meetingImage()
 
-            if (image != null){ image2 = meetingImage() }
+            if (image != null){
+
+                SpacerTextWithLine(headline = "Второе изображение")
+                image2 = meetingImage()
+
+                if (image2 != null){
+
+                    SpacerTextWithLine(headline = "Третье изображение")
+                    image3 = meetingImage()
+
+                }
+
+            }
+
+
 
 
 
@@ -283,31 +302,134 @@ class CreateMeeting(private val act: MainActivity) {
             selectImage.value = it
         }
 
-        Image(
+        Card(
             modifier = Modifier
-                .background(
-                    shape = RoundedCornerShape(20.dp),
-                    color = Grey95
-                )
                 .fillMaxWidth()
-                .height(200.dp)
-                .clickable {
-                    // вызываем выборщика картинок
-                    //pickMedia?.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    galleryLauncher.launch("image/*")
-                },
-            painter = (
-                    if (selectImage.value == null) {
-                        painterResource(id = R.drawable.korn_concert)
-            } else {
-                rememberAsyncImagePainter(model = selectImage.value)
-            }
-                    ),
-            contentDescription = "",
+                .height(220.dp),
+            shape = RoundedCornerShape(15.dp),
+            backgroundColor = Grey100
+        ) {
 
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.Center
-        )
+            if (selectImage.value == null) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                galleryLauncher.launch("image/*")
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_add),
+                            contentDescription = "",
+                            tint = Grey10
+                        )
+                        
+                        Spacer(modifier = Modifier.width(10.dp))
+                        
+                        Text(
+                            text = "Добавь изображение",
+                            color = Grey10,
+                            style = Typography.bodyMedium
+                        )
+                        
+                    }
+                }
+                
+            } else {
+
+                Image(
+                    modifier = Modifier
+                        .background(
+                            shape = RoundedCornerShape(20.dp),
+                            color = Grey95
+                        )
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    painter = (
+                            if (selectImage.value == null) {
+                                painterResource(id = R.drawable.korn_concert)
+                            } else {
+                                rememberAsyncImagePainter(model = selectImage.value)
+                            }
+                            ),
+                    contentDescription = "",
+
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize().padding(5.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    IconButton(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier.background(WarningColor, shape = RoundedCornerShape(50))
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit),
+                            contentDescription = "",
+                            tint = Grey95
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { selectImage.value = null },
+                        modifier = Modifier.background(AttentionColor, shape = RoundedCornerShape(50))
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_delete),
+                            contentDescription = "",
+                            tint = Grey95
+                        )
+                    }
+                }
+
+                /*Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    /*Text(
+                        text = "Главная картинка",
+                        color = Grey95,
+                        modifier = Modifier
+                            .background(SuccessColor, shape = RoundedCornerShape(10.dp))
+                            .padding(10.dp),
+                        style = Typography.labelSmall
+                    )*/
+
+
+
+                }*/
+
+
+
+
+            }
+
+            
+
+        }
+
+
 
         return selectImage.value
 
