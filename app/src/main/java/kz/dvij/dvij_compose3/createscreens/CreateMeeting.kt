@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.createscreens
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -25,6 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -40,6 +44,20 @@ class CreateMeeting(private val act: MainActivity) {
 
     private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
     var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null // Слушатель выбора картинок
+
+    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
+
+    private val imageRef = storage
+        .child(act.mAuth.uid!!)
+        .child("image_${System.currentTimeMillis()}")
+
+    private val imageRef2 = storage
+        .child(act.mAuth.uid!!)
+        .child("image2_${System.currentTimeMillis()}")
+
+    private val imageRef3 = storage
+        .child(act.mAuth.uid!!)
+        .child("image3_${System.currentTimeMillis()}")
 
 
 
@@ -76,9 +94,15 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
         var category = "" // категория
 
-        var image: Uri?
-        var image2: Uri?
-        var image3: Uri?
+        var image: Uri? = null
+        var image2: Uri? = null
+        var image3: Uri? = null
+
+        var downloadUrl: String = ""
+        var downloadUrl2: String = ""
+        var downloadUrl3: String = ""
+
+
 
 
 
@@ -198,6 +222,86 @@ class CreateMeeting(private val act: MainActivity) {
 
                 Button(
                     onClick = {
+
+
+                        val uploadImage1 = image?.let { imageRef.putFile(it) }
+                        val uploadImage2 = image2?.let { imageRef2.putFile(it) }
+                        val uploadImage3 = image3?.let { imageRef3.putFile(it) }
+
+                        uploadImage1?.continueWithTask { task ->
+                            if (!task.isSuccessful) {
+                                task.exception?.let { throw it }
+                            }
+
+                            imageRef.downloadUrl
+                        }?.addOnCompleteListener { task ->
+
+                            if (task.isSuccessful) {
+
+                                downloadUrl = task.result.toString()
+
+                                if (image2 == null) {
+
+                                    val filledMeeting = MeetingsAdsClass(
+                                        key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                        category = category,
+                                        headline = headline,
+                                        description = description,
+                                        price = price,
+                                        phone = phone,
+                                        whatsapp = whatsapp,
+                                        data = dataResult,
+                                        startTime = timeStartResult,
+                                        finishTime = timeFinishResult
+                                    )
+
+                                    databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
+
+                                }
+
+
+                                uploadImage2?.continueWithTask { task2->
+                                    if (!task2.isSuccessful) {
+                                        task2.exception?.let { throw it }
+                                    }
+
+                                    imageRef2.downloadUrl
+                                }?.addOnCompleteListener { task1 ->
+
+                                    if (task1.isSuccessful) {
+
+                                        downloadUrl2 = task1.result.toString()
+
+                                        uploadImage3?.continueWithTask { task4->
+                                            if (!task4.isSuccessful) {
+                                                task4.exception?.let { throw it }
+                                            }
+
+                                            imageRef3.downloadUrl
+                                        }?.addOnCompleteListener { task5 ->
+
+                                            if (task5.isSuccessful) {
+
+                                                downloadUrl3 = task5.result.toString()
+
+                                                Log.d("MyLog", "URL: $downloadUrl")
+                                                Log.d("MyLog", "URL2: $downloadUrl2")
+                                                Log.d("MyLog", "URL2: $downloadUrl3")
+
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        }
+
+
+
 
                         // заполняем в переменную значения, согласно классу мероприятий
 

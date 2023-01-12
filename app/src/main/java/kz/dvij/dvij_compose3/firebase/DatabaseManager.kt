@@ -34,7 +34,7 @@ class DatabaseManager (private val activity: MainActivity) {
         description = "def"
     )
 
-    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
+
 
 
 
@@ -57,22 +57,9 @@ class DatabaseManager (private val activity: MainActivity) {
         }
     }
 
-    fun uploadImage(photo: Uri, listener: OnCompleteListener<Uri>){
 
-        val imageRef = storage
-            .child(auth.uid!!)
-            .child("image_${System.currentTimeMillis()}")
 
-        val uploadTask = imageRef.putFile(photo)
-        uploadTask.continueWithTask{
-            task -> imageRef.downloadUrl
-        }.addOnCompleteListener (listener)
 
-    }
-
-    fun uploadImages(){
-
-    }
 
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
