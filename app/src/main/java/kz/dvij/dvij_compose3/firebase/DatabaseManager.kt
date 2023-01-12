@@ -1,8 +1,11 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.runtime.MutableState
+import com.google.android.gms.auth.api.signin.internal.Storage
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -10,9 +13,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.internal.StorageReferenceUri
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
 import kz.dvij.dvij_compose3.MainActivity
 
-class DatabaseManager (val activity: MainActivity) {
+class DatabaseManager (private val activity: MainActivity) {
 
 
 
@@ -27,6 +33,8 @@ class DatabaseManager (val activity: MainActivity) {
     val default = MeetingsAdsClass (
         description = "def"
     )
+
+    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
 
 
 
@@ -47,6 +55,23 @@ class DatabaseManager (val activity: MainActivity) {
                 .child("meetingData")
                 .setValue(meeting) // записываем само значение. Передаем целый класс
         }
+    }
+
+    fun uploadImage(photo: Uri, listener: OnCompleteListener<Uri>){
+
+        val imageRef = storage
+            .child(auth.uid!!)
+            .child("image_${System.currentTimeMillis()}")
+
+        val uploadTask = imageRef.putFile(photo)
+        uploadTask.continueWithTask{
+            task -> imageRef.downloadUrl
+        }.addOnCompleteListener (listener)
+
+    }
+
+    fun uploadImages(){
+
     }
 
 
