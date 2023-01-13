@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.firebase
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.runtime.MutableState
 import com.google.android.gms.auth.api.signin.internal.Storage
@@ -53,7 +54,12 @@ class DatabaseManager (private val activity: MainActivity) {
                 .child(meeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
                 .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
                 .child("meetingData")
-                .setValue(meeting) // записываем само значение. Передаем целый класс
+                .setValue(meeting).addOnCompleteListener {
+
+                    Toast.makeText(activity, "мероприятие успешно опубликовано", Toast.LENGTH_SHORT).show()
+
+
+                }// записываем само значение. Передаем целый класс
         }
     }
 

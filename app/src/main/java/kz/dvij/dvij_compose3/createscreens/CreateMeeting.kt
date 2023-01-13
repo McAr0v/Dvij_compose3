@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kz.dvij.dvij_compose3.pickers.dataPicker
@@ -48,16 +50,29 @@ class CreateMeeting(private val act: MainActivity) {
     private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
 
     private val imageRef = storage
-        .child(act.mAuth.uid!!)
+        .child(act.mAuth.uid ?: "empty")
         .child("image_${System.currentTimeMillis()}")
 
     private val imageRef2 = storage
-        .child(act.mAuth.uid!!)
+        .child(act.mAuth.uid ?: "empty")
         .child("image2_${System.currentTimeMillis()}")
 
     private val imageRef3 = storage
-        .child(act.mAuth.uid!!)
+        .child(act.mAuth.uid ?: "empty")
         .child("image3_${System.currentTimeMillis()}")
+
+
+
+
+    val meetingDatabase = FirebaseDatabase // обращаемся к БД
+        .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
+        .getReference("Meetings") // Создаем ПАПКУ В БД для мероприятий
+
+    private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
+
+    val default = MeetingsAdsClass (
+        description = "def"
+    )
 
 
 
@@ -223,6 +238,7 @@ class CreateMeeting(private val act: MainActivity) {
                 Button(
                     onClick = {
 
+                        // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
 
                         val uploadImage1 = image?.let { imageRef.putFile(it) }
                         val uploadImage2 = image2?.let { imageRef2.putFile(it) }
@@ -234,11 +250,11 @@ class CreateMeeting(private val act: MainActivity) {
                             }
 
                             imageRef.downloadUrl
-                        }?.addOnCompleteListener { task ->
+                        }?.addOnCompleteListener { task1 ->
 
-                            if (task.isSuccessful) {
+                            if (task1.isSuccessful) {
 
-                                downloadUrl = task.result.toString()
+                                downloadUrl = task1.result.toString()
 
                                 if (image2 == null) {
 
@@ -252,11 +268,13 @@ class CreateMeeting(private val act: MainActivity) {
                                         whatsapp = whatsapp,
                                         data = dataResult,
                                         startTime = timeStartResult,
-                                        finishTime = timeFinishResult
+                                        finishTime = timeFinishResult,
+                                        image1 = downloadUrl
                                     )
 
                                     databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
 
+                                    Log.d("MyLog", "URL: $downloadUrl")
                                 }
 
 

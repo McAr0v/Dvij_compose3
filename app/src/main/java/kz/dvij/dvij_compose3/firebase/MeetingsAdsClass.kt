@@ -10,5 +10,8 @@ data class MeetingsAdsClass(
     val whatsapp: String? = null,
     val data: String? = null,
     val startTime: String? = null,
-    val finishTime: String? = null
+    val finishTime: String? = null,
+    val image1: String? = null,
+    val image2: String? = null,
+    val image3: String? = null
 )

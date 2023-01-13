@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 
 @Composable
@@ -50,12 +51,24 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
 
             // Картинка - все настройки тут
 
-            Image(
-                painter = painterResource(kz.dvij.dvij_compose3.R.drawable.korn_concert), // картинка карточки. Потом сюда надо подставлять картинку с базы данных
-                modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
-                contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
-                contentDescription = "Изображение мероприятия" // описание изображения для слабовидящих
-            )
+
+
+            if (meetingItem.image1 !=null){
+                AsyncImage(
+                    model = meetingItem.image1,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Image(
+                    painter = painterResource(kz.dvij.dvij_compose3.R.drawable.korn_concert), // картинка карточки. Потом сюда надо подставлять картинку с базы данных
+                    modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
+                    contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
+                    contentDescription = "Изображение мероприятия" // описание изображения для слабовидящих
+                )
+            }
+
 
             // Помещаем еще контейнер поверх картинки
             // В нем уже находится все ТЕКСТОВОЕ содержимое
@@ -63,9 +76,9 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
 
             Column(
                 modifier = Modifier
-                .fillMaxSize() // занять всю карточку
-                .background(linear) // помещаем поверх картинки черный полупрозрачный цвет
-                .padding(20.dp), // отступ от краев карточки
+                    .fillMaxSize() // занять всю карточку
+                    .background(linear) // помещаем поверх картинки черный полупрозрачный цвет
+                    .padding(20.dp), // отступ от краев карточки
                 verticalArrangement = Arrangement.SpaceBetween // раздвигаем элементы между собой к верху и низу
             )
             {
