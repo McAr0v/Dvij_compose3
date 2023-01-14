@@ -25,12 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -38,6 +41,7 @@ import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateMeeting(private val act: MainActivity) {
@@ -81,7 +85,7 @@ class CreateMeeting(private val act: MainActivity) {
 
     @SuppressLint("RememberReturnType")
     @Composable
-    fun CreateMeetingScreen() {
+    fun CreateMeetingScreen(navController: NavController) {
 
         var uris1 = remember {
             mutableStateOf(listOf<Uri>())
@@ -109,16 +113,11 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
         var category = "" // категория
 
-        var image: Uri? = null
-        var image2: Uri? = null
-        var image3: Uri? = null
+        // ТЕСТ
 
-        var downloadUrl: String = ""
-        var downloadUrl2: String = ""
-        var downloadUrl3: String = ""
-
-
-
+        var finishLoad = remember {mutableStateOf(false)}
+        var finishLoadMeeting = remember {mutableStateOf(false)}
+        var image1url = remember {mutableStateOf("")}
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -140,25 +139,15 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Главное изображение") // подпись перед формой
 
-            image = meetingImage()
+            val image1 = meetingImage()
 
-            if (image != null){
+            SpacerTextWithLine(headline = "Второе изображение")
 
-                SpacerTextWithLine(headline = "Второе изображение")
-                image2 = meetingImage()
+            val image2 = meetingImage()
 
-                if (image2 != null){
+            SpacerTextWithLine(headline = "Третье изображение")
 
-                    SpacerTextWithLine(headline = "Третье изображение")
-                    image3 = meetingImage()
-
-                }
-
-            }
-
-
-
-
+            val image3 = meetingImage()
 
             SpacerTextWithLine(headline = "Заголовок") // подпись перед формой
 
@@ -240,7 +229,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                         // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
 
-                        val uploadImage1 = image?.let { imageRef.putFile(it) }
+                        val uploadImage1 = image1?.let { imageRef.putFile(it) }
                         val uploadImage2 = image2?.let { imageRef2.putFile(it) }
                         val uploadImage3 = image3?.let { imageRef3.putFile(it) }
 
@@ -254,89 +243,33 @@ class CreateMeeting(private val act: MainActivity) {
 
                             if (task1.isSuccessful) {
 
-                                downloadUrl = task1.result.toString()
+                                val filledMeeting = MeetingsAdsClass(
+                                    key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                    category = category,
+                                    headline = headline,
+                                    description = description,
+                                    price = price,
+                                    phone = phone,
+                                    whatsapp = whatsapp,
+                                    data = dataResult,
+                                    startTime = timeStartResult,
+                                    finishTime = timeFinishResult,
+                                    image1 = task1.result.toString()
+                                )
 
-                                if (image2 == null) {
+                                val result = databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
 
-                                    val filledMeeting = MeetingsAdsClass(
-                                        key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                                        category = category,
-                                        headline = headline,
-                                        description = description,
-                                        price = price,
-                                        phone = phone,
-                                        whatsapp = whatsapp,
-                                        data = dataResult,
-                                        startTime = timeStartResult,
-                                        finishTime = timeFinishResult,
-                                        image1 = downloadUrl
-                                    )
-
-                                    databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
-
-                                    Log.d("MyLog", "URL: $downloadUrl")
-                                }
+                                if (result) {navController.navigate(MEETINGS_ROOT)}
 
 
-                                uploadImage2?.continueWithTask { task2->
-                                    if (!task2.isSuccessful) {
-                                        task2.exception?.let { throw it }
-                                    }
-
-                                    imageRef2.downloadUrl
-                                }?.addOnCompleteListener { task1 ->
-
-                                    if (task1.isSuccessful) {
-
-                                        downloadUrl2 = task1.result.toString()
-
-                                        uploadImage3?.continueWithTask { task4->
-                                            if (!task4.isSuccessful) {
-                                                task4.exception?.let { throw it }
-                                            }
-
-                                            imageRef3.downloadUrl
-                                        }?.addOnCompleteListener { task5 ->
-
-                                            if (task5.isSuccessful) {
-
-                                                downloadUrl3 = task5.result.toString()
-
-                                                Log.d("MyLog", "URL: $downloadUrl")
-                                                Log.d("MyLog", "URL2: $downloadUrl2")
-                                                Log.d("MyLog", "URL2: $downloadUrl3")
 
 
-                                            }
 
-                                        }
-
-                                    }
-
-                                }
                             }
 
                         }
 
 
-
-
-                        // заполняем в переменную значения, согласно классу мероприятий
-
-                        val filledMeeting = MeetingsAdsClass(
-                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                            category = category,
-                            headline = headline,
-                            description = description,
-                            price = price,
-                            phone = phone,
-                            whatsapp = whatsapp,
-                            data = dataResult,
-                            startTime = timeStartResult,
-                            finishTime = timeFinishResult
-                        )
-
-                        databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
 
                     },
                     modifier = Modifier
