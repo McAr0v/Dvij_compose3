@@ -27,12 +27,16 @@ import kz.dvij.dvij_compose3.elements.fieldPasswordComponent
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class AccountScreens(act: MainActivity) {
+class AccountScreens(val act: MainActivity) {
 
     // https://storyset.com/illustration/forgot-password/bro -- картинки
 
-    private val act = act // Инициализируем MainActivity
     private val accountHelper = AccountHelper(act) // инициализируем класс AccountHelper
+
+
+
+
+    // ------- СТРАНИЦА ВХОДА / РЕГИСТРАЦИИ ---------
 
     @Composable
     fun SignInUpPage(switch: String, navController: NavController){
@@ -251,8 +255,6 @@ class AccountScreens(act: MainActivity) {
                                             accountHelper.sendEmailVerification(task.result.user!!)
                                             navController.navigate(THANK_YOU_PAGE_ROOT) {popUpTo(0)} // переходим на диалог СПАСИБО ЗА РЕГИСТРАЦИЮ
 
-
-
                                         } else {
 
                                             // если регистрация не выполнилась
@@ -421,24 +423,9 @@ class AccountScreens(act: MainActivity) {
                 // -------------- КНОПКА ВХОДА ЧЕРЕЗ GOOGLE ------------------
 
                 Button(
-                    onClick = {
-                        accountHelper.signInWithGoogle()
-                        navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
-
-                        /*act.mAuth.addAuthStateListener {
-                            val user = act.mAuth.currentUser
-
-
-
-
-                            if (act.mAuth.currentUser != null) {
-                                // navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
-                                navController.navigate(PROFILE_ROOT) {popUpTo(0)}
-                            } /*else {
-                                navController.navigate(PROFILE_ROOT) {popUpTo(0)}
-                            }*/
-                        }*/
-
+                    onClick = { // действие на нажатие
+                        accountHelper.signInWithGoogle() // запускаем функцию регистрации через Google
+                        navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на  главную страницу
 
                     },
                     modifier = Modifier

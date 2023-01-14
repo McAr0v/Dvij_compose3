@@ -1,11 +1,9 @@
 package kz.dvij.dvij_compose3.ui.theme
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
@@ -14,13 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 
 @Composable
@@ -51,21 +50,19 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
 
             // Картинка - все настройки тут
 
-
-
             if (meetingItem.image1 !=null){
                 AsyncImage(
-                    model = meetingItem.image1,
-                    contentDescription = "",
+                    model = meetingItem.image1, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
+                    contentDescription = stringResource(id = R.string.cd_meeting_image), // описание изображения для слабовидящих
                     modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
                 )
             } else {
                 Image(
                     painter = painterResource(kz.dvij.dvij_compose3.R.drawable.korn_concert), // картинка карточки. Потом сюда надо подставлять картинку с базы данных
                     modifier = Modifier.fillMaxSize(), // заполнить картинкой весь контейнер
                     contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
-                    contentDescription = "Изображение мероприятия" // описание изображения для слабовидящих
+                    contentDescription = stringResource(id = R.string.cd_meeting_image) // описание изображения для слабовидящих
                 )
             }
 
@@ -196,6 +193,37 @@ fun IconText (icon: Int, inputText: String) {
             )
 
 
+    }
+}
+
+// --------- ЭКРАН "ИДЕТ ЗАГРУЗКА" ----------
+
+@Composable
+fun LoadingScreen (messageText: String) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Grey100_95), // полупрозрачный фон
+        verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
+        horizontalArrangement = Arrangement.Center // выравнивание по горизонтали
+    ) {
+
+        // ---- ЦИРКУЛЛИРУЮЩИЙ ИНДИКАТОР ------
+
+        androidx.compose.material.CircularProgressIndicator(
+            color = PrimaryColor, // цвет крутилки
+            strokeWidth = 3.dp, // толщина крутилки
+            modifier = Modifier.size(40.dp) // размер крутилки
+        )
+
+        Spacer(modifier = Modifier.width(20.dp)) // разделитель между крутилкой и текстом
+
+        androidx.compose.material.Text(
+            text = messageText, // текст рядом с крутилкой
+            style = Typography.bodyMedium, // стиль текста
+            color = Grey10 // цвет
+        )
     }
 }
 

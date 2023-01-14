@@ -1,26 +1,13 @@
 package kz.dvij.dvij_compose3.firebase
 
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.runtime.MutableState
-import com.google.android.gms.auth.api.signin.internal.Storage
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.internal.StorageReferenceUri
-import com.google.firebase.storage.ktx.storage
-import com.google.firebase.storage.ktx.storageMetadata
 import kz.dvij.dvij_compose3.MainActivity
-import okhttp3.internal.wait
-import kotlin.properties.Delegates
 
 class DatabaseManager (private val activity: MainActivity) {
 
@@ -37,53 +24,6 @@ class DatabaseManager (private val activity: MainActivity) {
     val default = MeetingsAdsClass (
         description = "def"
     )
-
-    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
-
-    private val imageRef = storage
-        .child(activity.mAuth.uid ?: "empty")
-        .child("image_${System.currentTimeMillis()}")
-
-
-
-    // --- ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЙ -------
-
-    fun publishMeeting(meeting: MeetingsAdsClass): Boolean {
-
-        // ОПЕРАТОР ЭЛВИСА ?: ГОВОРИТ О ТОМ, ЧТО ЕСЛИ KEY БУДЕТ NULL ТО ТОГДА ПОДСТАВИТЬ ЗНАЧЕНИЕ СПРАВА ОТ ОПЕРАТОРА, т.е "empty"
-
-        // .child создает дополнительный путь в разделе базы данных Meetings, чтобы у каждого мероприятия был свой
-        // уникальный ключ и мы случайно не перезаписывали мероприятия
-
-        var result: Boolean
-
-        if (auth.uid != null) {
-            meetingDatabase // записываем в базу данных
-                //.child(meeting.category ?: "Без категории") // создаем путь категорий
-                .child(meeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
-                .child("meetingData")
-                .setValue(meeting).addOnCompleteListener {
-
-                    if (it.isSuccessful) {
-                        Toast.makeText(activity, "мероприятие успешно опубликовано", Toast.LENGTH_SHORT).show()
-                        //return@addOnCompleteListener
-
-                        result = true
-
-                    } else {
-                        result = false
-                    }
-                }// записываем само значение. Передаем целый класс
-        }
-
-        return true
-
-    }
-
-
-
-
 
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
@@ -188,10 +128,6 @@ class DatabaseManager (private val activity: MainActivity) {
                 } else {
                     meetingsList.value = meetingArray
                 }
-
-
-
-
 
             }
 

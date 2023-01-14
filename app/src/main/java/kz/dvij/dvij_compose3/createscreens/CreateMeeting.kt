@@ -3,6 +3,7 @@ package kz.dvij.dvij_compose3.createscreens
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -51,24 +52,17 @@ class CreateMeeting(private val act: MainActivity) {
     private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
     var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null // Слушатель выбора картинок
 
-    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings")
+    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings") // инициализируем папку, в которую будет сохраняться картинка мероприятия
+
+
+    // делаем дополнительные подпапки для более удобного поиска изображений
 
     private val imageRef = storage
-        .child(act.mAuth.uid ?: "empty")
-        .child("image_${System.currentTimeMillis()}")
-
-    private val imageRef2 = storage
-        .child(act.mAuth.uid ?: "empty")
-        .child("image2_${System.currentTimeMillis()}")
-
-    private val imageRef3 = storage
-        .child(act.mAuth.uid ?: "empty")
-        .child("image3_${System.currentTimeMillis()}")
+        .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
+        .child("image_${System.currentTimeMillis()}") // название изображения
 
 
-
-
-    val meetingDatabase = FirebaseDatabase // обращаемся к БД
+    private val meetingDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
         .getReference("Meetings") // Создаем ПАПКУ В БД для мероприятий
 
@@ -87,12 +81,7 @@ class CreateMeeting(private val act: MainActivity) {
     @Composable
     fun CreateMeetingScreen(navController: NavController) {
 
-        var uris1 = remember {
-            mutableStateOf(listOf<Uri>())
-        }
-
         val activity = act
-        val context = LocalContext.current
         val databaseManager = DatabaseManager(activity) // инициализируем класс с функциями базы данных
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
@@ -100,7 +89,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
-        var openDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
+
 
         var headline = "" // инициализируем заголовок
         var description = "" // инициализируем описание
@@ -113,11 +102,8 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
         var category = "" // категория
 
-        // ТЕСТ
-
-        var finishLoad = remember {mutableStateOf(false)}
-        var finishLoadMeeting = remember {mutableStateOf(false)}
-        var image1url = remember {mutableStateOf("")}
+        var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
+        val openDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -126,34 +112,26 @@ class CreateMeeting(private val act: MainActivity) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Grey95)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp)
+                .fillMaxSize() // занять весь размер экрана
+                .background(Grey95) // цвет фона
+                .verticalScroll(rememberScrollState()) // говорим, что колонка скролится вверх и вниз
+                .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp) // паддинги
             ,
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+            verticalArrangement = Arrangement.Top, // выравнивание по вертикали
+            horizontalAlignment = Alignment.Start // выравнивание по горизонтали
         ) {
 
             // -------- ИЗОБРАЖЕНИЕ МЕРОПРИЯТИЯ -----------
 
-            SpacerTextWithLine(headline = "Главное изображение") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
-            val image1 = meetingImage()
+            val image1 = meetingImage() // Изображение мероприятия
 
-            SpacerTextWithLine(headline = "Второе изображение")
-
-            val image2 = meetingImage()
-
-            SpacerTextWithLine(headline = "Третье изображение")
-
-            val image3 = meetingImage()
-
-            SpacerTextWithLine(headline = "Заголовок") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_headline)) // подпись перед формой
 
             headline = fieldHeadlineComponent(act = activity) // форма заголовка
 
-            SpacerTextWithLine(headline = "Выбери категорию") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
             // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
@@ -165,11 +143,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             category = activity.getString(categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
-            SpacerTextWithLine(headline = "Телефон для кнопки Позвонить") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
             phone = fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
 
-            SpacerTextWithLine(headline = "Телефон для кнопки Whatsapp") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_whatsapp)) // подпись перед формой
 
 
             // --- ФОРМА WHATSAPP ----
@@ -180,106 +158,135 @@ class CreateMeeting(private val act: MainActivity) {
                 icon = painterResource(id = R.drawable.whatsapp)
             )
 
-            SpacerTextWithLine(headline = "Выберите дату") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
             dataResult = dataPicker() // ВЫБОР ДАТЫ
 
-            SpacerTextWithLine(headline = "Начало мероприятия") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_start_time)) // подпись перед формой
 
             timeStartResult = timePicker() // ВЫБОР ВРЕМЕНИ - Начало мероприятия
 
-            SpacerTextWithLine(headline = "Конец мероприятия") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_finish_time)) // подпись перед формой
 
             timeFinishResult = timePicker() // ВЫБОР ВРЕМЕНИ - Конец мероприятия
 
-            SpacerTextWithLine(headline = "Цена билета") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_price)) // подпись перед формой
 
             price = fieldPriceComponent(act = activity) // Форма цены за билет
 
-            SpacerTextWithLine(headline = "Описание") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
             description = fieldDescriptionComponent(act = activity) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 
 
-
             // -------------- КНОПКИ ОТМЕНА И ОПУБЛИКОВАТЬ ------------
 
-            Row(modifier = Modifier.fillMaxWidth()) {
 
-
-                TextButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.3f),
-                ) {
-                    Text(
-                        text = "Отмена",
-                        style = Typography.labelMedium,
-                        color = AttentionColor
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(20.dp))
+            // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
 
                 Button(
+
                     onClick = {
 
-                        // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
+                        // действие на нажатие
 
-                        val uploadImage1 = image1?.let { imageRef.putFile(it) }
-                        val uploadImage2 = image2?.let { imageRef2.putFile(it) }
-                        val uploadImage3 = image3?.let { imageRef3.putFile(it) }
+                        // если какое либо обязательное поле не заполнено
 
-                        uploadImage1?.continueWithTask { task ->
-                            if (!task.isSuccessful) {
-                                task.exception?.let { throw it }
-                            }
+                        if (image1 == null || headline == "" || phone == "7" || dataResult == "" || timeStartResult == "" || description == "") {
 
-                            imageRef.downloadUrl
-                        }?.addOnCompleteListener { task1 ->
+                            if (image1 == null) {Toast.makeText(activity, act.resources.getString(R.string.cm_no_image), Toast.LENGTH_SHORT).show()}
+                            if (headline == "") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_headline), Toast.LENGTH_SHORT).show()}
+                            if (phone == "7") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_phone), Toast.LENGTH_SHORT).show()}
 
-                            if (task1.isSuccessful) {
+                            // по моему не работает телефон. ПРОВЕРИТЬ
 
-                                val filledMeeting = MeetingsAdsClass(
-                                    key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                                    category = category,
-                                    headline = headline,
-                                    description = description,
-                                    price = price,
-                                    phone = phone,
-                                    whatsapp = whatsapp,
-                                    data = dataResult,
-                                    startTime = timeStartResult,
-                                    finishTime = timeFinishResult,
-                                    image1 = task1.result.toString()
-                                )
+                            if (dataResult == "") {Toast.makeText(activity, "Когда начало?", Toast.LENGTH_SHORT).show()}
+                            if (timeStartResult == "") {Toast.makeText(activity, "Во сколько начало?", Toast.LENGTH_SHORT).show()}
+                            if (description == "") {Toast.makeText(activity, "Где описание?", Toast.LENGTH_SHORT).show()}
 
-                                val result = databaseManager.publishMeeting(filledMeeting) // вызываем функцию публикации мероприятия. Передаем заполненную переменную как класс
+                        } else {
 
-                                if (result) {navController.navigate(MEETINGS_ROOT)}
+                            openLoading.value = true
 
+                            // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
 
+                            val uploadImage1 = image1?.let { imageRef.putFile(it) }
 
+                            uploadImage1?.continueWithTask { task ->
+                                if (!task.isSuccessful) {
+                                    task.exception?.let { throw it }
+                                }
 
+                                imageRef.downloadUrl
+                            }?.addOnCompleteListener { task1 ->
+
+                                if (task1.isSuccessful) {
+
+                                    val filledMeeting = MeetingsAdsClass(
+                                        key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                        category = category,
+                                        headline = headline,
+                                        description = description,
+                                        price = price,
+                                        phone = phone,
+                                        whatsapp = whatsapp,
+                                        data = dataResult,
+                                        startTime = timeStartResult,
+                                        finishTime = timeFinishResult,
+                                        image1 = task1.result.toString()
+                                    )
+
+                                    if (auth.uid != null) {
+                                        meetingDatabase // записываем в базу данных
+                                            //.child(meeting.category ?: "Без категории") // создаем путь категорий
+                                            .child(
+                                                filledMeeting.key ?: "empty"
+                                            ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+                                            .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
+                                            .child("meetingData")
+                                            .setValue(filledMeeting).addOnCompleteListener {
+
+                                                if (it.isSuccessful) {
+                                                    Toast.makeText(
+                                                        activity,
+                                                        "мероприятие успешно опубликовано",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    //return@addOnCompleteListener
+                                                    navController.navigate(MEETINGS_ROOT) {
+                                                        popUpTo(
+                                                            0
+                                                        )
+                                                    }
+
+                                                } else {
+                                                    Toast.makeText(
+                                                        activity,
+                                                        "произошла ошибка",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }// записываем само значение. Передаем целый класс
+                                    }
+
+                                }
 
                             }
 
                         }
-
-
+                    //
 
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.7f),
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp),// высота - 50
+                    shape = RoundedCornerShape(50), // скругление углов
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = SuccessColor,
-                        contentColor = Grey00
-                    ),
-                    shape = RoundedCornerShape(50)
+                        backgroundColor = SuccessColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
                 ) {
                     Text(
                         text = "Опубликовать",
@@ -294,9 +301,31 @@ class CreateMeeting(private val act: MainActivity) {
                         modifier = Modifier.size(20.dp)
                     )
                 }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            TextButton(
+                onClick = { Toast.makeText(activity, "СДЕЛАТЬ ДИАЛОГ - ДЕЙСТВИТЕЛЬНО ХОТИТЕ ВЫЙТИ?", Toast.LENGTH_SHORT).show() },
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    text = "Отменить создание",
+                    style = Typography.labelMedium,
+                    color = Grey40
+                )
             }
+
+
+
+        }
+
+        if (openLoading.value) {
+            LoadingScreen("Мероприятие загружается")
         }
     }
+
+
 
     // -------- КНОПКА ВЫБОРА КАТЕГОРИИ -----------
 
@@ -427,7 +456,8 @@ class CreateMeeting(private val act: MainActivity) {
 
                 Column(
                     modifier = Modifier
-                        .fillMaxSize().padding(5.dp),
+                        .fillMaxSize()
+                        .padding(5.dp),
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -454,41 +484,10 @@ class CreateMeeting(private val act: MainActivity) {
                         )
                     }
                 }
-
-                /*Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    /*Text(
-                        text = "Главная картинка",
-                        color = Grey95,
-                        modifier = Modifier
-                            .background(SuccessColor, shape = RoundedCornerShape(10.dp))
-                            .padding(10.dp),
-                        style = Typography.labelSmall
-                    )*/
-
-
-
-                }*/
-
-
-
-
             }
-
-            
-
         }
 
-
-
         return selectImage.value
-
 
     }
 

@@ -43,6 +43,7 @@
     <string name="cd_illustration">Иллюстрация</string>
     <string name="cd_phone_icon">Иконка поля ввода телефона</string>
     <string name="cd_create">Кнопка "Создать"</string>
+    <string name="cd_meeting_image">Изображение мероприятия</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -131,4 +132,19 @@
 
     <!-- SYSTEM STRINGS -->
     <string name="ss_loading">Идет загрузка</string>
+
+    <!-- Создание мероприятия -->
+    <string name="cm_image">Картинка мероприятия*</string>
+    <string name="cm_headline">Заголовок*</string>
+    <string name="cm_category">Категория*</string>
+    <string name="cm_phone">Телефон для звонков*</string>
+    <string name="cm_whatsapp">Телефон для общения в WhatsApp</string>
+    <string name="cm_date">Дата мероприятия*</string>
+    <string name="cm_start_time">Время начала мероприятия*</string>
+    <string name="cm_finish_time">Время завершения мероприятия</string>
+    <string name="cm_price">Цена билета</string>
+    <string name="cm_description">Описание*</string>
+    <string name="cm_no_image">Нет картинки. Без нее никак не опубликовать мероприятие :(</string>
+    <string name="cm_no_headline">Нет заголовка. Заполни - а то не понятно, о чем твое мероприятие</string>
+    <string name="cm_no_phone">Не введен телефон для звоноков. Как связаться-то с тобой?</string>
 </resources>

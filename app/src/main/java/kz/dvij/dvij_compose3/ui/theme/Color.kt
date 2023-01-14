@@ -21,8 +21,6 @@ val Primary00 = Color(0xFFFEE5E9)
 // Grey Colors - цвета из дизайн-файла Figma
 
 val Grey100 = Color(0xFF171717)
-val Grey100_50 = Color(0x80171717)
-val Grey100_30 = Color(0x50171717)
 val Grey95 = Color(0xFF232323)
 val Grey90 = Color(0xFF2F2F2F)
 val Grey80 = Color(0xFF535353)
@@ -34,6 +32,12 @@ val Grey30 = Color(0xFFE3E3E3)
 val Grey20 = Color(0xFFEFEFEF)
 val Grey10 = Color(0xFFF6F6F6)
 val Grey00 = Color(0xFFFFFFFF)
+
+// Полупрозрачные цвета
+
+val Grey100_95 = Color(0xF2171717)
+val Grey100_50 = Color(0x80171717)
+val Grey100_30 = Color(0x50171717)
 
 // Gradient
 
