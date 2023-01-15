@@ -1,5 +1,7 @@
 package kz.dvij.dvij_compose3.firebase
 
+import androidx.compose.runtime.MutableState
+
 data class MeetingsAdsClass(
     val key: String? = null,
     val category: String? = null,

@@ -18,7 +18,6 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.screens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -29,7 +28,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН И ФУНКЦИОНАЛ ТАБОВ (МОИ, ИЗБРАННЫЕ, ЛЕНТА) В РАЗДЕЛАХ МЕРОПРИЯТИЯ, ЗАВЕДЕНИЯ, АКЦИИ
 
-fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity){
+fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity, meetingKey: MutableState<String>? = null){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
     // (Смотри Horizontal Pager)
@@ -91,9 +90,17 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                 MEETINGS_ROOT -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> activity.meetingsScreens.MeetingsTapeScreen(navController = navController) // мероприятия Лента
+                        0 -> meetingKey?.let {
+                            activity.meetingsScreens.MeetingsTapeScreen(navController = navController,
+                                it
+                            )
+                        } // мероприятия Лента
                         1 -> activity.meetingsScreens.MeetingsFavScreen(navController) // мероприятия Избранные
-                        else -> activity.meetingsScreens.MeetingsMyScreen(navController) // мероприятия Мои
+                        else -> meetingKey?.let {
+                            activity.meetingsScreens.MeetingsMyScreen(navController,
+                                it
+                            )
+                        } // мероприятия Мои
                 }
                 }
 

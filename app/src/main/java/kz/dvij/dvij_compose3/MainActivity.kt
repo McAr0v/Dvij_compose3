@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-
+            val meetingKey = remember { mutableStateOf("") }
 
             val context = LocalContext.current // контекст для тостов
 
@@ -119,6 +119,8 @@ class MainActivity : ComponentActivity() {
 
             val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
             val currentRoute = navBackStackEntry?.destination?.route // Получаем доступ к корню страницы
+
+
 
             // Помещаем все меню в Scaffold
 
@@ -236,7 +238,7 @@ class MainActivity : ComponentActivity() {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey)}
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController)}
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
@@ -250,7 +252,7 @@ class MainActivity : ComponentActivity() {
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController)}
-
+                        composable(MEETING_VIEW) {meetingsScreens.MeetingViewScreen(key = meetingKey.value)}
                     }
                 }
             }

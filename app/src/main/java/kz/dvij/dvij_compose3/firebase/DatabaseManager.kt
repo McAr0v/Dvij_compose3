@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -24,6 +25,36 @@ class DatabaseManager (private val activity: MainActivity) {
     val default = MeetingsAdsClass (
         description = "def"
     )
+
+    fun readOneMeetingFromDataBase(meetingInfo: MutableState<MeetingsAdsClass>, key: String){
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                    if (meeting != null && meeting.key == key) {
+                        meetingInfo.value = meeting
+                    }
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+
+    }
 
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------

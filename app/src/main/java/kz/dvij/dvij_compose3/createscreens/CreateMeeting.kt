@@ -194,17 +194,20 @@ class CreateMeeting(private val act: MainActivity) {
 
                         // если какое либо обязательное поле не заполнено
 
-                        if (image1 == null || headline == "" || phone == "7" || dataResult == "" || timeStartResult == "" || description == "") {
+                        Log.d("MyLog", category)
+
+                        if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выберите категорию") {
 
                             if (image1 == null) {Toast.makeText(activity, act.resources.getString(R.string.cm_no_image), Toast.LENGTH_SHORT).show()}
                             if (headline == "") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_headline), Toast.LENGTH_SHORT).show()}
-                            if (phone == "7") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_phone), Toast.LENGTH_SHORT).show()}
+                            if (phone == "+77") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_phone), Toast.LENGTH_SHORT).show()}
 
                             // по моему не работает телефон. ПРОВЕРИТЬ
 
                             if (dataResult == "") {Toast.makeText(activity, "Когда начало?", Toast.LENGTH_SHORT).show()}
                             if (timeStartResult == "") {Toast.makeText(activity, "Во сколько начало?", Toast.LENGTH_SHORT).show()}
                             if (description == "") {Toast.makeText(activity, "Где описание?", Toast.LENGTH_SHORT).show()}
+                            if (category == "Выберите категорию") {Toast.makeText(activity, "Выбери категорию", Toast.LENGTH_SHORT).show()}
 
                         } else {
 

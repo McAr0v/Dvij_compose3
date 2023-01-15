@@ -1,13 +1,16 @@
 package kz.dvij.dvij_compose3.ui.theme
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,12 +21,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
 
 @Composable
-fun MeetingCard (meetingItem: MeetingsAdsClass) {
+fun MeetingCard (navController: NavController, meetingItem: MeetingsAdsClass, meetingKey: MutableState<String>) {
 
     // Принимаем категорию и заголовок. Надо еще принимать дату, время и картинку
     // Карточка мероприятий
@@ -34,7 +39,12 @@ fun MeetingCard (meetingItem: MeetingsAdsClass) {
         modifier = Modifier
             .fillMaxWidth() // растягиваем карточку на всю ширину экрана
             .padding(10.dp) // отступ от краев экрана
-            ,
+            .clickable {
+                meetingKey.value = meetingItem.key.toString()
+
+
+                navController.navigate(MEETING_VIEW)
+            },
         shape = RoundedCornerShape(15.dp), // shape - форма. Скругляем углы
         colors = CardDefaults.cardColors(Grey95), // цвет карточки под картинкой, по идее можно убрать
         elevation = CardDefaults.cardElevation(5.dp) // "левитация" над фоном

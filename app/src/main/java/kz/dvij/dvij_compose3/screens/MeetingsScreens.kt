@@ -1,22 +1,27 @@
 package kz.dvij.dvij_compose3.screens
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
@@ -31,10 +36,10 @@ class MeetingsScreens (val act: MainActivity) {
     )
 
     @Composable
-    fun MeetingsScreen (navController: NavController) {
+    fun MeetingsScreen (navController: NavController, meetingKey: MutableState<String>) {
         Column {
 
-            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act)
+            TabMenu(bottomPage = MEETINGS_ROOT, navController = navController, act, meetingKey)
 
         }
     }
@@ -42,7 +47,7 @@ class MeetingsScreens (val act: MainActivity) {
 // экран мероприятий
 
     @Composable
-    fun MeetingsTapeScreen (navController: NavController){
+    fun MeetingsTapeScreen (navController: NavController, meetingKey: MutableState<String>){
 
         val meetingsList = remember {
             mutableStateOf(listOf<MeetingsAdsClass>())
@@ -69,7 +74,7 @@ class MeetingsScreens (val act: MainActivity) {
                     verticalArrangement = Arrangement.Top
                 ){
                     items(meetingsList.value){ item ->
-                        MeetingCard(meetingItem = item)
+                        MeetingCard(meetingItem = item, navController = navController, meetingKey = meetingKey)
                     }
                 }
             } else if (meetingsList.value == listOf(default)){
@@ -105,7 +110,7 @@ class MeetingsScreens (val act: MainActivity) {
     }
 
     @Composable
-    fun MeetingsMyScreen (navController: NavController){
+    fun MeetingsMyScreen (navController: NavController, meetingKey: MutableState<String>){
 
         val myMeetingsList = remember {
             mutableStateOf(listOf<MeetingsAdsClass>())
@@ -132,7 +137,7 @@ class MeetingsScreens (val act: MainActivity) {
                         verticalArrangement = Arrangement.Top
                     ){
                         items(myMeetingsList.value){ item ->
-                            MeetingCard(meetingItem = item)
+                            MeetingCard(meetingItem = item, navController = navController, meetingKey = meetingKey)
                         }
                     }
                 } else if (myMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
@@ -195,6 +200,92 @@ class MeetingsScreens (val act: MainActivity) {
             Text(text = "MeetingsFavScreen")
 
         }
+    }
+
+    @Composable
+    fun MeetingViewScreen (key: String){
+
+        val meetingDatabase = databaseManager.meetingDatabase
+
+        var meetingInfo = remember {
+            mutableStateOf<MeetingsAdsClass>(MeetingsAdsClass())
+        }
+
+        databaseManager.readOneMeetingFromDataBase(meetingInfo, key)
+
+
+
+        Column(
+            modifier = Modifier
+                .background(Grey95)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+
+        ) {
+
+            AsyncImage(
+                model = meetingInfo.value.image1,
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top
+
+            ) {
+
+
+                if (meetingInfo.value.headline != null){
+
+                    Text(
+                        text = meetingInfo.value.headline!!,
+                        style = Typography.titleMedium,
+                        color = Grey10
+
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                if (meetingInfo.value.category != null){
+
+                    Text(
+                        text = meetingInfo.value.category!!,
+                        style = Typography.bodySmall,
+                        color = Grey95,
+                        modifier = Modifier
+                            .background(PrimaryColor)
+                            .padding(5.dp)
+
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+
+
+
+
+            }
+
+
+
+
+
+        }
+
+
     }
 
 }
