@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -30,12 +28,9 @@ import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.ReadDataCallback
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.screens.*
-import okhttp3.internal.wait
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -155,15 +150,22 @@ class MainActivity : ComponentActivity() {
                         || currentRoute == FORGOT_PASSWORD_ROOT
                         || currentRoute == THANK_YOU_PAGE_ROOT
                         || currentRoute == RESET_PASSWORD_SUCCESS
+
                     ){
 
                             // ------- ТО НИЧЕ НЕ ДЕЛАТЬ))) -----------
+
+                    } else if (currentRoute == MEETING_VIEW){
+
+                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА МЕРОПРИЯТИЯ ------------
+
+                        TopBarWithBackButton(navController = navController, text = R.string.meetings)
 
                     } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
 
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
 
-                        TopBar(
+                        TopBarInApp(
                             topBarName = stringResource(id =
                             //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
                             // какая страница открыта
@@ -180,6 +182,7 @@ class MainActivity : ComponentActivity() {
                                 ADS_ROOT -> R.string.side_ad
                                 BUGS_ROOT -> R.string.side_report_bug
                                 CREATE_MEETINGS_SCREEN -> R.string.create_meeting
+                                MEETING_VIEW -> R.string.meetings
                                 else -> R.string.app_name
                                 }
                             ),
@@ -252,7 +255,7 @@ class MainActivity : ComponentActivity() {
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController)}
-                        composable(MEETING_VIEW) {meetingsScreens.MeetingViewScreen(key = meetingKey.value)}
+                        composable(MEETING_VIEW) {meetingsScreens.MeetingViewScreen(key = meetingKey.value, navController)}
                     }
                 }
             }

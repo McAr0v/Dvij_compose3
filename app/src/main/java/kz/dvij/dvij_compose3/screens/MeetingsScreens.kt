@@ -1,8 +1,10 @@
 package kz.dvij.dvij_compose3.screens
 
 import android.util.Log
+import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -203,7 +206,7 @@ class MeetingsScreens (val act: MainActivity) {
     }
 
     @Composable
-    fun MeetingViewScreen (key: String){
+    fun MeetingViewScreen (key: String, navController: NavController){
 
         val meetingDatabase = databaseManager.meetingDatabase
 
@@ -212,8 +215,6 @@ class MeetingsScreens (val act: MainActivity) {
         }
 
         databaseManager.readOneMeetingFromDataBase(meetingInfo, key)
-
-
 
         Column(
             modifier = Modifier
@@ -245,47 +246,111 @@ class MeetingsScreens (val act: MainActivity) {
 
             ) {
 
+                // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
 
-                if (meetingInfo.value.headline != null){
+                if (meetingInfo.value.headline != null) {
 
                     Text(
                         text = meetingInfo.value.headline!!,
-                        style = Typography.titleMedium,
+                        style = Typography.headlineMedium,
                         color = Grey10
 
                     )
 
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------
+
+                if (meetingInfo.value.category != null) {
+
+                    Button(
+                        onClick = {
+                            Toast
+                                .makeText(act, "Сделать функцию", Toast.LENGTH_SHORT)
+                                .show()
+                        },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor,
+                        contentColor = Grey95
+                    ),
+                    shape = RoundedCornerShape(30.dp)) {
+
+                        Text(
+                            text = meetingInfo.value.category!!,
+                            style = Typography.bodyMedium
+                        )
+
+                    }
+
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                if (meetingInfo.value.category != null){
+                // ------- BOX С ДАННЫМИ МЕРОПРИЯТИЯ -----------
 
-                    Text(
-                        text = meetingInfo.value.category!!,
-                        style = Typography.bodySmall,
-                        color = Grey95,
-                        modifier = Modifier
-                            .background(PrimaryColor)
-                            .padding(5.dp)
 
-                    )
+                Column(
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    modifier = Modifier
+                        .background(Grey100, shape = RoundedCornerShape(20.dp))
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+
+                ) {
+
+                    // ------ ДАТА --------
+
+                    if (meetingInfo.value.data != null) {
+                        IconText(icon = R.drawable.ic_calendar, inputText = meetingInfo.value.data!!)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Divider(modifier = Modifier.fillMaxWidth(), color = Grey60, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    // ----- ВРЕМЯ -----------
+
+                    if (meetingInfo.value.startTime != null && meetingInfo.value.finishTime != null) {
+
+                        IconText(
+                            icon = R.drawable.ic_time,
+                            inputText = if (meetingInfo.value.finishTime == ""){
+                                "Начало в ${meetingInfo.value.startTime!!}"
+                            } else {
+                                "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Divider(modifier = Modifier.fillMaxWidth(), color = Grey60, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    // --------- СТОИМОСТЬ БИЛЕТА ----------
+
+                    if (meetingInfo.value.price != null) {
+
+                        IconText(
+
+                            icon = R.drawable.ic_tenge,
+                            inputText = if (meetingInfo.value.price == ""){
+                                stringResource(id = R.string.free_price)
+                            } else {
+                                "${meetingInfo.value.price} тенге"
+                            },
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+
                 }
 
+                // ------ КНОПКА ПОЗВОНИТЬ ---------
 
 
 
 
             }
-
-
-
-
-
         }
-
-
     }
-
 }

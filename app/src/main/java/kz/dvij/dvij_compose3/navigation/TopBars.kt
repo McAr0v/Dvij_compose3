@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.Grey10
 import kz.dvij.dvij_compose3.ui.theme.Grey100
@@ -16,7 +19,7 @@ import kz.dvij.dvij_compose3.ui.theme.Typography
 // ДИЗАЙН ВЕРХНЕЙ ПАНЕЛИ
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun TopBar(
+fun TopBarInApp(
     topBarName: String, // На вход должны получить заголовок панели
     onNavigationIconClick: () -> Unit // Так же должны получить функцию, которая запускается при нажатии на кнопку меню
 ){
@@ -49,4 +52,38 @@ fun TopBar(
             }
         }
     )
+}
+
+@Composable
+fun TopBarWithBackButton(navController: NavController, text: Int){
+
+    TopAppBar(
+        modifier = Modifier
+            .fillMaxWidth(),
+        backgroundColor = Grey100,
+        contentColor = Grey10
+    ) {
+
+        IconButton(
+            onClick = { navController.popBackStack() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = stringResource(id = R.string.cd_go_back),
+                tint = Grey10,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        Divider(modifier = Modifier.width(20.dp))
+
+        androidx.compose.material.Text(
+            text = stringResource(id = text),
+            style = Typography.titleMedium,
+            color = Grey10
+        )
+
+
+    }
+
 }

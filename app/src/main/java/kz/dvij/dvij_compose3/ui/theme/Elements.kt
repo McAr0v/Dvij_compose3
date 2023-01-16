@@ -156,9 +156,21 @@ fun MeetingCard (navController: NavController, meetingItem: MeetingsAdsClass, me
                         // time - время начала мероприятия.
                         // time надо будет передавать из базы данных. Иконку не надо, уже передаю
 
-                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_time, "${meetingItem.startTime} - ${meetingItem.finishTime}")
+                        IconText(
+                            R.drawable.ic_time,
+                            if (meetingItem.finishTime == ""){
+                                "Начало в ${meetingItem.startTime}"
+                            }else {
+                                "${meetingItem.startTime} - ${meetingItem.finishTime}"
+                            })
 
-                        IconText(kz.dvij.dvij_compose3.R.drawable.ic_tenge, "${meetingItem.price} тенге")
+                        IconText(
+                            R.drawable.ic_tenge, 
+                            if(meetingItem.price == ""){
+                                stringResource(id = R.string.free_price)
+                            }else {
+                                "${meetingItem.price} тенге"
+                            })
 
 
                     }
