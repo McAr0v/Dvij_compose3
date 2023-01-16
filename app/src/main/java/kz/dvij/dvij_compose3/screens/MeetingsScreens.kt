@@ -1,5 +1,10 @@
 package kz.dvij.dvij_compose3.screens
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
@@ -20,12 +25,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -345,12 +352,84 @@ class MeetingsScreens (val act: MainActivity) {
 
                 }
 
-                // ------ КНОПКА ПОЗВОНИТЬ ---------
+                Spacer(modifier = Modifier.height(10.dp))
 
+                SpacerTextWithLine(headline = "Связаться с организатором")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row (modifier = Modifier.fillMaxSize()){
+
+                    // ------ КНОПКА ПОЗВОНИТЬ ---------
+
+
+
+                    if (meetingInfo.value.phone != null) {
+
+                        Button(
+                            onClick = {
+                                act.makeACall(act, meetingInfo.value.phone!!)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.5f),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = SuccessColor,
+                                contentColor = Grey95
+                            ),
+                            shape = RoundedCornerShape(30.dp)
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey95)
+
+                            Spacer(modifier = Modifier
+                                .width(15.dp)
+                                .height(30.dp))
+
+                            Text("Позвонить", style = Typography.bodyMedium)
+
+                        }
+
+                    }
+
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Button(
+                            onClick = {
+                                act.writeInWhatsapp(act, meetingInfo.value.whatsapp!!)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.5f),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = SuccessColor,
+                                contentColor = Grey95
+                            ),
+                            shape = RoundedCornerShape(30.dp)
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey95)
+
+                            Spacer(modifier = Modifier
+                                .width(15.dp)
+                                .height(30.dp))
+
+                            Text("Написать", style = Typography.bodyMedium)
+
+                        }
+
+                    }
+
+                }
 
 
 
             }
         }
     }
+
+
+
 }

@@ -1,7 +1,11 @@
 package kz.dvij.dvij_compose3
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -15,6 +19,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -56,6 +63,7 @@ class MainActivity : ComponentActivity() {
     val placesScreens = PlacesScreens(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
+    var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
 
@@ -63,6 +71,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         // слушатель выбора картинок
 
@@ -261,4 +270,24 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    fun makeACall (context: Context, phoneNumber: String){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
+            val intent = Intent(Intent.ACTION_CALL)
+            intent.data = Uri.parse("tel: $phoneNumber")
+            startActivity(intent)
+        } else {
+
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), 777)
+
+        }
+    }
+
+    fun writeInWhatsapp (context: Context, phoneNumber: String){
+        val url = "https://api.whatsapp.com/send?phone=$phoneNumber"
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
+    }
+
 }
