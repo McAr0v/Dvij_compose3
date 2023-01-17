@@ -259,7 +259,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                     Text(
                         text = meetingInfo.value.headline!!,
-                        style = Typography.headlineMedium,
+                        style = Typography.titleLarge,
                         color = Grey10
 
                     )
@@ -360,6 +360,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                 Row (modifier = Modifier.fillMaxSize()){
 
+
+
                     // ------ КНОПКА ПОЗВОНИТЬ ---------
 
 
@@ -421,6 +423,28 @@ class MeetingsScreens (val act: MainActivity) {
                         }
 
                     }
+
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ---------- ОПИСАНИЕ -------------
+
+                Text(
+                    text = stringResource(id = R.string.about_meeting),
+                    style = Typography.titleMedium,
+                    color = Grey10
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (meetingInfo.value.description !=null){
+
+                    Text(
+                        text = meetingInfo.value.description!!,
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
 
                 }
 

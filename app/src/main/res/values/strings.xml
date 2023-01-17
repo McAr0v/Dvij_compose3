@@ -127,6 +127,7 @@
     <string name="input_description">Введите описание</string>
     <string name="input_price">Введите стоимость билета</string>
     <string name="free_price">Вход бесплатный</string>
+    <string name="about_meeting">О мероприятии</string>
 
     <!-- PICKERS -->
     <string name="piker_date">Выбери дату</string>
