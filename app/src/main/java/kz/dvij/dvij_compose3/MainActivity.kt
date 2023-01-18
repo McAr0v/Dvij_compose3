@@ -268,6 +268,7 @@ class MainActivity : ComponentActivity() {
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController)}
                         composable(MEETING_VIEW) {meetingsScreens.MeetingViewScreen(key = meetingKey.value, navController)}
+                        composable("picasso") {createMeeting.tryPicasso()}
                     }
                 }
             }

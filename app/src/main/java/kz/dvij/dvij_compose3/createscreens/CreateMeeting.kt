@@ -27,12 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.pickers.dataPicker
@@ -44,6 +46,7 @@ import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.io.File
 
 class CreateMeeting(private val act: MainActivity) {
 
@@ -214,6 +217,8 @@ class CreateMeeting(private val act: MainActivity) {
                             openLoading.value = true
 
                             // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
+                            
+                            val resizeImage = Picasso.get().load(image1).resize(1000, 500).get()
 
                             val uploadImage1 = image1?.let { imageRef.putFile(it) }
 
@@ -607,5 +612,78 @@ class CreateMeeting(private val act: MainActivity) {
                 }
             }
         }
+    }
+
+    fun imageResize (image: Uri?){
+        Picasso.get().load(image).resize(1000, 500)
+    }
+    
+    @Composable
+    fun tryPicasso(){
+
+        var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
+        val activity = act
+
+
+        
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(Grey60)) {
+
+            if (openLoading.value) {
+                LoadingScreen("Мероприятие загружается")
+            }
+
+            val image1 = meetingImage()
+            var image2 = remember {
+                mutableStateOf<Uri?>(null)
+            }
+
+
+
+
+            Button(onClick = {
+
+                openLoading.value = true
+
+                // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
+
+                val resizeImage = if(image1 != null) {
+                    Picasso.get().load(image1).resize(1000, 500)
+                } else {
+                    Toast.makeText(activity, "Нет изображения", Toast.LENGTH_SHORT).show()
+                }
+
+                Log.d("MyLog", "$resizeImage")
+                image2.value = resizeImage as Uri?
+
+
+
+                /*val uploadImage1 = image1?.let { imageRef.putFile(it) }
+
+                uploadImage1?.continueWithTask { task ->
+                    if (!task.isSuccessful) {
+                        task.exception?.let { throw it }
+                    }
+
+                    imageRef.downloadUrl
+                }?.addOnCompleteListener { task1 ->
+
+                    if (task1.isSuccessful) {
+
+
+
+                    }
+
+                }*/
+
+            }) {
+                Text(text = "Загрузить изображение")
+            }
+
+            AsyncImage(model = image2.value, contentDescription = "")
+            
+        }
+        
     }
 }

@@ -74,6 +74,10 @@ class MeetingsScreens (val act: MainActivity) {
             verticalArrangement = Arrangement.Center
         ) {
 
+            Button(onClick = {navController.navigate("picasso")}) {
+
+            }
+
             if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
 
                 LazyColumn(
