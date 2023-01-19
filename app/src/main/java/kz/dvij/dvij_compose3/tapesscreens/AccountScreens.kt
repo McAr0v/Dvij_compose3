@@ -18,6 +18,9 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
@@ -396,7 +399,15 @@ class AccountScreens(val act: MainActivity) {
 
                 Button(
                     onClick = { // действие на нажатие
-                        accountHelper.signInWithGoogle() // запускаем функцию регистрации через Google
+
+                        GlobalScope.launch(Dispatchers.IO) {
+
+                            accountHelper.signInWithGoogle() // запускаем функцию регистрации через Google
+
+
+                        }
+
+
                         navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на  главную страницу
 
                     },

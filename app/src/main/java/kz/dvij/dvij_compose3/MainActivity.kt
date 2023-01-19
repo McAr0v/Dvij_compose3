@@ -69,8 +69,6 @@ class MainActivity : ComponentActivity() {
 
 
 
-
-
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
                     val account = task.getResult(ApiException::class.java)
                     if (account != null) {
+
                         accountHelper.signInFirebaseWithGoogle(account.idToken!!)
 
                     }

@@ -1,10 +1,15 @@
 package kz.dvij.dvij_compose3.accounthelper
 
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
@@ -19,6 +24,8 @@ class AccountHelper (act: MainActivity) {
 
     private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
+
+
 
     fun signInWithEmailAndPassword(email: String, password: String, callback: (result: Boolean)-> Unit){
 
@@ -233,13 +240,19 @@ class AccountHelper (act: MainActivity) {
     fun signInFirebaseWithGoogle (token: String) {
 
         val credential = GoogleAuthProvider.getCredential(token, null)
-        act.mAuth.signInWithCredential(credential).addOnCompleteListener{ task ->
+        act.mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
 
             if (task.isSuccessful) {
                 act.recreate()
                 Toast.makeText(act, R.string.sign_in_google_success, Toast.LENGTH_SHORT).show()
 
-            } else {Toast.makeText(act, "Произошла ошибка в signInFirebaseWithGoogle", Toast.LENGTH_SHORT).show()}
+            } else {
+                Toast.makeText(
+                    act,
+                    "Произошла ошибка в signInFirebaseWithGoogle",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
         }
     }
