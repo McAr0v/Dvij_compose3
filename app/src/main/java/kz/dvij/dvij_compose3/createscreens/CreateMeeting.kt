@@ -1,9 +1,14 @@
 package kz.dvij.dvij_compose3.createscreens
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -33,10 +38,10 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.ktx.storage
-import com.squareup.picasso.Picasso
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -46,6 +51,7 @@ import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class CreateMeeting(private val act: MainActivity) {
@@ -80,6 +86,7 @@ class CreateMeeting(private val act: MainActivity) {
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
+    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RememberReturnType")
     @Composable
     fun CreateMeetingScreen(navController: NavController) {
@@ -103,7 +110,7 @@ class CreateMeeting(private val act: MainActivity) {
         var dataResult = "" // инициализируем выбор даты
         var timeStartResult = "" // инициализируем выбор времени начала мероприятия
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
-        var category = "" // категория
+        var category: String // категория
 
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
@@ -136,6 +143,12 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
+
+
+            category = activity.getString(CategoriesList.DefaultCat.categoryName)
+
+            category = activity.getString(categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
+
             // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
             if (openDialog.value) {
@@ -143,8 +156,6 @@ class CreateMeeting(private val act: MainActivity) {
                     openDialog.value = false
                 }
             }
-
-            category = activity.getString(categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
@@ -217,10 +228,73 @@ class CreateMeeting(private val act: MainActivity) {
                             openLoading.value = true
 
                             // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
-                            
-                            val resizeImage = Picasso.get().load(image1).resize(1000, 500).get()
 
-                            val uploadImage1 = image1?.let { imageRef.putFile(it) }
+                            GlobalScope.launch(Dispatchers.IO){
+
+                                val compressedImage = compressImage(activity, image1)
+                                uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
+
+                                    Log.d ("MyLog", "CompressURL: $it")
+
+                                    GlobalScope.launch(Dispatchers.Main){
+
+                                        val filledMeeting = MeetingsAdsClass(
+                                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                            category = category,
+                                            headline = headline,
+                                            description = description,
+                                            price = price,
+                                            phone = phone,
+                                            whatsapp = whatsapp,
+                                            data = dataResult,
+                                            startTime = timeStartResult,
+                                            finishTime = timeFinishResult,
+                                            image1 = it
+                                        )
+
+                                        if (auth.uid != null) {
+                                            meetingDatabase // записываем в базу данных
+                                                //.child(meeting.category ?: "Без категории") // создаем путь категорий
+                                                .child(
+                                                    filledMeeting.key ?: "empty"
+                                                ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+                                                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
+                                                .child("meetingData")
+                                                .setValue(filledMeeting).addOnCompleteListener {
+
+                                                    if (it.isSuccessful) {
+                                                        Toast.makeText(
+                                                            activity,
+                                                            "мероприятие успешно опубликовано",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+
+                                                        navController.navigate(MEETINGS_ROOT) {
+                                                            popUpTo(
+                                                                0
+                                                            )
+                                                        }
+
+                                                    } else {
+                                                        Toast.makeText(
+                                                            activity,
+                                                            "произошла ошибка",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                }// записываем само значение. Передаем целый класс
+                                        }
+
+                                        /*openDialog.value = false
+                                        navController.navigate(MEETINGS_ROOT)
+                                        Toast.makeText(activity, "Мероприятие успешно опубликовано", Toast.LENGTH_SHORT).show()*/
+
+                                    }
+                                }
+
+                            }
+
+                            /*val uploadImage1 = image1?.let { imageRef.putFile(it) }
 
                             uploadImage1?.continueWithTask { task ->
                                 if (!task.isSuccessful) {
@@ -228,9 +302,9 @@ class CreateMeeting(private val act: MainActivity) {
                                 }
 
                                 imageRef.downloadUrl
-                            }?.addOnCompleteListener { task1 ->
+                            }?.addOnCompleteListener { task1 ->*/
 
-                                if (task1.isSuccessful) {
+                                /*if (task1.isSuccessful) {
 
                                     val filledMeeting = MeetingsAdsClass(
                                         key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
@@ -281,7 +355,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                                 }
 
-                            }
+                            }*/
 
                         }
                     //
@@ -613,13 +687,10 @@ class CreateMeeting(private val act: MainActivity) {
             }
         }
     }
-
-    fun imageResize (image: Uri?){
-        Picasso.get().load(image).resize(1000, 500)
-    }
     
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    fun tryPicasso(){
+    fun tryPicasso(context: ComponentActivity){
 
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val activity = act
@@ -635,55 +706,73 @@ class CreateMeeting(private val act: MainActivity) {
             }
 
             val image1 = meetingImage()
-            var image2 = remember {
-                mutableStateOf<Uri?>(null)
-            }
 
+            Log.d("MyLog", "Uri1 = $image1")
 
+            if (image1 != null){
 
+                AsyncImage(model = image1, contentDescription = "")
 
-            Button(onClick = {
+                Button(onClick = {
 
-                openLoading.value = true
+                    GlobalScope.launch(Dispatchers.IO){
 
-                // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
+                        val compressedImage = compressImage(context, image1)
+                        uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
+                            Log.d ("MyLog", "CompressURL: $it")
+                            GlobalScope.launch(Dispatchers.Main){
+                                Toast.makeText(context, "Файл загружен", Toast.LENGTH_SHORT).show()
 
-                val resizeImage = if(image1 != null) {
-                    Picasso.get().load(image1).resize(1000, 500)
-                } else {
-                    Toast.makeText(activity, "Нет изображения", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                    }
+
+                }) {
+                    Text ("Сжать изображение")
                 }
 
-                Log.d("MyLog", "$resizeImage")
-                image2.value = resizeImage as Uri?
-
-
-
-                /*val uploadImage1 = image1?.let { imageRef.putFile(it) }
-
-                uploadImage1?.continueWithTask { task ->
-                    if (!task.isSuccessful) {
-                        task.exception?.let { throw it }
-                    }
-
-                    imageRef.downloadUrl
-                }?.addOnCompleteListener { task1 ->
-
-                    if (task1.isSuccessful) {
-
-
-
-                    }
-
-                }*/
-
-            }) {
-                Text(text = "Загрузить изображение")
             }
 
-            AsyncImage(model = image2.value, contentDescription = "")
-            
         }
         
+    }
+
+    private fun compressImage(context: ComponentActivity, uri: Uri): Uri?{
+
+        val bitmap = if (Build.VERSION.SDK_INT < 28){
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        } else {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        }
+
+        val bytes = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
+        val path: String = MediaStore.Images.Media.insertImage(
+            context.contentResolver,
+            bitmap,
+            "image_${System.currentTimeMillis()}",
+            null
+        )
+        return Uri.parse(path)
+    }
+
+    private suspend fun uploadPhoto(uri: Uri, name: String, mimeType: String?, callback: (url: String)-> Unit){
+
+        val metadata = mimeType?.let {
+            StorageMetadata.Builder()
+                .setContentType(mimeType)
+                .build()
+        }
+
+        if (metadata != null){
+            imageRef.putFile(uri, metadata).await()
+        } else {
+            imageRef.putFile(uri).await()
+        }
+
+        callback(imageRef.downloadUrl.await().toString())
     }
 }
