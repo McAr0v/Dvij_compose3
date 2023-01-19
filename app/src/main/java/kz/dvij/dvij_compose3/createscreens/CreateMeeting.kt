@@ -50,6 +50,7 @@ import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
+import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -60,16 +61,6 @@ class CreateMeeting(private val act: MainActivity) {
 
     private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
     var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null // Слушатель выбора картинок
-
-    private val storage = Firebase.storage("gs://dvij-compose3-1cf6a.appspot.com").getReference("Meetings") // инициализируем папку, в которую будет сохраняться картинка мероприятия
-
-
-    // делаем дополнительные подпапки для более удобного поиска изображений
-
-    private val imageRef = storage
-        .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
-        .child("image_${System.currentTimeMillis()}") // название изображения
-
 
     private val meetingDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
@@ -231,8 +222,62 @@ class CreateMeeting(private val act: MainActivity) {
 
                             GlobalScope.launch(Dispatchers.IO){
 
-                                val compressedImage = compressImage(activity, image1)
-                                uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
+                                val compressedImage = activity.photoHelper.compressImage(activity, image1)
+
+                                activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
+
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        val filledMeeting = MeetingsAdsClass(
+                                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                            category = category,
+                                            headline = headline,
+                                            description = description,
+                                            price = price,
+                                            phone = phone,
+                                            whatsapp = whatsapp,
+                                            data = dataResult,
+                                            startTime = timeStartResult,
+                                            finishTime = timeFinishResult,
+                                            image1 = it
+                                        )
+
+                                        if (auth.uid != null) {
+                                            meetingDatabase // записываем в базу данных
+                                                //.child(meeting.category ?: "Без категории") // создаем путь категорий
+                                                .child(
+                                                    filledMeeting.key ?: "empty"
+                                                ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+                                                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
+                                                .child("meetingData")
+                                                .setValue(filledMeeting).addOnCompleteListener {
+
+                                                    if (it.isSuccessful) {
+                                                        Toast.makeText(
+                                                            activity,
+                                                            "мероприятие успешно опубликовано",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+
+                                                        navController.navigate(MEETINGS_ROOT) {
+                                                            popUpTo(
+                                                                0
+                                                            )
+                                                        }
+
+                                                    } else {
+                                                        Toast.makeText(
+                                                            activity,
+                                                            "произошла ошибка",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                }// записываем само значение. Передаем целый класс
+                                        }
+                                    }
+
+                                }
+
+                                /*uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
 
                                     Log.d ("MyLog", "CompressURL: $it")
 
@@ -284,82 +329,10 @@ class CreateMeeting(private val act: MainActivity) {
                                                     }
                                                 }// записываем само значение. Передаем целый класс
                                         }
-
-                                        /*openDialog.value = false
-                                        navController.navigate(MEETINGS_ROOT)
-                                        Toast.makeText(activity, "Мероприятие успешно опубликовано", Toast.LENGTH_SHORT).show()*/
-
                                     }
-                                }
-
+                                }*/
                             }
-
-                            /*val uploadImage1 = image1?.let { imageRef.putFile(it) }
-
-                            uploadImage1?.continueWithTask { task ->
-                                if (!task.isSuccessful) {
-                                    task.exception?.let { throw it }
-                                }
-
-                                imageRef.downloadUrl
-                            }?.addOnCompleteListener { task1 ->*/
-
-                                /*if (task1.isSuccessful) {
-
-                                    val filledMeeting = MeetingsAdsClass(
-                                        key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                                        category = category,
-                                        headline = headline,
-                                        description = description,
-                                        price = price,
-                                        phone = phone,
-                                        whatsapp = whatsapp,
-                                        data = dataResult,
-                                        startTime = timeStartResult,
-                                        finishTime = timeFinishResult,
-                                        image1 = task1.result.toString()
-                                    )
-
-                                    if (auth.uid != null) {
-                                        meetingDatabase // записываем в базу данных
-                                            //.child(meeting.category ?: "Без категории") // создаем путь категорий
-                                            .child(
-                                                filledMeeting.key ?: "empty"
-                                            ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-                                            .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
-                                            .child("meetingData")
-                                            .setValue(filledMeeting).addOnCompleteListener {
-
-                                                if (it.isSuccessful) {
-                                                    Toast.makeText(
-                                                        activity,
-                                                        "мероприятие успешно опубликовано",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                    //return@addOnCompleteListener
-                                                    navController.navigate(MEETINGS_ROOT) {
-                                                        popUpTo(
-                                                            0
-                                                        )
-                                                    }
-
-                                                } else {
-                                                    Toast.makeText(
-                                                        activity,
-                                                        "произошла ошибка",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                            }// записываем само значение. Передаем целый класс
-                                    }
-
-                                }
-
-                            }*/
-
                         }
-                    //
-
                     },
                     modifier = Modifier
                         .fillMaxWidth() // кнопка на всю ширину
@@ -686,103 +659,5 @@ class CreateMeeting(private val act: MainActivity) {
                 }
             }
         }
-    }
-
-    private fun compressImage(context: ComponentActivity, uri: Uri): Uri?{
-
-        val bitmap = if (Build.VERSION.SDK_INT < 28){
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(context.contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
-        }
-
-        val bytes = ByteArrayOutputStream()
-
-        val correctImageSize = getWriteSizeImage(bitmap) // получаем размеры, до которых надо уменьшить картинку
-        Log.d (
-            "MyLog",
-            "Изначальная ширина: ${bitmap.width}, после функции ширина: ${correctImageSize[0]}, Изначальная высота: ${bitmap.height}, после функции высота: ${correctImageSize[1]}"
-        )
-
-        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, correctImageSize[0], correctImageSize[1], false) // изменение размера картинки
-
-        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
-
-        //bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytes)
-
-        val path: String = MediaStore.Images.Media.insertImage(
-            context.contentResolver,
-            resizedBitmap,
-            "image_${System.currentTimeMillis()}",
-            null
-        )
-        return Uri.parse(path)
-    }
-
-    private fun getWriteSizeImage(bitmap: Bitmap): List<Int>{
-
-        var listOfSize = arrayListOf<Int>(bitmap.width, bitmap.height)
-
-        val width = bitmap.width // ширина
-        val height = bitmap.height // высота
-
-        val ratio = (width / height).toFloat() // ratio - коэффициент
-
-        val scale: Float = width.toFloat() / height.toFloat()
-
-        Log.d ("MyLog", "$scale")
-
-        // если коэффициент больше или равен 1
-        if (ratio >= 1) {
-            // если ширина меньше 1000
-            if (width <= 1000) {
-                listOfSize[0] = width
-                listOfSize[1] = height
-                //listOfSize.add(width, height)
-            } else {
-                val resizeHeight = 1000/scale
-
-                listOfSize[0] = 1000
-                listOfSize[1] = resizeHeight.toInt()
-
-                //listOfSize.add(1000, resizeHeight.toInt())
-            }
-        } else {
-
-            if (height <= 1000) {
-                //listOfSize.add(height, width)
-
-                listOfSize[0] = height
-                listOfSize[1] = width
-
-            } else {
-                val resizeWidth = 1000*scale
-
-                listOfSize[0] = resizeWidth.toInt()
-                listOfSize[1] = 1000
-                //listOfSize.add(1000, resizeWidth.toInt())
-            }
-
-        }
-            return listOfSize
-
-    }
-
-    private suspend fun uploadPhoto(uri: Uri, name: String, mimeType: String?, callback: (url: String)-> Unit){
-
-        val metadata = mimeType?.let {
-            StorageMetadata.Builder()
-                .setContentType(mimeType)
-                .build()
-        }
-
-        if (metadata != null){
-            imageRef.putFile(uri, metadata).await()
-        } else {
-            imageRef.putFile(uri).await()
-        }
-
-        callback(imageRef.downloadUrl.await().toString())
     }
 }

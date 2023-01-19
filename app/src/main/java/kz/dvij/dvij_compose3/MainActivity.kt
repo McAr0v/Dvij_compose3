@@ -38,6 +38,7 @@ import kz.dvij.dvij_compose3.createscreens.CreateMeeting
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
+import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.screens.*
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
     val meetingsScreens = MeetingsScreens(this)
     val stockScreen = StockScreen(this)
     val placesScreens = PlacesScreens(this)
+    val photoHelper = PhotoHelper(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null

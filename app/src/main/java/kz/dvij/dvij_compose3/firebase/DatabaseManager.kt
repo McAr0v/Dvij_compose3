@@ -12,8 +12,6 @@ import kz.dvij.dvij_compose3.MainActivity
 
 class DatabaseManager (private val activity: MainActivity) {
 
-
-
     // --- ИНИЦИАЛИЗИРУЕМ БАЗУ ДАННЫХ -------
 
     val meetingDatabase = FirebaseDatabase // обращаемся к БД
