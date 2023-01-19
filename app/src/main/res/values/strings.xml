@@ -150,4 +150,8 @@
     <string name="cm_no_image">Нет картинки. Без нее никак не опубликовать мероприятие :(</string>
     <string name="cm_no_headline">Нет заголовка. Заполни - а то не понятно, о чем твое мероприятие</string>
     <string name="cm_no_phone">Не введен телефон для звоноков. Как связаться-то с тобой?</string>
+    <string name="cm_no_date">В какой день начало?</string>
+    <string name="cm_no_start_time">Во сколько начало?</string>
+    <string name="cm_no_description">Где описание?</string>
+    <string name="cm_no_category">Выбери категорию</string>
 </resources>

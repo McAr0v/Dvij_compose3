@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.screens
+package kz.dvij.dvij_compose3.tapesscreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

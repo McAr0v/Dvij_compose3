@@ -18,7 +18,7 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
-import kz.dvij.dvij_compose3.screens.*
+import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 

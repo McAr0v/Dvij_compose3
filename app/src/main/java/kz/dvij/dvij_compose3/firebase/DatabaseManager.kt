@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.firebase
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -9,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 
 class DatabaseManager (private val activity: MainActivity) {
 
@@ -27,6 +29,7 @@ class DatabaseManager (private val activity: MainActivity) {
     fun readOneMeetingFromDataBase(meetingInfo: MutableState<MeetingsAdsClass>, key: String){
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (item in snapshot.children){
@@ -165,6 +168,26 @@ class DatabaseManager (private val activity: MainActivity) {
 
         }
         )
+    }
+
+    suspend fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
+        meetingDatabase // записываем в базу данных
+            //.child(meeting.category ?: "Без категории") // создаем путь категорий
+            .child(
+                filledMeeting.key ?: "empty"
+            ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+            .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
+            .child("meetingData")
+            .setValue(filledMeeting).addOnCompleteListener {
+
+                if (it.isSuccessful) {
+
+                    callback (true)
+
+                } else {
+                    callback (false)
+                }
+            }
     }
 
 }

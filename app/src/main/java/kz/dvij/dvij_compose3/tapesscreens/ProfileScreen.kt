@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.screens
+package kz.dvij.dvij_compose3.tapesscreens
 
 import android.util.Log
 import android.widget.Toast

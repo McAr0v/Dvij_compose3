@@ -1,11 +1,7 @@
 package kz.dvij.dvij_compose3
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -17,12 +13,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -34,12 +26,15 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
+import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
+import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
-import kz.dvij.dvij_compose3.screens.*
+import kz.dvij.dvij_compose3.tapesscreens.*
+import kz.dvij.dvij_compose3.viewscreens.MeetingViewScreen
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -64,6 +59,9 @@ class MainActivity : ComponentActivity() {
     val stockScreen = StockScreen(this)
     val placesScreens = PlacesScreens(this)
     val photoHelper = PhotoHelper(this)
+    val meetingViewScreen = MeetingViewScreen(this)
+    val callAndWhatsapp = CallAndWhatsapp(this)
+    val categoryDialog = CategoryDialog(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -76,18 +74,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        // слушатель выбора картинок
-
-        createMeeting.pickMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(3)){ uris ->
-
-            if (uris.isNotEmpty()) {
-                Log.d("MyLog", "Выбранно фото: $uris")
-            } else {
-                Log.d("MyLog", "Не выбрано ниодно фото")
-            }
-        }
 
         // слушатель регистрации через гугл синг ин
 
@@ -269,30 +255,10 @@ class MainActivity : ComponentActivity() {
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController)}
-                        composable(MEETING_VIEW) {meetingsScreens.MeetingViewScreen(key = meetingKey.value, navController)}
+                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
                     }
                 }
             }
         }
     }
-
-    fun makeACall (context: Context, phoneNumber: String){
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
-            val intent = Intent(Intent.ACTION_CALL)
-            intent.data = Uri.parse("tel: $phoneNumber")
-            startActivity(intent)
-        } else {
-
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), 777)
-
-        }
-    }
-
-    fun writeInWhatsapp (context: Context, phoneNumber: String){
-        val url = "https://api.whatsapp.com/send?phone=$phoneNumber"
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(url)
-        startActivity(intent)
-    }
-
 }

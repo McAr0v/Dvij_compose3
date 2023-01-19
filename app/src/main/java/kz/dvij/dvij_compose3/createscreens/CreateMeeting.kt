@@ -1,18 +1,11 @@
 package kz.dvij.dvij_compose3.createscreens
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,24 +17,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageMetadata
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
@@ -49,30 +34,20 @@ import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.functions.checkDataOnCreateMeeting
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
-import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
+import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.io.ByteArrayOutputStream
-import java.io.File
 
 class CreateMeeting(private val act: MainActivity) {
 
     // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
-
-    private var chosenCategory: CategoriesList = CategoriesList.DefaultCat // категория по умолчанию (не выбрана категория)
-    var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null // Слушатель выбора картинок
-
-    private val meetingDatabase = FirebaseDatabase // обращаемся к БД
-        .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
-        .getReference("Meetings") // Создаем ПАПКУ В БД для мероприятий
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
     val default = MeetingsAdsClass (
         description = "def"
     )
-
-
 
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
@@ -126,7 +101,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
-            val image1 = meetingImage() // Изображение мероприятия
+            val image1 = chooseImageDesign(activity) // Изображение мероприятия
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_headline)) // подпись перед формой
 
@@ -134,16 +109,12 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-
-
-            category = activity.getString(CategoriesList.DefaultCat.categoryName)
-
-            category = activity.getString(categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
+            category = activity.getString(act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
             // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
             if (openDialog.value) {
-                CategoryChooseDialog {
+                act.categoryDialog.CategoryChooseDialog {
                     openDialog.value = false
                 }
             }
@@ -194,26 +165,18 @@ class CreateMeeting(private val act: MainActivity) {
                 Button(
 
                     onClick = {
-
                         // действие на нажатие
 
                         // если какое либо обязательное поле не заполнено
 
-                        Log.d("MyLog", category)
+                        val checkData = checkDataOnCreateMeeting(image1, headline, phone, dataResult, timeStartResult, description, category)
 
-                        if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выберите категорию") {
+                        if (checkData != 0) {
 
-                            if (image1 == null) {Toast.makeText(activity, act.resources.getString(R.string.cm_no_image), Toast.LENGTH_SHORT).show()}
-                            if (headline == "") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_headline), Toast.LENGTH_SHORT).show()}
-                            if (phone == "+77") {Toast.makeText(activity, act.resources.getString(R.string.cm_no_phone), Toast.LENGTH_SHORT).show()}
+                            Toast.makeText(activity, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
 
-                            // по моему не работает телефон. ПРОВЕРИТЬ
-
-                            if (dataResult == "") {Toast.makeText(activity, "Когда начало?", Toast.LENGTH_SHORT).show()}
-                            if (timeStartResult == "") {Toast.makeText(activity, "Во сколько начало?", Toast.LENGTH_SHORT).show()}
-                            if (description == "") {Toast.makeText(activity, "Где описание?", Toast.LENGTH_SHORT).show()}
-                            if (category == "Выберите категорию") {Toast.makeText(activity, "Выбери категорию", Toast.LENGTH_SHORT).show()}
-
+                        } else if (ContextCompat.checkSelfPermission(act, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            ActivityCompat.requestPermissions(act, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
                         } else {
 
                             openLoading.value = true
@@ -222,11 +185,12 @@ class CreateMeeting(private val act: MainActivity) {
 
                             GlobalScope.launch(Dispatchers.IO){
 
-                                val compressedImage = activity.photoHelper.compressImage(activity, image1)
+                                val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
 
                                 activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
 
                                     GlobalScope.launch(Dispatchers.Main) {
+
                                         val filledMeeting = MeetingsAdsClass(
                                             key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
                                             category = category,
@@ -242,95 +206,33 @@ class CreateMeeting(private val act: MainActivity) {
                                         )
 
                                         if (auth.uid != null) {
-                                            meetingDatabase // записываем в базу данных
-                                                //.child(meeting.category ?: "Без категории") // создаем путь категорий
-                                                .child(
-                                                    filledMeeting.key ?: "empty"
-                                                ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-                                                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
-                                                .child("meetingData")
-                                                .setValue(filledMeeting).addOnCompleteListener {
 
-                                                    if (it.isSuccessful) {
-                                                        Toast.makeText(
-                                                            activity,
-                                                            "мероприятие успешно опубликовано",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
+                                            databaseManager.publishMeeting(filledMeeting){ result ->
 
-                                                        navController.navigate(MEETINGS_ROOT) {
-                                                            popUpTo(
-                                                                0
-                                                            )
-                                                        }
+                                                if (result){
 
-                                                    } else {
-                                                        Toast.makeText(
-                                                            activity,
-                                                            "произошла ошибка",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-                                                    }
-                                                }// записываем само значение. Передаем целый класс
+                                                    act.categoryDialog.chosenCategory = CategoriesList.DefaultCat
+                                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+
+                                                    Toast.makeText(
+                                                        activity,
+                                                        "мероприятие успешно опубликовано",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else {
+
+                                                    Toast.makeText(
+                                                        activity,
+                                                        "произошла ошибка",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+                                            }
                                         }
                                     }
-
                                 }
-
-                                /*uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
-
-                                    Log.d ("MyLog", "CompressURL: $it")
-
-                                    GlobalScope.launch(Dispatchers.Main){
-
-                                        val filledMeeting = MeetingsAdsClass(
-                                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                                            category = category,
-                                            headline = headline,
-                                            description = description,
-                                            price = price,
-                                            phone = phone,
-                                            whatsapp = whatsapp,
-                                            data = dataResult,
-                                            startTime = timeStartResult,
-                                            finishTime = timeFinishResult,
-                                            image1 = it
-                                        )
-
-                                        if (auth.uid != null) {
-                                            meetingDatabase // записываем в базу данных
-                                                //.child(meeting.category ?: "Без категории") // создаем путь категорий
-                                                .child(
-                                                    filledMeeting.key ?: "empty"
-                                                ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-                                                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
-                                                .child("meetingData")
-                                                .setValue(filledMeeting).addOnCompleteListener {
-
-                                                    if (it.isSuccessful) {
-                                                        Toast.makeText(
-                                                            activity,
-                                                            "мероприятие успешно опубликовано",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-
-                                                        navController.navigate(MEETINGS_ROOT) {
-                                                            popUpTo(
-                                                                0
-                                                            )
-                                                        }
-
-                                                    } else {
-                                                        Toast.makeText(
-                                                            activity,
-                                                            "произошла ошибка",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-                                                    }
-                                                }// записываем само значение. Передаем целый класс
-                                        }
-                                    }
-                                }*/
                             }
                         }
                     },
@@ -370,9 +272,6 @@ class CreateMeeting(private val act: MainActivity) {
                     color = Grey40
                 )
             }
-
-
-
         }
 
         if (openLoading.value) {
@@ -380,284 +279,4 @@ class CreateMeeting(private val act: MainActivity) {
         }
     }
 
-
-
-    // -------- КНОПКА ВЫБОРА КАТЕГОРИИ -----------
-
-    @Composable
-    fun categorySelectButton(onClick: ()-> Unit): CategoriesList {
-
-        Button(
-            onClick = {
-                onClick()
-            },
-
-            // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
-
-            border = BorderStroke(
-                width = if (chosenCategory == CategoriesList.DefaultCat) {
-                    2.dp
-                } else {
-                    0.dp
-                }, color = if (chosenCategory == CategoriesList.DefaultCat) {
-                    Grey60
-                } else {
-                    Grey95
-                }
-            ),
-
-            // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
-
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenCategory == CategoriesList.DefaultCat) {
-                    Grey95
-                } else {
-                    PrimaryColor
-                },
-                contentColor = if (chosenCategory == CategoriesList.DefaultCat) {
-                    Grey60
-                } else {
-                    Grey100
-                },
-            ),
-            shape = RoundedCornerShape(50) // скругленные углы кнопки
-        ) {
-
-            Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
-
-            Text(
-                text = stringResource(id = chosenCategory.categoryName), // текст кнопки
-                style = Typography.labelMedium // стиль текста
-            )
-        }
-        return chosenCategory
-    }
-
-    @Composable
-    fun meetingImage (): Uri? {
-
-        var selectImage = remember { mutableStateOf<Uri?>(null) }
-
-        val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
-            selectImage.value = it
-        }
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-            shape = RoundedCornerShape(15.dp),
-            backgroundColor = Grey100
-        ) {
-
-            if (selectImage.value == null) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                galleryLauncher.launch("image/*")
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_add),
-                            contentDescription = "",
-                            tint = Grey10
-                        )
-                        
-                        Spacer(modifier = Modifier.width(10.dp))
-                        
-                        Text(
-                            text = "Добавь изображение",
-                            color = Grey10,
-                            style = Typography.bodyMedium
-                        )
-                        
-                    }
-                }
-                
-            } else {
-
-                Image(
-                    modifier = Modifier
-                        .background(
-                            shape = RoundedCornerShape(20.dp),
-                            color = Grey95
-                        )
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    painter = (
-                            if (selectImage.value == null) {
-                                painterResource(id = R.drawable.korn_concert)
-                            } else {
-                                rememberAsyncImagePainter(model = selectImage.value)
-                            }
-                            ),
-                    contentDescription = "",
-
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.Center
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(5.dp),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    IconButton(
-                        onClick = { galleryLauncher.launch("image/*") },
-                        modifier = Modifier.background(WarningColor, shape = RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_edit),
-                            contentDescription = "",
-                            tint = Grey95
-                        )
-                    }
-
-                    IconButton(
-                        onClick = { selectImage.value = null },
-                        modifier = Modifier.background(AttentionColor, shape = RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_delete),
-                            contentDescription = "",
-                            tint = Grey95
-                        )
-                    }
-                }
-            }
-        }
-
-        return selectImage.value
-
-    }
-
-
-    // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
-
-    @Composable
-    fun CategoryChooseDialog(onDismiss: () -> Unit) {
-
-        // Создаем список городов
-
-        val categoriesList = mutableListOf<CategoriesList>(
-
-            CategoriesList.ConcertsCat,
-            CategoriesList.HobieCat
-        )
-
-        // ------ САМ ДИАЛОГ ---------
-
-        Dialog(
-            onDismissRequest = { onDismiss() } // действие на нажатие за пределами диалога
-        ) {
-
-        // -------- СОДЕРЖИМОЕ ДИАЛОГА ---------
-
-            Column(
-                modifier = Modifier
-                    .border(
-                        2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
-                    )
-                    .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
-                    )
-                    .padding(20.dp) // отступы
-                    .fillMaxWidth() // занять всю ширину
-
-            ) {
-
-
-                // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание элементов по центру
-                    horizontalArrangement = Arrangement.End // выравнивание по горизонтали
-                ) {
-
-                    // --------- ЗАГОЛОВОК ----------
-
-                    androidx.compose.material3.Text(
-                        text = stringResource(id = R.string.cat_default), // текст заголовка
-                        style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
-                        modifier = Modifier.weight(1f)
-                    ) // занять всю оставшуюся ширину
-
-                    Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                    // ------------- ИКОНКА ЗАКРЫТЬ ----------------
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_close), // сама иконка
-                        contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
-                        modifier = Modifier.clickable { onDismiss() } // действие на нажатие
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-
-                // ---------- СПИСОК Категорий -------------
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth() // занять ширину
-                        .background(
-                            Grey100, // цвет фона
-                            shape = RoundedCornerShape(10.dp) // скругление углов
-                        )
-                        .padding(20.dp), // отступ
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-
-                ) {
-
-                    // наполнение ленивой колонки
-
-                    // берем каждый item из списка categoriesList и заполняем шаблон
-
-                    items(categoriesList) { category ->
-
-                        // ------------ строка с названием категории -------------
-
-                        Column(modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                // действие на нажатие на элемент
-                                chosenCategory =
-                                    category // выбранная категория теперь та, которую выбрали, а не по умолчанию
-                                onDismiss() // закрыть диалог
-                            }
-                        ) {
-                            androidx.compose.material3.Text(
-                                text = stringResource(id = category.categoryName), // само название категории
-                                color = Grey40, // цвет текста
-                                style = Typography.bodyMedium // стиль текста
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

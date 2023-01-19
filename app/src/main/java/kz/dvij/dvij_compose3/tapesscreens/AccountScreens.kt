@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.screens
+package kz.dvij.dvij_compose3.tapesscreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -240,46 +240,26 @@ class AccountScreens(val act: MainActivity) {
 
                             if (switch == REGISTRATION) {
 
-                                // запускаем функцию createUserWithEMailAndPassword и вешаем слушатель, который говорит что действие закончено
-                                act.mAuth.createUserWithEmailAndPassword(
-                                    email.value,
-                                    password.value
-                                )
-                                    .addOnCompleteListener { task ->
+                                accountHelper.registerWIthEmailAndPassword(email = email.value, password = password.value){ user ->
 
-                                        //  если регистрация прошла успешно
-                                        if (task.isSuccessful) {
-
-                                            // если пользователь успешно зарегистрировался, mAuth будет содержать всю информацию о пользователе user
-                                            //отправляем письмо с подтверждением Email. task.result.user можно взять act.mAuth.currentUser
-                                            accountHelper.sendEmailVerification(task.result.user!!)
-                                            navController.navigate(THANK_YOU_PAGE_ROOT) {popUpTo(0)} // переходим на диалог СПАСИБО ЗА РЕГИСТРАЦИЮ
-
+                                    accountHelper.sendEmailVerification(user){ result ->
+                                        if (result){
+                                            navController.navigate(THANK_YOU_PAGE_ROOT) {popUpTo(0)}
+                                            Toast.makeText(act, R.string.send_email_verification_success, Toast.LENGTH_SHORT).show()
                                         } else {
-
-                                            // если регистрация не выполнилась
-
-                                            task.exception?.let {
-                                                accountHelper.errorInSignInAndUp(
-                                                    it
-                                                )
-                                            } // отправляем в функцию отслеживания ошибки и вывода нужной информации
-
+                                            Toast.makeText(act, R.string.send_email_verification_error, Toast.LENGTH_SHORT).show()
                                         }
                                     }
-
+                                }
                             } else {
 
                                 // ------------------ ВХОД -----------------
 
-                                // запускаем функцию от FireBase signInWithEmailAndPassword и вешаем слушатель, что все завершилось
+                                // запускаем функцию signInWithEmailAndPassword и вешаем слушатель, что все завершилось
 
-                                act.mAuth.signInWithEmailAndPassword(
-                                    email.value,
-                                    password.value
-                                ).addOnCompleteListener { task ->
+                                accountHelper.signInWithEmailAndPassword(email = email.value, password = password.value) { result ->
 
-                                    if (task.isSuccessful) { // если вход выполнен
+                                    if (result){
 
                                         navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу профиля
 
@@ -288,16 +268,8 @@ class AccountScreens(val act: MainActivity) {
                                             act.resources.getString(R.string.log_in_successful),
                                             Toast.LENGTH_SHORT
                                         ).show()
-
-                                    } else { // если вход не выполнен
-
-                                        task.exception?.let {
-                                            accountHelper.errorInSignInAndUp(
-                                                it
-                                            )
-                                        } // отправляем в функцию отслеживания ошибки и вывода нужной информации
-
                                     }
+
                                 }
                             }
                         }

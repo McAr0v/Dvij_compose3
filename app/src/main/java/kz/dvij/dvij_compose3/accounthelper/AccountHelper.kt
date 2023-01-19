@@ -8,6 +8,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.navigation.PROFILE_ROOT
+import kz.dvij.dvij_compose3.navigation.THANK_YOU_PAGE_ROOT
 import okhttp3.internal.notify
 
 class AccountHelper (act: MainActivity) {
@@ -17,6 +19,59 @@ class AccountHelper (act: MainActivity) {
 
     private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
+
+    fun signInWithEmailAndPassword(email: String, password: String, callback: (result: Boolean)-> Unit){
+
+        act.mAuth.signInWithEmailAndPassword(
+            email,
+            password
+        ).addOnCompleteListener { task ->
+
+            if (task.isSuccessful) { // если вход выполнен
+
+                callback (true)
+
+
+            } else { // если вход не выполнен
+
+                task.exception?.let {
+                    errorInSignInAndUp(
+                        it
+                    )
+                } // отправляем в функцию отслеживания ошибки и вывода нужной информации
+
+            }
+        }
+
+    }
+
+    fun registerWIthEmailAndPassword(email: String, password: String, callback: (result: FirebaseUser)-> Unit) {
+
+        // запускаем функцию createUserWithEMailAndPassword и вешаем слушатель, который говорит что действие закончено
+        act.mAuth.createUserWithEmailAndPassword(
+            email,
+            password
+        )
+            .addOnCompleteListener { task ->
+
+                //  если регистрация прошла успешно
+                if (task.isSuccessful) {
+                        callback (task.result.user!!)
+
+                } else {
+
+                    // если регистрация не выполнилась
+
+                    task.exception?.let {
+                        errorInSignInAndUp(
+                            it
+                        )
+                    } // отправляем в функцию отслеживания ошибки и вывода нужной информации
+
+                }
+            }
+
+    }
 
     // ---- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ОШИБКИ И ВЫВОДА СООБЩЕНИЯ ПРИ РЕГИСТРАЦИИ И ВХОДЕ --------
 
@@ -112,14 +167,16 @@ class AccountHelper (act: MainActivity) {
 
     // --- Функция отправки письма с подтверждением Email. НЕ УДАЛЯТЬ ФУНКЦИЮ ------
 
-    fun sendEmailVerification(user: FirebaseUser){
+    fun sendEmailVerification(user: FirebaseUser, callback: (result: Boolean)-> Unit){
         // функция отправки письма с подтверждением Email при регистрации
         // данные зарегистрированного user находвтся в mAuth
 
         user.sendEmailVerification().addOnCompleteListener { task ->
             if (task.isSuccessful) {
+                callback (true)
                 Toast.makeText(act, R.string.send_email_verification_success, Toast.LENGTH_SHORT).show()
             } else {
+                callback (false)
                 Toast.makeText(act, R.string.send_email_verification_error, Toast.LENGTH_SHORT).show()
             }
         }

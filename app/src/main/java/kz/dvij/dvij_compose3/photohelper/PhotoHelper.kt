@@ -1,5 +1,7 @@
 package kz.dvij.dvij_compose3.photohelper
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -7,6 +9,8 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.ktx.storage
@@ -14,9 +18,10 @@ import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
+import okhttp3.internal.wait
 import java.io.ByteArrayOutputStream
 
-class PhotoHelper (act: MainActivity) {
+class PhotoHelper (val act: MainActivity) {
 
     private val storageMeetings = Firebase
         .storage("gs://dvij-compose3-1cf6a.appspot.com")
@@ -42,34 +47,34 @@ class PhotoHelper (act: MainActivity) {
 
     fun compressImage(context: ComponentActivity, uri: Uri): Uri?{
 
-        val bitmap = if (Build.VERSION.SDK_INT < 28){
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(context.contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
-        }
+            val bitmap = if (Build.VERSION.SDK_INT < 28){
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            } else {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            }
 
-        val bytes = ByteArrayOutputStream()
+            val bytes = ByteArrayOutputStream()
 
-        val correctImageSize = getWriteSizeImage(bitmap) // получаем размеры, до которых надо уменьшить картинку
-        Log.d (
-            "MyLog",
-            "Изначальная ширина: ${bitmap.width}, после функции ширина: ${correctImageSize[0]}, Изначальная высота: ${bitmap.height}, после функции высота: ${correctImageSize[1]}"
-        )
+            val correctImageSize = getWriteSizeImage(bitmap) // получаем размеры, до которых надо уменьшить картинку
+            Log.d (
+                "MyLog",
+                "Изначальная ширина: ${bitmap.width}, после функции ширина: ${correctImageSize[0]}, Изначальная высота: ${bitmap.height}, после функции высота: ${correctImageSize[1]}"
+            )
 
-        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, correctImageSize[0], correctImageSize[1], false) // изменение размера картинки
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, correctImageSize[0], correctImageSize[1], false) // изменение размера картинки
 
-        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
 
-        //bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytes)
+            val path: String = MediaStore.Images.Media.insertImage(
+                context.contentResolver,
+                resizedBitmap,
+                "image_${System.currentTimeMillis()}",
+                null
+            )
 
-        val path: String = MediaStore.Images.Media.insertImage(
-            context.contentResolver,
-            resizedBitmap,
-            "image_${System.currentTimeMillis()}",
-            null
-        )
-        return Uri.parse(path)
+            return Uri.parse(path)
+
     }
 
     private fun getWriteSizeImage(bitmap: Bitmap): List<Int>{
