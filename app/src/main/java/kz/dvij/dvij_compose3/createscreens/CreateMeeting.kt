@@ -687,56 +687,6 @@ class CreateMeeting(private val act: MainActivity) {
             }
         }
     }
-    
-    @OptIn(DelicateCoroutinesApi::class)
-    @Composable
-    fun tryPicasso(context: ComponentActivity){
-
-        var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
-        val activity = act
-
-
-        
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(Grey60)) {
-
-            if (openLoading.value) {
-                LoadingScreen("Мероприятие загружается")
-            }
-
-            val image1 = meetingImage()
-
-            Log.d("MyLog", "Uri1 = $image1")
-
-            if (image1 != null){
-
-                AsyncImage(model = image1, contentDescription = "")
-
-                Button(onClick = {
-
-                    GlobalScope.launch(Dispatchers.IO){
-
-                        val compressedImage = compressImage(context, image1)
-                        uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg"){
-                            Log.d ("MyLog", "CompressURL: $it")
-                            GlobalScope.launch(Dispatchers.Main){
-                                Toast.makeText(context, "Файл загружен", Toast.LENGTH_SHORT).show()
-
-                            }
-                        }
-
-                    }
-
-                }) {
-                    Text ("Сжать изображение")
-                }
-
-            }
-
-        }
-        
-    }
 
     private fun compressImage(context: ComponentActivity, uri: Uri): Uri?{
 
@@ -749,14 +699,74 @@ class CreateMeeting(private val act: MainActivity) {
 
         val bytes = ByteArrayOutputStream()
 
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
+        val correctImageSize = getWriteSizeImage(bitmap) // получаем размеры, до которых надо уменьшить картинку
+        Log.d (
+            "MyLog",
+            "Изначальная ширина: ${bitmap.width}, после функции ширина: ${correctImageSize[0]}, Изначальная высота: ${bitmap.height}, после функции высота: ${correctImageSize[1]}"
+        )
+
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, correctImageSize[0], correctImageSize[1], false) // изменение размера картинки
+
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes)
+
+        //bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytes)
+
         val path: String = MediaStore.Images.Media.insertImage(
             context.contentResolver,
-            bitmap,
+            resizedBitmap,
             "image_${System.currentTimeMillis()}",
             null
         )
         return Uri.parse(path)
+    }
+
+    private fun getWriteSizeImage(bitmap: Bitmap): List<Int>{
+
+        var listOfSize = arrayListOf<Int>(bitmap.width, bitmap.height)
+
+        val width = bitmap.width // ширина
+        val height = bitmap.height // высота
+
+        val ratio = (width / height).toFloat() // ratio - коэффициент
+
+        val scale: Float = width.toFloat() / height.toFloat()
+
+        Log.d ("MyLog", "$scale")
+
+        // если коэффициент больше или равен 1
+        if (ratio >= 1) {
+            // если ширина меньше 1000
+            if (width <= 1000) {
+                listOfSize[0] = width
+                listOfSize[1] = height
+                //listOfSize.add(width, height)
+            } else {
+                val resizeHeight = 1000/scale
+
+                listOfSize[0] = 1000
+                listOfSize[1] = resizeHeight.toInt()
+
+                //listOfSize.add(1000, resizeHeight.toInt())
+            }
+        } else {
+
+            if (height <= 1000) {
+                //listOfSize.add(height, width)
+
+                listOfSize[0] = height
+                listOfSize[1] = width
+
+            } else {
+                val resizeWidth = 1000*scale
+
+                listOfSize[0] = resizeWidth.toInt()
+                listOfSize[1] = 1000
+                //listOfSize.add(1000, resizeWidth.toInt())
+            }
+
+        }
+            return listOfSize
+
     }
 
     private suspend fun uploadPhoto(uri: Uri, name: String, mimeType: String?, callback: (url: String)-> Unit){
