@@ -157,8 +157,13 @@ class SideComponents (private val act: MainActivity) {
 
     ) {
 
+
+
         // РАЗДЕЛ С АВАТАРКОй
         val user = act.mAuth.currentUser // получаем пользователя - авторизован он или нет
+
+
+
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину
         val context = LocalContext.current // инициализируем контекст для ТОСТОВ
 

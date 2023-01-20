@@ -83,7 +83,11 @@ class CreateMeeting(private val act: MainActivity) {
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
+        val categoriesList = remember {
+            mutableStateOf(listOf<CategoriesList>())
+        }
 
+        act.categoryDialog.readCategoryDataFromDb(categoriesList)
 
 
         Column(
@@ -109,12 +113,14 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            category = activity.getString(act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
+            category = act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName.toString()
+
+                    //activity.getString(act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
             // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
             if (openDialog.value) {
-                act.categoryDialog.CategoryChooseDialog {
+                act.categoryDialog.CategoryChooseDialog(categoriesList) {
                     openDialog.value = false
                 }
             }
@@ -211,7 +217,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                 if (result){
 
-                                                    act.categoryDialog.chosenCategory = CategoriesList.DefaultCat
+                                                    act.categoryDialog.chosenCategory = CategoriesList ("Выберите категорию", "Default")
                                                     navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
 
                                                     Toast.makeText(
