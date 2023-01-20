@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.elements.MeetingCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
@@ -73,7 +72,11 @@ class MeetingsScreens (val act: MainActivity) {
                     verticalArrangement = Arrangement.Top
                 ){
                     items(meetingsList.value){ item ->
-                        MeetingCard(meetingItem = item, navController = navController, meetingKey = meetingKey)
+                        act.meetingsCard.MeetingCard(
+                            navController = navController,
+                            meetingItem = item,
+                            meetingKey = meetingKey
+                        )
                     }
                 }
             } else if (meetingsList.value == listOf(default)){
@@ -136,7 +139,11 @@ class MeetingsScreens (val act: MainActivity) {
                         verticalArrangement = Arrangement.Top
                     ){
                         items(myMeetingsList.value){ item ->
-                            MeetingCard(meetingItem = item, navController = navController, meetingKey = meetingKey)
+                            act.meetingsCard.MeetingCard(
+                                navController = navController,
+                                meetingItem = item,
+                                meetingKey = meetingKey
+                            )
                         }
                     }
                 } else if (myMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
