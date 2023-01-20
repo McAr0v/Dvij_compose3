@@ -79,7 +79,20 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     )
 
+
+                }
+
+                if (meetingInfo.value.city != null) {
+
+                    Text(
+                        text = meetingInfo.value.city!!,
+                        style = Typography.bodyMedium,
+                        color = Grey40
+
+                    )
+
                     Spacer(modifier = Modifier.height(10.dp))
+
                 }
 
                 // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------

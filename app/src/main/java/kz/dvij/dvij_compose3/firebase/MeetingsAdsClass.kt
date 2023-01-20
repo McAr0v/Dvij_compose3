@@ -15,5 +15,6 @@ data class MeetingsAdsClass(
     val finishTime: String? = null,
     val image1: String? = null,
     val image2: String? = null,
-    val image3: String? = null
+    val image3: String? = null,
+    val city: String? = null,
 )

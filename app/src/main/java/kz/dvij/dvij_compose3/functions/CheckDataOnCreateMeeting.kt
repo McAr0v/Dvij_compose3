@@ -4,11 +4,11 @@ import android.net.Uri
 import android.widget.Toast
 import kz.dvij.dvij_compose3.R
 
-fun checkDataOnCreateMeeting (image1: Uri?, headline: String, phone: String, dataResult: String, timeStartResult: String, description: String, category: String ): Int{
+fun checkDataOnCreateMeeting (image1: Uri?, headline: String, phone: String, dataResult: String, timeStartResult: String, description: String, category: String, city: String ): Int{
 
     var result: Int = 0
 
-    if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выберите категорию") {
+    if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выберите категорию" || city == "Выберите город" ) {
 
 
 
@@ -35,6 +35,12 @@ fun checkDataOnCreateMeeting (image1: Uri?, headline: String, phone: String, dat
             if (category == "Выберите категорию") {
                 result = R.string.cm_no_category
             }
+
+            if (city == "Выберите город") {
+                result = R.string.cm_no_city
+            }
+
+
 
         }
     return result

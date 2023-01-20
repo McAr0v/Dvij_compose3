@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
+import androidx.compose.foundation.BorderStroke
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,9 +9,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,19 +24,86 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class ChooseCityNavigation (act: MainActivity) {
 
-    var chosenCity: CitiesList = CitiesList.Almaty // задаем выбранный город по умолчанию. Это Алматы
+    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию. Это Алматы
+
+    val cityDatabase = FirebaseDatabase // обращаемся к БД
+        .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
+        .getReference("CitiesList") // Создаем ПАПКУ В БД для мероприятий
+
+
+    fun readCityDataFromDb(citiesList: MutableState<List<CitiesList>>){
+
+        // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
+        // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
+        // Есть другие типы слушателей, которые работают в режиме реального времени, т.е постоянно обращаются к БД
+        // Это приводит к нагрузке на сервер и соответственно будем платить за большое количество обращений к БД
+
+        // У самого объекта слушателя ValueEventListener есть 2 стандартные функции - onDataChange и onCancelled
+        // их нужно обязательно добавить и заполнить нужным кодом
+
+        cityDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            // функция при изменении данных в БД
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val cityArray = ArrayList<CitiesList>()
+
+                // запускаем цикл и пытаемся добраться до наших данных
+                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
+                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
+                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
+                // где знаем точный путь (как в "meetingData"), там пишем .child()
+
+                // добираемся
+
+                for (item in snapshot.children){
+
+                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+
+                    val city = item.child("CityData").getValue(CitiesList::class.java)
+
+
+                    /*item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                    .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                    .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ*/
+
+                    if (city != null && city.cityName != "Выберите город") {cityArray.add(city)}
+
+
+                }
+
+                if (cityArray.isEmpty()){
+                    citiesList.value = listOf()
+                } else {
+                    citiesList.value = cityArray
+                }
+
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+
+        }
+        )
+    }
 
 
     // ------ ФУНКЦИЯ ОТОБРАЖЕНИЯ В БОКОВОМ МЕНЮ ГОРОДА -------------
 
     @Composable
-    fun CityHeaderSideNavigation () {
+    fun CityHeaderSideNavigation (citiesList: MutableState<List<CitiesList>>) {
 
         // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
 
@@ -84,7 +155,7 @@ class ChooseCityNavigation (act: MainActivity) {
                     // если значение диалога true то вызываем открытие диалога и передаем ему
                     // значение для закрытия - это значение false
 
-                    CityChooseDialog {openDialog.value = false}
+                    CityChooseDialog(citiesList) {openDialog.value = false}
 
                 }
 
@@ -102,7 +173,7 @@ class ChooseCityNavigation (act: MainActivity) {
 
                 // -------------- НАЗВАНИЕ ГОРОДА -------------------
                 androidx.compose.material.Text(
-                    text = stringResource(id = chosenCity.cityName), // из chosenCity достаем название города
+                    text = chosenCity.cityName!!, // из chosenCity достаем название города
                     style = Typography.labelLarge, // Стиль текста
                     modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
                     color = Grey40 // цвет текста
@@ -127,17 +198,8 @@ class ChooseCityNavigation (act: MainActivity) {
     // --------- САМ ВСПЛЫВАЮЩИЙ ДИАЛОГ С ВЫБОРОМ ГОРОДА ------------
 
     @Composable
-    fun CityChooseDialog (onDismiss: ()-> Unit){
+    fun CityChooseDialog (citiesList: MutableState<List<CitiesList>> ,onDismiss: ()-> Unit){
 
-        // Создаем список городов
-
-        val citiesList = mutableListOf<CitiesList>(
-            CitiesList.Ridder,
-            CitiesList.Astana,
-            CitiesList.UKa,
-            CitiesList.Altay,
-            CitiesList.Almaty
-        )
 
         // ------ САМ ДИАЛОГ ---------
 
@@ -214,7 +276,7 @@ class ChooseCityNavigation (act: MainActivity) {
 
                     // берем каждый item из списка citiesList и заполняем шаблон
 
-                    items (citiesList) { city->
+                    items (citiesList.value) { city->
 
                         // ------------ строка с названием города -------------
 
@@ -228,7 +290,7 @@ class ChooseCityNavigation (act: MainActivity) {
                             }
                         ) {
                             Text(
-                                text = stringResource(id = city.cityName), // само название города
+                                text = city.cityName!!, // само название города
                                 color = Grey40, // цвет текста
                                 style = Typography.bodyMedium // стиль текста
                             )
@@ -237,5 +299,60 @@ class ChooseCityNavigation (act: MainActivity) {
                 }
             }
         }
+    }
+
+    @Composable
+    fun citySelectButton(onClick: ()-> Unit): CitiesList {
+
+        Button(
+            onClick = {
+                onClick()
+            },
+
+            // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+            border = BorderStroke(
+                width = if (chosenCity.cityName == "Выберите город") {
+                    2.dp
+                } else {
+                    0.dp
+                }, color = if (chosenCity.cityName == "Выберите город") {
+                    Grey60
+                } else {
+                    Grey95
+                }
+            ),
+
+            // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = if (chosenCity.cityName == "Выберите город") {
+                    Grey95
+                } else {
+                    PrimaryColor
+                },
+                contentColor = if (chosenCity.cityName == "Выберите город") {
+                    Grey60
+                } else {
+                    Grey100
+                },
+            ),
+            shape = RoundedCornerShape(50) // скругленные углы кнопки
+        ) {
+
+            Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
+
+            Text(
+                text = chosenCity.cityName!!, // текст кнопки
+                style = Typography.labelMedium, // стиль текста
+                color = if (chosenCity.cityName == "Выберите город") {
+                    Grey60
+                } else {
+                    Grey100
+                }
+            )
+
+        }
+        return chosenCity
     }
 }

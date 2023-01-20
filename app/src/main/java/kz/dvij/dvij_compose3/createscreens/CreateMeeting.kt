@@ -4,13 +4,9 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -20,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -31,6 +26,7 @@ import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
@@ -55,7 +51,7 @@ class CreateMeeting(private val act: MainActivity) {
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RememberReturnType")
     @Composable
-    fun CreateMeetingScreen(navController: NavController) {
+    fun CreateMeetingScreen(navController: NavController, citiesList: MutableState<List<CitiesList>>) {
 
         val activity = act
         val databaseManager = DatabaseManager(activity) // инициализируем класс с функциями базы данных
@@ -79,7 +75,8 @@ class CreateMeeting(private val act: MainActivity) {
         var category: String // категория
 
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
-        val openDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
+        val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
+        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -113,17 +110,32 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            category = act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName.toString()
+            category = act.categoryDialog.categorySelectButton { openCategoryDialog.value = true }.categoryName.toString()
+
+            SpacerTextWithLine(headline = "Город*") // подпись перед формой
+
+            val city = act.chooseCityNavigation.citySelectButton {
+                openCityDialog.value = true
+            }.cityName.toString()
+
+
 
                     //activity.getString(act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
 
             // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
-            if (openDialog.value) {
+            if (openCategoryDialog.value) {
                 act.categoryDialog.CategoryChooseDialog(categoriesList) {
-                    openDialog.value = false
+                    openCategoryDialog.value = false
                 }
             }
+
+            if (openCityDialog.value) {
+                act.chooseCityNavigation.CityChooseDialog(citiesList) {
+                    openCityDialog.value = false
+                }
+            }
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
@@ -175,7 +187,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                         // если какое либо обязательное поле не заполнено
 
-                        val checkData = checkDataOnCreateMeeting(image1, headline, phone, dataResult, timeStartResult, description, category)
+                        val checkData = checkDataOnCreateMeeting(image1, headline, phone, dataResult, timeStartResult, description, category, city)
 
                         if (checkData != 0) {
 
@@ -208,7 +220,8 @@ class CreateMeeting(private val act: MainActivity) {
                                             data = dataResult,
                                             startTime = timeStartResult,
                                             finishTime = timeFinishResult,
-                                            image1 = it
+                                            image1 = it,
+                                            city = city
                                         )
 
                                         if (auth.uid != null) {

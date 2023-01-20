@@ -28,6 +28,8 @@ import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
+import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
@@ -69,6 +71,8 @@ class MainActivity : ComponentActivity() {
 
 
 
+
+
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +101,12 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+
+            val citiesList = remember {
+                mutableStateOf(listOf<CitiesList>())
+            }
+
+            chooseCityNavigation.readCityDataFromDb(citiesList)
 
 
 
@@ -201,7 +211,7 @@ class MainActivity : ComponentActivity() {
                             //user = mAuth.currentUser,
                             navController = navController, scaffoldState = scaffoldState) // Аватарка
 
-                        chooseCityNavigation.CityHeaderSideNavigation() // Меню с выбором города находится теперь в отдельном классе
+                        chooseCityNavigation.CityHeaderSideNavigation(citiesList) // Меню с выбором города находится теперь в отдельном классе
 
                         sideComponents.BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                             navController = navController, // Передаем NavController
@@ -253,7 +263,7 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
                     }
                 }

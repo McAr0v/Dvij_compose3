@@ -154,4 +154,5 @@
     <string name="cm_no_start_time">Во сколько начало?</string>
     <string name="cm_no_description">Где описание?</string>
     <string name="cm_no_category">Выбери категорию</string>
+    <string name="cm_no_city">Выбери город</string>
 </resources>

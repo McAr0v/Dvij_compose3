@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -40,6 +41,7 @@ class CategoryDialog (act: MainActivity) {
         .getReference("CategoryList") // Создаем ПАПКУ В БД для мероприятий
 
     var chosenCategory: CategoriesList = CategoriesList("Выберите категорию", "Default") // категория по умолчанию (не выбрана категория)
+    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию. Это Алматы
 
     fun readCategoryDataFromDb(categoriesList: MutableState<List<CategoriesList>>){
 
@@ -98,12 +100,12 @@ class CategoryDialog (act: MainActivity) {
         )
     }
 
+
+
     // -------- КНОПКА ВЫБОРА КАТЕГОРИИ -----------
 
     @Composable
     fun categorySelectButton(onClick: ()-> Unit): CategoriesList {
-
-
 
         Button(
             onClick = {
