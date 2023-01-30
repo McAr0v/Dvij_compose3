@@ -15,8 +15,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,7 +29,6 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class CategoryDialog (act: MainActivity) {
@@ -41,7 +38,7 @@ class CategoryDialog (act: MainActivity) {
         .getReference("CategoryList") // Создаем ПАПКУ В БД для мероприятий
 
     var chosenCategory: CategoriesList = CategoriesList("Выберите категорию", "Default") // категория по умолчанию (не выбрана категория)
-    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию. Это Алматы
+    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию.
 
     fun readCategoryDataFromDb(categoriesList: MutableState<List<CategoriesList>>){
 
@@ -58,39 +55,29 @@ class CategoryDialog (act: MainActivity) {
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val categoryArray = ArrayList<CategoriesList>()
+                val categoryArray = ArrayList<CategoriesList>() // Создаем пустой список категорий
 
-                // запускаем цикл и пытаемся добраться до наших данных
-                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
-                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
-                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
-                // где знаем точный путь (как в "meetingData"), там пишем .child()
-
-                // добираемся
+                // добираемся до списка категорий
 
                 for (item in snapshot.children){
 
-                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+                    // создаем переменную category, в которую в конце поместим наш ДАТАКЛАСС с категорией с БД
 
+                    // пишем путь до категорий и забираем данные согласно Дата Класса категорий
                     val category = item.child("CategoryData").getValue(CategoriesList::class.java)
 
-
-                        /*item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                        .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
-                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ*/
-
+                    // если категория не нал и название категории не "Выберите категорию", то добавить в наш список
                     if (category != null && category.categoryName != "Выберите категорию") {categoryArray.add(category)}
-
 
                 }
 
                 if (categoryArray.isEmpty()){
+                    // если список пустой, то тогда в список добавить созданную категорию по умолчанию
                     categoriesList.value = listOf(chosenCategory)
                 } else {
+                    // если список не пустой, то тогда добавить данные с БД
                     categoriesList.value = categoryArray
                 }
-
             }
 
             // в функцию onCancelled пока ничего не добавляем
@@ -109,7 +96,7 @@ class CategoryDialog (act: MainActivity) {
 
         Button(
             onClick = {
-                onClick()
+                onClick() // действие на нажатие (передаем извне, когда обращаемся к функции)
             },
 
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
@@ -163,16 +150,6 @@ class CategoryDialog (act: MainActivity) {
 
     @Composable
     fun CategoryChooseDialog(categoriesList: MutableState<List<CategoriesList>> ,onDismiss: () -> Unit) {
-
-        // Создаем список категорий
-
-
-
-        /*val categoriesList = mutableListOf<CategoriesList>(
-
-            CategoriesList.ConcertsCat,
-            CategoriesList.HobieCat
-        )*/
 
         // ------ САМ ДИАЛОГ ---------
 
@@ -242,13 +219,14 @@ class CategoryDialog (act: MainActivity) {
                             shape = RoundedCornerShape(10.dp) // скругление углов
                         )
                         .padding(20.dp), // отступ
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами
 
                 ) {
 
                     items(categoriesList.value) { category ->
 
                         Log.d("MyLog", "Data: ${category.categoryName}")
+
                         // ------------ строка с названием категории -------------
 
                         Column(modifier = Modifier
@@ -273,5 +251,4 @@ class CategoryDialog (act: MainActivity) {
             }
         }
     }
-
 }

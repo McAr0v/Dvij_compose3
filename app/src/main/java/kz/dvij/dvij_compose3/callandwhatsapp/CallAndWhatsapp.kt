@@ -10,22 +10,32 @@ import kz.dvij.dvij_compose3.MainActivity
 
 class CallAndWhatsapp(val act: MainActivity) {
 
+    // ---- ФУНКЦИЯ НАБОРА НОМЕРА ПРИ НАЖАТИИ НА КНОПКУ -------
+
     fun makeACall (context: Context, phoneNumber: String){
+
+        // Проверяем, выданы ли права на доступ к телефону
+
         if (ContextCompat.checkSelfPermission(act, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
+
+            // если права даны, то запускаем набор номера
+
             val intent = Intent(Intent.ACTION_CALL)
             intent.data = Uri.parse("tel: $phoneNumber")
             act.startActivity(intent)
+
         } else {
-
+            // если не выданы права, запрашиваем права
             ActivityCompat.requestPermissions(act, arrayOf(android.Manifest.permission.CALL_PHONE), 777)
-
         }
     }
 
+    // ------ ФУНКЦИЯ ПЕРЕХОДА НА ДИАЛОГ В ВАТСАП -------
+
     fun writeInWhatsapp (context: Context, phoneNumber: String){
-        val url = "https://api.whatsapp.com/send?phone=$phoneNumber"
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(url)
-        act.startActivity(intent)
+        val url = "https://api.whatsapp.com/send?phone=$phoneNumber" // генерируем ссылку на Whatsapp
+        val intent = Intent(Intent.ACTION_VIEW) // Инициализируем интент
+        intent.data = Uri.parse(url) // Парсим URL, который создали выше
+        act.startActivity(intent) // запускаем активити на переход в Ватсапп
     }
 }

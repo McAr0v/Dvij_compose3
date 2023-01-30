@@ -29,65 +29,46 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class ChooseCityNavigation (act: MainActivity) {
 
-    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию. Это Алматы
+    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию.
 
     val cityDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
-        .getReference("CitiesList") // Создаем ПАПКУ В БД для мероприятий
+        .getReference("CitiesList") // Создаем ПАПКУ В БД для списка городов
 
+
+    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ГОРОДА С БАЗЫ ДАННЫХ ----------
 
     fun readCityDataFromDb(citiesList: MutableState<List<CitiesList>>){
-
-        // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
-        // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
-        // Есть другие типы слушателей, которые работают в режиме реального времени, т.е постоянно обращаются к БД
-        // Это приводит к нагрузке на сервер и соответственно будем платить за большое количество обращений к БД
-
-        // У самого объекта слушателя ValueEventListener есть 2 стандартные функции - onDataChange и onCancelled
-        // их нужно обязательно добавить и заполнить нужным кодом
 
         cityDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
 
             // функция при изменении данных в БД
+
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val cityArray = ArrayList<CitiesList>()
+                val cityArray = ArrayList<CitiesList>() // Создаем пустой список городов
 
-                // запускаем цикл и пытаемся добраться до наших данных
-                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
-                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
-                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
-                // где знаем точный путь (как в "meetingData"), там пишем .child()
-
-                // добираемся
+                // добираемся до списка городов
 
                 for (item in snapshot.children){
 
-                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+                    // создаем переменную city, в которую в конце поместим наш ДАТАКЛАСС с городами с БД
 
                     val city = item.child("CityData").getValue(CitiesList::class.java)
 
-
-                    /*item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                    .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                    .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
-                    .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ*/
-
-                    if (city != null && city.cityName != "Выберите город") {cityArray.add(city)}
-
+                    if (city != null && city.cityName != "Выберите город") {cityArray.add(city)} // если city не null и название города не "Выберите город", то добавить в список
 
                 }
 
                 if (cityArray.isEmpty()){
-                    citiesList.value = listOf()
+                    citiesList.value = listOf() // если список-черновик городов пустой, то добавить пустой список
                 } else {
-                    citiesList.value = cityArray
+                    citiesList.value = cityArray // если есть города в списке-черновике, то их и возвращаем
                 }
 
             }
@@ -268,7 +249,7 @@ class ChooseCityNavigation (act: MainActivity) {
                             shape = RoundedCornerShape(10.dp) // скругление углов
                         )
                         .padding(20.dp), // отступ
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка
 
                 ){
 
@@ -282,7 +263,6 @@ class ChooseCityNavigation (act: MainActivity) {
 
                         Column(modifier = Modifier
                             .fillMaxWidth()
-                            //.padding(vertical = 10.dp)
                             .clickable {
                             // действие на нажатие на элемент
                             chosenCity = city // выбранный город теперь тот, который выбрали, а не по умолчанию

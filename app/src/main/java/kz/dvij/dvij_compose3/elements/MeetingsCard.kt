@@ -29,7 +29,6 @@ import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.navigation.BottomNavigationItem
 import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
 

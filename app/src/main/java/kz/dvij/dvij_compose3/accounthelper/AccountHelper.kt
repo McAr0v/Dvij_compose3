@@ -1,21 +1,13 @@
 package kz.dvij.dvij_compose3.accounthelper
 
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.navigation.PROFILE_ROOT
-import kz.dvij.dvij_compose3.navigation.THANK_YOU_PAGE_ROOT
-import okhttp3.internal.notify
 
 class AccountHelper (act: MainActivity) {
 
@@ -27,58 +19,56 @@ class AccountHelper (act: MainActivity) {
 
 
 
+    // ----- ФУНКЦИЯ ВХОДА В АККАУНТ ЧЕРЕЗ EMAIL PASSWORD
+
     fun signInWithEmailAndPassword(email: String, password: String, callback: (result: Boolean)-> Unit){
 
-        act.mAuth.signInWithEmailAndPassword(
-            email,
-            password
-        ).addOnCompleteListener { task ->
+        // запускаем функцию от Google
 
-            if (task.isSuccessful) { // если вход выполнен
+        act.mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
 
+            if (task.isSuccessful) {
+
+                // если вход выполнен успешно, возвращаем колбак ТРУ
                 callback (true)
 
 
-            } else { // если вход не выполнен
+            } else {
 
+                // если вход не выполнен запускам функцию отслеживания ошибки и вывода ТОСТА
                 task.exception?.let {
-                    errorInSignInAndUp(
-                        it
-                    )
-                } // отправляем в функцию отслеживания ошибки и вывода нужной информации
-
+                    errorInSignInAndUp(it)
+                }
             }
         }
-
     }
+
+    // ------ ФУНКЦИЯ РЕГИСТРАЦИИ ЧЕРЕЗ EMAIL и PASSWORD -------------
 
     fun registerWIthEmailAndPassword(email: String, password: String, callback: (result: FirebaseUser)-> Unit) {
 
         // запускаем функцию createUserWithEMailAndPassword и вешаем слушатель, который говорит что действие закончено
-        act.mAuth.createUserWithEmailAndPassword(
-            email,
-            password
-        )
-            .addOnCompleteListener { task ->
+
+        act.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
 
                 //  если регистрация прошла успешно
+
                 if (task.isSuccessful) {
+                        // возвращаем колбак с данными пользователя
                         callback (task.result.user!!)
 
                 } else {
 
                     // если регистрация не выполнилась
+                    // отправляем в функцию отслеживания ошибки и вывода нужной информации
 
                     task.exception?.let {
-                        errorInSignInAndUp(
-                            it
-                        )
-                    } // отправляем в функцию отслеживания ошибки и вывода нужной информации
-
+                        errorInSignInAndUp(it)
+                    }
                 }
             }
-
     }
+
 
     // ---- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ОШИБКИ И ВЫВОДА СООБЩЕНИЯ ПРИ РЕГИСТРАЦИИ И ВХОДЕ --------
 
@@ -180,10 +170,10 @@ class AccountHelper (act: MainActivity) {
 
         user.sendEmailVerification().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                callback (true)
+                callback (true) // если успешно, возвращаем колбак ТРУ
                 Toast.makeText(act, R.string.send_email_verification_success, Toast.LENGTH_SHORT).show()
             } else {
-                callback (false)
+                callback (false) // если не успешно, возвращаем колбак фалс
                 Toast.makeText(act, R.string.send_email_verification_error, Toast.LENGTH_SHORT).show()
             }
         }
@@ -253,9 +243,7 @@ class AccountHelper (act: MainActivity) {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
         }
     }
-
 }
 

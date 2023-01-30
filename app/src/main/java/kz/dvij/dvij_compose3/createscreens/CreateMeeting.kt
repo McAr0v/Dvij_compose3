@@ -2,7 +2,6 @@ package kz.dvij.dvij_compose3.createscreens
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.util.Log
 import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
@@ -80,10 +79,14 @@ class CreateMeeting(private val act: MainActivity) {
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
+
+        // Инициализируем переменную списка категорий
         val categoriesList = remember {
             mutableStateOf(listOf<CategoriesList>())
         }
 
+
+        // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readCategoryDataFromDb(categoriesList)
 
 
@@ -98,7 +101,7 @@ class CreateMeeting(private val act: MainActivity) {
             horizontalAlignment = Alignment.Start // выравнивание по горизонтали
         ) {
 
-            // -------- ИЗОБРАЖЕНИЕ МЕРОПРИЯТИЯ -----------
+            // ---- СОДЕРЖИМОЕ СТРАНИЦЫ СОЗДАНИЯ ---------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
@@ -110,25 +113,21 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            category = act.categoryDialog.categorySelectButton { openCategoryDialog.value = true }.categoryName.toString()
+            category = act.categoryDialog.categorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
 
             SpacerTextWithLine(headline = "Город*") // подпись перед формой
 
-            val city = act.chooseCityNavigation.citySelectButton {
-                openCityDialog.value = true
-            }.cityName.toString()
+            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
 
-
-
-                    //activity.getString(act.categoryDialog.categorySelectButton { openDialog.value = true }.categoryName)  // КНОПКА, АКТИВИРУЮЩАЯ ДИАЛОГ выбора категории
-
-            // ДИАЛОГ ВЫБОРА КАТЕГОРИИ
+            // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
             if (openCategoryDialog.value) {
                 act.categoryDialog.CategoryChooseDialog(categoriesList) {
                     openCategoryDialog.value = false
                 }
             }
+
+            // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
             if (openCityDialog.value) {
                 act.chooseCityNavigation.CityChooseDialog(citiesList) {
@@ -183,31 +182,49 @@ class CreateMeeting(private val act: MainActivity) {
                 Button(
 
                     onClick = {
+
                         // действие на нажатие
 
-                        // если какое либо обязательное поле не заполнено
+                        // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
 
                         val checkData = checkDataOnCreateMeeting(image1, headline, phone, dataResult, timeStartResult, description, category, city)
 
                         if (checkData != 0) {
 
+                            // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
+
                             Toast.makeText(activity, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
 
                         } else if (ContextCompat.checkSelfPermission(act, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+                            // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
+
                             ActivityCompat.requestPermissions(act, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
+
                         } else {
 
-                            openLoading.value = true
+                            // если все права есть и все обязательные поля заполнены
 
-                            // сделать функцию получения картинок отдельно в датабаз менеджер, и уже после получения всех картинок, вызывать публиш адс
+                            openLoading.value = true // открываем диалог загрузки
+
+                            // запускаем корутину
 
                             GlobalScope.launch(Dispatchers.IO){
 
+                                // запускаем сжатие изображения
                                 val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
+
+                                // после сжатия запускаем функцию загрузки сжатого фота в Storage
 
                                 activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
 
+                                    // В качестве колбака придет ссылка на изображение в Storage
+
+                                    // Запускаем корутину и публикуем мероприятие
+
                                     GlobalScope.launch(Dispatchers.Main) {
+
+                                        // заполняем мероприятие
 
                                         val filledMeeting = MeetingsAdsClass(
                                             key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
@@ -224,15 +241,23 @@ class CreateMeeting(private val act: MainActivity) {
                                             city = city
                                         )
 
+                                        // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
                                         if (auth.uid != null) {
+
+                                            // Если зарегистрирован, то запускаем функцию публикации мероприятия
 
                                             databaseManager.publishMeeting(filledMeeting){ result ->
 
+                                                // в качестве колбака придет булин. Если опубликовано мероприятие то:
+
                                                 if (result){
 
+                                                    // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                     act.categoryDialog.chosenCategory = CategoriesList ("Выберите категорию", "Default")
-                                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+                                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 
+                                                    // показываем ТОСТ
                                                     Toast.makeText(
                                                         activity,
                                                         "мероприятие успешно опубликовано",
@@ -241,6 +266,9 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                 } else {
 
+                                                    // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                                    // Показываем тост
                                                     Toast.makeText(
                                                         activity,
                                                         "произошла ошибка",

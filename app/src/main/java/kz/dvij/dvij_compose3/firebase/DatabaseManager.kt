@@ -1,17 +1,14 @@
 package kz.dvij.dvij_compose3.firebase
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.snapshots
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 
 class DatabaseManager (private val activity: MainActivity) {
 
@@ -28,6 +25,8 @@ class DatabaseManager (private val activity: MainActivity) {
     val default = MeetingsAdsClass (
         description = "def"
     )
+
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
 
     fun readOneMeetingFromDataBase(meetingInfo: MutableState<MeetingsAdsClass>, key: String){
 
@@ -62,7 +61,7 @@ class DatabaseManager (private val activity: MainActivity) {
     }
 
 
-    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
 
     fun readMeetingDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
@@ -79,7 +78,7 @@ class DatabaseManager (private val activity: MainActivity) {
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>()
+                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
 
                 // запускаем цикл и пытаемся добраться до наших данных
                 // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
@@ -99,15 +98,15 @@ class DatabaseManager (private val activity: MainActivity) {
                         .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                    if (meeting != null) {meetingArray.add(meeting)}
+                    if (meeting != null) {meetingArray.add(meeting)} // если мероприятие не пустое, добавляем в список
 
                     //Log.d("MyLog", "Data: $item")
                 }
 
                 if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default)
+                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
                 } else {
-                    meetingsList.value = meetingArray
+                    meetingsList.value = meetingArray // если добавились мероприятия в список, то этот новый список и передаем
                 }
 
             }
@@ -118,6 +117,10 @@ class DatabaseManager (private val activity: MainActivity) {
         }
         )
     }
+
+
+
+    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ МЕРОПРИЯТИЙ --------
 
     fun readMeetingMyDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
@@ -154,16 +157,16 @@ class DatabaseManager (private val activity: MainActivity) {
                             .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                        if (meeting != null) {meetingArray.add(meeting)}
+                        if (meeting != null) {meetingArray.add(meeting)} //  если мероприятие не нал, то добавляем в список-черновик
                     }
 
                     //Log.d("MyLog", "Data: $item")
                 }
 
                 if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default)
+                    meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
-                    meetingsList.value = meetingArray
+                    meetingsList.value = meetingArray // если список не пустой, то возвращаем мои мероприятия с БД
                 }
 
             }
@@ -175,26 +178,33 @@ class DatabaseManager (private val activity: MainActivity) {
         )
     }
 
+
+
+    // ------ ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЯ --------
+
     suspend fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
+
         meetingDatabase // записываем в базу данных
-            //.child(meeting.category ?: "Без категории") // создаем путь категорий
             .child(
                 filledMeeting.key ?: "empty"
             ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-            .child("info")
+            .child("info") // помещаем данные в папку info
             .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
-            .child("meetingData")
+            .child("meetingData") // помещаем в папку
             .setValue(filledMeeting).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-
+                    // если мероприятие опубликовано, возвращаем колбак тру
                     callback (true)
 
                 } else {
+                    // если не опубликовано, то возвращаем фалс
                     callback (false)
                 }
             }
     }
+
+    // ФУНКЦИИ ПОД ВОПРОСОМ !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     fun addFavouriteMeeting(key: String, callback: (result: Boolean)-> Unit){
 
@@ -213,6 +223,8 @@ class DatabaseManager (private val activity: MainActivity) {
         }
     }
 
+    // ФУНКЦИИ ПОД ВОПРОСОМ !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     fun removeFavouriteMeeting(key: String, callback: (result: Boolean)-> Unit){
 
         activity.mAuth.uid?.let {
@@ -229,6 +241,8 @@ class DatabaseManager (private val activity: MainActivity) {
 
         }
     }
+
+    // ФУНКЦИИ ПОД ВОПРОСОМ !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     fun favIconMeeting(key: String, callback: (result: Boolean)-> Unit){
 
