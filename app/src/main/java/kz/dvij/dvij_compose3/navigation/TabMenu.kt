@@ -95,7 +95,11 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                                 it
                             )
                         } // мероприятия Лента
-                        1 -> activity.meetingsScreens.MeetingsFavScreen(navController) // мероприятия Избранные
+                        1 -> meetingKey?.let {
+                            activity.meetingsScreens.MeetingsFavScreen(navController,
+                                it
+                            )
+                        } // мероприятия Избранные
                         else -> meetingKey?.let {
                             activity.meetingsScreens.MeetingsMyScreen(navController,
                                 it

@@ -3,11 +3,14 @@ package kz.dvij.dvij_compose3.viewscreens
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +38,47 @@ class MeetingViewScreen(val act: MainActivity) {
         val meetingInfo = remember {
             mutableStateOf(MeetingsAdsClass())
         }
+        
+        val iconFavColor = remember {
+            mutableStateOf(Grey10)
+        }
 
-        act.databaseManager.readOneMeetingFromDataBase(meetingInfo, key)
+        // Переменная текста рядом с иконкой Избранные
+
+        val favText = remember {
+            mutableStateOf("")
+        }
+
+        // Переменная счетчика людей, добавивших в избранное мероприятие
+        val favCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Переменная счетчика просмотра мероприятия
+        val viewCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
+
+        act.databaseManager.readOneMeetingFromDataBase(meetingInfo, key){
+
+            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
+            viewCounter.value = it[1] // данные из списка - количество просмотров мероприятия
+
+        }
+
+        if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+            act.databaseManager.favIconMeeting(key) {
+                if (it) {
+                    iconFavColor.value = PrimaryColor
+                    favText.value = "В избранном"
+                } else {
+                    iconFavColor.value = Grey10
+                    favText.value = "Добавить в избранное"
+                }
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -93,6 +135,91 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                }
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = viewCounter.value.toString(),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = favCounter.value.toString(),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = favText.value,
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+                    
+                    androidx.compose.material3.Icon(
+                        imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
+                        contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+
+                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                    act.databaseManager.favIconMeeting(key) {
+                                        if (it) {
+                                            iconFavColor.value = Grey10
+                                            act.databaseManager.removeFavouriteMeeting(key) {
+                                                if (it) {
+                                                    Toast
+                                                        .makeText(
+                                                            act,
+                                                            "Удалено из избранных",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+
+                                                }
+                                            }
+                                        } else {
+
+                                            act.databaseManager.addFavouriteMeeting(key) {
+
+                                                if (it) {
+                                                    iconFavColor.value = PrimaryColor
+                                                    Toast
+                                                        .makeText(
+                                                            act,
+                                                            "Добавлено в избранные",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Toast
+                                        .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+
+
+                            }, // размер иконки
+                        tint = iconFavColor.value//favIconColor.value // Цвет иконки
+                    )
+                    
                 }
 
                 // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------

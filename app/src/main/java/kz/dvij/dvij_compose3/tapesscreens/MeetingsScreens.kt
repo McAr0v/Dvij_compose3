@@ -185,16 +185,77 @@ class MeetingsScreens (val act: MainActivity) {
     }
 
     @Composable
-    fun MeetingsFavScreen (navController: NavController){
+    fun MeetingsFavScreen (navController: NavController, meetingKey: MutableState<String>){
+
+        val favMeetingsList = remember {
+            mutableStateOf(listOf<MeetingsAdsClass>())
+        }
+
+        databaseManager.readMeetingFavDataFromDb(favMeetingsList)
+
         Column (
             modifier = Modifier
-                .background(Primary10)
-                .fillMaxSize(),
+                .background(Grey95)
+                .fillMaxWidth()
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "MeetingsFavScreen")
+            if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(default)){
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey95),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+                    items(favMeetingsList.value){ item ->
+                        act.meetingsCard.MeetingCard(
+                            navController = navController,
+                            meetingItem = item,
+                            meetingKey = meetingKey
+                        )
+                    }
+                }
+            } else if (favMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+                Text(
+                    text = "Пусто",
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                )
+            } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
+                Text(
+                    text = "Сначала зарегайся",
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                )
+
+            } else {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        color = PrimaryColor,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(40.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.ss_loading),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                }
+            }
         }
+
     }
 }

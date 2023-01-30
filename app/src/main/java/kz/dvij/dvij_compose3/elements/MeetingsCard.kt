@@ -42,13 +42,13 @@ class MeetingsCard(val act: MainActivity) {
 
         val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100))
 
-        val favIconColor = remember{ mutableStateOf(Grey10) }
+        val iconFavColor = remember{ mutableStateOf(Grey10) }
 
         act.databaseManager.favIconMeeting(meetingItem.key!!){
             if (it){
-                favIconColor.value = PrimaryColor
+                iconFavColor.value = PrimaryColor
             } else {
-                favIconColor.value = Grey10
+                iconFavColor.value = Grey10
             }
         }
 
@@ -58,9 +58,13 @@ class MeetingsCard(val act: MainActivity) {
                 .padding(10.dp) // отступ от краев экрана
                 .clickable {
                     meetingKey.value = meetingItem.key.toString()
+                    act.databaseManager.viewCounterMeeting(meetingItem.key){
+                        if (it) {
+                            navController.navigate(MEETING_VIEW)
+                        }
+                    }
 
 
-                    navController.navigate(MEETING_VIEW)
                 },
             shape = RoundedCornerShape(15.dp), // shape - форма. Скругляем углы
             colors = CardDefaults.cardColors(Grey95), // цвет карточки под картинкой, по идее можно убрать
@@ -134,44 +138,15 @@ class MeetingsCard(val act: MainActivity) {
 
                         // ИКОНКА ИЗБРАННОЕ
 
-                        Icon(
+                        androidx.compose.material3.Icon(
                             imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
                             contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
                             modifier = Modifier
-                                .size(24.dp)
-                                .clickable {
-
-                                    if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
-                                        act.databaseManager.favIconMeeting(meetingItem.key!!){
-                                            if (it){
-                                                favIconColor.value = Grey10
-                                                act.databaseManager.removeFavouriteMeeting(meetingItem.key!!){
-                                                    if (it){
-                                                        Toast.makeText(act, "Удалено из избранных", Toast.LENGTH_SHORT).show()
-
-                                                    }
-                                                }
-                                            } else {
-                                                favIconColor.value = PrimaryColor
-                                                act.databaseManager.addFavouriteMeeting(meetingItem.key!!){
-
-                                                    if (it){
-                                                        Toast.makeText(act, "Добавлено в избранные", Toast.LENGTH_SHORT).show()
-
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        Toast.makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT).show()
-                                    }
-
-
-
-                            }, // размер иконки
-                            tint = favIconColor.value // Цвет иконки
+                                .size(24.dp), // размер иконки
+                            tint = iconFavColor.value//favIconColor.value // Цвет иконки
                         )
+
+
                     }
 
                     // Заголовок, дата, время
