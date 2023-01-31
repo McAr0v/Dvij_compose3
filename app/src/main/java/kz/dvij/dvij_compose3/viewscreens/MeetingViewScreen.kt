@@ -3,7 +3,6 @@ package kz.dvij.dvij_compose3.viewscreens
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +23,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.elements.IconText
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -35,18 +33,19 @@ class MeetingViewScreen(val act: MainActivity) {
     @Composable
     fun MeetingViewScreen (key: String, navController: NavController){
 
+        // Переменная, которая содержит в себе информацию о мероприятии
         val meetingInfo = remember {
             mutableStateOf(MeetingsAdsClass())
         }
-        
-        val iconFavColor = remember {
+
+        // Переменная, отвечающая за цвет кнопки избранных
+        val buttonFavColor = remember {
             mutableStateOf(Grey90)
         }
 
-        // Переменная текста рядом с иконкой Избранные
-
-        val favText = remember {
-            mutableStateOf("")
+        // Переменная, отвечающая за цвет иконки избранных
+        val iconTextFavColor = remember {
+            mutableStateOf(Grey10)
         }
 
         // Переменная счетчика людей, добавивших в избранное мероприятие
@@ -68,17 +67,22 @@ class MeetingViewScreen(val act: MainActivity) {
 
         }
 
+        // Если пользователь авторизован, проверяем, добавлено ли уже мероприятие в избранное, или нет
+
         if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
             act.databaseManager.favIconMeeting(key) {
                 if (it) {
-                    iconFavColor.value = PrimaryColor
-                    favText.value = "В избранном"
+                    buttonFavColor.value = Grey90_2
+                    iconTextFavColor.value = PrimaryColor
                 } else {
-                    iconFavColor.value = Grey90
-                    favText.value = "Добавить в избранное"
+                    buttonFavColor.value = Grey90
+                    iconTextFavColor.value = Grey40
                 }
             }
         }
+
+
+        // ---------- КОНТЕНТ СТРАНИЦЫ --------------
 
         Column(
             modifier = Modifier
@@ -91,6 +95,8 @@ class MeetingViewScreen(val act: MainActivity) {
 
         ) {
 
+            // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
+
             AsyncImage(
                 model = meetingInfo.value.image1,
                 contentDescription = "",
@@ -99,6 +105,8 @@ class MeetingViewScreen(val act: MainActivity) {
                     .height(250.dp),
                 contentScale = ContentScale.Crop
             )
+
+            // --------- КОНТЕНТ ПОД КАРТИНКОЙ ----------
 
             Column(
                 modifier = Modifier
@@ -118,11 +126,10 @@ class MeetingViewScreen(val act: MainActivity) {
                         text = meetingInfo.value.headline!!,
                         style = Typography.titleLarge,
                         color = Grey10
-
                     )
-
-
                 }
+
+                // ------- ГОРОД ------------
 
                 if (meetingInfo.value.city != null) {
 
@@ -130,24 +137,59 @@ class MeetingViewScreen(val act: MainActivity) {
                         text = meetingInfo.value.city!!,
                         style = Typography.bodyMedium,
                         color = Grey40
-
                     )
-
                 }
+
+                // --------- КАТЕГОРИЯ, СЧЕТЧИКИ, ИЗБРАННОЕ -------------
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp),
+                        .padding(vertical = 20.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
+
+                    // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------
+
+
+                    if (meetingInfo.value.category != null) {
+
+                        Button(
+                            onClick = {
+                                Toast
+                                    .makeText(act, "Сделать функцию", Toast.LENGTH_SHORT)
+                                    .show()
+                            },
+
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = PrimaryColor,
+                                contentColor = Grey95
+                            ),
+
+                            shape = RoundedCornerShape(30.dp)
+                        ) {
+                            Text(
+                                text = meetingInfo.value.category!!,
+                                style = Typography.labelMedium
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+
+                    // --------- СЧЕТЧИК КОЛИЧЕСТВА ПРОСМОТРОВ ------------
+
+
                     Button(
-                        onClick = {},
+                        onClick = {Toast.makeText(act,"Количество просмотров мероприятия",Toast.LENGTH_SHORT).show()},
                         colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
                         shape = RoundedCornerShape(50)
                     ) {
+
+                        // ----- Иконка просмотра ------
 
                         Icon(
                             painter = painterResource(id = R.drawable.ic_visibility),
@@ -158,207 +200,158 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         Spacer(modifier = Modifier.width(5.dp))
 
+                        // ----------- Счетчик просмотров мероприятия ----------
+
                         Text(
                             text = viewCounter.value.toString(),
                             style = Typography.labelMedium,
                             color = Grey40
                         )
-
                     }
 
+                    Spacer(modifier = Modifier.width(10.dp))
 
 
-                    Spacer(modifier = Modifier.width(20.dp))
+                    // -------- ИЗБРАННЫЕ ---------
+
 
                     Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(backgroundColor = iconFavColor.value),
+                        onClick = {
+
+                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это мероприятие -----
+                            // Если не авторизован, условие else
+
+                            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                act.databaseManager.favIconMeeting(key) {
+
+                                    // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                    if (it) {
+
+                                        // Убираем из избранных
+                                        act.databaseManager.removeFavouriteMeeting(key) {
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (it) {
+
+                                                iconTextFavColor.value = Grey40 // При нажатии окрашиваем текст и иконку в белый
+                                                buttonFavColor.value = Grey80 // При нажатии окрашиваем кнопку в темно-серый
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(act,"Удалено из избранных",Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+
+                                    } else {
+
+                                        // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                        act.databaseManager.addFavouriteMeeting(key) {
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (it) {
+
+                                                iconTextFavColor.value = PrimaryColor // При нажатии окрашиваем текст и иконку в черный
+                                                buttonFavColor.value = Grey90_2 // Окрашиваем кнопку в главный цвет
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(act,"Добавлено в избранные",Toast.LENGTH_SHORT).show()
+
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } else {
+
+                                // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                Toast
+                                    .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = buttonFavColor.value),
                         shape = RoundedCornerShape(50)
                     ) {
+
+                        // --- Иконка СЕРДЕЧКО -----
 
                         androidx.compose.material3.Icon(
                             imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
                             contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
                             modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-
-                                    if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                        act.databaseManager.favIconMeeting(key) {
-                                            if (it) {
-                                                iconFavColor.value = Grey90
-                                                act.databaseManager.removeFavouriteMeeting(key) {
-                                                    if (it) {
-                                                        Toast
-                                                            .makeText(
-                                                                act,
-                                                                "Удалено из избранных",
-                                                                Toast.LENGTH_SHORT
-                                                            )
-                                                            .show()
-
-                                                    }
-                                                }
-                                            } else {
-
-                                                act.databaseManager.addFavouriteMeeting(key) {
-
-                                                    if (it) {
-                                                        iconFavColor.value = PrimaryColor
-                                                        Toast
-                                                            .makeText(
-                                                                act,
-                                                                "Добавлено в избранные",
-                                                                Toast.LENGTH_SHORT
-                                                            )
-                                                            .show()
-
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        Toast
-                                            .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
-                                            .show()
-                                    }
-
-
-                                }, // размер иконки
-                            tint = Grey10//favIconColor.value // Цвет иконки
+                                .size(20.dp), // размер иконки
+                            tint = iconTextFavColor.value // Цвет иконки
                         )
 
                         Spacer(modifier = Modifier.width(5.dp))
+
+                        // ------ Счетчик добавлено в избранное
 
                         Text(
                             text = favCounter.value.toString(),
                             style = Typography.labelMedium,
                             color = Grey40
                         )
-
                     }
-
                 }
 
+
+                // --------- ДАТА И ВРЕМЯ -----------
+
+
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                    // --- ДАТА ----
 
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.5f)
                     ) {
-
                         if (meetingInfo.value.data != null){
                             headlineAndDesc(headline = meetingInfo.value.data!!, desc = "Дата")
                         }
-
                     }
+
+                    // ---- ВРЕМЯ -----
 
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .weight(0.5f)) {
 
                         if (meetingInfo.value.startTime != null && meetingInfo.value.finishTime != null){
-                            headlineAndDesc(headline = "${meetingInfo.value.startTime!!} - ${meetingInfo.value.finishTime!!}", desc = "Время проведения")
+                            headlineAndDesc(
+                                headline = if (meetingInfo.value.finishTime == ""){
+                                    meetingInfo.value.startTime!!
+                                } else {
+                                    "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
+                                },//"${meetingInfo.value.startTime!!} - ${meetingInfo.value.finishTime!!}",
+                                desc = if (meetingInfo.value.finishTime == ""){
+                                    "Начинаем в"
+                                } else {
+                                    "Время проведения"
+                                } //
+                            )
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // ----- ЦЕНА ---------
+
                 if (meetingInfo.value.price != null){
-                    headlineAndDesc(headline = meetingInfo.value.price!!, desc = "Цена билета")
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-                
-
-
-                // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------
-
-                if (meetingInfo.value.category != null) {
-
-                    Button(
-                        onClick = {
-                            Toast
-                                .makeText(act, "Сделать функцию", Toast.LENGTH_SHORT)
-                                .show()
+                    headlineAndDesc(
+                        headline = if (meetingInfo.value.price == ""){
+                            stringResource(id = R.string.free_price)
+                        } else {
+                            "${meetingInfo.value.price} тенге"
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = PrimaryColor,
-                            contentColor = Grey95
-                        ),
-                        shape = RoundedCornerShape(30.dp)
-                    ) {
-
-                        Text(
-                            text = meetingInfo.value.category!!,
-                            style = Typography.bodyMedium
-                        )
-
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-
-
-                // ------- BOX С ДАННЫМИ МЕРОПРИЯТИЯ -----------
-
-
-                Column(
-
-                    modifier = Modifier
-                        .background(Grey100, shape = RoundedCornerShape(20.dp))
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
-
-                ) {
-
-                    // ------ ДАТА --------
-
-                    if (meetingInfo.value.data != null) {
-                        IconText(icon = R.drawable.ic_calendar, inputText = meetingInfo.value.data!!)
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Divider(modifier = Modifier.fillMaxWidth(), color = Grey60, thickness = 1.dp)
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-
-                    // ----- ВРЕМЯ -----------
-
-                    if (meetingInfo.value.startTime != null && meetingInfo.value.finishTime != null) {
-
-                        IconText(
-                            icon = R.drawable.ic_time,
-                            inputText = if (meetingInfo.value.finishTime == ""){
-                                "Начало в ${meetingInfo.value.startTime!!}"
-                            } else {
-                                "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Divider(modifier = Modifier.fillMaxWidth(), color = Grey60, thickness = 1.dp)
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-
-                    // --------- СТОИМОСТЬ БИЛЕТА ----------
-
-                    if (meetingInfo.value.price != null) {
-
-                        IconText(
-
-                            icon = R.drawable.ic_tenge,
-                            inputText = if (meetingInfo.value.price == ""){
-                                stringResource(id = R.string.free_price)
-                            } else {
-                                "${meetingInfo.value.price} тенге"
-                            },
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-
-
+                        desc = "Цена билета"
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -368,6 +361,35 @@ class MeetingViewScreen(val act: MainActivity) {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row (modifier = Modifier.fillMaxSize()){
+
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
+
+                        Button(
+                            onClick = {
+                                act.callAndWhatsapp.writeInWhatsapp(act, meetingInfo.value.whatsapp!!)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(0.2f),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Grey10,
+                                contentColor = Grey95
+                            ),
+                            shape = RoundedCornerShape(30.dp)
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey95)
+
+                            Spacer(modifier = Modifier
+                                //.width(15.dp)
+                                .height(30.dp))
+
+                            //Text("Написать", style = Typography.bodyMedium)
+
+                        }
+
+                        Spacer(modifier = Modifier.width(20.dp))
+                    }
 
 
 
@@ -383,53 +405,24 @@ class MeetingViewScreen(val act: MainActivity) {
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(0.5f),
+                                .weight(0.8f),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = SuccessColor,
+                                backgroundColor = PrimaryColor,
                                 contentColor = Grey95
                             ),
                             shape = RoundedCornerShape(30.dp)
                         ) {
 
-                            Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey95)
+                            //Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey95)
 
                             Spacer(modifier = Modifier
-                                .width(15.dp)
+                                //.width(15.dp)
                                 .height(30.dp))
 
                             Text("Позвонить", style = Typography.labelMedium)
 
                         }
 
-                    }
-
-                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
-
-                        Spacer(modifier = Modifier.width(20.dp))
-
-                        Button(
-                            onClick = {
-                                act.callAndWhatsapp.writeInWhatsapp(act, meetingInfo.value.whatsapp!!)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.5f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = SuccessColor,
-                                contentColor = Grey95
-                            ),
-                            shape = RoundedCornerShape(30.dp)
-                        ) {
-
-                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey95)
-
-                            Spacer(modifier = Modifier
-                                .width(15.dp)
-                                .height(30.dp))
-
-                            Text("Написать", style = Typography.bodyMedium)
-
-                        }
                     }
                 }
 
@@ -473,8 +466,6 @@ class MeetingViewScreen(val act: MainActivity) {
                 color = Grey10,
                 style = Typography.labelSmall
             )
-
         }
-
     }
 }
