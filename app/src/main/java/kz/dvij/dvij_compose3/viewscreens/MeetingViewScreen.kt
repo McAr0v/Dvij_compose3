@@ -40,7 +40,7 @@ class MeetingViewScreen(val act: MainActivity) {
         }
         
         val iconFavColor = remember {
-            mutableStateOf(Grey10)
+            mutableStateOf(Grey90)
         }
 
         // Переменная текста рядом с иконкой Избранные
@@ -74,7 +74,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     iconFavColor.value = PrimaryColor
                     favText.value = "В избранном"
                 } else {
-                    iconFavColor.value = Grey10
+                    iconFavColor.value = Grey90
                     favText.value = "Добавить в избранное"
                 }
             }
@@ -133,94 +133,146 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
                 }
-                
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(
-                        text = viewCounter.value.toString(),
-                        style = Typography.bodyMedium,
-                        color = Grey10
-                    )
+                    Button(
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                        shape = RoundedCornerShape(50)
+                    ) {
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_visibility),
+                            contentDescription = "Иконка количества просмотров",
+                            modifier = Modifier.size(20.dp),
+                            tint = Grey40
+                        )
 
-                    Text(
-                        text = favCounter.value.toString(),
-                        style = Typography.bodyMedium,
-                        color = Grey10
-                    )
+                        Spacer(modifier = Modifier.width(5.dp))
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = viewCounter.value.toString(),
+                            style = Typography.labelMedium,
+                            color = Grey40
+                        )
 
-                    Text(
-                        text = favText.value,
-                        style = Typography.bodyMedium,
-                        color = Grey10
-                    )
+                    }
 
-                    Spacer(modifier = Modifier.width(10.dp))
-                    
-                    androidx.compose.material3.Icon(
-                        imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
-                        contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
 
-                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                    act.databaseManager.favIconMeeting(key) {
-                                        if (it) {
-                                            iconFavColor.value = Grey10
-                                            act.databaseManager.removeFavouriteMeeting(key) {
-                                                if (it) {
-                                                    Toast
-                                                        .makeText(
-                                                            act,
-                                                            "Удалено из избранных",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Button(
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(backgroundColor = iconFavColor.value),
+                        shape = RoundedCornerShape(50)
+                    ) {
+
+                        androidx.compose.material3.Icon(
+                            imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
+                            contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+
+                                    if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                        act.databaseManager.favIconMeeting(key) {
+                                            if (it) {
+                                                iconFavColor.value = Grey90
+                                                act.databaseManager.removeFavouriteMeeting(key) {
+                                                    if (it) {
+                                                        Toast
+                                                            .makeText(
+                                                                act,
+                                                                "Удалено из избранных",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+
+                                                    }
+                                                }
+                                            } else {
+
+                                                act.databaseManager.addFavouriteMeeting(key) {
+
+                                                    if (it) {
+                                                        iconFavColor.value = PrimaryColor
+                                                        Toast
+                                                            .makeText(
+                                                                act,
+                                                                "Добавлено в избранные",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+
+                                                    }
 
                                                 }
-                                            }
-                                        } else {
-
-                                            act.databaseManager.addFavouriteMeeting(key) {
-
-                                                if (it) {
-                                                    iconFavColor.value = PrimaryColor
-                                                    Toast
-                                                        .makeText(
-                                                            act,
-                                                            "Добавлено в избранные",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
-
-                                                }
-
                                             }
                                         }
+                                    } else {
+                                        Toast
+                                            .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
+                                            .show()
                                     }
-                                } else {
-                                    Toast
-                                        .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
-                                        .show()
-                                }
 
 
-                            }, // размер иконки
-                        tint = iconFavColor.value//favIconColor.value // Цвет иконки
-                    )
-                    
+                                }, // размер иконки
+                            tint = Grey10//favIconColor.value // Цвет иконки
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = favCounter.value.toString(),
+                            style = Typography.labelMedium,
+                            color = Grey40
+                        )
+
+                    }
+
                 }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.5f)
+                    ) {
+
+                        if (meetingInfo.value.data != null){
+                            headlineAndDesc(headline = meetingInfo.value.data!!, desc = "Дата")
+                        }
+
+                    }
+
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.5f)) {
+
+                        if (meetingInfo.value.startTime != null && meetingInfo.value.finishTime != null){
+                            headlineAndDesc(headline = "${meetingInfo.value.startTime!!} - ${meetingInfo.value.finishTime!!}", desc = "Время проведения")
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (meetingInfo.value.price != null){
+                    headlineAndDesc(headline = meetingInfo.value.price!!, desc = "Цена билета")
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                
+
 
                 // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------
 
@@ -248,6 +300,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(20.dp))
                 }
+
 
                 // ------- BOX С ДАННЫМИ МЕРОПРИЯТИЯ -----------
 
@@ -344,7 +397,7 @@ class MeetingViewScreen(val act: MainActivity) {
                                 .width(15.dp)
                                 .height(30.dp))
 
-                            Text("Позвонить", style = Typography.bodyMedium)
+                            Text("Позвонить", style = Typography.labelMedium)
 
                         }
 
@@ -402,5 +455,26 @@ class MeetingViewScreen(val act: MainActivity) {
                 }
             }
         }
+    }
+
+    @Composable
+    fun headlineAndDesc (headline: String, desc: String){
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+
+            Text(
+                text = headline,
+                color = Grey10,
+                style = Typography.titleSmall
+            )
+
+            Text(
+                text = desc,
+                color = Grey10,
+                style = Typography.labelSmall
+            )
+
+        }
+
     }
 }
