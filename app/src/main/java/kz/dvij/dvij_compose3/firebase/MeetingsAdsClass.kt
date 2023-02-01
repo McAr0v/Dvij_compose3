@@ -15,4 +15,6 @@ data class MeetingsAdsClass(
     val image2: String? = null,
     val image3: String? = null,
     val city: String? = null,
+    val instagram: String? = null,
+    val telegram: String? = null,
 )

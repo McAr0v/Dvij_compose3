@@ -151,6 +151,14 @@ class CreateMeeting(private val act: MainActivity) {
                 icon = painterResource(id = R.drawable.whatsapp)
             )
 
+            SpacerTextWithLine(headline = "Instagram") // подпись перед формой
+            
+            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+
+            SpacerTextWithLine(headline = "Instagram") // подпись перед формой
+
+            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram)
+
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
             dataResult = dataPicker() // ВЫБОР ДАТЫ
@@ -238,7 +246,9 @@ class CreateMeeting(private val act: MainActivity) {
                                             startTime = timeStartResult,
                                             finishTime = timeFinishResult,
                                             image1 = it,
-                                            city = city
+                                            city = city,
+                                            instagram = "https://www.instagram.com/$instagram",
+                                            telegram = "https://t.me/$telegram"
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет

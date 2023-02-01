@@ -776,6 +776,133 @@ fun fieldPriceComponent (
 
 }
 
+@SuppressLint("ServiceCast")
+@Composable
+fun fieldInstagramComponent (
+    act: MainActivity,
+    icon: Int
+): String {
+
+    // создаем переменную текст - это значение функция возвращает
+
+    var text = remember { mutableStateOf("") }
+
+    // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
+
+    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+
+    var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
+
+    val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+
+    // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
+    // при фокусе на них окрашивались в нужные цвета
+
+    var focusColor = remember { mutableStateOf(Grey60) }
+
+
+
+    // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
+
+
+    TextField(
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (it.isFocused) focusColor.value =
+                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                else focusColor.value =
+                    Grey60 // если нет, то в переменные с цветами передать серый
+            }
+            .border( // настройки самих границ
+                2.dp, // толщина границы
+                color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
+                shape = RoundedCornerShape(50.dp) // скругление границ
+            ),
+
+        value = text.value, // значение поля
+
+        // on valueChange - это действие при изменении значения
+        onValueChange = { newText ->
+            text.value = newText
+
+            if (newText.contains("@")) {
+
+                isTextError.value = true // объявляем состояние ошибки
+                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                errorMassage.value = act.resources.getString(R.string.cm_without_dog) // передаем текст ошибки
+
+            } else { // когда все нормально
+
+                isTextError.value = false // объявляем, что ошибки нет
+                focusColor.value = SuccessColor // цвет фокуса переводим в нормальный
+            }
+
+        },
+
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            // цвета
+            textColor = Grey40,
+            backgroundColor = Grey95,
+            placeholderColor = Grey60,
+            focusedBorderColor = Grey95,
+            unfocusedBorderColor = Grey95,
+            cursorColor = Grey00,
+            errorBorderColor = Grey95
+
+        ),
+
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = icon), // сама иконка
+                contentDescription = "Иконка соц.сети", // описание для слабовидящих
+                tint = Grey60, // цвет иконки
+                modifier = Modifier.size(20.dp) // размер иконки
+            )
+        },
+
+        textStyle = Typography.bodyLarge, // стиль текста
+
+        keyboardOptions = KeyboardOptions(
+            // опции клавиатуры, которая появляется при вводе
+            keyboardType = KeyboardType.Text, // тип клавиатуры
+            imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
+
+        ),
+
+        keyboardActions = KeyboardActions(
+            // При нажатии на кнопку onDone - снимает фокус с формы
+            onDone = {
+                focusManager.clearFocus()
+            }
+        ),
+
+        placeholder = {
+            // подсказка для пользователей
+            Text(
+                text = stringResource(id = R.string.input_username), // значение подсказки
+                style = Typography.bodyLarge // стиль текста в холдере
+            )
+        },
+
+        singleLine = true, // говорим, что текст в форме будет однострочный
+
+        isError = isTextError.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
+    )
+
+    if (isTextError.value) {
+        Text(
+            text = errorMassage.value, // текст ошибки
+            color = AttentionColor, // цвет текста ошибки
+            style = Typography.bodySmall, // стиль текста
+            modifier = Modifier.padding(top = 5.dp)) // отступы
+    }  else {}
+
+    return text.value
+
+}
+
 
 
 

@@ -362,68 +362,40 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 Row (modifier = Modifier.fillMaxSize()){
 
-                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
-
-                        Button(
-                            onClick = {
-                                act.callAndWhatsapp.writeInWhatsapp(act, meetingInfo.value.whatsapp!!)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.2f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Grey10,
-                                contentColor = Grey95
-                            ),
-                            shape = RoundedCornerShape(30.dp)
-                        ) {
-
-                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey95)
-
-                            Spacer(modifier = Modifier
-                                //.width(15.dp)
-                                .height(30.dp))
-
-                            //Text("Написать", style = Typography.bodyMedium)
-
-                        }
-
-                        Spacer(modifier = Modifier.width(20.dp))
-                    }
-
-
-
-                    // ------ КНОПКА ПОЗВОНИТЬ ---------
-
-
+                    // ----- КНОПКА ПОЗВОНИТЬ --------
 
                     if (meetingInfo.value.phone != null) {
 
-                        Button(
-                            onClick = {
-                                act.callAndWhatsapp.makeACall(act, meetingInfo.value.phone!!)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.8f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = PrimaryColor,
-                                contentColor = Grey95
-                            ),
-                            shape = RoundedCornerShape(30.dp)
+                        IconButton(
+                            onClick = { act.callAndWhatsapp.makeACall(act, meetingInfo.value.phone!!) },
+                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
-                            //Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey95)
+                            Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey10)
 
-                            Spacer(modifier = Modifier
-                                //.width(15.dp)
-                                .height(30.dp))
+                        }
 
-                            Text("Позвонить", style = Typography.labelMedium)
+                        Spacer(modifier = Modifier
+                            .width(10.dp)
+                        )
+
+                    }
+
+                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
+
+                        IconButton(
+                            onClick = { act.callAndWhatsapp.writeInWhatsapp(act, meetingInfo.value.whatsapp!!) },
+                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey10)
 
                         }
 
                     }
+
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))

@@ -124,6 +124,7 @@
 
     <!-- МЕРОПРИЯТИЯ -->
     <string name="input_headline">Введите заголовок (max 40 символов)</string>
+    <string name="input_username">Введите имя пользователя</string>
     <string name="input_description">Введите описание</string>
     <string name="input_price">Введите стоимость билета</string>
     <string name="free_price">Вход бесплатный</string>
@@ -149,6 +150,7 @@
     <string name="cm_description">Описание*</string>
     <string name="cm_no_image">Нет картинки. Без нее никак не опубликовать мероприятие :(</string>
     <string name="cm_no_headline">Нет заголовка. Заполни - а то не понятно, о чем твое мероприятие</string>
+    <string name="cm_without_dog">Вводить имя пользователя нужно без @</string>
     <string name="cm_no_phone">Не введен телефон для звоноков. Как связаться-то с тобой?</string>
     <string name="cm_no_date">В какой день начало?</string>
     <string name="cm_no_start_time">Во сколько начало?</string>
