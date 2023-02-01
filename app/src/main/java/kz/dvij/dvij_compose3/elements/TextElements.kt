@@ -7,8 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import kz.dvij.dvij_compose3.ui.theme.Grey10
 import kz.dvij.dvij_compose3.ui.theme.Grey40
 import kz.dvij.dvij_compose3.ui.theme.Typography
 
@@ -31,7 +33,7 @@ fun IconText (icon: Int, inputText: String) {
 
         Icon(
             imageVector = ImageVector.vectorResource(icon), // передаем сам векторный файл иконки !!! ПРИМЕР ИЗ ПАПКИ drawable - kz.dvij.dvij_compose3.R.drawable.ic_time
-            contentDescription = "Иконка", // описание для слабовидящих
+            contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_icon), // описание для слабовидящих
             modifier = Modifier.size(20.dp), // размер иконки
             tint = Grey40 // Цвет иконки
         )
@@ -46,5 +48,24 @@ fun IconText (icon: Int, inputText: String) {
         )
 
 
+    }
+}
+
+@Composable
+fun HeadlineAndDesc (headline: String, desc: String){
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        androidx.compose.material.Text(
+            text = headline,
+            color = Grey10,
+            style = Typography.titleSmall
+        )
+
+        androidx.compose.material.Text(
+            text = desc,
+            color = Grey10,
+            style = Typography.labelSmall
+        )
     }
 }

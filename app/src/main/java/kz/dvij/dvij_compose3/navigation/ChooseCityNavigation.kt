@@ -32,9 +32,9 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class ChooseCityNavigation (act: MainActivity) {
+class ChooseCityNavigation (val act: MainActivity) {
 
-    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию.
+    var chosenCity = CitiesList("Выбери город", "default_city") // задаем выбранный город по умолчанию.
 
     val cityDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
@@ -61,7 +61,7 @@ class ChooseCityNavigation (act: MainActivity) {
 
                     val city = item.child("CityData").getValue(CitiesList::class.java)
 
-                    if (city != null && city.cityName != "Выберите город") {cityArray.add(city)} // если city не null и название города не "Выберите город", то добавить в список
+                    if (city != null && city.cityName != act.resources.getString(R.string.cm_no_city)) {cityArray.add(city)} // если city не null и название города не "Выберите город", то добавить в список
 
                 }
 
@@ -292,11 +292,11 @@ class ChooseCityNavigation (act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (chosenCity.cityName == "Выберите город") {
+                width = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
                     2.dp
                 } else {
                     0.dp
-                }, color = if (chosenCity.cityName == "Выберите город") {
+                }, color = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
                     Grey60
                 } else {
                     Grey95
@@ -306,12 +306,12 @@ class ChooseCityNavigation (act: MainActivity) {
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenCity.cityName == "Выберите город") {
+                backgroundColor = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
                     Grey95
                 } else {
                     PrimaryColor
                 },
-                contentColor = if (chosenCity.cityName == "Выберите город") {
+                contentColor = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
                     Grey60
                 } else {
                     Grey100
@@ -325,7 +325,7 @@ class ChooseCityNavigation (act: MainActivity) {
             Text(
                 text = chosenCity.cityName!!, // текст кнопки
                 style = Typography.labelMedium, // стиль текста
-                color = if (chosenCity.cityName == "Выберите город") {
+                color = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
                     Grey60
                 } else {
                     Grey100

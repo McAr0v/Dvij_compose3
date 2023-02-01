@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.constants.WHATSAPP_URL
 
 class CallAndWhatsapp(val act: MainActivity) {
 
@@ -33,7 +34,16 @@ class CallAndWhatsapp(val act: MainActivity) {
     // ------ ФУНКЦИЯ ПЕРЕХОДА НА ДИАЛОГ В ВАТСАП -------
 
     fun writeInWhatsapp (context: Context, phoneNumber: String){
-        val url = "https://api.whatsapp.com/send?phone=$phoneNumber" // генерируем ссылку на Whatsapp
+        val url = WHATSAPP_URL + phoneNumber // генерируем ссылку на Whatsapp
+        val intent = Intent(Intent.ACTION_VIEW) // Инициализируем интент
+        intent.data = Uri.parse(url) // Парсим URL, который создали выше
+        act.startActivity(intent) // запускаем активити на переход в Ватсапп
+    }
+
+    // ------ ФУНКЦИЯ ПЕРЕХОДА В ИНСТАГРАМ ИЛИ ТЕЛЕГРАМ -------
+
+    fun goToInstagramOrTelegram (url: String){
+
         val intent = Intent(Intent.ACTION_VIEW) // Инициализируем интент
         intent.data = Uri.parse(url) // Парсим URL, который создали выше
         act.startActivity(intent) // запускаем активити на переход в Ватсапп

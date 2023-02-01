@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Dvij.kz</string>
     <string name="compose">Jetpack Compose</string>
+    <string name="database_url">Jetpack Compose</string>
 
     <!-- Нижнее меню -->
 
@@ -22,6 +23,7 @@
     <string name="side_ad">Реклама</string>
     <string name="side_report_bug">Сообщить об ошибке</string>
     <string name="city">Город</string>
+    <string name="city_with_star">Город*</string>
     <string name="subscribe">Подпишись на Движ</string>
 
     <!-- Content Descriptions (Для слабослышащих) -->
@@ -45,6 +47,7 @@
     <string name="cd_create">Кнопка "Создать"</string>
     <string name="cd_meeting_image">Изображение мероприятия</string>
     <string name="cd_go_back">Иконка "Вернуться назад"</string>
+    <string name="cd_publish_button">Кнопка "Опубликовать"</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -58,6 +61,8 @@
     <string name="go_to_home">Вернуться на главную страницу</string>
     <string name="choose_city">Выбери город:</string>
     <string name="create_meeting">Создание мероприятия</string>
+    <string name="push_button">Опубликовать</string>
+    <string name="cansel_button">Отменить</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>
@@ -107,6 +112,7 @@
     <string name="exception_wrong_format_email">Неверный формат Email-адреса. Проверь, правильно ли ты написал Email?</string>
     <string name="exception_wrong_password">Неверный пароль</string>
     <string name="exception_password_need_more_letters">Пароль должен содержать больше 6 символов</string>
+    <string name="error_text">Что-то пошло не так :( Произошла ошибка</string>
 
     <!-- Города -->
     <string name="astana">Астана</string>
@@ -157,4 +163,10 @@
     <string name="cm_no_description">Где описание?</string>
     <string name="cm_no_category">Выбери категорию</string>
     <string name="cm_no_city">Выбери город</string>
+    <string name="cm_success">Твое мероприятие успешно опубликовано! Сейчас его все увидят!</string>
+
+    <!-- Social Media -->
+    <string name="social_instagram">Instagram</string>
+    <string name="social_telegram">Telegram</string>
+
 </resources>

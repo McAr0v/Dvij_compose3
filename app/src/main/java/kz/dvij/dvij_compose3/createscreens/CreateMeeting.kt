@@ -24,6 +24,8 @@ import kotlinx.coroutines.*
 import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
+import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
@@ -115,7 +117,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             category = act.categoryDialog.categorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
 
-            SpacerTextWithLine(headline = "Город*") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
             val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
 
@@ -151,11 +153,11 @@ class CreateMeeting(private val act: MainActivity) {
                 icon = painterResource(id = R.drawable.whatsapp)
             )
 
-            SpacerTextWithLine(headline = "Instagram") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
             
             val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram)
 
-            SpacerTextWithLine(headline = "Instagram") // подпись перед формой
+            SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
             val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram)
 
@@ -247,8 +249,8 @@ class CreateMeeting(private val act: MainActivity) {
                                             finishTime = timeFinishResult,
                                             image1 = it,
                                             city = city,
-                                            instagram = "https://www.instagram.com/$instagram",
-                                            telegram = "https://t.me/$telegram"
+                                            instagram = INSTAGRAM_URL + instagram,
+                                            telegram = TELEGRAM_URL + telegram
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -265,12 +267,16 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                     // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                     act.categoryDialog.chosenCategory = CategoriesList ("Выберите категорию", "Default")
+
+                                                    // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
+                                                    act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+
                                                     navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 
                                                     // показываем ТОСТ
                                                     Toast.makeText(
                                                         activity,
-                                                        "мероприятие успешно опубликовано",
+                                                        act.resources.getString(R.string.cm_success),
                                                         Toast.LENGTH_SHORT
                                                     ).show()
 
@@ -281,7 +287,7 @@ class CreateMeeting(private val act: MainActivity) {
                                                     // Показываем тост
                                                     Toast.makeText(
                                                         activity,
-                                                        "произошла ошибка",
+                                                        act.resources.getString(R.string.error_text),
                                                         Toast.LENGTH_SHORT
                                                     ).show()
 
@@ -303,7 +309,7 @@ class CreateMeeting(private val act: MainActivity) {
                     )
                 ) {
                     Text(
-                        text = "Опубликовать",
+                        text = stringResource(id = R.string.push_button),
                         style = Typography.labelMedium
                     )
 
@@ -311,7 +317,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_publish),
-                        contentDescription = "",
+                        contentDescription = stringResource(id = R.string.cd_publish_button),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -324,7 +330,7 @@ class CreateMeeting(private val act: MainActivity) {
                     .fillMaxWidth(),
             ) {
                 Text(
-                    text = "Отменить создание",
+                    text = stringResource(id = R.string.cansel_button),
                     style = Typography.labelMedium,
                     color = Grey40
                 )
@@ -332,7 +338,7 @@ class CreateMeeting(private val act: MainActivity) {
         }
 
         if (openLoading.value) {
-            LoadingScreen("Мероприятие загружается")
+            LoadingScreen(act.resources.getString(R.string.ss_loading))
         }
     }
 

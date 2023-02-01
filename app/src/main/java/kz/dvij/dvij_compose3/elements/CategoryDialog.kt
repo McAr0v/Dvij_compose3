@@ -28,17 +28,16 @@ import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
-import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class CategoryDialog (act: MainActivity) {
+class CategoryDialog (val act: MainActivity) {
 
     val categoryDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
         .getReference("CategoryList") // Создаем ПАПКУ В БД для мероприятий
 
-    var chosenCategory: CategoriesList = CategoriesList("Выберите категорию", "Default") // категория по умолчанию (не выбрана категория)
-    var chosenCity = CitiesList("Выберите город", "default_city") // задаем выбранный город по умолчанию.
+    var chosenCategory: CategoriesList = CategoriesList("Выбери категорию", "Default") // категория по умолчанию (не выбрана категория)
+
 
     fun readCategoryDataFromDb(categoriesList: MutableState<List<CategoriesList>>){
 
@@ -67,7 +66,7 @@ class CategoryDialog (act: MainActivity) {
                     val category = item.child("CategoryData").getValue(CategoriesList::class.java)
 
                     // если категория не нал и название категории не "Выберите категорию", то добавить в наш список
-                    if (category != null && category.categoryName != "Выберите категорию") {categoryArray.add(category)}
+                    if (category != null && category.categoryName != act.resources.getString(R.string.cm_no_category)) {categoryArray.add(category)}
 
                 }
 
@@ -102,11 +101,11 @@ class CategoryDialog (act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (chosenCategory.categoryName == "Выберите категорию") {
+                width = if (chosenCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
                     2.dp
                 } else {
                     0.dp
-                }, color = if (chosenCategory.categoryName == "Выберите категорию") {
+                }, color = if (chosenCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
                     Grey60
                 } else {
                     Grey95
@@ -116,12 +115,12 @@ class CategoryDialog (act: MainActivity) {
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenCategory.categoryName == "Выберите категорию") {
+                backgroundColor = if (chosenCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
                     Grey95
                 } else {
                     PrimaryColor
                 },
-                contentColor = if (chosenCategory.categoryName == "Выберите категорию") {
+                contentColor = if (chosenCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
                     Grey60
                 } else {
                     Grey100
@@ -135,7 +134,7 @@ class CategoryDialog (act: MainActivity) {
             Text(
                     text = chosenCategory.categoryName!!, // текст кнопки
                     style = Typography.labelMedium, // стиль текста
-                    color = if (chosenCategory.categoryName == "Выберите категорию") {
+                    color = if (chosenCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
                         Grey60
                     } else {
                         Grey100

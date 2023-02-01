@@ -23,6 +23,9 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
+import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
+import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -312,7 +315,7 @@ class MeetingViewScreen(val act: MainActivity) {
                         .weight(0.5f)
                     ) {
                         if (meetingInfo.value.data != null){
-                            headlineAndDesc(headline = meetingInfo.value.data!!, desc = "Дата")
+                            HeadlineAndDesc(headline = meetingInfo.value.data!!, desc = "Дата")
                         }
                     }
 
@@ -323,7 +326,7 @@ class MeetingViewScreen(val act: MainActivity) {
                         .weight(0.5f)) {
 
                         if (meetingInfo.value.startTime != null && meetingInfo.value.finishTime != null){
-                            headlineAndDesc(
+                            HeadlineAndDesc(
                                 headline = if (meetingInfo.value.finishTime == ""){
                                     meetingInfo.value.startTime!!
                                 } else {
@@ -344,7 +347,7 @@ class MeetingViewScreen(val act: MainActivity) {
                 // ----- ЦЕНА ---------
 
                 if (meetingInfo.value.price != null){
-                    headlineAndDesc(
+                    HeadlineAndDesc(
                         headline = if (meetingInfo.value.price == ""){
                             stringResource(id = R.string.free_price)
                         } else {
@@ -394,6 +397,48 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         }
 
+                        Spacer(modifier = Modifier
+                            .width(10.dp)
+                        )
+
+                    }
+
+                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+
+                    if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != INSTAGRAM_URL) {
+
+                        IconButton(
+                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!) },
+                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.instagram), contentDescription = "", tint = Grey10)
+
+                        }
+
+                        Spacer(modifier = Modifier
+                            .width(10.dp)
+                        )
+
+                    }
+
+                    // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
+
+                    if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != TELEGRAM_URL) {
+
+                        IconButton(
+                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!) },
+                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
+                        ) {
+
+                            Icon(painter = painterResource(id = R.drawable.telegram), contentDescription = "", tint = Grey10)
+
+                        }
+
+                        Spacer(modifier = Modifier
+                            .width(10.dp)
+                        )
+
                     }
 
                 }
@@ -422,22 +467,5 @@ class MeetingViewScreen(val act: MainActivity) {
         }
     }
 
-    @Composable
-    fun headlineAndDesc (headline: String, desc: String){
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-
-            Text(
-                text = headline,
-                color = Grey10,
-                style = Typography.titleSmall
-            )
-
-            Text(
-                text = desc,
-                color = Grey10,
-                style = Typography.labelSmall
-            )
-        }
-    }
 }
