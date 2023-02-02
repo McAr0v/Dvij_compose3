@@ -57,33 +57,36 @@ fun TopBarInApp(
 @Composable
 fun TopBarWithBackButton(navController: NavController, text: Int){
 
+    // ---- ПАНЕЛЬ С КНОПКОЙ НАЗАД -------
+
     TopAppBar(
         modifier = Modifier
-            .fillMaxWidth(),
-        backgroundColor = Grey100,
-        contentColor = Grey10
+            .fillMaxWidth(), // на всю ширину
+        backgroundColor = Grey100, // цвет фона
+        contentColor = Grey10 // цвет контента
     ) {
 
+        // ----- КНОПКА НАЗАД -------
+
         IconButton(
-            onClick = { navController.popBackStack() }
+            onClick = { navController.popBackStack() } // действие на нажатие
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_back),
-                contentDescription = stringResource(id = R.string.cd_go_back),
-                tint = Grey10,
-                modifier = Modifier.size(20.dp)
+                painter = painterResource(id = R.drawable.ic_back), // иконка
+                contentDescription = stringResource(id = R.string.cd_go_back), // описание для слабовидящих
+                tint = Grey10, // цвет
+                modifier = Modifier.size(20.dp) // размер иконки
             )
         }
 
-        Divider(modifier = Modifier.width(20.dp))
+        Divider(modifier = Modifier.width(20.dp)) // разделитель
+
+        // Заголовок панели
 
         androidx.compose.material.Text(
-            text = stringResource(id = text),
-            style = Typography.titleMedium,
-            color = Grey10
+            text = stringResource(id = text), // сам текст
+            style = Typography.titleMedium, // стиль текста
+            color = Grey10 // цвет
         )
-
-
     }
-
 }

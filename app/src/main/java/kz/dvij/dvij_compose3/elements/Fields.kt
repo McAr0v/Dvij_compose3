@@ -776,12 +776,11 @@ fun fieldPriceComponent (
 
 }
 
+// ------- ФОРМА ИНСТАГРАМА И ТЕЛЕГРАМА -----------
+
 @SuppressLint("ServiceCast")
 @Composable
-fun fieldInstagramComponent (
-    act: MainActivity,
-    icon: Int
-): String {
+fun fieldInstagramComponent (act: MainActivity,icon: Int): String {
 
     // создаем переменную текст - это значение функция возвращает
 
@@ -856,7 +855,7 @@ fun fieldInstagramComponent (
         leadingIcon = {
             Icon(
                 painter = painterResource(id = icon), // сама иконка
-                contentDescription = "Иконка соц.сети", // описание для слабовидящих
+                contentDescription = stringResource(id = R.string.cd_social_icon), // описание для слабовидящих
                 tint = Grey60, // цвет иконки
                 modifier = Modifier.size(20.dp) // размер иконки
             )

@@ -11,7 +11,7 @@ fun checkDataOnCreateMeeting (image1: Uri?, headline: String, phone: String, dat
 
     var result: Int = 0
 
-    if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выберите категорию" || city == "Выберите город" ) {
+    if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выбери категорию" || city == "Выбери город" ) {
 
 
             if (image1 == null) {
@@ -36,11 +36,11 @@ fun checkDataOnCreateMeeting (image1: Uri?, headline: String, phone: String, dat
             if (description == "") {
                 result = R.string.cm_no_description
             }
-            if (category == "Выберите категорию") {
+            if (category == "Выбери категорию") {
                 result = R.string.cm_no_category
             }
 
-            if (city == "Выберите город") {
+            if (city == "Выбери город") {
                 result = R.string.cm_no_city
             }
 

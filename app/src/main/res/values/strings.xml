@@ -48,6 +48,12 @@
     <string name="cd_meeting_image">Изображение мероприятия</string>
     <string name="cd_go_back">Иконка "Вернуться назад"</string>
     <string name="cd_publish_button">Кнопка "Опубликовать"</string>
+    <string name="cd_social_icon">Кнопка социальной сети</string>
+    <string name="cd_fav_icon">Иконка "Избранное"</string>
+    <string name="cd_add_image">Иконка "Добавить картинку"</string>
+    <string name="cd_chosen_image">Выбранное изображение</string>
+    <string name="cd_edit_image">Иконка "Редактировать изображение"</string>
+    <string name="cd_delete_image">Иконка "Удалить изображение"</string>
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -142,6 +148,7 @@
 
     <!-- SYSTEM STRINGS -->
     <string name="ss_loading">Идет загрузка</string>
+    <string name="ss_tenge">тенге</string>
 
     <!-- Создание мероприятия -->
     <string name="cm_image">Картинка мероприятия*</string>
@@ -164,6 +171,8 @@
     <string name="cm_no_category">Выбери категорию</string>
     <string name="cm_no_city">Выбери город</string>
     <string name="cm_success">Твое мероприятие успешно опубликовано! Сейчас его все увидят!</string>
+    <string name="cm_start_in">Начинаем в</string>
+    <string name="cm_choose_image">Выбери картинку</string>
 
     <!-- Social Media -->
     <string name="social_instagram">Instagram</string>

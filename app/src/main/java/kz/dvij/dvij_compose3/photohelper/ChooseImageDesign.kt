@@ -19,16 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // --- ФУНКЦИЯ ВЫБОРА КАРТИНКИ В СОЗДАНИИ МЕРОПРИЯТИЯ --------
 
 @Composable
-fun chooseImageDesign (act: MainActivity): Uri? {
+fun chooseImageDesign (): Uri? {
 
     var selectImage = remember { mutableStateOf<Uri?>(null) } // создаем пустое значение Uri
 
@@ -78,19 +78,19 @@ fun chooseImageDesign (act: MainActivity): Uri? {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = "",
+                        contentDescription = stringResource(id = R.string.cd_add_image),
                         tint = Grey10
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
 
                     // -------- ТЕКСТ ВЫБЕРИ ИЗОБРАЖЕНИЕ -----------
+
                     Text(
-                        text = "Добавь изображение",
+                        text = stringResource(id = R.string.cm_choose_image),
                         color = Grey10,
                         style = Typography.bodyMedium
                     )
-
                 }
             }
 
@@ -120,7 +120,7 @@ fun chooseImageDesign (act: MainActivity): Uri? {
 
                         }
                         ),
-                contentDescription = "", // Описание для слабовидящих
+                contentDescription = stringResource(id = R.string.cd_chosen_image), // Описание для слабовидящих
 
                 contentScale = ContentScale.Crop, // Поместить изображение
                 alignment = Alignment.Center // выравнивание по центру
@@ -141,12 +141,15 @@ fun chooseImageDesign (act: MainActivity): Uri? {
                 IconButton(
 
                     onClick = { galleryLauncher.launch("image/*") },
-                    modifier = Modifier.background(WarningColor, shape = RoundedCornerShape(50))
-
+                    modifier = Modifier
+                        .background(
+                            WarningColor,
+                            shape = RoundedCornerShape(50)
+                        )
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_edit),
-                        contentDescription = "",
+                        contentDescription = stringResource(id = R.string.cd_edit_image),
                         tint = Grey95
                     )
                 }
@@ -155,11 +158,15 @@ fun chooseImageDesign (act: MainActivity): Uri? {
 
                 IconButton(
                     onClick = { selectImage.value = null },
-                    modifier = Modifier.background(AttentionColor, shape = RoundedCornerShape(50))
+                    modifier = Modifier
+                        .background(
+                            AttentionColor,
+                            shape = RoundedCornerShape(50)
+                        )
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = "",
+                        contentDescription = stringResource(id = R.string.cd_delete_image),
                         tint = Grey95
                     )
                 }

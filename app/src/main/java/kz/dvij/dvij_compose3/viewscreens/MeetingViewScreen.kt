@@ -370,7 +370,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     if (meetingInfo.value.phone != null) {
 
                         IconButton(
-                            onClick = { act.callAndWhatsapp.makeACall(act, meetingInfo.value.phone!!) },
+                            onClick = { act.callAndWhatsapp.makeACall(meetingInfo.value.phone!!) },
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
@@ -389,7 +389,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
 
                         IconButton(
-                            onClick = { act.callAndWhatsapp.writeInWhatsapp(act, meetingInfo.value.whatsapp!!) },
+                            onClick = { act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!) },
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 

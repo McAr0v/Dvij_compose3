@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream
 class PhotoHelper (val act: MainActivity) {
 
     private val storageMeetings = Firebase
-        .storage("gs://dvij-compose3-1cf6a.appspot.com")
+        .storage("gs://dvij-compose3-1cf6a.appspot.com") // Указываем путь на наш Storage
         .getReference("Meetings") // инициализируем папку, в которую будет сохраняться картинка мероприятия
 
     // делаем дополнительные подпапки для более удобного поиска изображений
@@ -65,11 +65,6 @@ class PhotoHelper (val act: MainActivity) {
 
             val correctImageSize = getWriteSizeImage(bitmap) // получаем размеры, до которых надо уменьшить картинку
 
-            Log.d (
-                "MyLog",
-                "Изначальная ширина: ${bitmap.width}, после функции ширина: ${correctImageSize[0]}, Изначальная высота: ${bitmap.height}, после функции высота: ${correctImageSize[1]}"
-            )
-
             val resizedBitmap = Bitmap.createScaledBitmap(bitmap, correctImageSize[0], correctImageSize[1], false) // изменение размера картинки
 
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes) // сжимаем изображение до нужного качества
@@ -100,8 +95,6 @@ class PhotoHelper (val act: MainActivity) {
         val ratio = (width / height).toFloat() // ratio - коэффициент. Определяем положение, вертикальное или горизонтальное
 
         val scale: Float = width.toFloat() / height.toFloat() // коэфициент, на сколько нужно уменьшить сторону чтобы соблюсти пропорции
-
-        Log.d ("MyLog", "$scale")
 
         // если коэффициент больше или равен 1 (картинка квадратная или горизонтальная)
 

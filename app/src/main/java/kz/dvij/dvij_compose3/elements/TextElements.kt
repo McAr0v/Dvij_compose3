@@ -46,21 +46,25 @@ fun IconText (icon: Int, inputText: String) {
             color = Grey40, // цвет текста
             style = Typography.bodyMedium // стиль текста
         )
-
-
     }
 }
+
+// ------ ЗАГОЛОВОК И ПОДПИСЬ СНИЗУ ---------
 
 @Composable
 fun HeadlineAndDesc (headline: String, desc: String){
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
+        // ТЕКСТ ЗАГОЛОВКА
+
         androidx.compose.material.Text(
             text = headline,
             color = Grey10,
             style = Typography.titleSmall
         )
+
+        // ТЕКСТ ОПИСАНИЯ ПОД ЗАГОЛОВКОМ
 
         androidx.compose.material.Text(
             text = desc,

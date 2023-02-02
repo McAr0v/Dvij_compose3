@@ -1,6 +1,5 @@
 package kz.dvij.dvij_compose3.elements
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -37,34 +35,42 @@ class MeetingsCard(val act: MainActivity) {
     @Composable
     fun MeetingCard (navController: NavController, meetingItem: MeetingsAdsClass, meetingKey: MutableState<String>) {
 
-        // Принимаем категорию и заголовок. Надо еще принимать дату, время и картинку
-        // Карточка мероприятий
+        val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100)) // Переменная полупрозрачного градиента
 
-        val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100))
+        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
 
-        val iconFavColor = remember{ mutableStateOf(Grey10) }
+        // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
         act.databaseManager.favIconMeeting(meetingItem.key!!){
+            // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
                 iconFavColor.value = PrimaryColor
             } else {
+                // Если колбак фалс, то в обычный цвет
                 iconFavColor.value = Grey10
             }
         }
+
+        // ------ САМ КОНТЕНТ КАРТОЧКИ ----------
 
         Card(
             modifier = Modifier
                 .fillMaxWidth() // растягиваем карточку на всю ширину экрана
                 .padding(10.dp) // отступ от краев экрана
                 .clickable {
+                    // При клике на карточку - передаем на Main Activity meetingKey. Ключ берем из дата класса мероприятия
+
                     meetingKey.value = meetingItem.key.toString()
-                    act.databaseManager.viewCounterMeeting(meetingItem.key){
+
+                    // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
+
+                    act.databaseManager.viewCounterMeeting(meetingItem.key) {
+
+                        // если колбак тру, то счетчик успешно сработал, значит переходим на страницу мероприятия
                         if (it) {
                             navController.navigate(MEETING_VIEW)
                         }
                     }
-
-
                 },
             shape = RoundedCornerShape(15.dp), // shape - форма. Скругляем углы
             colors = CardDefaults.cardColors(Grey95), // цвет карточки под картинкой, по идее можно убрать
@@ -120,7 +126,7 @@ class MeetingsCard(val act: MainActivity) {
                         verticalAlignment = Alignment.Top // вертикальное выравнивание элементов - по верху
                     ) {
 
-                        // КНОПКА КАТЕГОРИИ
+                        // ------- КНОПКА КАТЕГОРИИ -----------
                         if (meetingItem.category != null) Text(
                             text = meetingItem.category, // category - название категории. Нужно сюда передавать категорию из базы данных
                             color = Grey95, // цвет текста
@@ -136,20 +142,19 @@ class MeetingsCard(val act: MainActivity) {
                             )
 
 
-                        // ИКОНКА ИЗБРАННОЕ
+                        // ---- ИКОНКА ИЗБРАННОЕ ---------
 
                         androidx.compose.material3.Icon(
                             imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
-                            contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
+                            contentDescription = stringResource(id = R.string.cd_fav_icon), // описание для слабовидящих
                             modifier = Modifier
                                 .size(24.dp), // размер иконки
-                            tint = iconFavColor.value//favIconColor.value // Цвет иконки
+                            tint = iconFavColor.value // Цвет иконки
                         )
-
 
                     }
 
-                    // Заголовок, дата, время
+                    // ------ ЗАГОЛОВОК, ДАТА, ВРЕМЯ, ЦЕНА -----------
 
                     Column() {
 
@@ -163,44 +168,45 @@ class MeetingsCard(val act: MainActivity) {
                             )
                         }
 
-                        // Панель ДАТА И ВРЕМЯ
+                        // -------- ДАТА, ВРЕМЯ, ЦЕНА ----------
 
                         Column(
                             modifier = Modifier.padding(top=10.dp), // отступ сверху
                         ) {
 
-                            // Вывод даты мероприятия
-                            // date - дата проведения мероприятия.
-                            // date надо будет передавать из базы данных. Иконку не надо, уже передаю
+                            // ДАТА
 
                             IconText(R.drawable.ic_calendar, meetingItem.data!!)
 
 
-                            // Вывод времени начала мероприятия
-                            // time - время начала мероприятия.
-                            // time надо будет передавать из базы данных. Иконку не надо, уже передаю
+                            // ВРЕМЯ
+
+                            val startIn = act.getString(R.string.cm_start_in) // Переменная слова Начинаем в
 
                             IconText(
                                 R.drawable.ic_time,
                                 if (meetingItem.finishTime == ""){
-                                    "Начало в ${meetingItem.startTime}"
+                                    "$startIn ${meetingItem.startTime}" // текст - начинаем в и время начала
                                 }else {
-                                    "${meetingItem.startTime} - ${meetingItem.finishTime}"
+                                    "${meetingItem.startTime} - ${meetingItem.finishTime}" // просто время начала и время окончания мероприятия
                                 })
+
+
+                            // ЦЕНА
+
+                            val tenge = act.getString(R.string.ss_tenge)
 
                             IconText(
                                 R.drawable.ic_tenge,
                                 if(meetingItem.price == ""){
                                     stringResource(id = R.string.free_price)
-                                }else {
-                                    "${meetingItem.price} тенге"
-                                })
-
-
+                                } else {
+                                    "${meetingItem.price} $tenge"
+                                }
+                            )
                         }
                     }
                 }
-
             }
         }
     }

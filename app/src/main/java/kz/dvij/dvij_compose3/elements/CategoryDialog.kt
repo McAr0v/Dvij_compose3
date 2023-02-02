@@ -32,7 +32,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 class CategoryDialog (val act: MainActivity) {
 
-    val categoryDatabase = FirebaseDatabase // обращаемся к БД
+    private val categoryDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
         .getReference("CategoryList") // Создаем ПАПКУ В БД для мероприятий
 

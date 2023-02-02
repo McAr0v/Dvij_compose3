@@ -9,14 +9,9 @@ import com.google.firebase.auth.*
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 
-class AccountHelper (act: MainActivity) {
+class AccountHelper (val act: MainActivity) {
 
-    // Передаем в класс Account Helper Main Activity, чтобы мы имели доступ к переменныс с MainActivity в этом классе
-
-
-    private val act = act // инициализируем Main Activity
     private lateinit var signInClient: GoogleSignInClient
-
 
 
     // ----- ФУНКЦИЯ ВХОДА В АККАУНТ ЧЕРЕЗ EMAIL PASSWORD

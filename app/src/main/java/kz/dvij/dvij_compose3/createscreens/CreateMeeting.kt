@@ -76,8 +76,8 @@ class CreateMeeting(private val act: MainActivity) {
         var category: String // категория
 
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
-        val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
-        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог
+        val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
+        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -107,7 +107,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
-            val image1 = chooseImageDesign(activity) // Изображение мероприятия
+            val image1 = chooseImageDesign() // Изображение мероприятия
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_headline)) // подпись перед формой
 
@@ -155,11 +155,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
             
-            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram) // форма инстаграма
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram)
+            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram) // форма телеграма
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
@@ -266,7 +266,7 @@ class CreateMeeting(private val act: MainActivity) {
                                                 if (result){
 
                                                     // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
-                                                    act.categoryDialog.chosenCategory = CategoriesList ("Выберите категорию", "Default")
+                                                    act.categoryDialog.chosenCategory = CategoriesList ("Выбери категорию", "Default")
 
                                                     // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
                                                     act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
@@ -336,6 +336,8 @@ class CreateMeeting(private val act: MainActivity) {
                 )
             }
         }
+
+        // --- ЭКРАН ИДЕТ ЗАГРУЗКА ----
 
         if (openLoading.value) {
             LoadingScreen(act.resources.getString(R.string.ss_loading))

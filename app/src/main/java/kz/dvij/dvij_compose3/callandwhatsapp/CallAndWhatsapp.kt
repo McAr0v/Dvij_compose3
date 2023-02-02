@@ -7,13 +7,14 @@ import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.constants.PHONE_URL
 import kz.dvij.dvij_compose3.constants.WHATSAPP_URL
 
 class CallAndWhatsapp(val act: MainActivity) {
 
     // ---- ФУНКЦИЯ НАБОРА НОМЕРА ПРИ НАЖАТИИ НА КНОПКУ -------
 
-    fun makeACall (context: Context, phoneNumber: String){
+    fun makeACall (phoneNumber: String){
 
         // Проверяем, выданы ли права на доступ к телефону
 
@@ -22,7 +23,8 @@ class CallAndWhatsapp(val act: MainActivity) {
             // если права даны, то запускаем набор номера
 
             val intent = Intent(Intent.ACTION_CALL)
-            intent.data = Uri.parse("tel: $phoneNumber")
+            val url = PHONE_URL + phoneNumber
+            intent.data = Uri.parse(url)
             act.startActivity(intent)
 
         } else {
@@ -33,7 +35,7 @@ class CallAndWhatsapp(val act: MainActivity) {
 
     // ------ ФУНКЦИЯ ПЕРЕХОДА НА ДИАЛОГ В ВАТСАП -------
 
-    fun writeInWhatsapp (context: Context, phoneNumber: String){
+    fun writeInWhatsapp (phoneNumber: String){
         val url = WHATSAPP_URL + phoneNumber // генерируем ссылку на Whatsapp
         val intent = Intent(Intent.ACTION_VIEW) // Инициализируем интент
         intent.data = Uri.parse(url) // Парсим URL, который создали выше

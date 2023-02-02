@@ -322,11 +322,7 @@ class SideComponents (private val act: MainActivity) {
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
                         }
-
                         navController.navigate(LOG_IN_ROOT)
-
-
-
                     },
                 verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
 
@@ -431,5 +427,4 @@ class SideComponents (private val act: MainActivity) {
             }
         }
     }
-
 }

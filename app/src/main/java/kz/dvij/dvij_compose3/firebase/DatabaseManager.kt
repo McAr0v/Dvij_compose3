@@ -17,8 +17,6 @@ class DatabaseManager (private val activity: MainActivity) {
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
         .getReference("Meetings") // Создаем ПАПКУ В БД для мероприятий
 
-
-
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
     val default = MeetingsAdsClass (
@@ -38,34 +36,35 @@ class DatabaseManager (private val activity: MainActivity) {
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
                     val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                        .child("info")
-                        .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // добираесся до следующей папки внутри - папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                    val meetingFav = item
-                        .child("AddedToFavorites").childrenCount
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val meetingFav = item.child("AddedToFavorites").childrenCount
 
+                    // считываем данные для счетчика - количество просмотров объявления
                     var meetingCount = item
                         .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
+                    // если мероприятие не нал и ключ мероприятия совпадает с ключем из БД, то...
                     if (meeting != null && meeting.key == key) {
+
+                        // передаем в переменную нужное мероприятие
+
                         meetingInfo.value = meeting
+
+                        // если счетчик просмотров мероприятия не нал, то...
                         if (meetingCount != null) {
+                            // Возвращаем калбак в виде списка счетчиков
                             callback (listOf(meetingFav.toInt(), meetingCount.toInt()))
                         }
                     }
-
-
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
+            override fun onCancelled(error: DatabaseError) {}
         })
-
     }
 
 
@@ -101,14 +100,13 @@ class DatabaseManager (private val activity: MainActivity) {
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
                     val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                        .child("info")
-                        .children.iterator().next() // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("info") // следующая папка с информацией о мероприятии
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
                         .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                     if (meeting != null) {meetingArray.add(meeting)} // если мероприятие не пустое, добавляем в список
 
-                    //Log.d("MyLog", "Data: $item")
                 }
 
                 if (meetingArray.isEmpty()){
@@ -116,12 +114,10 @@ class DatabaseManager (private val activity: MainActivity) {
                 } else {
                     meetingsList.value = meetingArray // если добавились мероприятия в список, то этот новый список и передаем
                 }
-
             }
 
             // в функцию onCancelled пока ничего не добавляем
             override fun onCancelled(error: DatabaseError) {}
-
         }
         )
     }
@@ -132,14 +128,6 @@ class DatabaseManager (private val activity: MainActivity) {
 
     fun readMeetingMyDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
-        // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
-        // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
-        // Есть другие типы слушателей, которые работают в режиме реального времени, т.е постоянно обращаются к БД
-        // Это приводит к нагрузке на сервер и соответственно будем платить за большое количество обращений к БД
-
-        // У самого объекта слушателя ValueEventListener есть 2 стандартные функции - onDataChange и onCancelled
-        // их нужно обязательно добавить и заполнить нужным кодом
-
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
@@ -147,28 +135,19 @@ class DatabaseManager (private val activity: MainActivity) {
 
                 val meetingArray = ArrayList<MeetingsAdsClass>()
 
-                // запускаем цикл и пытаемся добраться до наших данных
-                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
-                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
-                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
-                // где знаем точный путь (как в "meetingData"), там пишем .child()
-
-                // добираемся
-
                 for (item in snapshot.children){
 
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
                     if (auth.uid !=null) {
                         val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                            .child("info").child(auth.uid!!) // добираемся до следующей папки внутри УКМероприятия - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .child("info") // следующая папка с информацией о мероприятии
+                            .child(auth.uid!!) // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("meetingData") // добираемся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                         if (meeting != null) {meetingArray.add(meeting)} //  если мероприятие не нал, то добавляем в список-черновик
                     }
-
-                    //Log.d("MyLog", "Data: $item")
                 }
 
                 if (meetingArray.isEmpty()){
@@ -176,12 +155,10 @@ class DatabaseManager (private val activity: MainActivity) {
                 } else {
                     meetingsList.value = meetingArray // если список не пустой, то возвращаем мои мероприятия с БД
                 }
-
             }
 
             // в функцию onCancelled пока ничего не добавляем
             override fun onCancelled(error: DatabaseError) {}
-
         }
         )
     }
@@ -190,14 +167,6 @@ class DatabaseManager (private val activity: MainActivity) {
 
     fun readMeetingFavDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
-        // Обращаемся к базе данных и вешаем слушатель addListenerForSingleValueEvent.
-        // У этого слушателя функция такая - он один раз просматривает БД при запуске и все, ждет, когда мы его снова запустим
-        // Есть другие типы слушателей, которые работают в режиме реального времени, т.е постоянно обращаются к БД
-        // Это приводит к нагрузке на сервер и соответственно будем платить за большое количество обращений к БД
-
-        // У самого объекта слушателя ValueEventListener есть 2 стандартные функции - onDataChange и onCancelled
-        // их нужно обязательно добавить и заполнить нужным кодом
-
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
@@ -205,54 +174,48 @@ class DatabaseManager (private val activity: MainActivity) {
 
                 val meetingArray = ArrayList<MeetingsAdsClass>()
 
-                // запускаем цикл и пытаемся добраться до наших данных
-                // snapshot - по сути это JSON файл, в котором нам нужно как в папках прописать путь до наших данных
-                // ниже используем итератор и некст для того, чтобы войти в папку, название которой мы не знаем
-                // так как на нашем пути куча уникальных ключей, которые мы не можем знать
-                // где знаем точный путь (как в "meetingData"), там пишем .child()
-
-                // добираемся
-
                 for (item in snapshot.children){
 
-                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+                    // Считываем каждое мероприятие для сравнения
 
                     if (auth.uid !=null) {
                         val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                            .child("info")
-                            .children.iterator().next().child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .child("info") // папка с информацией о мероприятии
+                            .children.iterator().next() // папка уникального ключа пользователя. Пропускаем ее
+                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
+                        // Считываем папку, в которую попадают ключи добавивших в избранное
+
                         val meetingFav = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                            .child("AddedToFavorites")
-                            .child(auth.uid!!) // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
-                            .getValue(String::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+                            .child("AddedToFavorites") // Папка со списком добавивших в избранное
+                            .child(auth.uid!!) // ищем папку с ключом пользователя
+                            .getValue(String::class.java) // забираем данные из БД если они есть
+
+                        // сравниваем ключи мероприятия
 
                         if (meetingFav == auth.uid) {
+                            // если ключи совпали, проверяем мероприятие на нал
                             if (meeting != null) {
+
+                                //  если мероприятие не нал, то добавляем в список-черновик
                                 meetingArray.add(meeting)
                             }
-                        } //  если мероприятие не нал, то добавляем в список-черновик
+                        }
                     }
-
-                    //Log.d("MyLog", "Data: $item")
                 }
 
                 if (meetingArray.isEmpty()){
                     meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
-                    meetingsList.value = meetingArray // если список не пустой, то возвращаем мои мероприятия с БД
+                    meetingsList.value = meetingArray // если список не пустой, то возвращаем избранные мероприятия с БД
                 }
-
             }
-
             // в функцию onCancelled пока ничего не добавляем
             override fun onCancelled(error: DatabaseError) {}
-
         }
         )
     }
-
 
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЯ --------
@@ -260,9 +223,7 @@ class DatabaseManager (private val activity: MainActivity) {
     suspend fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
 
         meetingDatabase // записываем в базу данных
-            .child(
-                filledMeeting.key ?: "empty"
-            ) // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+            .child(filledMeeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
             .child("info") // помещаем данные в папку info
             .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего мероприятие
             .child("meetingData") // помещаем в папку
@@ -283,18 +244,20 @@ class DatabaseManager (private val activity: MainActivity) {
 
     fun addFavouriteMeeting(key: String, callback: (result: Boolean)-> Unit){
 
-        activity.mAuth.uid?.let {
-            meetingDatabase
-                .child(key)
-                .child("AddedToFavorites")
-                .child(it)
-                .setValue(activity.mAuth.uid)
-        }?.addOnCompleteListener {
+        // если ключ пользователя не будет нал, то выполнится функция
 
+        activity.mAuth.uid?.let {
+            meetingDatabase // обращаемся к БД
+                .child(key) // заходим в папку с уникальным ключем мероприятия
+                .child("AddedToFavorites") // заходим в папку добавших в избранное
+                .child(it) // заходим в папку с названием как наш ключ
+                .setValue(activity.mAuth.uid) // записываем наш ключ
+        }?.addOnCompleteListener {
+            // слушаем выполнение. Если успешно сделано, то...
             if (it.isSuccessful){
+                // возвращаем колбак ТРУ
                 callback (true)
             }
-
         }
     }
 
@@ -302,18 +265,20 @@ class DatabaseManager (private val activity: MainActivity) {
 
     fun removeFavouriteMeeting(key: String, callback: (result: Boolean)-> Unit){
 
-        activity.mAuth.uid?.let {
-            meetingDatabase
-                .child(key)
-                .child("AddedToFavorites")
-                .child(it)
-                .removeValue()
-        }?.addOnCompleteListener {
+        // если ключ пользователя не будет нал, то выполнится функция
 
+        activity.mAuth.uid?.let {
+            meetingDatabase // обращаемся к БД
+                .child(key) // заходим в папку с уникальным ключем мероприятия
+                .child("AddedToFavorites") // заходим в папку добавших в избранное
+                .child(it) // заходим в папку с названием как наш ключ
+                .removeValue() // удаляем значение
+        }?.addOnCompleteListener {
+            // слушаем выполнение. Если успешно сделано, то...
             if (it.isSuccessful){
+                // возвращаем колбак ТРУ
                 callback (true)
             }
-
         }
     }
 
@@ -323,8 +288,6 @@ class DatabaseManager (private val activity: MainActivity) {
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
-
-            // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (item in snapshot.children){
@@ -335,7 +298,8 @@ class DatabaseManager (private val activity: MainActivity) {
 
                         val meeting = item
                             .child("info")
-                            .children.iterator().next().child("meetingData")
+                            .children.iterator().next()
+                            .child("meetingData")
                             .getValue(MeetingsAdsClass::class.java)
 
                         // считываем список добавивших в избранное пользователей
@@ -356,7 +320,6 @@ class DatabaseManager (private val activity: MainActivity) {
                                 if (meetingFav == auth.uid){
                                     callback (true)
                                 } else {
-
                                     // если в списке нет, то фалс
                                     callback (false)
                                 }
@@ -379,8 +342,6 @@ class DatabaseManager (private val activity: MainActivity) {
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
-
-            // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (item in snapshot.children){
@@ -389,13 +350,16 @@ class DatabaseManager (private val activity: MainActivity) {
 
                         val meeting = item
                             .child("info")
-                            .children.iterator().next().child("meetingData")
+                            .children.iterator().next()
+                            .child("meetingData")
                             .getValue(MeetingsAdsClass::class.java)
 
                         // считываем список добавивших в избранное пользователей
 
                         var meetingCount = item
-                            .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+                            .child("viewCounter")
+                            .child("viewCounter")
+                            .getValue(Int::class.java)
 
                         // проверка мероприятия на Null
 
@@ -404,20 +368,32 @@ class DatabaseManager (private val activity: MainActivity) {
                             // если ключ мероприятия равен переданному ключу
                             if (meeting.key == key) {
 
+                                // Если счетчик просмотров не нал
                                 if (meetingCount != null) {
-                                    meetingCount ++
-                                    meetingDatabase.child(key).child("viewCounter").child("viewCounter").setValue(meetingCount)
-                                    callback (true)
+                                    meetingCount ++ // добавляем к счетчику 1
+
+                                    // Перезаписываем новое значение счетчика
+
+                                    meetingDatabase
+                                        .child(key)
+                                        .child("viewCounter")
+                                        .child("viewCounter")
+                                        .setValue(meetingCount)
+
+                                    callback (true) // возвращаем колбак тру
+
                                 } else {
+                                    // если счетчик еще не создан, то создаем и устанавливаем значение 1
+                                    meetingDatabase
+                                        .child(key)
+                                        .child("viewCounter")
+                                        .child("viewCounter")
+                                        .setValue(1)
 
-                                    meetingDatabase.child(key).child("viewCounter").child("viewCounter").setValue(1)
-                                    callback (true)
+                                    callback (true) // возвращаем колбак тру
                                 }
-
-
                             }
                         }
-
                 }
             }
 
@@ -426,9 +402,5 @@ class DatabaseManager (private val activity: MainActivity) {
 
         }
         )
-
     }
-
-
-
 }
