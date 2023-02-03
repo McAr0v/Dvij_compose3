@@ -32,6 +32,7 @@ import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
+import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.firebase.DatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
     val callAndWhatsapp = CallAndWhatsapp(this)
     val categoryDialog = CategoryDialog(this)
     val meetingsCard = MeetingsCard(this)
+    val placesCard = PlacesCard(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null

@@ -26,6 +26,8 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
+import kz.dvij.dvij_compose3.elements.PlaceCard
+import kz.dvij.dvij_compose3.elements.PlaceCardSmall
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -456,6 +458,18 @@ class MeetingViewScreen(val act: MainActivity) {
                     }
 
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Местро проведения",
+                    style = Typography.titleMedium,
+                    color = Grey10
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                PlaceCardSmall()
 
                 Spacer(modifier = Modifier.height(20.dp))
 
