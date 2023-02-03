@@ -102,7 +102,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
             AsyncImage(
                 model = meetingInfo.value.image1,
-                contentDescription = "",
+                contentDescription = stringResource(id = R.string.cm_image),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp),
@@ -187,7 +187,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
 
                     Button(
-                        onClick = {Toast.makeText(act,"Количество просмотров мероприятия",Toast.LENGTH_SHORT).show()},
+                        onClick = {Toast.makeText(act,act.getString(R.string.meeting_view_counter),Toast.LENGTH_SHORT).show()},
                         colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
                         shape = RoundedCornerShape(50)
                     ) {
@@ -196,7 +196,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.ic_visibility),
-                            contentDescription = "Иконка количества просмотров",
+                            contentDescription = stringResource(id = R.string.cd_counter_view_meeting),
                             modifier = Modifier.size(20.dp),
                             tint = Grey40
                         )
@@ -242,7 +242,7 @@ class MeetingViewScreen(val act: MainActivity) {
                                                 buttonFavColor.value = Grey80 // При нажатии окрашиваем кнопку в темно-серый
 
                                                 // Выводим ТОСТ
-                                                Toast.makeText(act,"Удалено из избранных",Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(act,act.getString(R.string.delete_from_fav),Toast.LENGTH_SHORT).show()
                                             }
                                         }
 
@@ -260,7 +260,7 @@ class MeetingViewScreen(val act: MainActivity) {
                                                 buttonFavColor.value = Grey90_2 // Окрашиваем кнопку в главный цвет
 
                                                 // Выводим ТОСТ
-                                                Toast.makeText(act,"Добавлено в избранные",Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(act,act.getString(R.string.add_to_fav),Toast.LENGTH_SHORT).show()
 
                                             }
                                         }
@@ -272,7 +272,7 @@ class MeetingViewScreen(val act: MainActivity) {
                                 // Если пользователь не авторизован, то ему выводим ТОСТ
 
                                 Toast
-                                    .makeText(act, "Сначала зарегайся", Toast.LENGTH_SHORT)
+                                    .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
                                     .show()
                             }
                         },
@@ -284,7 +284,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         androidx.compose.material3.Icon(
                             imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
-                            contentDescription = "Иконка добавить в избранные", // описание для слабовидящих
+                            contentDescription = stringResource(id = R.string.cd_add_to_fav), // описание для слабовидящих
                             modifier = Modifier
                                 .size(20.dp), // размер иконки
                             tint = iconTextFavColor.value // Цвет иконки
@@ -315,7 +315,7 @@ class MeetingViewScreen(val act: MainActivity) {
                         .weight(0.5f)
                     ) {
                         if (meetingInfo.value.data != null){
-                            HeadlineAndDesc(headline = meetingInfo.value.data!!, desc = "Дата")
+                            HeadlineAndDesc(headline = meetingInfo.value.data!!, desc = act.getString(R.string.cm_date2))
                         }
                     }
 
@@ -331,11 +331,11 @@ class MeetingViewScreen(val act: MainActivity) {
                                     meetingInfo.value.startTime!!
                                 } else {
                                     "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
-                                },//"${meetingInfo.value.startTime!!} - ${meetingInfo.value.finishTime!!}",
+                                },
                                 desc = if (meetingInfo.value.finishTime == ""){
-                                    "Начинаем в"
+                                    act.getString(R.string.cm_start_in)
                                 } else {
-                                    "Время проведения"
+                                    act.getString(R.string.cm_all_time)
                                 } //
                             )
                         }
@@ -346,20 +346,22 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 // ----- ЦЕНА ---------
 
+                val tenge = act.getString(R.string.ss_tenge)
+
                 if (meetingInfo.value.price != null){
                     HeadlineAndDesc(
                         headline = if (meetingInfo.value.price == ""){
                             stringResource(id = R.string.free_price)
                         } else {
-                            "${meetingInfo.value.price} тенге"
+                            "${meetingInfo.value.price} $tenge"
                         },
-                        desc = "Цена билета"
+                        desc = act.getString(R.string.cm_price)
                     )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                SpacerTextWithLine(headline = "Связаться с организатором")
+                SpacerTextWithLine(headline = stringResource(id = R.string.meeting_call_org))
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -393,7 +395,11 @@ class MeetingViewScreen(val act: MainActivity) {
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
-                            Icon(painter = painterResource(id = R.drawable.whatsapp), contentDescription = "", tint = Grey10)
+                            Icon(
+                                painter = painterResource(id = R.drawable.whatsapp),
+                                contentDescription = stringResource(id = R.string.social_whatsapp),
+                                tint = Grey10
+                            )
 
                         }
 
@@ -412,7 +418,11 @@ class MeetingViewScreen(val act: MainActivity) {
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
-                            Icon(painter = painterResource(id = R.drawable.instagram), contentDescription = "", tint = Grey10)
+                            Icon(
+                                painter = painterResource(id = R.drawable.instagram),
+                                contentDescription = stringResource(id = R.string.social_instagram),
+                                tint = Grey10
+                            )
 
                         }
 
@@ -431,7 +441,11 @@ class MeetingViewScreen(val act: MainActivity) {
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
-                            Icon(painter = painterResource(id = R.drawable.telegram), contentDescription = "", tint = Grey10)
+                            Icon(
+                                painter = painterResource(id = R.drawable.telegram),
+                                contentDescription = stringResource(id = R.string.social_telegram),
+                                tint = Grey10
+                            )
 
                         }
 

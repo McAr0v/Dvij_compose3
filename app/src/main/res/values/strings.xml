@@ -51,9 +51,12 @@
     <string name="cd_social_icon">Кнопка социальной сети</string>
     <string name="cd_fav_icon">Иконка "Избранное"</string>
     <string name="cd_add_image">Иконка "Добавить картинку"</string>
+    <string name="cd_add_to_fav">Иконка "Добавить в избранное"</string>
     <string name="cd_chosen_image">Выбранное изображение</string>
     <string name="cd_edit_image">Иконка "Редактировать изображение"</string>
     <string name="cd_delete_image">Иконка "Удалить изображение"</string>
+    <string name="cd_counter_view_meeting">Иконка "Количество просмотров"</string>
+
 
     <!-- Действия -->
     <string name="to_change">Изменить</string>
@@ -69,6 +72,8 @@
     <string name="create_meeting">Создание мероприятия</string>
     <string name="push_button">Опубликовать</string>
     <string name="cansel_button">Отменить</string>
+    <string name="delete_from_fav">Удалено из избранных</string>
+    <string name="add_to_fav">Добавлено в избранные</string>
 
     <!-- Авторизация -->
     <string name="guest">Гость</string>
@@ -141,6 +146,11 @@
     <string name="input_price">Введите стоимость билета</string>
     <string name="free_price">Вход бесплатный</string>
     <string name="about_meeting">О мероприятии</string>
+    <string name="empty_meeting">Пусто</string>
+    <string name="need_reg_meeting">Чтобы добавить мероприятие в этот раздел, тебе нужно авторизоваться в системе</string>
+    <string name="need_reg_meeting_to_fav">Чтобы добавить мероприятие в ИЗБРАННОЕ, тебе нужно авторизоваться в системе</string>
+    <string name="meeting_view_counter">Количество просмотров мероприятия</string>
+    <string name="meeting_call_org">Связаться с организатором</string>
 
     <!-- PICKERS -->
     <string name="piker_date">Выбери дату</string>
@@ -157,6 +167,8 @@
     <string name="cm_phone">Телефон для звонков*</string>
     <string name="cm_whatsapp">Телефон для общения в WhatsApp</string>
     <string name="cm_date">Дата мероприятия*</string>
+    <string name="cm_date2">Дата</string>
+    <string name="cm_all_time">Время проведения</string>
     <string name="cm_start_time">Время начала мероприятия*</string>
     <string name="cm_finish_time">Время завершения мероприятия</string>
     <string name="cm_price">Цена билета</string>
@@ -177,5 +189,20 @@
     <!-- Social Media -->
     <string name="social_instagram">Instagram</string>
     <string name="social_telegram">Telegram</string>
+    <string name="social_whatsapp">Whatsapp</string>
+
+    <!-- Месяцы -->
+    <string name="january">января</string>
+    <string name="february">февраля</string>
+    <string name="march">марта</string>
+    <string name="april">апреля</string>
+    <string name="may">мая</string>
+    <string name="june">июня</string>
+    <string name="july">июля</string>
+    <string name="august">августа</string>
+    <string name="september">сентрября</string>
+    <string name="october">октября</string>
+    <string name="november">ноября</string>
+    <string name="december">декабря</string>
 
 </resources>

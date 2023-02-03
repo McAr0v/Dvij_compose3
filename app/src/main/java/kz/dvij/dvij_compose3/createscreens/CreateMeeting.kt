@@ -163,7 +163,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
-            dataResult = dataPicker() // ВЫБОР ДАТЫ
+            dataResult = dataPicker(act) // ВЫБОР ДАТЫ
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_start_time)) // подпись перед формой
 

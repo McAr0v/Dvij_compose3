@@ -16,13 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.util.*
 
 
 @Composable
-fun dataPicker(): String{
+fun dataPicker(act: MainActivity): String{
 
     var dataResult = "" // возвращаемая переменная
     val mContext = LocalContext.current // инициализируем контекст
@@ -47,18 +48,18 @@ fun dataPicker(): String{
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
             mDate.value = "$mDayOfMonth ${
                 when (mMonth+1) {
-                    1 -> "января"
-                    2 -> "февраля"
-                    3 -> "марта"
-                    4 -> "апреля"
-                    5 -> "мая"
-                    6 -> "июня"
-                    7 -> "июля"
-                    8 -> "августа"
-                    9 -> "сентября"
-                    10 -> "октября"
-                    11 -> "ноября"
-                    else -> "декабря"
+                    1 -> act.getString(R.string.january)
+                    2 -> act.getString(R.string.february)
+                    3 -> act.getString(R.string.march)
+                    4 -> act.getString(R.string.april)
+                    5 -> act.getString(R.string.may)
+                    6 -> act.getString(R.string.june)
+                    7 -> act.getString(R.string.july)
+                    8 -> act.getString(R.string.august)
+                    9 -> act.getString(R.string.september)
+                    10 -> act.getString(R.string.october)
+                    11 -> act.getString(R.string.november)
+                    else -> act.getString(R.string.december)
                 }
             } $mYear"
         }, mYear, mMonth, mDay
