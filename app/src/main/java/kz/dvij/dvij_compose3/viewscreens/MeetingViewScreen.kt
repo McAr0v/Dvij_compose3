@@ -26,8 +26,6 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
-import kz.dvij.dvij_compose3.elements.PlaceCard
-import kz.dvij.dvij_compose3.elements.PlaceCardSmall
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -65,7 +63,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
         // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
 
-        act.databaseManager.readOneMeetingFromDataBase(meetingInfo, key){
+        act.meetingDatabaseManager.readOneMeetingFromDataBase(meetingInfo, key){
 
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров мероприятия
@@ -75,7 +73,7 @@ class MeetingViewScreen(val act: MainActivity) {
         // Если пользователь авторизован, проверяем, добавлено ли уже мероприятие в избранное, или нет
 
         if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-            act.databaseManager.favIconMeeting(key) {
+            act.meetingDatabaseManager.favIconMeeting(key) {
                 if (it) {
                     buttonFavColor.value = Grey90_2
                     iconTextFavColor.value = PrimaryColor
@@ -227,14 +225,14 @@ class MeetingViewScreen(val act: MainActivity) {
                             // Если не авторизован, условие else
 
                             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                act.databaseManager.favIconMeeting(key) {
+                                act.meetingDatabaseManager.favIconMeeting(key) {
 
                                     // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
                                     if (it) {
 
                                         // Убираем из избранных
-                                        act.databaseManager.removeFavouriteMeeting(key) {
+                                        act.meetingDatabaseManager.removeFavouriteMeeting(key) {
 
                                             // Если пришел колбак, что успешно
 
@@ -252,7 +250,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                                         // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.databaseManager.addFavouriteMeeting(key) {
+                                        act.meetingDatabaseManager.addFavouriteMeeting(key) {
 
                                             // Если пришел колбак, что успешно
 
@@ -468,8 +466,6 @@ class MeetingViewScreen(val act: MainActivity) {
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
-
-                PlaceCardSmall()
 
                 Spacer(modifier = Modifier.height(20.dp))
 

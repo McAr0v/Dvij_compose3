@@ -29,7 +29,7 @@ import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.DatabaseManager
+import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateMeeting
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
@@ -55,7 +55,7 @@ class CreateMeeting(private val act: MainActivity) {
     fun CreateMeetingScreen(navController: NavController, citiesList: MutableState<List<CitiesList>>) {
 
         val activity = act
-        val databaseManager = DatabaseManager(activity) // инициализируем класс с функциями базы данных
+        val meetingDatabaseManager = MeetingDatabaseManager(activity) // инициализируем класс с функциями базы данных ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
@@ -89,7 +89,7 @@ class CreateMeeting(private val act: MainActivity) {
 
 
         // Запускаем функцию считывания списка категорий с базы данных
-        act.categoryDialog.readCategoryDataFromDb(categoriesList)
+        act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
 
 
         Column(
@@ -115,7 +115,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            category = act.categoryDialog.categorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
+            category = act.categoryDialog.meetingCategorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -124,7 +124,7 @@ class CreateMeeting(private val act: MainActivity) {
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
             if (openCategoryDialog.value) {
-                act.categoryDialog.CategoryChooseDialog(categoriesList) {
+                act.categoryDialog.CategoryMeetingChooseDialog(categoriesList) {
                     openCategoryDialog.value = false
                 }
             }
@@ -237,7 +237,7 @@ class CreateMeeting(private val act: MainActivity) {
                                         // заполняем мероприятие
 
                                         val filledMeeting = MeetingsAdsClass(
-                                            key = databaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                            key = meetingDatabaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
                                             category = category,
                                             headline = headline,
                                             description = description,
@@ -259,14 +259,14 @@ class CreateMeeting(private val act: MainActivity) {
 
                                             // Если зарегистрирован, то запускаем функцию публикации мероприятия
 
-                                            databaseManager.publishMeeting(filledMeeting){ result ->
+                                            meetingDatabaseManager.publishMeeting(filledMeeting){ result ->
 
                                                 // в качестве колбака придет булин. Если опубликовано мероприятие то:
 
                                                 if (result){
 
                                                     // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
-                                                    act.categoryDialog.chosenCategory = CategoriesList ("Выбери категорию", "Default")
+                                                    act.categoryDialog.chosenMeetingCategory = CategoriesList ("Выбери категорию", "Default")
 
                                                     // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
                                                     act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")

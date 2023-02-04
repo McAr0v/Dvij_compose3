@@ -41,7 +41,7 @@ class MeetingsCard(val act: MainActivity) {
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
-        act.databaseManager.favIconMeeting(meetingItem.key!!){
+        act.meetingDatabaseManager.favIconMeeting(meetingItem.key!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
                 iconFavColor.value = PrimaryColor
@@ -64,7 +64,7 @@ class MeetingsCard(val act: MainActivity) {
 
                     // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
 
-                    act.databaseManager.viewCounterMeeting(meetingItem.key) {
+                    act.meetingDatabaseManager.viewCounterMeeting(meetingItem.key) {
 
                         // если колбак тру, то счетчик успешно сработал, значит переходим на страницу мероприятия
                         if (it) {

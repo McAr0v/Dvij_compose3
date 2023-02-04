@@ -9,7 +9,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 
-class DatabaseManager (private val activity: MainActivity) {
+class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // --- ИНИЦИАЛИЗИРУЕМ БАЗУ ДАННЫХ -------
 

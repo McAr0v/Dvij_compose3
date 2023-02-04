@@ -23,7 +23,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingsScreens (val act: MainActivity) {
 
-    private val databaseManager = act.databaseManager // инициализируем датабаз менеджер
+    private val databaseManager = act.meetingDatabaseManager // инициализируем датабаз менеджер
 
     // создаем мероприятие по умолчанию
     private val default = MeetingsAdsClass (

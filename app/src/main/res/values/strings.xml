@@ -186,6 +186,13 @@
     <string name="cm_start_in">Начинаем в</string>
     <string name="cm_choose_image">Выбери картинку</string>
 
+    <!-- Создание заведения -->
+    <string name="cp_no_place_name">Как называется твое заведение?</string>
+    <string name="cp_no_image">Нет картинки. Без нее никак не опубликовать заведение :(</string>
+    <string name="cp_no_finish_time">Во сколько закрывается заведение?</string>
+    <string name="cp_no_start_time">Во сколько открывается заведение?</string>
+    <string name="cp_no_address">Какой адрес у заведения?</string>
+
     <!-- Social Media -->
     <string name="social_instagram">Instagram</string>
     <string name="social_telegram">Telegram</string>

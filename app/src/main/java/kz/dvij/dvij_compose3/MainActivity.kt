@@ -28,12 +28,13 @@ import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
-import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.createscreens.CreatePlace
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
 import kz.dvij.dvij_compose3.elements.PlacesCard
-import kz.dvij.dvij_compose3.firebase.DatabaseManager
+import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
+import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
     val chooseCityNavigation = ChooseCityNavigation (this)
     val createMeeting = CreateMeeting (this)
     val sideComponents = SideComponents (this)
-    val databaseManager = DatabaseManager( this)
+    val meetingDatabaseManager = MeetingDatabaseManager( this)
     val meetingsScreens = MeetingsScreens(this)
     val stockScreen = StockScreen(this)
     val placesScreens = PlacesScreens(this)
@@ -68,6 +69,8 @@ class MainActivity : ComponentActivity() {
     val categoryDialog = CategoryDialog(this)
     val meetingsCard = MeetingsCard(this)
     val placesCard = PlacesCard(this)
+    val createPlace = CreatePlace(this)
+    val placesDatabaseManager = PlacesDatabaseManager(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -115,6 +118,7 @@ class MainActivity : ComponentActivity() {
 
 
             val meetingKey = remember { mutableStateOf("") }
+            val placeKey = remember { mutableStateOf("") }
 
             val context = LocalContext.current // контекст для тостов
 
@@ -254,8 +258,8 @@ class MainActivity : ComponentActivity() {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey)}
-                        composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey)}
+                        composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey)}
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
                         composable(ABOUT_ROOT) { AboutScreen()}
@@ -269,6 +273,11 @@ class MainActivity : ComponentActivity() {
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
+                        composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(
+                            navController = navController,
+                            citiesList = citiesList
+                        )}
+
                     }
                 }
             }
