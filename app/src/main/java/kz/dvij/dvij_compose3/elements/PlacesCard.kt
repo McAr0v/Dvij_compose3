@@ -29,6 +29,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
+import kz.dvij.dvij_compose3.navigation.PLACE_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class PlacesCard (val act: MainActivity) {
@@ -180,7 +181,7 @@ class PlacesCard (val act: MainActivity) {
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
-        act.placesDatabaseManager.favIconPlace(placeKey.value!!){
+        act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
                 iconFavColor.value = PrimaryColor
@@ -208,7 +209,7 @@ class PlacesCard (val act: MainActivity) {
                             // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
                             if (it) {
                                 // РАССКОМЕНТИРОВАТЬ ПОСЛЕ ТОГО, КАК СОЗДАМ СТРАНИЦУ ПРОСМОТРА
-                                // navController.navigate(MEETING_VIEW)
+                                navController.navigate(PLACE_VIEW)
                             }
                         }
                     }

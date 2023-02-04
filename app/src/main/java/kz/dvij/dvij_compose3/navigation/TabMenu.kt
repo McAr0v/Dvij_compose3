@@ -112,8 +112,8 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                     // в завимисости от того, какой индекс страницы
                     when (page) {
                         0 -> placesKey?.let { activity.placesScreens.PlacesTapeScreen(navController = navController, placeKey = it) } // заведения Лента
-                        1 -> activity.placesScreens.PlacesFavScreen() // заведения Избранные
-                        else -> activity.placesScreens.PlacesMyScreen(navController = navController) // заведения Мои
+                        1 -> placesKey?.let { activity.placesScreens.PlacesFavScreen(navController = navController, placeKey = it) } // заведения Избранные
+                        else -> placesKey?.let { activity.placesScreens.PlacesMyScreen(navController = navController, placeKey = it) } // заведения Мои
                     }
                 }
                 else -> {

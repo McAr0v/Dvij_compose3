@@ -140,21 +140,148 @@ class PlacesScreens (val act: MainActivity) {
 
 
     @Composable
-    fun PlacesFavScreen() {
-        Column(
+    fun PlacesFavScreen(navController: NavController, placeKey: MutableState<String>) {
+
+        // Инициализируем список заведений
+
+        val favPlacesList = remember {
+            mutableStateOf(listOf<PlacesAdsClass>())
+        }
+
+        // Считываем с базы данных избранные заведения
+
+        databaseManager.readPlacesFavDataFromDb(favPlacesList)
+
+
+        // --------- САМ КОНТЕНТ СТРАНИЦЫ ----------
+
+        Column (
             modifier = Modifier
-                .background(Primary10)
-                .fillMaxSize(),
+                .background(Grey95)
+                .fillMaxWidth()
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "PlacesScreen FAV")
 
+            // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
+
+            if (favPlacesList.value.isNotEmpty() && favPlacesList.value != listOf(default)){
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey95),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+
+                    // Шаблон для каждого заведения
+
+                    items(favPlacesList.value){ item ->
+                        act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+                    }
+                }
+            } else if (favPlacesList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+
+                // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+
+                Text(
+                    text = stringResource(id = R.string.empty_meeting),
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                )
+
+            } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
+
+                // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
+
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.sign_in_illustration
+                    ),
+                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
+                    modifier = Modifier.size(200.dp)
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "Чтобы добавить заведение в этот раздел, тебе нужно авторизоваться",
+                    style = Typography.bodyMedium,
+                    color = Grey10,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                Button(
+
+                    onClick = { navController.navigate(LOG_IN_ROOT) },
+
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp) // высота - 50
+                        .padding(horizontal = 20.dp),
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                )
+                {
+
+                    // СОДЕРЖИМОЕ КНОПКИ
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_login), // иконка
+                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                        tint = Grey100 // цвет иконки
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                    Text(
+                        text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
+                        style = Typography.labelMedium // стиль текста
+                    )
+                }
+
+            } else {
+
+                // ---- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        color = PrimaryColor,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(40.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.ss_loading),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+                }
+            }
         }
+
     }
 
     @Composable
-    fun PlacesMyScreen(navController: NavController) {
+    fun PlacesMyScreen(navController: NavController, placeKey: MutableState<String>) {
         // инициализируем пустой список мероприятий
 
         val myPlacesList = remember {
@@ -163,7 +290,7 @@ class PlacesScreens (val act: MainActivity) {
 
         // считываем с БД мои заведения !!!!!!!!!!!!!!
 
-        //databaseManager.readMeetingMyDataFromDb(myMeetingsList)
+        databaseManager.readPlaceMyDataFromDb(myPlacesList)
 
         // Surface для того, чтобы внизу отображать кнопочку "ДОБАВИТЬ МЕРОПРИЯТИЕ"
 
@@ -196,13 +323,9 @@ class PlacesScreens (val act: MainActivity) {
 
                         // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
 
-                        /*items(myPlacesList.value){ item ->
-                            act.meetingsCard.MeetingCard(
-                                navController = navController,
-                                meetingItem = item,
-                                meetingKey = meetingKey
-                            )
-                        }*/
+                        items(myPlacesList.value){ item ->
+                            act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+                        }
                     }
                 } else if (myPlacesList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 

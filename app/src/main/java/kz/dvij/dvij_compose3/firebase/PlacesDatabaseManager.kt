@@ -254,4 +254,141 @@ class PlacesDatabaseManager (val act: MainActivity) {
         )
     }
 
+    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ ЗАВЕДЕНИЙ --------
+
+    fun readPlaceMyDataFromDb(placesList: MutableState<List<PlacesAdsClass>>){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            // функция при изменении данных в БД
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val placeArray = ArrayList<PlacesAdsClass>()
+
+                for (item in snapshot.children){
+
+                    // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
+
+                    if (auth.uid !=null) {
+                        val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                            .child("info") // следующая папка с информацией о заведении
+                            .child(auth.uid!!) // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("placeData") // добираемся до следующей папки внутри УКПользователя - папка с данными о заведении
+                            .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведения
+
+                        if (place != null) {placeArray.add(place)} //  если заведение не нал, то добавляем в список-черновик
+                    }
+                }
+
+                if (placeArray.isEmpty()){
+                    placesList.value = listOf(default) // если в списке ничего нет, то добавляем заведение по умолчанию
+                } else {
+                    placesList.value = placeArray // если список не пустой, то возвращаем мои заведения с БД
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
+    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ Заведений --------
+
+    fun readPlacesFavDataFromDb(placesList: MutableState<List<PlacesAdsClass>>){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            // функция при изменении данных в БД
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val placeArray = ArrayList<PlacesAdsClass>()
+
+                for (item in snapshot.children){
+
+                    // Считываем каждое заведение для сравнения
+
+                    if (auth.uid !=null) {
+                        val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА заведения
+                            .child("info") // папка с информацией о заведении
+                            .children.iterator().next() // папка уникального ключа пользователя. Пропускаем ее
+                            .child("placeData") // добираесся до следующей папки внутри УКПользователя - папка с данными о заведении
+                            .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведения
+
+                        // Считываем папку, в которую попадают ключи добавивших в избранное
+
+                        val placeFav = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА заведения
+                            .child("AddedToFavorites") // Папка со списком добавивших в избранное
+                            .child(auth.uid!!) // ищем папку с ключом пользователя
+                            .getValue(String::class.java) // забираем данные из БД если они есть
+
+                        // сравниваем ключи
+
+                        if (placeFav == auth.uid) {
+                            // если ключи совпали, проверяем заведение на нал
+                            if (place != null) {
+
+                                //  если заведение не нал, то добавляем в список-черновик
+                                placeArray.add(place)
+                            }
+                        }
+                    }
+                }
+
+                if (placeArray.isEmpty()){
+                    placesList.value = listOf(default) // если в списке ничего нет, то добавляем заведение по умолчанию
+                } else {
+                    placesList.value = placeArray // если список не пустой, то возвращаем избранные заведения с БД
+                }
+            }
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
+
+    fun readOnePlaceFromDataBase(placeInfo: MutableState<PlacesAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
+
+                    val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА заведения
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("placeData") // добираесся до следующей папки внутри - папка с данными о заведении
+                        .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведеиня
+
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val placeFav = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество просмотров объявления
+                    var placeViewCount = item
+                        .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
+                    // если мероприятие не нал и ключ завдения совпадает с ключем из БД, то...
+                    if (place != null && place.placeKey == key) {
+
+                        // передаем в переменную нужное заведение
+
+                        placeInfo.value = place
+
+                        // если счетчик просмотров заведение не нал, то...
+                        if (placeViewCount != null) {
+                            // Возвращаем калбак в виде списка счетчиков
+                            callback (listOf(placeFav.toInt(), placeViewCount.toInt()))
+                        }
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
 }

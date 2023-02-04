@@ -40,6 +40,7 @@ import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.viewscreens.MeetingViewScreen
+import kz.dvij.dvij_compose3.viewscreens.PlaceViewScreen
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -71,6 +72,7 @@ class MainActivity : ComponentActivity() {
     val placesCard = PlacesCard(this)
     val createPlace = CreatePlace(this)
     val placesDatabaseManager = PlacesDatabaseManager(this)
+    val placeViewScreen = PlaceViewScreen(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -276,6 +278,10 @@ class MainActivity : ComponentActivity() {
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(
                             navController = navController,
                             citiesList = citiesList
+                        )}
+                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(
+                            key = placeKey.value,
+                            navController = navController
                         )}
 
                     }
