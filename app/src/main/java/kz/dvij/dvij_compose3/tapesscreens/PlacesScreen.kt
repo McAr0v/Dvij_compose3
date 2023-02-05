@@ -91,13 +91,13 @@ class PlacesScreens (val act: MainActivity) {
 
                     items(placeList.value){ item ->
 
-                        // сам шаблон карточки мероприятия
+                        // сам шаблон карточки
                         act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
                     }
                 }
             } else if (placeList.value == listOf(default)){
 
-                // ----- ЕСЛИ НЕТ МЕРОПРИЯТИЙ -------
+                // ----- ЕСЛИ НЕТ ЗАВЕДЕНИЙ -------
 
                 Text(
                     text = stringResource(id = R.string.empty_meeting),
@@ -282,7 +282,8 @@ class PlacesScreens (val act: MainActivity) {
 
     @Composable
     fun PlacesMyScreen(navController: NavController, placeKey: MutableState<String>) {
-        // инициализируем пустой список мероприятий
+
+        // инициализируем пустой список заведений
 
         val myPlacesList = remember {
             mutableStateOf(listOf<PlacesAdsClass>())

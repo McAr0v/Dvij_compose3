@@ -28,7 +28,6 @@ import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -53,7 +52,7 @@ class PlaceViewScreen (val act: MainActivity) {
             mutableStateOf(Grey10)
         }
 
-        // Переменная счетчика людей, добавивших в избранное мероприятие
+        // Переменная счетчика людей, добавивших в избранное заведение
         val favCounter = remember {
             mutableStateOf(0)
         }
@@ -63,7 +62,7 @@ class PlaceViewScreen (val act: MainActivity) {
             mutableStateOf(0)
         }
 
-        // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
+        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
 
         act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, key){
 
@@ -225,7 +224,7 @@ class PlaceViewScreen (val act: MainActivity) {
                     Button(
                         onClick = {
 
-                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это завдение -----
+                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это заведение -----
                             // Если не авторизован, условие else
 
                             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {

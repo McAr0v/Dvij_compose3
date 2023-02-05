@@ -28,29 +28,22 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     suspend fun publishPlace(filledPLace: PlacesAdsClass, callback: (result: Boolean)-> Unit){
 
-        try {
-            placeDatabase // записываем в базу данных
-                .child(filledPLace.placeKey ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ЗАВЕДЕНИЯ
-                .child("info") // помещаем данные в папку info
-                .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего заведение
-                .child("placeData") // помещаем в папку
-                .setValue(filledPLace).addOnCompleteListener {
+        placeDatabase // записываем в базу данных
+            .child(filledPLace.placeKey ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ЗАВЕДЕНИЯ
+            .child("info") // помещаем данные в папку info
+            .child(auth.uid!!) // создаем для безопасности путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, публикующего заведение
+            .child("placeData") // помещаем в папку
+            .setValue(filledPLace).addOnCompleteListener {
 
-                    if (it.isSuccessful) {
-                        // если мероприятие опубликовано, возвращаем колбак тру
-                        callback (true)
+                if (it.isSuccessful) {
+                    // если мероприятие опубликовано, возвращаем колбак тру
+                    callback (true)
 
-                    } else {
-                        // если не опубликовано, то возвращаем фалс
-                        callback (false)
-                    }
+                } else {
+                    // если не опубликовано, то возвращаем фалс
+                    callback (false)
                 }
-        } catch (e: Exception) {
-
-            Log.d("MyLog", "Exception in publish Place = ${e.message}")
-            Log.d("MyLog", "Exception in publish Place = ${e}")
-
-        }
+            }
     }
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ЗАВЕДЕНИЙ С БАЗЫ ДАННЫХ --------

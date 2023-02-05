@@ -14,9 +14,12 @@ import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
+import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import java.io.ByteArrayOutputStream
 
 class PhotoHelper (val act: MainActivity) {
+
+    // ----- STORAGE МЕРОПРИЯТИЙ -----------
 
     private val storageMeetings = Firebase
         .storage("gs://dvij-compose3-1cf6a.appspot.com") // Указываем путь на наш Storage
@@ -28,6 +31,8 @@ class PhotoHelper (val act: MainActivity) {
         .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
         .child("image_${System.currentTimeMillis()}") // название изображения
 
+    // ----- STORAGE ЗАВЕДЕНИЙ -----------
+
     private val storagePlaces = Firebase
         .storage("gs://dvij-compose3-1cf6a.appspot.com")
         .getReference("Places") // инициализируем папку, в которую будет сохраняться картинка мест
@@ -36,6 +41,18 @@ class PhotoHelper (val act: MainActivity) {
 
     private val imageRefPlaces = storagePlaces
         .child(act.mAuth.uid ?: "empty") // в папке "Places" будет еще папка - для каждого пользователя своя
+        .child("image_${System.currentTimeMillis()}") // название изображения
+
+    // ----- STORAGE АКЦИЙ -----------
+
+    private val storageStock = Firebase
+        .storage("gs://dvij-compose3-1cf6a.appspot.com")
+        .getReference("Stock") // инициализируем папку, в которую будет сохраняться картинка акций
+
+    // делаем дополнительные подпапки для более удобного поиска изображений
+
+    private val imageRefStock = storagePlaces
+        .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
         .child("image_${System.currentTimeMillis()}") // название изображения
 
 
@@ -173,6 +190,20 @@ class PhotoHelper (val act: MainActivity) {
             }
 
             callback(imageRefPlaces.downloadUrl.await().toString())
+
+        } else if (typePost == STOCK_ROOT){
+
+            // ----- ЕСЛИ ЗАГРУЖАЕМ ФОТО АКЦИЙ --------
+
+            // То же самое что и в фото мероприятий, только в другую папку
+
+            if (metadata != null){
+                imageRefStock.putFile(uri, metadata).await()
+            } else {
+                imageRefStock.putFile(uri).await()
+            }
+
+            callback(imageRefStock.downloadUrl.await().toString())
 
         }
     }

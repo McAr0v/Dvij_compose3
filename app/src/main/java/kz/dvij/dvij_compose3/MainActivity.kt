@@ -176,9 +176,15 @@ class MainActivity : ComponentActivity() {
 
                     } else if (currentRoute == MEETING_VIEW){
 
-                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА МЕРОПРИЯТИЯ ------------
+                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА МЕРОПРИЯТИЯ ------------
 
                         TopBarWithBackButton(navController = navController, text = R.string.meetings)
+
+                    } else if (currentRoute == PLACE_VIEW){
+
+                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА ЗАВЕДЕНИЯ ------------
+
+                        TopBarWithBackButton(navController = navController, text = R.string.places)
 
                     } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
 
@@ -275,14 +281,8 @@ class MainActivity : ComponentActivity() {
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
-                        composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(
-                            navController = navController,
-                            citiesList = citiesList
-                        )}
-                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(
-                            key = placeKey.value,
-                            navController = navController
-                        )}
+                        composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
+                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController)}
 
                     }
                 }

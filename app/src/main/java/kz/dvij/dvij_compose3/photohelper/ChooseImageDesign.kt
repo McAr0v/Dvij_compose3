@@ -25,7 +25,7 @@ import coil.compose.rememberAsyncImagePainter
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
 
-// --- ФУНКЦИЯ ВЫБОРА КАРТИНКИ В СОЗДАНИИ МЕРОПРИЯТИЯ --------
+// --- ФУНКЦИЯ ВЫБОРА КАРТИНКИ В СОЗДАНИИ МЕРОПРИЯТИЯ / ЗАВЕДЕНИЯ / АКЦИЙ  --------
 
 @Composable
 fun chooseImageDesign (): Uri? {
