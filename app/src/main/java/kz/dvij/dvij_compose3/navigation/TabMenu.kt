@@ -28,7 +28,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН И ФУНКЦИОНАЛ ТАБОВ (МОИ, ИЗБРАННЫЕ, ЛЕНТА) В РАЗДЕЛАХ МЕРОПРИЯТИЯ, ЗАВЕДЕНИЯ, АКЦИИ
 
-fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity, meetingKey: MutableState<String>? = null, placesKey: MutableState<String>? = null){
+fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity, meetingKey: MutableState<String>? = null, placesKey: MutableState<String>? = null, stockKey: MutableState<String>? = null){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
     // (Смотри Horizontal Pager)
@@ -121,7 +121,7 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                     when (page) {
                         0 -> activity.stockScreen.StockTapeScreen() // Акции Лента
                         1 -> activity.stockScreen.StockFavScreen() // Акции Избранные
-                        else -> activity.stockScreen.StockMyScreen() // Акции МОИ
+                        else -> stockKey?.let { activity.stockScreen.StockMyScreen(navController = navController, stockKey = it) } // Акции МОИ
                     }
                 }
             }

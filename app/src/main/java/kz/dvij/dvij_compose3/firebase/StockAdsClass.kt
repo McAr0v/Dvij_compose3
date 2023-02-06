@@ -1,0 +1,14 @@
+package kz.dvij.dvij_compose3.firebase
+
+data class StockAdsClass(
+    val image: String? = null,
+    val headline: String? = null,
+    val description: String? = null,
+    val category: String? = null,
+    val keyStock: String? = null,
+    val keyPlace: String? = null,
+    val keyCreator: String? = null,
+    val city: String? = null,
+    val startDate: String? = null,
+    val finishDate: String? = null,
+)

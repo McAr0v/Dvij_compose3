@@ -29,6 +29,7 @@ import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
 import kz.dvij.dvij_compose3.createscreens.CreateMeeting
 import kz.dvij.dvij_compose3.createscreens.CreatePlace
+import kz.dvij.dvij_compose3.createscreens.CreateStock
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
     val createPlace = CreatePlace(this)
     val placesDatabaseManager = PlacesDatabaseManager(this)
     val placeViewScreen = PlaceViewScreen(this)
+    val createStock = CreateStock (this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -121,6 +123,7 @@ class MainActivity : ComponentActivity() {
 
             val meetingKey = remember { mutableStateOf("") }
             val placeKey = remember { mutableStateOf("") }
+            val stockKey = remember { mutableStateOf("") }
 
             val context = LocalContext.current // контекст для тостов
 
@@ -268,7 +271,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey)}
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey)}
-                        composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity)}
+                        composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey)}
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
@@ -283,6 +286,10 @@ class MainActivity : ComponentActivity() {
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController)}
+                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(
+                            navController = navController,
+                            citiesList = citiesList
+                        )}
 
                     }
                 }
