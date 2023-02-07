@@ -193,6 +193,11 @@
     <string name="cp_no_start_time">Во сколько открывается заведение?</string>
     <string name="cp_no_address">Какой адрес у заведения?</string>
 
+    <!-- Создание акции -->
+    <string name="cs_no_headline">Напиши заголовок акции</string>
+    <string name="cs_no_start_day">В какой день начало акции?</string>
+    <string name="cs_no_finish_day">В какой день заканчивается акция?</string>
+
     <!-- Social Media -->
     <string name="social_instagram">Instagram</string>
     <string name="social_telegram">Telegram</string>

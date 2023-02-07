@@ -37,7 +37,9 @@ import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.functions.checkDataOnCreatePlace
+import kz.dvij.dvij_compose3.functions.checkDataOnCreateStock
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.pickers.dataPicker
@@ -54,7 +56,7 @@ class CreateStock (val act: MainActivity) {
 
 
 
-    // СДЕЛАТЬ !!! private val placesDatabaseManager = PlacesDatabaseManager(act) // ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
+    private val stockDatabaseManager = StockDatabaseManager(act) // ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
 
     // ----- ЭКРАН СОЗДАНИЯ АКЦИИ --------
 
@@ -161,16 +163,14 @@ class CreateStock (val act: MainActivity) {
 
                           // !!!!!!!! СДЕЛАТЬ ВЕСЬ ФУНКЦИОНАЛ !!!!!!!!!!!
 
-                    /* val checkData = checkDataOnCreatePlace(
+                    val checkData = checkDataOnCreateStock(
                         image1 = image1,
                         headline = headline,
-                        phone = phone,
-                        openTime = openTimeResult,
-                        closeTime = closeTimeResult,
+                        startDay = openTimeResult,
+                        finishDay = closeTimeResult,
                         description = description,
                         category = category,
-                        city = city,
-                        address = address
+                        city = city
                     )
 
                     if (checkData != 0) {
@@ -185,7 +185,7 @@ class CreateStock (val act: MainActivity) {
 
                         ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
 
-                    } else {
+                    } /*else {
 
                         // если все права есть и все обязательные поля заполнены
 
