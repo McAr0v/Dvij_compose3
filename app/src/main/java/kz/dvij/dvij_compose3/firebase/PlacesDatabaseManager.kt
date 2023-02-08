@@ -20,7 +20,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
     val default = PlacesAdsClass (
-        placeDescription = "def"
+        placeDescription = "Default"
     )
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ ЗАВЕДЕНИЯ --------
@@ -59,7 +59,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
                     // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
 
-                    val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА ЗАВЕДЕНИЯ
                         .child("info") // следующая папка с информацией о заведении
                         .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
                         .child("placeData") // добираесся до следующей папки внутри УКПользователя - папка с данными о заведении
@@ -262,7 +262,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
                     // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
 
                     if (auth.uid !=null) {
-                        val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА ЗАВЕДЕНИЯ
                             .child("info") // следующая папка с информацией о заведении
                             .child(auth.uid!!) // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
                             .child("placeData") // добираемся до следующей папки внутри УКПользователя - папка с данными о заведении
@@ -339,7 +339,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
         )
     }
 
-    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ --------
 
     fun readOnePlaceFromDataBase(placeInfo: MutableState<PlacesAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
 

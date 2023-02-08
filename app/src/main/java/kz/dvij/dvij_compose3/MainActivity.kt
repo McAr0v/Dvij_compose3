@@ -34,14 +34,17 @@ import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
 import kz.dvij.dvij_compose3.elements.PlacesCard
+import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
+import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.viewscreens.MeetingViewScreen
 import kz.dvij.dvij_compose3.viewscreens.PlaceViewScreen
+import kz.dvij.dvij_compose3.viewscreens.StockViewScreen
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -75,6 +78,9 @@ class MainActivity : ComponentActivity() {
     val placesDatabaseManager = PlacesDatabaseManager(this)
     val placeViewScreen = PlaceViewScreen(this)
     val createStock = CreateStock (this)
+    val stockCard = StockCard (this)
+    val stockDatabaseManager = StockDatabaseManager(this)
+    val stockViewScreen = StockViewScreen(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -189,6 +195,12 @@ class MainActivity : ComponentActivity() {
 
                         TopBarWithBackButton(navController = navController, text = R.string.places)
 
+                    } else if (currentRoute == STOCK_VIEW){
+
+                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА АКЦИИ ------------
+
+                        TopBarWithBackButton(navController = navController, text = R.string.stock)
+
                     } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
 
                         // в секцию верхнего меню вызываем наше созданное верхнее меню
@@ -286,9 +298,10 @@ class MainActivity : ComponentActivity() {
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController)}
-                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(
-                            navController = navController,
-                            citiesList = citiesList
+                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
+                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(
+                            key = stockKey.value,
+                            navController = navController
                         )}
 
                     }

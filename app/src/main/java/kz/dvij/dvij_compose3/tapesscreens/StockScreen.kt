@@ -21,13 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // функция превью экрана
 class StockScreen(val act: MainActivity) {
+
+    private val databaseManager = StockDatabaseManager(act = act)
+    private val stockCard = StockCard(act)
 
     private val user = act.mAuth.currentUser
 
@@ -47,21 +51,94 @@ class StockScreen(val act: MainActivity) {
 
     }
 
-
-// экран акций
+    // ----- ЛЕНТА АКЦИЙ ----------
 
     @Composable
-    fun StockTapeScreen() {
-        Column(
+    fun StockTapeScreen(navController: NavController, stockKey: MutableState<String>) {
+
+        // инициализируем список акций
+        val stockList = remember {
+            mutableStateOf(listOf<StockAdsClass>())
+        }
+
+        // обращаемся к базе данных и записываем в список акций
+        databaseManager.readStockDataFromDb(stockList)
+
+        // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
+
+        Column (
             modifier = Modifier
-                .background(Primary70)
-                .fillMaxSize(),
+                .background(Grey95)
+                .fillMaxWidth()
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "StockScreen TAPE")
 
+            // ---- ЕСЛИ ЗАГРУЗИЛИСЬ АКЦИИ С БД --------
+
+            if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+
+                // ---- ЛЕНИВАЯ КОЛОНКА --------
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey95),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+
+                    // для каждого элемента из списка указываем шаблон для отображения
+
+                    items(stockList.value){ item ->
+
+                        // сам шаблон карточки
+                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                    }
+                }
+            } else if (stockList.value == listOf(default)){
+
+                // ----- ЕСЛИ НЕТ АКЦИЙ -------
+
+                Text(
+                    text = stringResource(id = R.string.empty_meeting),
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                )
+
+            } else {
+
+                // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    // крутилка индикатор
+
+                    CircularProgressIndicator(
+                        color = PrimaryColor,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(40.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    // текст рядом с крутилкой
+
+                    Text(
+                        text = stringResource(id = R.string.ss_loading),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+
+                }
+            }
         }
+
     }
 
     @Composable
@@ -73,11 +150,11 @@ class StockScreen(val act: MainActivity) {
                 mutableStateOf(listOf<StockAdsClass>())
             }
 
-            // считываем с БД мои акции !!!!!!!!!!!!!!
+            // считываем с БД мои акции
 
-            // databaseManager.readPlaceMyDataFromDb(myPlacesList)
+            databaseManager.readStockMyDataFromDb(myStockList)
 
-            // Surface для того, чтобы внизу отображать кнопочку "ДОБАВИТЬ МЕРОПРИЯТИЕ"
+            // Surface для того, чтобы внизу отображать кнопочку "ДОБАВИТЬ АКЦИЮ"
 
             Surface(modifier = Modifier.fillMaxSize()) {
 
@@ -92,7 +169,7 @@ class StockScreen(val act: MainActivity) {
                     verticalArrangement = Arrangement.Center
                 ) {
 
-                    // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ Заведения ---------
+                    // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ АКЦИИ ---------
 
                     if (myStockList.value.isNotEmpty() && myStockList.value != listOf(default)){
 
@@ -109,7 +186,7 @@ class StockScreen(val act: MainActivity) {
                             // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
 
                             items(myStockList.value){ item ->
-                                // act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+                                act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
                             }
                         }
                     } else if (myStockList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
@@ -218,16 +295,142 @@ class StockScreen(val act: MainActivity) {
     }
 
     @Composable
-    fun StockFavScreen() {
-        Column(
+    fun StockFavScreen(navController: NavController, stockKey: MutableState<String>) {
+
+        // Инициализируем список акций
+
+        val favStockList = remember {
+            mutableStateOf(listOf<StockAdsClass>())
+        }
+
+        // Считываем с базы данных избранные акции
+
+        databaseManager.readStockFavDataFromDb(favStockList)
+
+
+        // --------- САМ КОНТЕНТ СТРАНИЦЫ ----------
+
+        Column (
             modifier = Modifier
-                .background(Primary70)
-                .fillMaxSize(),
+                .background(Grey95)
+                .fillMaxWidth()
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "StockScreen FAV")
 
+            // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
+
+            if (favStockList.value.isNotEmpty() && favStockList.value != listOf(default)){
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey95),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+
+                    // Шаблон для каждой акции
+
+                    items(favStockList.value){ item ->
+                       stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                    }
+                }
+            } else if (favStockList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+
+                // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+
+                Text(
+                    text = stringResource(id = R.string.empty_meeting),
+                    style = Typography.bodyMedium,
+                    color = Grey10
+                )
+
+            } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
+
+                // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
+
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.sign_in_illustration
+                    ),
+                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
+                    modifier = Modifier.size(200.dp)
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "Чтобы добавить акцию в этот раздел, тебе нужно авторизоваться",
+                    style = Typography.bodyMedium,
+                    color = Grey10,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                Button(
+
+                    onClick = { navController.navigate(LOG_IN_ROOT) },
+
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp) // высота - 50
+                        .padding(horizontal = 20.dp),
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = PrimaryColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                )
+                {
+
+                    // СОДЕРЖИМОЕ КНОПКИ
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_login), // иконка
+                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                        tint = Grey100 // цвет иконки
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                    Text(
+                        text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
+                        style = Typography.labelMedium // стиль текста
+                    )
+                }
+
+            } else {
+
+                // ---- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        color = PrimaryColor,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(40.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.ss_loading),
+                        style = Typography.bodyMedium,
+                        color = Grey10
+                    )
+                }
+            }
         }
     }
 }

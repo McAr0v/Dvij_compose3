@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
@@ -35,7 +34,7 @@ class PlacesScreens (val act: MainActivity) {
 
     // создаем заведение по умолчанию
     private val default = PlacesAdsClass (
-        placeDescription = "def"
+        placeDescription = "Default"
     )
 
     @Composable
@@ -49,7 +48,7 @@ class PlacesScreens (val act: MainActivity) {
     }
 
 
-// экран заведений
+    // ----- ЛЕНТА ЗАВЕДЕНИЙ -------
 
     @Composable
     fun PlacesTapeScreen(navController: NavController, placeKey: MutableState<String>) {
@@ -289,7 +288,7 @@ class PlacesScreens (val act: MainActivity) {
             mutableStateOf(listOf<PlacesAdsClass>())
         }
 
-        // считываем с БД мои заведения !!!!!!!!!!!!!!
+        // считываем с БД мои заведения
 
         databaseManager.readPlaceMyDataFromDb(myPlacesList)
 
@@ -425,7 +424,7 @@ class PlacesScreens (val act: MainActivity) {
                 }
             }
 
-            // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ МЕРОПРИЯТИЯ --------------
+            // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ ЗАВЕДЕНИЯ --------------
 
             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
                 FloatingButton { navController.navigate(CREATE_PLACES_SCREEN) }

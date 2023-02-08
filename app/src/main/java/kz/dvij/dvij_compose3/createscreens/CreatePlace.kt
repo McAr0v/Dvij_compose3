@@ -47,10 +47,8 @@ class CreatePlace (val act: MainActivity) {
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО заведение
 
     val default = PlacesAdsClass (
-        placeDescription = "def"
+        placeDescription = "Default"
     )
-
-
 
     private val placesDatabaseManager = PlacesDatabaseManager(act) // ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
 
@@ -93,7 +91,7 @@ class CreatePlace (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Логотип заведения") // подпись перед формой
 
-            val image1 = chooseImageDesign() // Изображение мероприятия
+            val image1 = chooseImageDesign() // Изображение заведения
 
             SpacerTextWithLine(headline = "Название заведения") // подпись перед формой
 
@@ -153,17 +151,18 @@ class CreatePlace (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Начало рабочего дня") // подпись перед формой
 
-            var openTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Начало мероприятия
+            var openTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
             SpacerTextWithLine(headline = "Конец рабочего дня") // подпись перед формой
 
-            var closeTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Конец мероприятия
+            var closeTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Когда закрывается заведение
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ ЗАВЕДЕНИЯ
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
+
 
             // -------------- КНОПКИ ОТМЕНА И ОПУБЛИКОВАТЬ ------------
 
@@ -256,7 +255,7 @@ class CreatePlace (val act: MainActivity) {
 
                                             placesDatabaseManager.publishPlace(filledPlace) { result ->
 
-                                                // в качестве колбака придет булин. Если опубликовано мероприятие то:
+                                                // в качестве колбака придет булин. Если опубликовано заведение то:
 
                                                 if (result) {
 

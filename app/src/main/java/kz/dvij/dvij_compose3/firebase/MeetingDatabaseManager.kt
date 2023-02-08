@@ -20,7 +20,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
     val default = MeetingsAdsClass (
-        description = "def"
+        description = "Default"
     )
 
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------

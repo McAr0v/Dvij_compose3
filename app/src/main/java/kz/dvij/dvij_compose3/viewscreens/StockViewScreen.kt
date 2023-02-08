@@ -29,17 +29,18 @@ import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
-class PlaceViewScreen (val act: MainActivity) {
+class StockViewScreen (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun PlaceViewScreen (key: String, navController: NavController){
+    fun StockViewScreen (key: String, navController: NavController){
 
-        // Переменная, которая содержит в себе информацию о заведении
-        val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+        // Переменная, которая содержит в себе информацию об акции
+        val stockInfo = remember {
+            mutableStateOf(StockAdsClass())
         }
 
         // Переменная, отвечающая за цвет кнопки избранных
@@ -52,29 +53,29 @@ class PlaceViewScreen (val act: MainActivity) {
             mutableStateOf(Grey10)
         }
 
-        // Переменная счетчика людей, добавивших в избранное заведение
+        // Переменная счетчика людей, добавивших в избранное акции
         val favCounter = remember {
             mutableStateOf(0)
         }
 
-        // Переменная счетчика просмотра заведения
+        // Переменная счетчика просмотра акции
         val viewCounter = remember {
             mutableStateOf(0)
         }
 
-        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
+        // Считываем данные про акцию и счетчики добавивших в избранное и количество просмотров акции
 
-        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, key){
+        act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, key){
 
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров заведения
 
         }
 
-        // Если пользователь авторизован, проверяем, добавлено ли уже заведение в избранное, или нет
+        // Если пользователь авторизован, проверяем, добавлена ли уже акция в избранное, или нет
 
         if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-            act.placesDatabaseManager.favIconPlace(key) {
+            act.stockDatabaseManager.favIconStock(key) {
                 if (it) {
                     buttonFavColor.value = Grey90_2
                     iconTextFavColor.value = PrimaryColor
@@ -99,11 +100,11 @@ class PlaceViewScreen (val act: MainActivity) {
 
         ) {
 
-            // ------- КАРТИНКА Заведения ----------
+            // ------- КАРТИНКА Акции ----------
 
             AsyncImage(
-                model = placeInfo.value.logo,
-                contentDescription = "Логотип заведения",
+                model = stockInfo.value.image,
+                contentDescription = "Картинка акции",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp),
@@ -122,12 +123,12 @@ class PlaceViewScreen (val act: MainActivity) {
 
             ) {
 
-                // -------- НАЗВАНИЕ ЗАВЕДЕНИЯ ----------
+                // -------- НАЗВАНИЕ АКЦИИ ----------
 
-                if (placeInfo.value.placeName != null) {
+                if (stockInfo.value.headline != null) {
 
                     Text(
-                        text = placeInfo.value.placeName!!,
+                        text = stockInfo.value.headline!!,
                         style = Typography.titleLarge,
                         color = Grey10
                     )
@@ -135,21 +136,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 // ------- ГОРОД ------------
 
-                if (placeInfo.value.city != null) {
+                if (stockInfo.value.city != null) {
 
                     Text(
-                        text = placeInfo.value.city!!,
-                        style = Typography.bodyMedium,
-                        color = Grey40
-                    )
-                }
-
-                // ------- АДРЕС ------------
-
-                if (placeInfo.value.address != null) {
-
-                    Text(
-                        text = placeInfo.value.address!!,
+                        text = stockInfo.value.city!!,
                         style = Typography.bodyMedium,
                         color = Grey40
                     )
@@ -166,10 +156,10 @@ class PlaceViewScreen (val act: MainActivity) {
                 ) {
 
 
-                    // -------- КАТЕГОРИЯ заведения ----------
+                    // -------- КАТЕГОРИЯ акции ----------
 
 
-                    if (placeInfo.value.category != null) {
+                    if (stockInfo.value.category != null) {
 
                         Button(
                             onClick = {
@@ -186,7 +176,7 @@ class PlaceViewScreen (val act: MainActivity) {
                             shape = RoundedCornerShape(30.dp)
                         ) {
                             Text(
-                                text = placeInfo.value.category!!,
+                                text = stockInfo.value.category!!,
                                 style = Typography.labelMedium
                             )
                         }
@@ -235,18 +225,19 @@ class PlaceViewScreen (val act: MainActivity) {
                     Button(
                         onClick = {
 
-                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это заведение -----
+                            // --- Если клиент авторизован, проверяем, добавлена ли уже в избранное эта акция -----
                             // Если не авторизован, условие else
 
                             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                act.placesDatabaseManager.favIconPlace(key) {
+                                act.stockDatabaseManager.favIconStock(key) {
 
                                     // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
                                     if (it) {
 
                                         // Убираем из избранных
-                                        act.placesDatabaseManager.removeFavouritePlace(key) {
+
+                                        act.stockDatabaseManager.removeFavouriteStock(key) {
 
                                             // Если пришел колбак, что успешно
 
@@ -265,7 +256,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                                         // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.placesDatabaseManager.addFavouritePlace(key) {
+                                        act.stockDatabaseManager.addFavouriteStock(key) {
 
                                             // Если пришел колбак, что успешно
 
@@ -288,7 +279,7 @@ class PlaceViewScreen (val act: MainActivity) {
                                 // Если пользователь не авторизован, то ему выводим ТОСТ
 
                                 Toast
-                                    .makeText(act, "Чтобы добавить заведение в избранные, тебе нужно авторизоваться", Toast.LENGTH_SHORT)
+                                    .makeText(act, "Чтобы добавить акцию в избранные, тебе нужно авторизоваться", Toast.LENGTH_SHORT)
                                     .show()
                             }
                         },
@@ -330,152 +321,34 @@ class PlaceViewScreen (val act: MainActivity) {
                         .fillMaxWidth()
                         .weight(0.5f)
                     ) {
-                        if (placeInfo.value.openTime != null){
-                            HeadlineAndDesc(headline = placeInfo.value.openTime!!, desc = act.getString(
-                                R.string.cm_date2))
-                        }
-                    }
-
-                    // ---- ВРЕМЯ -----
-
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.5f)) {
-
-                        if (placeInfo.value.openTime != null && placeInfo.value.closeTime != null){
-                            HeadlineAndDesc(
-                                headline = if (placeInfo.value.closeTime == ""){
-                                    placeInfo.value.openTime!!
-                                } else {
-                                    "${placeInfo.value.openTime} - ${placeInfo.value.closeTime}"
-                                },
-                                desc = if (placeInfo.value.closeTime == ""){
-                                    act.getString(R.string.cm_start_in)
-                                } else {
-                                    act.getString(R.string.cm_all_time)
-                                } //
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-
-                SpacerTextWithLine(headline = stringResource(id = R.string.meeting_call_org))
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row (modifier = Modifier.fillMaxSize()){
-
-                    // ----- КНОПКА ПОЗВОНИТЬ --------
-
-                    if (placeInfo.value.phone != null) {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.makeACall(placeInfo.value.phone!!) },
-                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
-                        ) {
-
-                            androidx.compose.material.Icon(painter = painterResource(id = R.drawable.ic_phone), contentDescription = "", tint = Grey10)
-
+                        if (stockInfo.value.startDate != null){
+                            HeadlineAndDesc(headline = stockInfo.value.startDate!!, desc = "Начало акции")
                         }
 
-                        Spacer(modifier = Modifier
-                            .width(10.dp)
-                        )
-
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
-
-                    if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "+77") {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!) },
-                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
-                        ) {
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.whatsapp),
-                                contentDescription = stringResource(id = R.string.social_whatsapp),
-                                tint = Grey10
-                            )
-
+                        if (stockInfo.value.finishDate != null){
+                            HeadlineAndDesc(headline = stockInfo.value.finishDate!!, desc = "Конец акции")
                         }
-
-                        Spacer(modifier = Modifier
-                            .width(10.dp)
-                        )
-
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
-
-                    if (placeInfo.value.instagram != null && placeInfo.value.instagram != INSTAGRAM_URL) {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!) },
-                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
-                        ) {
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.instagram),
-                                contentDescription = stringResource(id = R.string.social_instagram),
-                                tint = Grey10
-                            )
-
-                        }
-
-                        Spacer(modifier = Modifier
-                            .width(10.dp)
-                        )
-
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
-
-                    if (placeInfo.value.telegram != null && placeInfo.value.telegram != TELEGRAM_URL) {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!) },
-                            modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
-                        ) {
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.telegram),
-                                contentDescription = stringResource(id = R.string.social_telegram),
-                                tint = Grey10
-                            )
-
-                        }
-
-                        Spacer(modifier = Modifier
-                            .width(10.dp)
-                        )
 
                     }
 
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // ---------- ОПИСАНИЕ -------------
 
                 Text(
-                    text = stringResource(id = R.string.about_meeting),
+                    text = "Об акции",
                     style = Typography.titleMedium,
                     color = Grey10
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (placeInfo.value.placeDescription !=null){
+                if (stockInfo.value.description !=null){
 
                     Text(
-                        text = placeInfo.value.placeDescription!!,
+                        text = stockInfo.value.description!!,
                         style = Typography.bodyMedium,
                         color = Grey10
                     )

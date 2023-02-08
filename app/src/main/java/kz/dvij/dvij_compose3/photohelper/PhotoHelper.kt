@@ -137,8 +137,8 @@ class PhotoHelper (val act: MainActivity) {
             if (height <= 1000) { // Если высота меньше или равна 1000
 
                 // оставляем размеры без изменений
-                listOfSize[0] = height
-                listOfSize[1] = width
+                listOfSize[0] = width
+                listOfSize[1] = height
 
             } else {
                 // если высота больше 1000, то пересчитываем ширину на нужное значение

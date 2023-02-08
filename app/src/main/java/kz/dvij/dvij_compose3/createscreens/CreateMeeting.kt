@@ -42,8 +42,10 @@ class CreateMeeting(private val act: MainActivity) {
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
+    // ---- МЕРОПРИЯТИЕ ПО УМОЛЧАНИЮ ----------
+
     val default = MeetingsAdsClass (
-        description = "def"
+        description = "Default"
     )
 
 
@@ -136,7 +138,6 @@ class CreateMeeting(private val act: MainActivity) {
                     openCityDialog.value = false
                 }
             }
-
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 

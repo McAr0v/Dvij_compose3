@@ -27,7 +27,7 @@ class MeetingsScreens (val act: MainActivity) {
 
     // создаем мероприятие по умолчанию
     private val default = MeetingsAdsClass (
-        description = "def"
+        description = "Default"
     )
 
     // ------ ЭКРАН, ВНУТРИ КОТОРОГО ТАБЫ С ИЗБРАННЫМ, ЛЕНТОЙ И МОИМИ ---------

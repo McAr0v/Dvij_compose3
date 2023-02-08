@@ -119,8 +119,8 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                 else -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> activity.stockScreen.StockTapeScreen() // Акции Лента
-                        1 -> activity.stockScreen.StockFavScreen() // Акции Избранные
+                        0 -> stockKey?.let { activity.stockScreen.StockTapeScreen(navController = navController, stockKey = it) } // Акции Лента
+                        1 -> stockKey?.let { activity.stockScreen.StockFavScreen(navController = navController, stockKey = it) } // Акции Избранные
                         else -> stockKey?.let { activity.stockScreen.StockMyScreen(navController = navController, stockKey = it) } // Акции МОИ
                     }
                 }

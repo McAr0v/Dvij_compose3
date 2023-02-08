@@ -1,6 +1,5 @@
 package kz.dvij.dvij_compose3.callandwhatsapp
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri

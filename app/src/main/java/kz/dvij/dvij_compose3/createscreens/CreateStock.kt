@@ -1,7 +1,8 @@
+@file:Suppress("IMPLICIT_CAST_TO_ANY")
+
 package kz.dvij.dvij_compose3.createscreens
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
@@ -12,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,39 +29,32 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
-import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
-import kz.dvij.dvij_compose3.functions.checkDataOnCreatePlace
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateStock
-import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
+import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.pickers.dataPicker
-import kz.dvij.dvij_compose3.pickers.timePicker
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateStock (val act: MainActivity) {
 
-    private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО акию
+    private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО АКЦИЮ
+
+    // ---- АКЦИЯ ПО УМОЛЧАНИЮ -------
 
     val defaultStock = StockAdsClass (
-        description = "def"
+        description = "Default"
     )
-
-
 
     private val stockDatabaseManager = StockDatabaseManager(act) // ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
 
     // ----- ЭКРАН СОЗДАНИЯ АКЦИИ --------
 
     @OptIn(DelicateCoroutinesApi::class)
-    @SuppressLint("RememberReturnType")
     @Composable
     fun CreateStockScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
 
@@ -112,11 +105,9 @@ class CreateStock (val act: MainActivity) {
 
             val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
 
+
             // СДЕЛАТЬ ДИАЛОГ ВЫБОРА ЗАВЕДЕНИЯ
 
-            SpacerTextWithLine(headline = "Адрес") // подпись перед формой
-
-            val address = fieldHeadlineComponent(act = act) // форма заголовка
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
@@ -136,17 +127,19 @@ class CreateStock (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
 
-            var openTimeResult = dataPicker(act = act) // выбор даты начала
+            var startDay = dataPicker(act = act) // выбор даты начала
 
             SpacerTextWithLine(headline = "Дата завершения акции") // подпись перед формой
 
-            var closeTimeResult = dataPicker(act = act) // выбор даты завершения
+            var finishDay = dataPicker(act = act) // выбор даты завершения
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ Акции
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
+
+
 
             // -------------- КНОПКИ ОТМЕНА И ОПУБЛИКОВАТЬ ------------
 
@@ -161,13 +154,11 @@ class CreateStock (val act: MainActivity) {
 
                     // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
 
-                          // !!!!!!!! СДЕЛАТЬ ВЕСЬ ФУНКЦИОНАЛ !!!!!!!!!!!
-
                     val checkData = checkDataOnCreateStock(
                         image1 = image1,
                         headline = headline,
-                        startDay = openTimeResult,
-                        finishDay = closeTimeResult,
+                        startDay = startDay,
+                        finishDay = finishDay,
                         description = description,
                         category = category,
                         city = city
@@ -185,7 +176,7 @@ class CreateStock (val act: MainActivity) {
 
                         ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
 
-                    } /*else {
+                    } else {
 
                         // если все права есть и все обязательные поля заполнены
 
@@ -200,67 +191,63 @@ class CreateStock (val act: MainActivity) {
 
                             // после сжатия запускаем функцию загрузки сжатого фота в Storage
 
-                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
+                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
 
 
                                 Log.d("MyLog", it)
                                 // В качестве колбака придет ссылка на изображение в Storage
 
-                                // Запускаем корутину и публикуем заведение
+                                // Запускаем корутину и публикуем акцию
 
                                 GlobalScope.launch(Dispatchers.Main) {
 
-                                    // заполняем заведение
+                                    // заполняем акцию
 
-                                    val filledPlace = PlacesAdsClass(
+                                    val filledStock = StockAdsClass (
 
-                                        logo = it,
-                                        placeName = headline,
-                                        placeDescription = description,
-                                        phone = phone,
-                                        whatsapp = whatsapp,
-                                        telegram = TELEGRAM_URL + telegram,
-                                        instagram = INSTAGRAM_URL + instagram,
+                                        image = it,
+                                        headline = headline,
+                                        description = description,
                                         category = category,
+                                        keyStock = stockDatabaseManager.stockDatabase.push().key,
+                                        keyPlace = "",
+                                        keyCreator = auth.uid,
                                         city = city,
-                                        address = address,
-                                        placeKey = placesDatabaseManager.placeDatabase.push().key,
-                                        owner = auth.uid,
-                                        openTime = openTimeResult,
-                                        closeTime = closeTimeResult
+                                        startDate = startDay,
+                                        finishDate = finishDay
 
-                                    )
+                                            )
 
                                     // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
                                     if (auth.uid != null) {
 
-                                        // Если зарегистрирован, то запускаем функцию публикации заведения
+                                        // Если зарегистрирован, то запускаем функцию публикации акции
 
-                                        placesDatabaseManager.publishPlace(filledPlace) { result ->
+                                        stockDatabaseManager.publishStock(filledStock = filledStock) { result ->
 
-                                            // в качестве колбака придет булин. Если опубликовано мероприятие то:
+                                            // в качестве колбака придет булин. Если опубликована акция то:
 
                                             if (result) {
 
                                                 // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
-                                                act.categoryDialog.chosenPlaceCategory = CategoriesList ("Выбери категорию", "Default")
+                                                act.categoryDialog.chosenStockCategory = CategoriesList ("Выбери категорию", "Default")
 
                                                 // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
                                                 act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
-                                                navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
+                                                navController.navigate(STOCK_ROOT) {popUpTo(0)} // переходим на страницу акций
 
                                                 // показываем ТОСТ
                                                 Toast.makeText(
                                                     act,
-                                                    "Твое заведение успешно опубликовано",
+                                                    "Твоя акция успешно опубликована",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
 
                                             } else {
 
-                                                // если произошла ошибка и заведение не опубликовалось то:
+                                                // если произошла ошибка и акция не опубликовалась то:
 
                                                 // Показываем тост
                                                 Toast.makeText(
@@ -276,7 +263,7 @@ class CreateStock (val act: MainActivity) {
                                 }
                             }
                         }
-                    }*/
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth() // кнопка на всю ширину
