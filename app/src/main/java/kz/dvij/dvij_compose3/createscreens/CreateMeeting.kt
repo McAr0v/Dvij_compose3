@@ -48,6 +48,8 @@ class CreateMeeting(private val act: MainActivity) {
         description = "Default"
     )
 
+    private val placesCard = PlacesCard(act = act)
+
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
@@ -118,6 +120,10 @@ class CreateMeeting(private val act: MainActivity) {
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
             category = act.categoryDialog.meetingCategorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
+
+            SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
+
+            val place = placesCard.choosePlaceDialog()
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 

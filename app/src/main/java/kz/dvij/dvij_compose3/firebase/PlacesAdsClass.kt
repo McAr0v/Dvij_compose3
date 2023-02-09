@@ -16,3 +16,11 @@ data class PlacesAdsClass(
     val openTime: String? = null,
     val closeTime: String? = null,
 )
+
+data class PlacesDialogClass(
+
+    val placeHeadline: String? = null,
+    val placeAddress: String? = null,
+    val placeKey: String? = null
+
+)

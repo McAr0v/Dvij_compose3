@@ -902,6 +902,95 @@ fun fieldInstagramComponent (act: MainActivity,icon: Int): String {
 
 }
 
+@SuppressLint("ServiceCast")
+@Composable
+fun fieldTextComponent(placeHolder: String): String {
+
+    // создаем переменную текст - это значение функция возвращает
+
+    var text = remember { mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+
+    // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
+    // при фокусе на них окрашивались в нужные цвета
+
+    var focusColor = remember { mutableStateOf(Grey60) }
+
+
+
+    // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
+
+
+    TextField(
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (it.isFocused) focusColor.value =
+                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                else focusColor.value =
+                    Grey60 // если нет, то в переменные с цветами передать серый
+            }
+            .border( // настройки самих границ
+                2.dp, // толщина границы
+                color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
+                shape = RoundedCornerShape(50.dp) // скругление границ
+            ),
+
+        value = text.value, // значение поля
+
+        // on valueChange - это действие при изменении значения
+        onValueChange = { newText ->
+
+            text.value = newText
+
+        },
+
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            // цвета
+            textColor = Grey40,
+            //backgroundColor = Grey95,
+            placeholderColor = Grey60,
+            focusedBorderColor = Grey95,
+            unfocusedBorderColor = Grey95,
+            cursorColor = Grey00,
+            errorBorderColor = Grey95
+
+        ),
+
+        textStyle = Typography.bodyLarge, // стиль текста
+
+        keyboardOptions = KeyboardOptions(
+            // опции клавиатуры, которая появляется при вводе
+            keyboardType = KeyboardType.Text, // тип клавиатуры
+            imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
+
+        ),
+
+        keyboardActions = KeyboardActions(
+            // При нажатии на кнопку onDone - снимает фокус с формы
+            onDone = {
+                focusManager.clearFocus()
+            }
+        ),
+
+        placeholder = {
+            // подсказка для пользователей
+            Text(
+                text = placeHolder, // значение подсказки
+                style = Typography.bodyLarge // стиль текста в холдере
+            )
+        },
+
+        singleLine = true, // говорим, что текст в форме будет однострочный
+
+    )
+
+    return text.value
+
+}
+
 
 
 
