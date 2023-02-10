@@ -383,4 +383,6 @@ class PlacesDatabaseManager (val act: MainActivity) {
         })
     }
 
+
+
 }

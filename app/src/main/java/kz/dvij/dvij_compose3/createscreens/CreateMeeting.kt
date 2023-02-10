@@ -31,7 +31,10 @@ import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateMeeting
+import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -49,6 +52,7 @@ class CreateMeeting(private val act: MainActivity) {
     )
 
     private val placesCard = PlacesCard(act = act)
+    private val choosePlaceDialog = ChoosePlaceDialog(act)
 
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
@@ -60,6 +64,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         val activity = act
         val meetingDatabaseManager = MeetingDatabaseManager(activity) // инициализируем класс с функциями базы данных ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
+        val placesDatabaseManager = PlacesDatabaseManager(act = activity)
 
         // КАЛЕНДАРЬ - https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
@@ -82,6 +87,7 @@ class CreateMeeting(private val act: MainActivity) {
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
+        val openPlaceDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
 
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
@@ -91,9 +97,16 @@ class CreateMeeting(private val act: MainActivity) {
             mutableStateOf(listOf<CategoriesList>())
         }
 
+        // Инициализируем переменную списка мест
+        val placesList = remember {
+            mutableStateOf(listOf<PlacesAdsClass>())
+        }
+
 
         // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
+
+        placesDatabaseManager.readPlaceMyDataFromDb(placesList)
 
 
         Column(
@@ -123,7 +136,23 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
 
-            val place = placesCard.choosePlaceDialog()
+            val placeInfo = choosePlaceDialog.placeSelectButton {
+                openPlaceDialog.value = true
+            }
+
+            // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
+
+            if (openPlaceDialog.value) {
+                choosePlaceDialog.PlaceChooseDialog(placesList = placesList) {
+                    openPlaceDialog.value = false
+                }
+            }
+
+            /*SpacerTextWithLine(headline = "Название места проведения")
+            headlinePlace.value = fieldTextComponent("Введите название места")
+            SpacerTextWithLine(headline = "Адрес места проведения")
+            addressPlace.value = fieldTextComponent("Введите адрес места")*/
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -144,6 +173,8 @@ class CreateMeeting(private val act: MainActivity) {
                     openCityDialog.value = false
                 }
             }
+
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
@@ -257,7 +288,8 @@ class CreateMeeting(private val act: MainActivity) {
                                             image1 = it,
                                             city = city,
                                             instagram = INSTAGRAM_URL + instagram,
-                                            telegram = TELEGRAM_URL + telegram
+                                            telegram = TELEGRAM_URL + telegram,
+                                            placeKey = placeInfo.placeKey
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет

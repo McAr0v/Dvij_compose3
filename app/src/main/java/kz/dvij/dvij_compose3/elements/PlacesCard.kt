@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Card
@@ -12,9 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,6 +33,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.firebase.PlacesDialogClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -449,114 +454,4 @@ class PlacesCard (val act: MainActivity) {
             }
         }
     }
-
-    @OptIn(ExperimentalPagerApi::class)
-    @Composable
-    fun choosePlaceDialog()//: PlacesDialogClass
-    {
-
-        val enterPlaceButtonColor = remember { mutableStateOf(PrimaryColor) }
-        val enterPlaceTextColor = remember { mutableStateOf(Grey100) }
-
-        val choosePlaceButtonColor = remember { mutableStateOf(Grey90) }
-        val choosePlaceTextColor = remember { mutableStateOf(Grey40) }
-        
-        val headlinePlace = remember {
-            mutableStateOf("")
-        }
-
-        val addressPlace = remember {
-            mutableStateOf("")
-        }
-
-        Column(modifier = Modifier.fillMaxWidth().background(Grey100).padding(10.dp)) {
-
-            val tabItem = listOf("Ввести адрес", "Выбрать заведение") // делаем список табов
-            val pagerState = rememberPagerState(pageCount = tabItem.size) // Инициализируем pagerState. pageCount - количество страниц в меню табов. Прописываем не цифрой, а количеством итомов табов в списке tabItem
-            val tabIndex = pagerState.currentPage // создаем переменную tabIndex. Это будет текущая страница
-            val coroutineScope = rememberCoroutineScope() // инициализируем корутину
-
-            // Начинаем делать дизайн меню табов
-            // помещаем в контейнер Column
-
-            Column() {
-
-                TabRow( // выбираем TabRow - чтобы табы были по горизонтали
-                    selectedTabIndex = tabIndex, // указываем, что выбранный индекс это индекс текущей открытой страницы
-
-                    // настраиваем индикатор под названиями табов
-                    indicator = { pos ->
-                        TabRowDefaults.Indicator(
-                            Modifier.pagerTabIndicatorOffset(pagerState, pos),
-                            color = PrimaryColor
-                        )
-                    },
-                    contentColor = Grey10, // цвет контента
-                    backgroundColor = Grey95 // цвет фона табов
-                ) {
-                    // начинаем отрабатывать для каждого таба дизайн
-                    tabItem.forEachIndexed{index, tabItems ->
-                        Tab(selected = pagerState.currentPage == index, // указываем индекс выбранного таба
-                            onClick = { //действие на клик по табу
-                                coroutineScope.launch { // запускаем во второстепенном потоке переход на выбранный таб
-                                    pagerState.animateScrollToPage(index) // сам переход на страницу index, которую указываем ниже в HorizontalPager
-                                }
-                            },
-                            selectedContentColor = PrimaryColor, // цвет выбранного таба
-                            unselectedContentColor = Grey30, // цвет не выбранного тада
-                            text = {
-                                androidx.compose.material.Text(text = tabItems, // Заголовок берем из табов
-                                    style = Typography.labelMedium) // указываем стиль текста
-                            }
-
-                        )
-                    }
-                }
-
-                HorizontalPager(
-                    state = pagerState, // за состояние отвечает pagerState
-                ) { page -> // настраиваем страницы
-
-                    when (tabIndex) {
-
-                        0 -> {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-
-                                SpacerTextWithLine(headline = "Название места проведения")
-                                headlinePlace.value = fieldTextComponent("Введите название места")
-                                SpacerTextWithLine(headline = "Адрес места проведения")
-                                addressPlace.value = fieldTextComponent("Введите адрес места")
-
-                            }
-                        }
-                        1 -> {
-
-                            Column(modifier = Modifier.fillMaxWidth()) {
-
-                                Spacer(modifier = Modifier.height(40.dp))
-                                // нужна функция получения СПИСКА МОИХ МЕСТ И ОТОБРАЖЕНИЯ В ВИДЕ СПИСКА
-
-                            }
-
-                        }
-
-                    }
-
-                }
-            }
-
-
-
-
-        }
-
-        // callback: (result: List<PlacesDialogClass> -> Unit)
-
-
-
-
-    }
-
-
-
 }

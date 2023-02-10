@@ -295,7 +295,7 @@ class MainActivity : ComponentActivity() {
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList)}
-                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController)}
+                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController, placeKey)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}

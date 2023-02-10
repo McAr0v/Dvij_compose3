@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,15 +27,22 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
+import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingViewScreen(val act: MainActivity) {
 
+    val placesDatabaseManager = PlacesDatabaseManager(act)
+    val placeCard = PlacesCard(act)
+
     @SuppressLint("NotConstructor")
     @Composable
-    fun MeetingViewScreen (key: String, navController: NavController){
+    fun MeetingViewScreen (key: String, navController: NavController, placeKey: MutableState<String>){
+
 
         // Переменная, которая содержит в себе информацию о мероприятии
         val meetingInfo = remember {
@@ -61,6 +69,11 @@ class MeetingViewScreen(val act: MainActivity) {
             mutableStateOf(0)
         }
 
+        val placeInfo = remember {
+            mutableStateOf(PlacesAdsClass())
+        }
+
+
         // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
 
         act.meetingDatabaseManager.readOneMeetingFromDataBase(meetingInfo, key){
@@ -68,7 +81,15 @@ class MeetingViewScreen(val act: MainActivity) {
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров мероприятия
 
+            meetingInfo.value.placeKey?.let { it1 ->
+                act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = placeInfo, key = it1) {
+
+                }
+            }
+
         }
+
+
 
         // Если пользователь авторизован, проверяем, добавлено ли уже мероприятие в избранное, или нет
 
@@ -466,6 +487,12 @@ class MeetingViewScreen(val act: MainActivity) {
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                placeInfo.value.placeKey?.let {
+
+                    placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+
+                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
