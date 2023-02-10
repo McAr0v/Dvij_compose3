@@ -63,6 +63,7 @@ class MeetingsScreens (val act: MainActivity) {
             modifier = Modifier
                 .background(Grey95)
                 .fillMaxWidth()
+                .padding(horizontal = 10.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -161,6 +162,7 @@ class MeetingsScreens (val act: MainActivity) {
             Column (
                 modifier = Modifier
                     .background(Grey95)
+                    .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -317,6 +319,7 @@ class MeetingsScreens (val act: MainActivity) {
         Column (
             modifier = Modifier
                 .background(Grey95)
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,

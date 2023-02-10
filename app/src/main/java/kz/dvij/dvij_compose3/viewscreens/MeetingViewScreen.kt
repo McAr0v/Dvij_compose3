@@ -69,6 +69,7 @@ class MeetingViewScreen(val act: MainActivity) {
             mutableStateOf(0)
         }
 
+        // Переменная, которая содержит информацию о заведении-организаторе
         val placeInfo = remember {
             mutableStateOf(PlacesAdsClass())
         }
@@ -81,12 +82,13 @@ class MeetingViewScreen(val act: MainActivity) {
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров мероприятия
 
+            // если считалось мероприятие, то берем из него ключ заведения и считываем данные о заведении
+
             meetingInfo.value.placeKey?.let { it1 ->
                 act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = placeInfo, key = it1) {
 
                 }
             }
-
         }
 
 
@@ -430,7 +432,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     }
 
-                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+                    // ---- КНОПКА ПЕРЕХОДА В ИНСТАГРАМ -----------
 
                     if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != INSTAGRAM_URL) {
 
@@ -480,21 +482,51 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text = "Местро проведения",
-                    style = Typography.titleMedium,
-                    color = Grey10
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
+                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 
                 placeInfo.value.placeKey?.let {
 
+                    Text(
+                        text = "Место проведения",
+                        style = Typography.titleMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+
+                    Spacer(modifier = Modifier.height(20.dp))
 
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                if (meetingInfo.value.placeKey == "Empty"){
+
+                    Text(
+                        text = "Место проведения",
+                        style = Typography.titleMedium,
+                        color = Grey10
+                    )
+
+                    meetingInfo.value.headlineInput?.let {
+                        Text(
+                            text = it,
+                            style = Typography.titleMedium,
+                            color = Grey10
+                        )
+                    }
+
+                    meetingInfo.value.addressInput?.let {
+                        Text(
+                            text = it,
+                            style = Typography.titleMedium,
+                            color = Grey10
+                        )
+                    }
+
+                }
+
+
 
                 // ---------- ОПИСАНИЕ -------------
 
@@ -517,6 +549,4 @@ class MeetingViewScreen(val act: MainActivity) {
             }
         }
     }
-
-
 }

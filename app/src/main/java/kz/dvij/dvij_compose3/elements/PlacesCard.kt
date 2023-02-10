@@ -205,7 +205,7 @@ class PlacesCard (val act: MainActivity) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(vertical = 10.dp)
                 .clickable {
 
                     // При клике на карточку - передаем на Main Activity placeKey. Ключ берем из дата класса заведения

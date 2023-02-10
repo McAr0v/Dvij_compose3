@@ -56,7 +56,7 @@ class MeetingsCard(val act: MainActivity) {
         Card(
             modifier = Modifier
                 .fillMaxWidth() // растягиваем карточку на всю ширину экрана
-                .padding(10.dp) // отступ от краев экрана
+                .padding(vertical = 10.dp) // отступ от краев экрана
                 .clickable {
                     // При клике на карточку - передаем на Main Activity meetingKey. Ключ берем из дата класса мероприятия
 

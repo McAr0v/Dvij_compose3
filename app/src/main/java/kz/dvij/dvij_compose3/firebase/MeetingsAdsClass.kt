@@ -17,5 +17,7 @@ data class MeetingsAdsClass(
     val city: String? = null,
     val instagram: String? = null,
     val telegram: String? = null,
-    val placeKey: String? = null
+    val placeKey: String? = null,
+    val headlineInput: String? = null,
+    val addressInput: String? = null,
 )

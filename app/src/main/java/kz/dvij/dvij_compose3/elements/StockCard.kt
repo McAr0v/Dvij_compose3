@@ -52,7 +52,7 @@ class StockCard (val act: MainActivity) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(vertical = 10.dp)
                 .clickable {
 
                     // При клике на карточку - передаем на Main Activity keyStock. Ключ берем из дата класса акции

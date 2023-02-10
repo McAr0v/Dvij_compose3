@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.createscreens
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
@@ -51,7 +52,6 @@ class CreateMeeting(private val act: MainActivity) {
         description = "Default"
     )
 
-    private val placesCard = PlacesCard(act = act)
     private val choosePlaceDialog = ChoosePlaceDialog(act)
 
 
@@ -71,6 +71,8 @@ class CreateMeeting(private val act: MainActivity) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
+        var headlinePlace = remember {mutableStateOf("")} // инициализируем переменную заголовка места, введенного вручную
+        var addressPlace = remember {mutableStateOf("")} // инициализирууем переменную адреса места, введенного вручную
 
 
         var headline = "" // инициализируем заголовок
@@ -84,11 +86,13 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
         var category: String // категория
 
+        var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
+
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
         val openPlaceDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
-
+        val openFieldPlace = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
@@ -106,8 +110,10 @@ class CreateMeeting(private val act: MainActivity) {
         // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
 
+        // Считываем список моих заведений
         placesDatabaseManager.readPlaceMyDataFromDb(placesList)
 
+        // --------- САМ КОНТЕНТ СТРАНИЦЫ -----------------
 
         Column(
             modifier = Modifier
@@ -136,9 +142,109 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
 
-            val placeInfo = choosePlaceDialog.placeSelectButton {
-                openPlaceDialog.value = true
+            // --- КНОПКИ ВЫБОРА - ВЫБРАТЬ ЗАВЕДЕНИЕ ИЗ СПИСКА ИЛИ ВВВЕСТИ ВРУЧНУЮ ------
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
+
+                placeInfo = choosePlaceDialog.placeSelectButton {
+                    openPlaceDialog.value = true
+                    openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
+                    headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
+                    addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // --- КНОПКА ВКЛЮЧЕНИЯ ВВОДА АДРЕСА ВРУЧНУЮ --------
+
+                Button(
+                    onClick = {
+
+                        if (openFieldPlace.value){
+                            openFieldPlace.value = false
+                        } else {
+                            openFieldPlace.value = true
+
+                            // если выбираем ввести вручную, а уже выбрано заведение из списка
+                            // то сбрасываем выбранное заведение из списка
+                            choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                        }
+
+                    },
+
+                    // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    border = BorderStroke(
+                        width = if (!openFieldPlace.value) {
+                            2.dp
+                        } else {
+                            0.dp
+                        }, color = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey95
+                        }
+                    ),
+
+                    // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (!openFieldPlace.value) {
+                            Grey95
+                        } else {
+                            PrimaryColor
+                        },
+                        contentColor = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey100
+                        },
+                    ),
+                    shape = RoundedCornerShape(50) // скругленные углы кнопки
+                ) {
+
+                    Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
+
+                    androidx.compose.material3.Text(
+                        text = "Ввести адрес вручную", // текст кнопки
+                        style = Typography.labelMedium, // стиль текста
+                        color = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey100
+                        }
+                    )
+                }
             }
+
+            // --- КОНТЕНТ, ЕСЛИ МЫ ВЫБРАЛИ ВВЕСТИ АДРЕС И НАЗВАНИЕ ЗАВЕДЕНИЯ ВРУЧНУЮ ----
+
+            if (openFieldPlace.value){
+                
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Column(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Grey90, shape = RoundedCornerShape(15.dp))
+                        .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 20.dp)
+
+                ) {
+                    SpacerTextWithLine(headline = "Название места проведения")
+                    headlinePlace.value = fieldTextComponent("Введите название места") // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+                    SpacerTextWithLine(headline = "Адрес места проведения")
+                    addressPlace.value = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+                }
+            }
+
+
 
             // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
 
@@ -147,12 +253,6 @@ class CreateMeeting(private val act: MainActivity) {
                     openPlaceDialog.value = false
                 }
             }
-
-            /*SpacerTextWithLine(headline = "Название места проведения")
-            headlinePlace.value = fieldTextComponent("Введите название места")
-            SpacerTextWithLine(headline = "Адрес места проведения")
-            addressPlace.value = fieldTextComponent("Введите адрес места")*/
-
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -289,7 +389,9 @@ class CreateMeeting(private val act: MainActivity) {
                                             city = city,
                                             instagram = INSTAGRAM_URL + instagram,
                                             telegram = TELEGRAM_URL + telegram,
-                                            placeKey = placeInfo.placeKey
+                                            placeKey = placeInfo.placeKey ?: "Empty",
+                                            headlineInput = headlinePlace.value,
+                                            addressInput = addressPlace.value
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет

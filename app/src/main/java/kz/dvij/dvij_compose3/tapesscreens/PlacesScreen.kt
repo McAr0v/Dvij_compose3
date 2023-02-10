@@ -66,6 +66,7 @@ class PlacesScreens (val act: MainActivity) {
         Column (
             modifier = Modifier
                 .background(Grey95)
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,6 +158,7 @@ class PlacesScreens (val act: MainActivity) {
         Column (
             modifier = Modifier
                 .background(Grey95)
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -301,6 +303,7 @@ class PlacesScreens (val act: MainActivity) {
             Column (
                 modifier = Modifier
                     .background(Grey95)
+                    .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
