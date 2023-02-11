@@ -43,10 +43,44 @@ class PlacesCard (val act: MainActivity) {
     @Composable
     fun PlaceCardSmall (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
 
+        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+
+        // Считываем с базы данных - добавлено ли это мероприятие в избранное?
+
+        act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
+            // Если колбак тру, то окрашиваем иконку в нужный цвет
+            if (it){
+                iconFavColor.value = PrimaryColor
+            } else {
+                // Если колбак фалс, то в обычный цвет
+                iconFavColor.value = Grey10
+            }
+        }
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                //.padding(10.dp)
+                .clickable {
+
+                    // При клике на карточку - передаем на Main Activity placeKey. Ключ берем из дата класса заведения
+
+                    placeKey.value = placeItem.placeKey.toString()
+
+                    // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
+
+                    placeItem.placeKey?.let {
+                        act.placesDatabaseManager.viewCounterPlace(it) {
+
+                            // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
+                            if (it) {
+                                // РАССКОМЕНТИРОВАТЬ ПОСЛЕ ТОГО, КАК СОЗДАМ СТРАНИЦУ ПРОСМОТРА
+                                navController.navigate(PLACE_VIEW)
+                            }
+                        }
+                    }
+
+                },
             shape = RoundedCornerShape(15.dp),
             elevation = CardDefaults.cardElevation(5.dp),
             colors = CardDefaults.cardColors(Grey100)
@@ -56,16 +90,21 @@ class PlacesCard (val act: MainActivity) {
                 .fillMaxWidth()
                 .height(170.dp)){
 
-                Image(
-                    modifier = Modifier
-                        .width(170.dp)
-                        .height(170.dp),
-                    painter = painterResource(id = R.drawable.rest_logo2),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.Center
-                )
+                // ----- ЛОГОТИП ЗАВЕДЕНИЯ ---------
 
+                if (placeItem.logo != null && placeItem.logo != ""){
+
+                    AsyncImage(
+                        model = placeItem.logo,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .width(170.dp)
+                            .height(170.dp),
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    )
+
+                }
 
                 // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
 
@@ -93,25 +132,44 @@ class PlacesCard (val act: MainActivity) {
 
                             // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
 
-                            Text(
-                                text = "Пицца Блюз Восток",
-                                style = Typography.titleSmall,
-                                color = Grey10
-                            )
+                            if (placeItem.placeName != null && placeItem.placeName != ""){
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = placeItem.placeName,
+                                    style = Typography.titleSmall,
+                                    color = Grey10
+                                )
 
-                            Text(
-                                text = "Усть-Каменогорск",
-                                style = Typography.bodyMedium,
-                                color = Grey40
-                            )
+                                Spacer(modifier = Modifier.height(10.dp))
 
-                            Text(
-                                text = "ул. Назарбаева 32",
-                                style = Typography.bodyMedium,
-                                color = Grey40
-                            )
+                            }
+
+                            // ------- ГОРОД ---------
+
+                            if (placeItem.city != null && placeItem.city != ""){
+
+                                Text(
+                                    text = placeItem.city,
+                                    style = Typography.bodyMedium,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            // --------- АДРЕС -------------
+
+                            if (placeItem.address != null && placeItem.address != ""){
+
+                                Text(
+                                    text = placeItem.address,
+                                    style = Typography.bodyMedium,
+                                    color = Grey40
+                                )
+
+                            }
+
+
+
 
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -131,7 +189,7 @@ class PlacesCard (val act: MainActivity) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_celebration),
                                         contentDescription = "",
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(15.dp),
                                         tint = Grey40
                                     )
 
@@ -159,7 +217,7 @@ class PlacesCard (val act: MainActivity) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_fire),
                                         contentDescription = "",
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(15.dp),
                                         tint = Grey40
                                     )
 
@@ -175,9 +233,7 @@ class PlacesCard (val act: MainActivity) {
                                 }
 
                             }
-
                         }
-
                     }
                 }
             }

@@ -70,6 +70,8 @@
     <string name="go_to_home">Вернуться на главную страницу</string>
     <string name="choose_city">Выбери город:</string>
     <string name="create_meeting">Создание мероприятия</string>
+    <string name="create_place">Создание места</string>
+    <string name="create_stock">Создание акции</string>
     <string name="push_button">Опубликовать</string>
     <string name="cansel_button">Отменить</string>
     <string name="delete_from_fav">Удалено из избранных</string>

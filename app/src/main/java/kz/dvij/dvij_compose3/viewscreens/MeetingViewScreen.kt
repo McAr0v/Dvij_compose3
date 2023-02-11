@@ -494,7 +494,9 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+                    placeCard.PlaceCardSmall(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+
+                    //placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -508,10 +510,12 @@ class MeetingViewScreen(val act: MainActivity) {
                         color = Grey10
                     )
 
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     meetingInfo.value.headlineInput?.let {
                         Text(
                             text = it,
-                            style = Typography.titleMedium,
+                            style = Typography.titleSmall,
                             color = Grey10
                         )
                     }
@@ -519,10 +523,12 @@ class MeetingViewScreen(val act: MainActivity) {
                     meetingInfo.value.addressInput?.let {
                         Text(
                             text = it,
-                            style = Typography.titleMedium,
+                            style = Typography.bodyMedium,
                             color = Grey10
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(20.dp))
 
                 }
 

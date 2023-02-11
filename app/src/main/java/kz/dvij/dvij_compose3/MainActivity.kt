@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
     val stockCard = StockCard (this)
     val stockDatabaseManager = StockDatabaseManager(this)
     val stockViewScreen = StockViewScreen(this)
+    val choosePlaceDialog = ChoosePlaceDialog(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -222,7 +223,11 @@ class MainActivity : ComponentActivity() {
                                 ADS_ROOT -> R.string.side_ad
                                 BUGS_ROOT -> R.string.side_report_bug
                                 CREATE_MEETINGS_SCREEN -> R.string.create_meeting
+                                CREATE_PLACES_SCREEN -> R.string.create_place
+                                CREATE_STOCK_SCREEN -> R.string.create_stock
                                 MEETING_VIEW -> R.string.meetings
+                                PLACE_VIEW -> R.string.places
+                                STOCK_VIEW -> R.string.stock
                                 else -> R.string.app_name
                                 }
                             ),
@@ -297,12 +302,9 @@ class MainActivity : ComponentActivity() {
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(key = meetingKey.value, navController, placeKey)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
-                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController)}
+                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
-                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(
-                            key = stockKey.value,
-                            navController = navController
-                        )}
+                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey)}
 
                     }
                 }

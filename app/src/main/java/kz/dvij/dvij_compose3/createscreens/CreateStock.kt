@@ -6,6 +6,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -32,9 +33,12 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateStock
+import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.pickers.dataPicker
@@ -43,6 +47,9 @@ import kz.dvij.dvij_compose3.ui.theme.*
 class CreateStock (val act: MainActivity) {
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО АКЦИЮ
+
+    val choosePlaceDialog = ChoosePlaceDialog(act)
+
 
     // ---- АКЦИЯ ПО УМОЛЧАНИЮ -------
 
@@ -58,9 +65,26 @@ class CreateStock (val act: MainActivity) {
     @Composable
     fun CreateStockScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
 
+        val placesDatabaseManager = PlacesDatabaseManager(act = act)
+
+
         var openLoading = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
+        val openPlaceDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
+        val openFieldPlace = remember { mutableStateOf(false) } // инициализируем переменную, открывающую формы ЗАВЕДЕНИЙ
+        var headlinePlace = remember {mutableStateOf("")} // инициализируем переменную заголовка места, введенного вручную
+        var addressPlace = remember {mutableStateOf("")} // инициализирууем переменную адреса места, введенного вручную
+
+        var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
+
+        // Инициализируем переменную списка мест
+        val placesList = remember {
+            mutableStateOf(listOf<PlacesAdsClass>())
+        }
+
+        // Считываем список моих заведений
+        placesDatabaseManager.readPlaceMyDataFromDb(placesList)
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
@@ -100,6 +124,120 @@ class CreateStock (val act: MainActivity) {
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
             val category = act.categoryDialog.stockCategorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
+
+            SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
+
+            // --- КНОПКИ ВЫБОРА - ВЫБРАТЬ ЗАВЕДЕНИЕ ИЗ СПИСКА ИЛИ ВВВЕСТИ ВРУЧНУЮ ------
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
+
+                placeInfo = choosePlaceDialog.placeSelectButton {
+                    openPlaceDialog.value = true
+                    openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
+                    headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
+                    addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // --- КНОПКА ВКЛЮЧЕНИЯ ВВОДА АДРЕСА ВРУЧНУЮ --------
+
+                Button(
+                    onClick = {
+
+                        if (openFieldPlace.value){
+                            openFieldPlace.value = false
+                        } else {
+                            openFieldPlace.value = true
+
+                            // если выбираем ввести вручную, а уже выбрано заведение из списка
+                            // то сбрасываем выбранное заведение из списка
+                            choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                        }
+
+                    },
+
+                    // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    border = BorderStroke(
+                        width = if (!openFieldPlace.value) {
+                            2.dp
+                        } else {
+                            0.dp
+                        }, color = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey95
+                        }
+                    ),
+
+                    // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (!openFieldPlace.value) {
+                            Grey95
+                        } else {
+                            PrimaryColor
+                        },
+                        contentColor = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey100
+                        },
+                    ),
+                    shape = RoundedCornerShape(50) // скругленные углы кнопки
+                ) {
+
+                    Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
+
+                    androidx.compose.material3.Text(
+                        text = "Ввести адрес вручную", // текст кнопки
+                        style = Typography.labelMedium, // стиль текста
+                        color = if (!openFieldPlace.value) {
+                            Grey60
+                        } else {
+                            Grey100
+                        }
+                    )
+                }
+            }
+
+            // --- КОНТЕНТ, ЕСЛИ МЫ ВЫБРАЛИ ВВЕСТИ АДРЕС И НАЗВАНИЕ ЗАВЕДЕНИЯ ВРУЧНУЮ ----
+
+            if (openFieldPlace.value){
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Column(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Grey90, shape = RoundedCornerShape(15.dp))
+                        .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 20.dp)
+
+                ) {
+                    SpacerTextWithLine(headline = "Название места проведения")
+                    headlinePlace.value = fieldTextComponent("Введите название места") // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+                    SpacerTextWithLine(headline = "Адрес места проведения")
+                    addressPlace.value = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+                }
+            }
+
+
+
+            // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
+
+            if (openPlaceDialog.value) {
+                choosePlaceDialog.PlaceChooseDialog(placesList = placesList) {
+                    openPlaceDialog.value = false
+                }
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -210,11 +348,13 @@ class CreateStock (val act: MainActivity) {
                                         description = description,
                                         category = category,
                                         keyStock = stockDatabaseManager.stockDatabase.push().key,
-                                        keyPlace = "",
+                                        keyPlace = placeInfo.placeKey ?: "Empty",
                                         keyCreator = auth.uid,
                                         city = city,
                                         startDate = startDay,
-                                        finishDate = finishDay
+                                        finishDate = finishDay,
+                                        inputHeadlinePlace = headlinePlace.value,
+                                        inputAddressPlace = addressPlace.value
 
                                             )
 
@@ -229,6 +369,11 @@ class CreateStock (val act: MainActivity) {
                                             // в качестве колбака придет булин. Если опубликована акция то:
 
                                             if (result) {
+
+                                                // сбрасываем выбранное заведение, чтобы потом не отображался последний выбор
+
+                                                choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                                                placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
 
                                                 // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                 act.categoryDialog.chosenStockCategory = CategoriesList ("Выбери категорию", "Default")

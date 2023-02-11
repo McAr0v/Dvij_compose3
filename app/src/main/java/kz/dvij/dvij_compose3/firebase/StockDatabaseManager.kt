@@ -383,5 +383,42 @@ class StockDatabaseManager (val act: MainActivity) {
         })
     }
 
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
+
+    fun readStockInPlaceFromDb(stockList: MutableState<List<StockAdsClass>>, placeKey: String){
+
+        stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val stockArray = ArrayList<StockAdsClass>() // создаем пустой список акций
+
+                for (item in snapshot.children){
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val stock = item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА АКЦИИ
+                        .child("info") // следующая папка с информацией об акции
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("stockData") // добираесся до следующей папки внутри УКПользователя - папка с данными об акции
+                        .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
+
+                    if (stock != null && stock.keyPlace == placeKey) {stockArray.add(stock)} // если акция не пустая, добавляем в список
+
+                }
+
+                if (stockArray.isEmpty()){
+                    stockList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
+                } else {
+                    stockList.value = stockArray // если добавились акции в список, то этот новый список и передаем
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
 
 }

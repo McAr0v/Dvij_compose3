@@ -92,7 +92,7 @@ class CreateMeeting(private val act: MainActivity) {
         val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
         val openPlaceDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
-        val openFieldPlace = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
+        val openFieldPlace = remember { mutableStateOf(false) } // инициализируем переменную, открывающую формы ЗАВЕДЕНИЙ
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
@@ -405,6 +405,10 @@ class CreateMeeting(private val act: MainActivity) {
                                                 // в качестве колбака придет булин. Если опубликовано мероприятие то:
 
                                                 if (result){
+
+                                                    // сбрасываем выбранное заведение, чтобы потом не отображался последний выбор
+                                                    choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                                                    placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
 
                                                     // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                     act.categoryDialog.chosenMeetingCategory = CategoriesList ("Выбери категорию", "Default")

@@ -11,4 +11,6 @@ data class StockAdsClass(
     val city: String? = null,
     val startDate: String? = null,
     val finishDate: String? = null,
+    val inputHeadlinePlace: String? = null,
+    val inputAddressPlace: String? = null,
 )

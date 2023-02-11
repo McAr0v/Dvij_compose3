@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
+import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
@@ -34,9 +36,11 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 class StockViewScreen (val act: MainActivity) {
 
+    private val placeCard = PlacesCard (act)
+
     @SuppressLint("NotConstructor")
     @Composable
-    fun StockViewScreen (key: String, navController: NavController){
+    fun StockViewScreen (key: String, navController: NavController, placeKey: MutableState<String>){
 
         // Переменная, которая содержит в себе информацию об акции
         val stockInfo = remember {
@@ -63,12 +67,24 @@ class StockViewScreen (val act: MainActivity) {
             mutableStateOf(0)
         }
 
+        // Переменная, которая содержит информацию о заведении-организаторе
+        val placeInfo = remember {
+            mutableStateOf(PlacesAdsClass())
+        }
+
         // Считываем данные про акцию и счетчики добавивших в избранное и количество просмотров акции
 
-        act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, key){
+        act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, key){ list->
 
-            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
-            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+            favCounter.value = list[0] // данные из списка - количество добавивших в избранное
+            viewCounter.value = list[1] // данные из списка - количество просмотров
+
+            stockInfo.value.keyPlace?.let { nonNullKeyPlace -> act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = placeInfo, key = nonNullKeyPlace) {
+
+
+
+            }
+            }
 
         }
 
@@ -334,6 +350,56 @@ class StockViewScreen (val act: MainActivity) {
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
+
+                placeInfo.value.placeKey?.let {
+
+                    Text(
+                        text = "Место проведения",
+                        style = Typography.titleMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    placeCard.PlaceCardSmall(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+
+                    //placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                }
+
+                if (stockInfo.value.keyPlace == "Empty"){
+
+                    Text(
+                        text = "Место проведения",
+                        style = Typography.titleMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    stockInfo.value.inputHeadlinePlace?.let {
+                        Text(
+                            text = it,
+                            style = Typography.titleSmall,
+                            color = Grey10
+                        )
+                    }
+
+                    stockInfo.value.inputAddressPlace?.let {
+                        Text(
+                            text = it,
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                }
 
                 // ---------- ОПИСАНИЕ -------------
 
