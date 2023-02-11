@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.tapesscreens
+package kz.dvij.dvij_compose3.userscreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast

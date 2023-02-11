@@ -27,24 +27,26 @@ import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
 import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
-import kz.dvij.dvij_compose3.createscreens.CreateMeeting
-import kz.dvij.dvij_compose3.createscreens.CreatePlace
-import kz.dvij.dvij_compose3.createscreens.CreateStock
+import kz.dvij.dvij_compose3.meetingscreens.CreateMeeting
+import kz.dvij.dvij_compose3.placescreens.CreatePlace
+import kz.dvij.dvij_compose3.stockscreens.CreateStock
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.StockCard
-import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
-import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.tapesscreens.*
-import kz.dvij.dvij_compose3.viewscreens.MeetingViewScreen
-import kz.dvij.dvij_compose3.viewscreens.PlaceViewScreen
-import kz.dvij.dvij_compose3.viewscreens.StockViewScreen
+import kz.dvij.dvij_compose3.meetingscreens.MeetingViewScreen
+import kz.dvij.dvij_compose3.meetingscreens.MeetingsScreens
+import kz.dvij.dvij_compose3.placescreens.PlaceViewScreen
+import kz.dvij.dvij_compose3.stockscreens.StockScreen
+import kz.dvij.dvij_compose3.stockscreens.StockViewScreen
+import kz.dvij.dvij_compose3.userscreens.AccountScreens
+import kz.dvij.dvij_compose3.userscreens.CreateProfileInfoScreen
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -82,6 +84,8 @@ class MainActivity : ComponentActivity() {
     val stockDatabaseManager = StockDatabaseManager(this)
     val stockViewScreen = StockViewScreen(this)
     val choosePlaceDialog = ChoosePlaceDialog(this)
+    val createProfileInfoScreen = CreateProfileInfoScreen(this)
+    val userDatabaseManager = UserDatabaseManager(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -124,19 +128,40 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(listOf<CitiesList>())
             }
 
+            val userInfo = remember {
+                mutableStateOf(UserInfoClass())
+            }
+
             chooseCityNavigation.readCityDataFromDb(citiesList)
-
-
 
             val meetingKey = remember { mutableStateOf("") }
             val placeKey = remember { mutableStateOf("") }
             val stockKey = remember { mutableStateOf("") }
+            val startPage = remember { mutableStateOf(MEETINGS_ROOT) }
 
             val context = LocalContext.current // контекст для тостов
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
 
+            // --- Если пользователь вошел и подтвердил почту, в общем авторизован
+
+            if (mAuth.currentUser != null && mAuth.currentUser!!.isEmailVerified) {
+
+                mAuth.uid?.let {
+                    userDatabaseManager.readOneUserFromDataBase(userInfo, it) { result ->
+
+                        if (!result) {
+
+                            startPage.value = CREATE_USER_INFO_SCREEN
+
+
+                        }
+
+                    }
+                }
+
+            }
 
             val coroutineScope = rememberCoroutineScope() // инициализируем Корутину
             val scaffoldState = rememberScaffoldState() // Инициализируем состояние Scaffold
@@ -281,7 +306,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = MEETINGS_ROOT //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = startPage.value //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
@@ -289,7 +314,7 @@ class MainActivity : ComponentActivity() {
                         composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey)}
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey)}
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey)}
-                        composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity)}
+                        composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity, userInfo)}
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
@@ -305,6 +330,7 @@ class MainActivity : ComponentActivity() {
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
                         composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey)}
+                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController)}
 
                     }
                 }

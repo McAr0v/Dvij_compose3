@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.tapesscreens
+package kz.dvij.dvij_compose3.meetingscreens
 
 import androidx.compose.foundation.Image
 import kz.dvij.dvij_compose3.MainActivity

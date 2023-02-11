@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,12 +24,14 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
-import kz.dvij.dvij_compose3.navigation.LOG_IN_ROOT
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
-import kz.dvij.dvij_compose3.navigation.REG_ROOT
+import kz.dvij.dvij_compose3.firebase.UserInfoClass
+import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // функция превью экрана
@@ -37,8 +40,11 @@ import kz.dvij.dvij_compose3.ui.theme.*
 fun ProfileScreen (
     user: FirebaseUser?,
     navController: NavController,
-    activity: MainActivity
+    activity: MainActivity,
+    userInfo: MutableState<UserInfoClass>
 ) {
+
+
 
     val accountHelper = AccountHelper(activity)
 
@@ -61,16 +67,35 @@ fun ProfileScreen (
 
                 // ----- ЕСЛИ ЕСТЬ ФОТОГРАФИЯ ---------
 
-                AsyncImage(
-                    model = user.photoUrl, // фотография пользователя из Google аккаунта
-                    contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
-                    contentDescription = stringResource(id = R.string.icon_user_image), // описание для слабовидящих
-                    modifier = Modifier
-                        .size(150.dp) // размер аватарки
-                        .border(
-                            BorderStroke(4.dp, PrimaryColor), CircleShape
-                        ) // рамка вокруг иконки
-                        .clip(CircleShape)) // делаем аватарку круглой
+                if (userInfo.value.avatar != ""){
+
+                    AsyncImage(
+                        model = userInfo.value.avatar, // фотография пользователя из Google аккаунта
+                        contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
+                        contentDescription = stringResource(id = R.string.icon_user_image), // описание для слабовидящих
+                        modifier = Modifier
+                            .size(150.dp) // размер аватарки
+                            .border(
+                                BorderStroke(4.dp, PrimaryColor), CircleShape
+                            ) // рамка вокруг иконки
+                            .clip(CircleShape)) // делаем аватарку круглой
+
+                } else {
+
+                    AsyncImage(
+                        model = user.photoUrl, // фотография пользователя из Google аккаунта
+                        contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
+                        contentDescription = stringResource(id = R.string.icon_user_image), // описание для слабовидящих
+                        modifier = Modifier
+                            .size(150.dp) // размер аватарки
+                            .border(
+                                BorderStroke(4.dp, PrimaryColor), CircleShape
+                            ) // рамка вокруг иконки
+                            .clip(CircleShape)) // делаем аватарку круглой
+
+                }
+
+
             } else {
 
                 // ------- ЕСЛИ НЕТ ФОТОГРАФИИ -------------
@@ -122,6 +147,20 @@ fun ProfileScreen (
             }
 
                 Spacer(modifier = Modifier.height(50.dp)) // разделитель
+
+            // --------------- телефон ПОЛЬЗОВАТЕЛЯ ----------------
+
+            if (userInfo.value.phoneNumber != "" && userInfo.value.phoneNumber != null) {
+
+                Text(
+                    text = "+7 ${userInfo.value.phoneNumber!!}", // email из базы данных firebase
+                    style = Typography.labelMedium, // стиль текста
+                    textAlign = TextAlign.Center, // выравнивание по центру
+                    color = Grey40 // цвет
+                )
+            }
+
+            Spacer(modifier = Modifier.height(50.dp)) // разделитель
 
 
 
@@ -181,6 +220,36 @@ fun ProfileScreen (
                     )
 
 
+            }
+
+            Button(
+
+                onClick = {
+
+                    navController.navigate(CREATE_USER_INFO_SCREEN)
+
+                },
+                modifier = Modifier
+                    .fillMaxWidth() // кнопка на всю ширину
+                    .height(50.dp),// высота - 50
+                shape = RoundedCornerShape(50), // скругление углов
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = SuccessColor, // цвет кнопки
+                    contentColor = Grey100 // цвет контента на кнопке
+                )
+            ) {
+                Text(
+                    text = "Редактировать",
+                    style = Typography.labelMedium
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_publish),
+                    contentDescription = stringResource(id = R.string.cd_publish_button),
+                    modifier = Modifier.size(20.dp)
+                )
             }
 
         }

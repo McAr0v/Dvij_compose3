@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.tapesscreens
+package kz.dvij.dvij_compose3.stockscreens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image

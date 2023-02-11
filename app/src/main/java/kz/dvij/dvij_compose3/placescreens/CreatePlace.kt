@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.createscreens
+package kz.dvij.dvij_compose3.placescreens
 
 import android.Manifest
 import android.annotation.SuppressLint

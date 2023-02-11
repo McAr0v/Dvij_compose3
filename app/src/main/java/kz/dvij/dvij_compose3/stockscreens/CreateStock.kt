@@ -1,6 +1,6 @@
 @file:Suppress("IMPLICIT_CAST_TO_ANY")
 
-package kz.dvij.dvij_compose3.createscreens
+package kz.dvij.dvij_compose3.stockscreens
 
 import android.Manifest
 import android.content.pm.PackageManager

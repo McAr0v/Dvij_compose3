@@ -1,8 +1,7 @@
-package kz.dvij.dvij_compose3.createscreens
+package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.util.Log
 import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*

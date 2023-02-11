@@ -12,6 +12,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
@@ -51,7 +52,19 @@ class PhotoHelper (val act: MainActivity) {
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
-    private val imageRefStock = storagePlaces
+    private val imageRefStock = storageStock
+        .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
+        .child("image_${System.currentTimeMillis()}") // название изображения
+
+    // ----- STORAGE ПОЛЬЗОВАТЕЛЕЙ -----------
+
+    private val storageUser = Firebase
+        .storage("gs://dvij-compose3-1cf6a.appspot.com")
+        .getReference("Stock") // инициализируем папку, в которую будет сохраняться картинка акций
+
+    // делаем дополнительные подпапки для более удобного поиска изображений
+
+    private val imageRefUser = storageUser
         .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
         .child("image_${System.currentTimeMillis()}") // название изображения
 
@@ -204,6 +217,20 @@ class PhotoHelper (val act: MainActivity) {
             }
 
             callback(imageRefStock.downloadUrl.await().toString())
+
+        } else if (typePost == CREATE_USER_INFO_SCREEN){
+
+            // ----- ЕСЛИ ЗАГРУЖАЕМ ФОТО ПОЛЬЗОВАТЕЛЕЙ --------
+
+            // То же самое что и в фото мероприятий, только в другую папку
+
+            if (metadata != null){
+                imageRefUser.putFile(uri, metadata).await()
+            } else {
+                imageRefUser.putFile(uri).await()
+            }
+
+            callback(imageRefUser.downloadUrl.await().toString())
 
         }
     }
