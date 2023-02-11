@@ -49,6 +49,29 @@ class StockCard (val act: MainActivity) {
             }
         }
 
+        // Переменная счетчика людей, добавивших в избранное заведение
+        val favCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Переменная счетчика просмотра заведения
+        val viewCounter = remember {
+            mutableStateOf(0)
+        }
+
+        val stockInfo = remember {
+            mutableStateOf(StockAdsClass())
+        }
+
+        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
+
+        act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, stockItem.keyStock){
+
+            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
+            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+
+        }
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -140,7 +163,7 @@ class StockCard (val act: MainActivity) {
                     ) {
 
                         Text(
-                            text = "10",
+                            text = favCounter.value.toString(),
                             style = Typography.labelSmall,
                             color = Grey40
                         )

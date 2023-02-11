@@ -440,4 +440,44 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         }
         )
     }
+
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ КОЛИЧЕСТВА МЕРОПРИЯТИЙ КОНКРЕТНОГО ЗАВЕДЕНИЯ С БАЗЫ ДАННЫХ --------
+
+    fun readMeetingCounterInPlaceDataFromDb(placeKey: String, callback: (meetingsCounter: Int)-> Unit){
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+
+                for (item in snapshot.children){
+
+                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        .child("info") // следующая папка с информацией о мероприятии
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                    if (meeting != null && meeting.placeKey == placeKey) {meetingArray.add(meeting)} // если мероприятие не пустое, добавляем в список
+
+                }
+
+                if (meetingArray.isEmpty()){
+                    callback (0) // выдаем колбак, что список пустой
+                } else {
+                    callback (meetingArray.size) // выдаем размер списка мероприятий
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
+
+
 }

@@ -44,6 +44,8 @@ class PlacesCard (val act: MainActivity) {
     fun PlaceCardSmall (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+        val meetingCounter = remember{ mutableStateOf("") }
+        val stockCounter = remember{ mutableStateOf("") }
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
@@ -55,6 +57,18 @@ class PlacesCard (val act: MainActivity) {
                 // Если колбак фалс, то в обычный цвет
                 iconFavColor.value = Grey10
             }
+        }
+
+        // Считываем количество мероприятий у этого заведения
+
+        act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeItem.placeKey){ meetingsCounter ->
+            meetingCounter.value = meetingsCounter.toString()
+        }
+
+        // Считываем количество мероприятий у этого заведения
+
+        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeItem.placeKey) { stockCounters ->
+            stockCounter.value = stockCounters.toString()
         }
 
         Card(
@@ -198,7 +212,7 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик мероприятий ----------
 
                                     androidx.compose.material.Text(
-                                        text = "34",
+                                        text = meetingCounter.value,
                                         style = Typography.labelSmall,
                                         color = Grey40
                                     )
@@ -226,7 +240,7 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик акций ----------
 
                                     androidx.compose.material.Text(
-                                        text = "5",
+                                        text = stockCounter.value,
                                         style = Typography.labelSmall,
                                         color = Grey40
                                     )
@@ -245,6 +259,8 @@ class PlacesCard (val act: MainActivity) {
     fun PlaceCard (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+        val meetingCounter = remember{ mutableStateOf("") }
+        val stockCounter = remember{ mutableStateOf("") }
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
@@ -256,6 +272,42 @@ class PlacesCard (val act: MainActivity) {
                 // Если колбак фалс, то в обычный цвет
                 iconFavColor.value = Grey10
             }
+        }
+
+        // Считываем количество мероприятий у этого заведения
+
+        act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeItem.placeKey){ meetingsCounter ->
+            meetingCounter.value = meetingsCounter.toString()
+        }
+
+        // Считываем количество мероприятий у этого заведения
+
+        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeItem.placeKey) { stockCounters ->
+            stockCounter.value = stockCounters.toString()
+        }
+
+        // Переменная, которая содержит в себе информацию о заведении
+        val placeInfo = remember {
+            mutableStateOf(PlacesAdsClass())
+        }
+
+        // Переменная счетчика людей, добавивших в избранное заведение
+        val favCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Переменная счетчика просмотра заведения
+        val viewCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
+
+        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, placeItem.placeKey){
+
+            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
+            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+
         }
 
         Card(
@@ -352,7 +404,7 @@ class PlacesCard (val act: MainActivity) {
                     ) {
 
                         androidx.compose.material.Text(
-                            text = "10",
+                            text = favCounter.value.toString(),
                             style = Typography.labelSmall,
                             color = Grey40
                         )
@@ -467,7 +519,11 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик мероприятий ----------
 
                                     androidx.compose.material.Text(
-                                        text = "34 мероприятия",
+                                        text = when (meetingCounter.value) {
+                                            "1" -> "${meetingCounter.value} мероприятие"
+                                            "2","3","4" -> "${meetingCounter.value} мероприятия"
+                                            else -> "${meetingCounter.value} мероприятий"
+                                        },
                                         style = Typography.labelSmall,
                                         color = Grey40
                                     )
@@ -495,7 +551,11 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик акций ----------
 
                                     androidx.compose.material.Text(
-                                        text = "5 акций",
+                                        text = when (stockCounter.value) {
+                                            "1" -> "${stockCounter.value} акция"
+                                            "2","3","4" -> "${stockCounter.value} акции"
+                                            else -> "${stockCounter.value} акций"
+                                        },
                                         style = Typography.labelSmall,
                                         color = Grey40
                                     )

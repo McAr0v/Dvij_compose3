@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.viewscreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -150,7 +151,7 @@ class PlaceViewScreen (val act: MainActivity) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(10.dp),
 
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Top
@@ -294,6 +295,7 @@ class PlaceViewScreen (val act: MainActivity) {
                                                         Grey40 // При нажатии окрашиваем текст и иконку в белый
                                                     buttonFavColor.value =
                                                         Grey80 // При нажатии окрашиваем кнопку в темно-серый
+                                                    favCounter.value = favCounter.value.toInt() - 1
 
                                                     // Выводим ТОСТ
                                                     Toast.makeText(
@@ -318,6 +320,8 @@ class PlaceViewScreen (val act: MainActivity) {
                                                         PrimaryColor // При нажатии окрашиваем текст и иконку в черный
                                                     buttonFavColor.value =
                                                         Grey90_2 // Окрашиваем кнопку в главный цвет
+
+                                                    favCounter.value++
 
                                                     // Выводим ТОСТ
                                                     Toast.makeText(
@@ -568,7 +572,7 @@ class PlaceViewScreen (val act: MainActivity) {
             item {
 
                 Text(
-                    modifier = Modifier.padding(horizontal = 20.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp),
                     text = "Мероприятия этого заведения",
                     style = Typography.titleMedium,
                     color = Grey10
@@ -581,7 +585,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 items(meetingsList.value) { item ->
 
-                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                         // сам шаблон карточки мероприятия
                         act.meetingsCard.MeetingCard(
                             navController = navController,
@@ -599,7 +603,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     Column(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 20.dp)) {
+                        .padding(horizontal = 10.dp, vertical = 20.dp)) {
 
                         Text(
                             text = "У этого места пока нет мероприятий",
@@ -620,7 +624,7 @@ class PlaceViewScreen (val act: MainActivity) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp),
+                            .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -651,8 +655,20 @@ class PlaceViewScreen (val act: MainActivity) {
 
             item {
 
+                Image(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp).height(200.dp),
+                    painter = painterResource(id = R.drawable.korn_concert),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+
+                    )
+
+            }
+
+            item {
+
                 Text(
-                    modifier = Modifier.padding(horizontal = 20.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp),
                     text = "Акции этого заведения",
                     style = Typography.titleMedium,
                     color = Grey10
@@ -665,7 +681,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 items(stockList.value) { item ->
 
-                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                         // сам шаблон карточки акции
                         act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
                     }
@@ -679,7 +695,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     Column(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 20.dp)) {
+                        .padding(horizontal = 10.dp, vertical = 20.dp)) {
 
                         Text(
                             text = "У этого места пока нет акций",
