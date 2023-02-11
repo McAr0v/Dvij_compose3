@@ -306,7 +306,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = startPage.value //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = MEETINGS_ROOT //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
