@@ -28,9 +28,12 @@ import kz.dvij.dvij_compose3.ui.theme.*
 // --- ФУНКЦИЯ ВЫБОРА КАРТИНКИ В СОЗДАНИИ МЕРОПРИЯТИЯ / ЗАВЕДЕНИЯ / АКЦИЙ  --------
 
 @Composable
-fun chooseImageDesign (): Uri? {
+fun chooseImageDesign (inputImageUrl: String? = ""): Uri? {
 
-    var selectImage = remember { mutableStateOf<Uri?>(null) } // создаем пустое значение Uri
+    val imageUrl = remember {
+        mutableStateOf(inputImageUrl)
+    }
+    val selectImage = remember { mutableStateOf<Uri?>(null) } // создаем пустое значение Uri
 
     // запускаем Галерею и получаем Uri нашей картинки
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
@@ -49,7 +52,7 @@ fun chooseImageDesign (): Uri? {
 
         // ---- ЕСЛИ ИЗОБРАЖЕНИЕ ЕЩЕ НЕ ВЫБРАНО -------
 
-        if (selectImage.value == null) {
+        if (selectImage.value == null && imageUrl.value == "") {
 
             Column(
                 modifier = Modifier
@@ -108,15 +111,15 @@ fun chooseImageDesign (): Uri? {
                     .fillMaxHeight(), // занять всю высоту
 
                 painter = (
-                        if (selectImage.value == null) {
+                        if (selectImage.value != null) {
 
                             // изображение-ЗАГЛУШКА
-                            painterResource(id = R.drawable.korn_concert)
+                            rememberAsyncImagePainter(model = selectImage.value)
 
                         } else {
 
                             // ВЫБРАННОЕ ИЗОБРАЖЕНИЕ
-                            rememberAsyncImagePainter(model = selectImage.value)
+                            rememberAsyncImagePainter(model = imageUrl.value)
 
                         }
                         ),
@@ -157,7 +160,10 @@ fun chooseImageDesign (): Uri? {
                 // --- ИКОНКА УДАЛИТЬ -----------
 
                 IconButton(
-                    onClick = { selectImage.value = null },
+                    onClick = {
+                        selectImage.value = null
+                        imageUrl.value = ""
+                              },
                     modifier = Modifier
                         .background(
                             AttentionColor,

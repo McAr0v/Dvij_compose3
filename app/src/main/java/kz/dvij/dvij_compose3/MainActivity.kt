@@ -131,7 +131,11 @@ class MainActivity : ComponentActivity() {
             }
 
             val userInfo = remember {
-                mutableStateOf(UserInfoClass())
+                mutableStateOf(UserInfoClass(
+                    name = "",
+                    surname = "",
+                    email = "",
+                ))
             }
 
             chooseCityNavigation.readCityDataFromDb(citiesList)
@@ -332,7 +336,7 @@ class MainActivity : ComponentActivity() {
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
                         composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey)}
-                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList)}
+                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
 
                     }
                 }

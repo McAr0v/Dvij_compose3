@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.userscreens
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -56,7 +57,11 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    fun CreateUserInfoScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
+    fun CreateUserInfoScreen (
+        navController: NavController,
+        citiesList: MutableState<List<CitiesList>>,
+        filledUserInfo: UserInfoClass? = UserInfoClass()
+    ) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
@@ -76,7 +81,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Аватар") // подпись перед формой
 
-            val avatar = chooseImageDesign() // Изображение акции
+            val avatar = chooseImageDesign(filledUserInfo?.avatar) // Изображение акции
 
             SpacerTextWithLine(headline = "Имя")
 
@@ -122,6 +127,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                 act.chooseCityNavigation.CityChooseDialog(citiesList) {
                     openCityDialog.value = false
                 }
+
+                Log.d ("MyLog", "Avatar = $avatar")
             }
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------

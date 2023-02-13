@@ -2,14 +2,12 @@ package kz.dvij.dvij_compose3.tapesscreens
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -31,6 +29,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.elements.IconText
+import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -53,225 +52,346 @@ fun ProfileScreen (
 
     if (user!=null && user.isEmailVerified) {
 
-        Column(
-            modifier = Modifier
-                .background(Grey95)
-                .fillMaxSize()
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Column(modifier = Modifier
+            .fillMaxSize().background(Grey100)
+            .verticalScroll(rememberScrollState())
+        ){
 
-            // -------------- АВАТАРКА ПОЛЬЗОВАТЕЛЯ ------------------
+            Box(modifier = Modifier.fillMaxWidth().background(Grey90).fillMaxSize()) {
 
-            if (user.photoUrl != null) {
-
-                // ----- ЕСЛИ ЕСТЬ ФОТОГРАФИЯ ---------
-
-                if (userInfo.value.avatar != "" && userInfo.value.avatar != null){
+                if (userInfo.value.avatar != "") {
 
                     AsyncImage(
-                        model = userInfo.value.avatar, // фотография пользователя из Google аккаунта
-                        contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
-                        contentDescription = stringResource(id = R.string.icon_user_image), // описание для слабовидящих
+                        model = userInfo.value.avatar, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
+                        contentDescription = "Аватар пользователя", // описание изображения для слабовидящих
                         modifier = Modifier
-                            .size(150.dp) // размер аватарки
-                            .border(
-                                BorderStroke(4.dp, PrimaryColor), CircleShape
-                            ) // рамка вокруг иконки
-                            .clip(CircleShape)) // делаем аватарку круглой
+                            .height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
+                        //alignment = Alignment.Center
+                    )
+
+                } else if (user.photoUrl != null && userInfo.value.avatar == "") {
+
+                    AsyncImage(
+                        model = user.photoUrl, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
+                        contentDescription = "Аватар пользователя", // описание изображения для слабовидящих
+                        modifier = Modifier
+                            .height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
+                        //alignment = Alignment.Center
+                    )
 
                 } else {
 
-                    AsyncImage(
-                        model = user.photoUrl, // фотография пользователя из Google аккаунта
-                        contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
-                        contentDescription = stringResource(id = R.string.icon_user_image), // описание для слабовидящих
+                    Image(
                         modifier = Modifier
-                            .size(150.dp) // размер аватарки
-                            .border(
-                                BorderStroke(4.dp, PrimaryColor), CircleShape
-                            ) // рамка вокруг иконки
-                            .clip(CircleShape)) // делаем аватарку круглой
-
-                }
-
-
-            } else {
-
-                // ------- ЕСЛИ НЕТ ФОТОГРАФИИ -------------
-
-                Image(
-                    painter = painterResource(id = R.drawable.no_user_image), // заглушка
-                    contentScale = ContentScale.Crop, // увеличение изображения - либо по ширине либо по высоте выступающее за края части будут обрезаны
-                    contentDescription = stringResource(id = R.string.cd_avatar), // описание для слабовидящих
-                    modifier = Modifier
-                        .size(150.dp) // размер аватарки
-                        .border(
-                            BorderStroke(4.dp, PrimaryColor),
-                            CircleShape
-                        ) // рамка вокруг иконки
-                        .clip(CircleShape) // делаем ее круглой
-                )
-            }
-
-            Spacer(modifier = Modifier.height(30.dp)) // разделитель
-
-
-            // -------------- ИМЯ ПОЛЬЗОВАТЕЛЯ -----------------------
-
-            if (userInfo.value.name != "" && userInfo.value.surname != ""){
-
-                Text(
-                    text = "${userInfo.value.name} ${userInfo.value.surname}", // имя из базы данных firebase
-                    style = Typography.titleLarge, // стиль текста
-                    color = Grey00, // цвет
-                    textAlign = TextAlign.Center // выравнивание по центру
-                )
-
-            } else {
-
-                Text(
-                    text = user.displayName!!, // имя из базы данных firebase
-                    style = Typography.titleLarge, // стиль текста
-                    color = Grey00, // цвет
-                    textAlign = TextAlign.Center // выравнивание по центру
-                )
-
-            }
-
-            Spacer(modifier = Modifier.height(10.dp)) // разделитель
-
-
-            // --------------- EMAIL ПОЛЬЗОВАТЕЛЯ ----------------
-
-            if (user.email != null) {
-
-                Text(
-                    text = user.email!!, // email из базы данных firebase
-                    style = Typography.labelMedium, // стиль текста
-                    textAlign = TextAlign.Center, // выравнивание по центру
-                    color = Grey40 // цвет
-                )
-            }
-
-                Spacer(modifier = Modifier.height(50.dp)) // разделитель
-
-            // --------------- телефон ПОЛЬЗОВАТЕЛЯ ----------------
-
-            if (userInfo.value.phoneNumber != "" && userInfo.value.phoneNumber != null) {
-
-                Text(
-                    text = "+7 ${userInfo.value.phoneNumber!!}", // email из базы данных firebase
-                    style = Typography.labelMedium, // стиль текста
-                    textAlign = TextAlign.Center, // выравнивание по центру
-                    color = Grey40 // цвет
-                )
-            }
-
-            Spacer(modifier = Modifier.height(50.dp)) // разделитель
-
-            if (userInfo.value.telegram != ""){
-
-                userInfo.value.telegram?.let {
-                    IconText(icon = R.drawable.telegram,
-                        inputText = it
+                            .fillMaxWidth()
+                            .height(260.dp),
+                        painter = painterResource(id = R.drawable.no_user_image),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
                     )
+
                 }
 
-            }
+                // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
 
-            Spacer(modifier = Modifier.height(50.dp)) // разделитель
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth().fillMaxSize()
+                        .padding(top = 245.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                    androidx.compose.material3.Card(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Grey100,
+                                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+                            ),
+                        shape = RoundedCornerShape(
+                            topStart = 15.dp,
+                            topEnd = 15.dp,
+                            bottomEnd = 15.dp,
+                            bottomStart = 15.dp
+                        ),
+                        elevation = CardDefaults.cardElevation(5.dp),
+                        colors = CardDefaults.cardColors(Grey100)
+                    ) {
+
+                        Column(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(20.dp)
+                        ) {
+
+                            SpacerTextWithLine(headline = "Твое имя")
+
+                            if (userInfo.value.name != "" && userInfo.value.surname != ""){
+
+                                androidx.compose.material3.Text(
+                                    text = "${userInfo.value.name} ${userInfo.value.surname}",
+                                    style = Typography.titleMedium,
+                                    color = Grey10
+                                )
+
+                            } else if (userInfo.value.name == "" && userInfo.value.surname == ""){
+
+                                user.displayName?.let { name ->
+                                    androidx.compose.material3.Text(
+                                        text = name,
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Новый пользователь",
+                                    style = Typography.titleSmall,
+                                    color = Grey10
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Email для входа")
+
+                            if (user.email != null) {
+
+                                androidx.compose.material3.Text(
+                                    text = user.email!!,
+                                    style = Typography.titleMedium,
+                                    color = Grey10
+                                )
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Email не указан",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Город")
+
+                            if (userInfo.value.city != "" && userInfo.value.city != null){
+
+                                userInfo.value.city?.let { city ->
+                                    androidx.compose.material3.Text(
+                                        text = city,
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Город не выбран",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Телефон для звонков")
+
+                            if (userInfo.value.phoneNumber != ""){
+
+                                userInfo.value.phoneNumber?.let { phone ->
+                                    androidx.compose.material3.Text(
+                                        text = "+7${phone}",
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Телефон не указан",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Whatsapp")
+
+                            if (userInfo.value.whatsapp != "") {
+
+                                userInfo.value.whatsapp?.let {
+                                    androidx.compose.material3.Text(
+                                        text = it,
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Номер телефона не указан",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Instagram")
+
+                            if (userInfo.value.instagram != "") {
+
+                                userInfo.value.instagram?.let {
+                                    androidx.compose.material3.Text(
+                                        text = it,
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Номер телефона не указан",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
+
+                            SpacerTextWithLine(headline = "Telegram")
+
+                            if (userInfo.value.telegram != "") {
+
+                                userInfo.value.telegram?.let {
+                                    androidx.compose.material3.Text(
+                                        text = it,
+                                        style = Typography.titleMedium,
+                                        color = Grey10
+                                    )
+                                }
+
+                            } else {
+
+                                androidx.compose.material3.Text(
+                                    text = "Telegram не указан",
+                                    style = Typography.titleSmall,
+                                    color = Grey40
+                                )
+
+                            }
 
 
 
-            // --------- КНОПКА ВЫХОДА ИЗ АККАУНТА ------------
+                            Spacer(modifier = Modifier.height(50.dp)) // разделитель
 
-                Button(
-                    onClick = {
-                        // функции на нажатие
+                            Button(
 
-                        try {
+                                onClick = {
 
-                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // после выхода отправляем на страницу мероприятий
+                                    navController.navigate(CREATE_USER_INFO_SCREEN)
 
-                            accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth() // кнопка на всю ширину
+                                    .height(50.dp)// высота - 50
+                                    .padding(horizontal = 30.dp), // отступы от краев
+                                shape = RoundedCornerShape(50), // скругление углов
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = SuccessColor, // цвет кнопки
+                                    contentColor = Grey100 // цвет контента на кнопке
+                                )
+                            ) {
+                                Text(
+                                    text = "Редактировать",
+                                    style = Typography.labelMedium
+                                )
 
-                            activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_publish),
+                                    contentDescription = stringResource(id = R.string.cd_publish_button),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp)) // разделитель
 
 
+                            // --------- КНОПКА ВЫХОДА ИЗ АККАУНТА ------------
 
-                        } catch (e: ApiException) {
-                            Log.d("MyLog", "ApiError: ${e.message}")
+                            Button(
+                                onClick = {
+                                    // функции на нажатие
+
+                                    try {
+
+                                        navController.navigate(MEETINGS_ROOT) { popUpTo(0) } // после выхода отправляем на страницу мероприятий
+
+                                        accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
+
+                                        activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+
+
+                                    } catch (e: ApiException) {
+                                        Log.d("MyLog", "ApiError: ${e.message}")
+                                    }
+
+                                    // показываем ТОСТ что все готово
+
+                                    Toast.makeText(
+                                        activity,
+                                        activity.getString(R.string.sign_out_success),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth() // кнопка занимает всю ширину
+                                    .height(50.dp)// высота - 50
+                                    .padding(horizontal = 30.dp), // отступы от краев
+                                shape = RoundedCornerShape(50), // скругление углов
+                                colors = ButtonDefaults.buttonColors(
+
+                                    // цвета кнопки
+                                    backgroundColor = PrimaryColor,
+                                    contentColor = Grey100
+
+                                )
+                            ) {
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_logout), // иконка
+                                    contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
+                                    tint = Grey100 // цвет иконки
+                                )
+
+                                Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+
+                                Text(
+                                    text = stringResource(id = R.string.sign_out_button), // текст кнопки
+                                    style = Typography.labelMedium // стиль текста
+                                )
+
+
+                            }
+
                         }
 
-                        // показываем ТОСТ что все готово
-
-                        Toast.makeText(
-                            activity,
-                            activity.getString(R.string.sign_out_success),
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка занимает всю ширину
-                        .height(50.dp)// высота - 50
-                        .padding(horizontal = 30.dp), // отступы от краев
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-
-                        // цвета кнопки
-                        backgroundColor = PrimaryColor,
-                        contentColor = Grey100
-
-                    )) {
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_logout), // иконка
-                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                        tint = Grey100 // цвет иконки
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
-
-                    Text(
-                        text = stringResource(id = R.string.sign_out_button), // текст кнопки
-                        style = Typography.labelMedium // стиль текста
-                    )
-
+                    }
+                }
 
             }
 
-            Button(
 
-                onClick = {
-
-                    navController.navigate(CREATE_USER_INFO_SCREEN)
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка на всю ширину
-                    .height(50.dp),// высота - 50
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = SuccessColor, // цвет кнопки
-                    contentColor = Grey100 // цвет контента на кнопке
-                )
-            ) {
-                Text(
-                    text = "Редактировать",
-                    style = Typography.labelMedium
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_publish),
-                    contentDescription = stringResource(id = R.string.cd_publish_button),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
 
         }
 
