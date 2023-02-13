@@ -2,6 +2,8 @@ package kz.dvij.dvij_compose3.userscreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultRegistry
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

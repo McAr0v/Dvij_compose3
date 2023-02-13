@@ -10,4 +10,5 @@ data class UserInfoClass(
     val instagram: String? = null,
     val telegram: String? = null,
     val userKey: String? = null,
+    val city: String? = null,
 )

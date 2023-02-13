@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.elements.IconText
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -67,7 +68,7 @@ fun ProfileScreen (
 
                 // ----- ЕСЛИ ЕСТЬ ФОТОГРАФИЯ ---------
 
-                if (userInfo.value.avatar != ""){
+                if (userInfo.value.avatar != "" && userInfo.value.avatar != null){
 
                     AsyncImage(
                         model = userInfo.value.avatar, // фотография пользователя из Google аккаунта
@@ -119,8 +120,16 @@ fun ProfileScreen (
 
             // -------------- ИМЯ ПОЛЬЗОВАТЕЛЯ -----------------------
 
+            if (userInfo.value.name != "" && userInfo.value.surname != ""){
 
-            if (user.displayName != null) {
+                Text(
+                    text = "${userInfo.value.name} ${userInfo.value.surname}", // имя из базы данных firebase
+                    style = Typography.titleLarge, // стиль текста
+                    color = Grey00, // цвет
+                    textAlign = TextAlign.Center // выравнивание по центру
+                )
+
+            } else {
 
                 Text(
                     text = user.displayName!!, // имя из базы данных firebase
@@ -158,6 +167,18 @@ fun ProfileScreen (
                     textAlign = TextAlign.Center, // выравнивание по центру
                     color = Grey40 // цвет
                 )
+            }
+
+            Spacer(modifier = Modifier.height(50.dp)) // разделитель
+
+            if (userInfo.value.telegram != ""){
+
+                userInfo.value.telegram?.let {
+                    IconText(icon = R.drawable.telegram,
+                        inputText = it
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(50.dp)) // разделитель

@@ -23,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class SideComponents (private val act: MainActivity) {
@@ -152,8 +153,8 @@ class SideComponents (private val act: MainActivity) {
     @Composable
     fun AvatarBoxSideNavigation(
         navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
-        scaffoldState: ScaffoldState // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
-
+        scaffoldState: ScaffoldState, // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
+        userInfo: MutableState<UserInfoClass>
     ) {
 
 
@@ -195,7 +196,18 @@ class SideComponents (private val act: MainActivity) {
 
                 // АВАТАРКА ПОЛЬЗОВАТЕЛЯ
 
-                if (user.photoUrl != null) {
+                if (userInfo.value.avatar != ""){
+
+                    AsyncImage(
+                        model = userInfo.value.avatar,
+                        contentDescription = stringResource(id = R.string.icon_user_image),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
+                            .clip(CircleShape))
+
+                } else if (user.photoUrl != null) {
                     AsyncImage(
                         model = user.photoUrl,
                         contentDescription = stringResource(id = R.string.icon_user_image),
@@ -217,7 +229,30 @@ class SideComponents (private val act: MainActivity) {
                 }
 
                 // КОЛОНКА С ИМЕНЕМ И EMAIL
-                if (user.displayName == null || user.displayName == ""){
+
+                if (userInfo.value.name != "" && userInfo.value.surname != ""){
+
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 10.dp) // паддинг слева
+                            .weight(1f),// ширина - колонка займет оставшуюся ширину среди всех элементов
+                        verticalArrangement = Arrangement.Center
+                    ){
+
+                        Text(
+                            text = "${userInfo.value.name} ${userInfo.value.surname}", // сюда нужно передавать имя пользователя из БД
+                            color = Grey40, // цвет имени
+                            style = Typography.titleSmall // стиль текста
+                        )
+
+                        Text(
+                            text = user.email!!, // сюда нужно передавать email пользователя из БД
+                            color = Grey40, // цвет Email
+                            style = Typography.labelSmall // стиль текста
+                        )
+                    }
+
+                } else if (user.displayName == null || user.displayName == ""){
 
                     Column(
                         modifier = Modifier

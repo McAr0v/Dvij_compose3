@@ -56,11 +56,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    fun CreateUserInfoScreen (navController: NavController) {
+    fun CreateUserInfoScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
+        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
 
         Column(
             modifier = Modifier
@@ -111,6 +112,18 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram) // форма телеграма
 
+            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
+
+            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
+
+            // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
+
+            if (openCityDialog.value) {
+                act.chooseCityNavigation.CityChooseDialog(citiesList) {
+                    openCityDialog.value = false
+                }
+            }
+
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
 
             Button(
@@ -149,7 +162,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     whatsapp = whatsapp,
                                     instagram = instagram,
                                     telegram = telegram,
-                                    userKey = auth.uid
+                                    userKey = auth.uid,
+                                    city = city
                                 )
 
                                 // Делаем дополнительную проверку - пользователь зарегистрирован или нет

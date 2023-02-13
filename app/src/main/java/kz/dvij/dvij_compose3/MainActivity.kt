@@ -7,7 +7,9 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -270,7 +272,7 @@ class MainActivity : ComponentActivity() {
 
                         sideComponents.AvatarBoxSideNavigation(
                             //user = mAuth.currentUser,
-                            navController = navController, scaffoldState = scaffoldState) // Аватарка
+                            navController = navController, scaffoldState = scaffoldState, userInfo = userInfo) // Аватарка
 
                         chooseCityNavigation.CityHeaderSideNavigation(citiesList) // Меню с выбором города находится теперь в отдельном классе
 
@@ -330,7 +332,7 @@ class MainActivity : ComponentActivity() {
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
                         composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey)}
-                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController)}
+                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList)}
 
                     }
                 }
