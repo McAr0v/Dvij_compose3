@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.elements
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,12 +28,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 
 @Composable
 fun fieldEmailComponent (
-    act: MainActivity
+    act: MainActivity, inputEmail: String? = ""
 ): String {
 
     // функция вовзвращает переменную текст, в которую записывается вводимое в поле значение
 
-    var text = remember { mutableStateOf("") }
+    var text = remember { mutableStateOf(inputEmail) }
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -65,7 +66,7 @@ fun fieldEmailComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value.lowercase(), // значение text // lowerCase() - делает все буквы строчными
+        value = text.value!!.lowercase(), // значение text // lowerCase() - делает все буквы строчными
 
         // on valueChange - это действие при изменении значения
 
@@ -198,7 +199,7 @@ fun fieldEmailComponent (
             modifier = Modifier.padding(top = 5.dp)) // отступы
     }  else {}
 
-    return text.value
+    return text.value!!
 
 }
 
@@ -590,7 +591,7 @@ fun fieldPhoneComponent(
     mask: String = "+7 (XXX) XXX XX XX",
     maskNumber: Char = 'X',
     onPhoneChanged: (String) -> Unit,
-    icon: Painter = painterResource(id = R.drawable.ic_phone)
+    icon: Painter = painterResource(id = R.drawable.ic_phone),
 ): String {
 
     var focusColor = remember { mutableStateOf(Grey40) } // изначальный цвет фокуса
@@ -601,9 +602,11 @@ fun fieldPhoneComponent(
     TextField(
         value = phone, // значение поля
 
-        onValueChange = { it ->
+        onValueChange = { it -> onPhoneChanged(it.take(mask.count {it == maskNumber}))}
+
+        /*{ it ->
             onPhoneChanged(it.take(mask.count { it == maskNumber }))
-        },
+        }*/,
 
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone, // тип клавиатуры
@@ -780,11 +783,11 @@ fun fieldPriceComponent (
 
 @SuppressLint("ServiceCast")
 @Composable
-fun fieldInstagramComponent (act: MainActivity,icon: Int): String {
+fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = ""): String {
 
     // создаем переменную текст - это значение функция возвращает
 
-    var text = remember { mutableStateOf("") }
+    var text = remember { mutableStateOf(inputText) }
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -820,7 +823,7 @@ fun fieldInstagramComponent (act: MainActivity,icon: Int): String {
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение поля
+        value = text.value ?: "", // значение поля
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -898,17 +901,19 @@ fun fieldInstagramComponent (act: MainActivity,icon: Int): String {
             modifier = Modifier.padding(top = 5.dp)) // отступы
     }  else {}
 
-    return text.value
+    return text.value ?: ""
 
 }
 
 @SuppressLint("ServiceCast")
 @Composable
-fun fieldTextComponent(placeHolder: String): String {
+fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
 
     // создаем переменную текст - это значение функция возвращает
 
-    var text = remember { mutableStateOf("") }
+
+
+    var text = remember { mutableStateOf(inputText) }
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
@@ -938,7 +943,7 @@ fun fieldTextComponent(placeHolder: String): String {
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение поля
+        value = text.value!!, // значение поля
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -987,7 +992,7 @@ fun fieldTextComponent(placeHolder: String): String {
 
     )
 
-    return text.value
+    return text.value!!
 
 }
 

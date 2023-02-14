@@ -13,13 +13,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
@@ -53,13 +57,28 @@ fun ProfileScreen (
     if (user!=null && user.isEmailVerified) {
 
         Column(modifier = Modifier
-            .fillMaxSize().background(Grey100)
+            .fillMaxSize()
+            .background(Grey100)
             .verticalScroll(rememberScrollState())
         ){
 
-            Box(modifier = Modifier.fillMaxWidth().background(Grey90).fillMaxSize()) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .background(Grey90)
+                .fillMaxSize()) {
 
-                if (userInfo.value.avatar != "") {
+                if (user.photoUrl != null && userInfo.value.avatar == "") {
+
+                    AsyncImage(
+                        model = user.photoUrl,
+                        contentDescription = "Аватар пользователя",
+                        imageLoader = ImageLoader(activity),
+                        modifier = Modifier
+                            .height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
+                    )
+
+                } else if (userInfo.value.avatar != "") {
 
                     AsyncImage(
                         model = userInfo.value.avatar, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
@@ -68,17 +87,7 @@ fun ProfileScreen (
                             .height(260.dp), // заполнить картинкой весь контейнер
                         contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
                         //alignment = Alignment.Center
-                    )
-
-                } else if (user.photoUrl != null && userInfo.value.avatar == "") {
-
-                    AsyncImage(
-                        model = user.photoUrl, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
-                        contentDescription = "Аватар пользователя", // описание изображения для слабовидящих
-                        modifier = Modifier
-                            .height(260.dp), // заполнить картинкой весь контейнер
-                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
-                        //alignment = Alignment.Center
+                        placeholder = painterResource(id = R.drawable.no_user_image)
                     )
 
                 } else {
@@ -99,7 +108,8 @@ fun ProfileScreen (
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth().fillMaxSize()
+                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(top = 245.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
@@ -180,7 +190,7 @@ fun ProfileScreen (
 
                             SpacerTextWithLine(headline = "Город")
 
-                            if (userInfo.value.city != "" && userInfo.value.city != null){
+                            if (userInfo.value.city != "Выбери город" && userInfo.value.city != null){
 
                                 userInfo.value.city?.let { city ->
                                     androidx.compose.material3.Text(
@@ -202,7 +212,7 @@ fun ProfileScreen (
 
                             SpacerTextWithLine(headline = "Телефон для звонков")
 
-                            if (userInfo.value.phoneNumber != ""){
+                            if (userInfo.value.phoneNumber != "7"){
 
                                 userInfo.value.phoneNumber?.let { phone ->
                                     androidx.compose.material3.Text(
@@ -224,7 +234,7 @@ fun ProfileScreen (
 
                             SpacerTextWithLine(headline = "Whatsapp")
 
-                            if (userInfo.value.whatsapp != "") {
+                            if (userInfo.value.whatsapp != "+77") {
 
                                 userInfo.value.whatsapp?.let {
                                     androidx.compose.material3.Text(

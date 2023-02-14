@@ -85,19 +85,26 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Имя")
 
-            val name = fieldTextComponent("Введи своё имя") // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+            val name = fieldTextComponent("Введи своё имя", filledUserInfo?.name) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
 
             SpacerTextWithLine(headline = "Фамилия")
 
-            val surname = fieldTextComponent("Введи свою фамилию") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+            val surname = fieldTextComponent("Введи свою фамилию", filledUserInfo?.surname) // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
 
             SpacerTextWithLine(headline = "Email")
 
-            val email = fieldEmailComponent(act = act)
+            val email = fieldEmailComponent(act = act, filledUserInfo?.email)
 
             SpacerTextWithLine(headline = "Телефон")
 
-            val phone = fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+            var numberFromDatabase = filledUserInfo?.phoneNumber
+
+            val phone = if (numberFromDatabase != "+7" && numberFromDatabase != null){
+                fieldPhoneComponent(numberFromDatabase, onPhoneChanged = { numberFromDatabase = it }) // форма телефона
+            } else {
+                fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+            }
+
 
             // --- ФОРМА WHATSAPP ----
 
@@ -111,11 +118,11 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
 
-            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram) // форма инстаграма
+            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledUserInfo?.instagram) // форма инстаграма
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram) // форма телеграма
+            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo?.instagram) // форма телеграма
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -128,7 +135,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                     openCityDialog.value = false
                 }
 
-                Log.d ("MyLog", "Avatar = $avatar")
+
             }
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
@@ -145,14 +152,75 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
                     GlobalScope.launch(Dispatchers.IO){
 
-                        // запускаем сжатие изображения
-                        val compressedImage = act.photoHelper.compressImage(act, avatar!!)
+                        if (avatar != null){
 
-                        // после сжатия запускаем функцию загрузки сжатого фота в Storage
+                            // запускаем сжатие изображения
+                            val compressedImage = act.photoHelper.compressImage(act, avatar!!)
 
-                        act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", CREATE_USER_INFO_SCREEN){ avatarUrl ->
+                            // после сжатия запускаем функцию загрузки сжатого фота в Storage
 
-                            // В качестве колбака придет ссылка на изображение в Storage
+                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", CREATE_USER_INFO_SCREEN){ avatarUrl ->
+
+                                // В качестве колбака придет ссылка на изображение в Storage
+
+                                // Запускаем корутину и публикуем данные пользователя
+
+                                GlobalScope.launch(Dispatchers.Main) {
+
+                                    // заполняем
+
+                                    val filledUser = UserInfoClass(
+                                        avatar = avatarUrl,
+                                        name = name,
+                                        surname = surname,
+                                        email = email,
+                                        phoneNumber = phoneNumber,
+                                        whatsapp = whatsapp,
+                                        instagram = instagram,
+                                        telegram = telegram,
+                                        userKey = auth.uid,
+                                        city = city
+                                    )
+
+                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                    if (auth.uid != null) {
+
+                                        // Если зарегистрирован, то запускаем функцию публикации мероприятия
+
+                                        userDatabaseManager.publishUser(filledUser = filledUser){ result ->
+
+                                            // в качестве колбака придет булин. Если опубликовано, то:
+
+                                            if (result){
+
+                                                navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
+
+                                                // показываем ТОСТ
+                                                Toast.makeText(
+                                                    act,
+                                                    "Данные пользователя успешно опубликованы",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            } else {
+
+                                                // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                                // Показываем тост
+                                                Toast.makeText(
+                                                    act,
+                                                    act.resources.getString(R.string.error_text),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
 
                             // Запускаем корутину и публикуем данные пользователя
 
@@ -161,7 +229,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                 // заполняем
 
                                 val filledUser = UserInfoClass(
-                                    avatar = avatarUrl,
+                                    avatar = filledUserInfo?.avatar,
                                     name = name,
                                     surname = surname,
                                     email = email,
@@ -172,6 +240,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     userKey = auth.uid,
                                     city = city
                                 )
+
+                                Log.d ("MyLog", "$filledUser")
 
                                 // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
@@ -209,7 +279,10 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     }
                                 }
                             }
+
                         }
+
+
                     }
 
                 },
