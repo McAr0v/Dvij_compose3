@@ -67,6 +67,46 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         })
     }
 
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
+
+    fun readOneMeetingFromDBReturnClass(key: String, callback: (result: MeetingsAdsClass)-> Unit){
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
+
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // добираесся до следующей папки внутри - папка с данными о мероприятии
+                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val meetingFav = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество просмотров объявления
+                    var meetingCount = item
+                        .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
+                    // если мероприятие не нал и ключ мероприятия совпадает с ключем из БД, то...
+                    if (meeting != null && meeting.key == key) {
+
+                        // передаем в переменную нужное мероприятие
+
+                        callback (meeting)
+
+
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
 

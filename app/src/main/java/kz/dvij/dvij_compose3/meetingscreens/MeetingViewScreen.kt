@@ -26,12 +26,15 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
+import kz.dvij.dvij_compose3.navigation.CREATE_MEETINGS_SCREEN
+import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingViewScreen(val act: MainActivity) {
@@ -41,7 +44,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun MeetingViewScreen (key: String, navController: NavController, placeKey: MutableState<String>){
+    fun MeetingViewScreen (meetingKey: MutableState<String>, navController: NavController, placeKey: MutableState<String>, filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>){
 
 
         // Переменная, которая содержит в себе информацию о мероприятии
@@ -77,7 +80,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
         // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
 
-        act.meetingDatabaseManager.readOneMeetingFromDataBase(meetingInfo, key){
+        act.meetingDatabaseManager.readOneMeetingFromDataBase(meetingInfo, meetingKey.value){
 
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров мероприятия
@@ -96,7 +99,7 @@ class MeetingViewScreen(val act: MainActivity) {
         // Если пользователь авторизован, проверяем, добавлено ли уже мероприятие в избранное, или нет
 
         if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-            act.meetingDatabaseManager.favIconMeeting(key) {
+            act.meetingDatabaseManager.favIconMeeting(meetingKey.value) {
                 if (it) {
                     buttonFavColor.value = Grey90_2
                     iconTextFavColor.value = PrimaryColor
@@ -143,6 +146,48 @@ class MeetingViewScreen(val act: MainActivity) {
                 verticalArrangement = Arrangement.Top
 
             ) {
+
+                Button(
+
+                    onClick = {
+
+                        meetingInfo.value.key?.let {
+                            act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
+
+                                filledMeetingInfoFromAct.value = meeting
+                                navController.navigate(CREATE_MEETINGS_SCREEN)
+
+
+                            }
+                        }
+
+
+
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp)// высота - 50
+                        .padding(horizontal = 30.dp), // отступы от краев
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = SuccessColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                ) {
+                    Text(
+                        text = "Редактировать",
+                        style = Typography.labelMedium
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_publish),
+                        contentDescription = stringResource(id = R.string.cd_publish_button),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
 
                 // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
 
@@ -248,14 +293,14 @@ class MeetingViewScreen(val act: MainActivity) {
                             // Если не авторизован, условие else
 
                             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                act.meetingDatabaseManager.favIconMeeting(key) {
+                                act.meetingDatabaseManager.favIconMeeting(meetingKey.value) {
 
                                     // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
                                     if (it) {
 
                                         // Убираем из избранных
-                                        act.meetingDatabaseManager.removeFavouriteMeeting(key) {
+                                        act.meetingDatabaseManager.removeFavouriteMeeting(meetingKey.value) {
 
                                             // Если пришел колбак, что успешно
 
@@ -273,7 +318,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                                         // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.meetingDatabaseManager.addFavouriteMeeting(key) {
+                                        act.meetingDatabaseManager.addFavouriteMeeting(meetingKey.value) {
 
                                             // Если пришел колбак, что успешно
 
@@ -411,7 +456,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7") {
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7" && meetingInfo.value.whatsapp != "" && meetingInfo.value.whatsapp != "+7") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!) },
@@ -512,7 +557,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    meetingInfo.value.headlineInput?.let {
+                    meetingInfo.value.headlinePlaceInput?.let {
                         Text(
                             text = it,
                             style = Typography.titleSmall,
@@ -520,7 +565,7 @@ class MeetingViewScreen(val act: MainActivity) {
                         )
                     }
 
-                    meetingInfo.value.addressInput?.let {
+                    meetingInfo.value.addressPlaceInput?.let {
                         Text(
                             text = it,
                             style = Typography.bodyMedium,

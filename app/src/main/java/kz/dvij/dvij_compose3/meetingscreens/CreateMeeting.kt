@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
@@ -29,10 +30,7 @@ import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.MeetingDatabaseManager
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateMeeting
 import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
@@ -40,6 +38,8 @@ import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateMeeting(private val act: MainActivity) {
+
+    private val meetingDatabase = MeetingDatabaseManager(act)
 
     // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
 
@@ -59,7 +59,15 @@ class CreateMeeting(private val act: MainActivity) {
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RememberReturnType")
     @Composable
-    fun CreateMeetingScreen(navController: NavController, citiesList: MutableState<List<CitiesList>>) {
+    fun CreateMeetingScreen(
+        navController: NavController,
+        citiesList: MutableState<List<CitiesList>>,
+        filledUserInfo: UserInfoClass? = UserInfoClass(),
+        filledMeeting: MeetingsAdsClass? = null,
+        meetingKey: String
+    ) {
+
+        Log.d ("MyLog", "$filledMeeting")
 
         val activity = act
         val meetingDatabaseManager = MeetingDatabaseManager(activity) // инициализируем класс с функциями базы данных ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
@@ -69,7 +77,16 @@ class CreateMeeting(private val act: MainActivity) {
         // https://stackoverflow.com/questions/60417233/jetpack-compose-date-time-picker
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
+        var phoneNumberFromDb by rememberSaveable {
+            mutableStateOf(filledMeeting?.phone)
+        }
+
+
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
+        var phoneNumberWhatsappFromDb by rememberSaveable {
+            mutableStateOf(filledMeeting?.whatsapp)
+        }
+
         var headlinePlace = remember {mutableStateOf("")} // инициализируем переменную заголовка места, введенного вручную
         var addressPlace = remember {mutableStateOf("")} // инициализирууем переменную адреса места, введенного вручную
 
@@ -106,6 +123,8 @@ class CreateMeeting(private val act: MainActivity) {
         }
 
 
+
+
         // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
 
@@ -129,11 +148,20 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
-            val image1 = chooseImageDesign() // Изображение мероприятия
+            val image1 = if (filledMeeting?.image1 != null && meetingKey != "0"){
+                chooseImageDesign(filledMeeting.image1) // Изображение мероприятия
+            } else {
+                chooseImageDesign()
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_headline)) // подпись перед формой
 
-            headline = fieldHeadlineComponent(act = activity) // форма заголовка
+            headline = if (filledMeeting?.headline != null && meetingKey != "0"){
+                fieldHeadlineComponent(act = activity, filledMeeting.headline) // форма заголовка
+            } else {
+                fieldHeadlineComponent(act = activity) // форма заголовка
+            }
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
@@ -277,18 +305,39 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
-            phone = fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+            // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
+
+            phone = if (phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != "" && phoneNumberFromDb != null && meetingKey != "0"){
+
+                fieldPhoneComponent(phoneNumberFromDb!!, onPhoneChanged = { phoneNumberFromDb = it }) // форма телефона
+
+            } else {
+
+                fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+
+            }
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_whatsapp)) // подпись перед формой
 
 
             // --- ФОРМА WHATSAPP ----
 
-            whatsapp = fieldPhoneComponent(
-                phoneNumberWhatsapp,
-                onPhoneChanged = { phoneNumberWhatsapp = it },
-                icon = painterResource(id = R.drawable.whatsapp)
-            )
+            whatsapp = if (phoneNumberWhatsappFromDb != null && phoneNumberWhatsappFromDb != "+7" && phoneNumberWhatsappFromDb != "+77" && phoneNumberWhatsappFromDb != "" && meetingKey != "0"){
+
+                fieldPhoneComponent(phoneNumberWhatsappFromDb!!, onPhoneChanged = { phoneNumberWhatsappFromDb = it }) // форма телефона
+
+            } else {
+
+                fieldPhoneComponent(phoneNumberWhatsapp, onPhoneChanged = { phoneNumberWhatsapp = it }, icon = painterResource(id = R.drawable.whatsapp))
+
+            }
+
+
+
+
+
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
             
@@ -389,8 +438,9 @@ class CreateMeeting(private val act: MainActivity) {
                                             instagram = INSTAGRAM_URL + instagram,
                                             telegram = TELEGRAM_URL + telegram,
                                             placeKey = placeInfo.placeKey ?: "Empty",
-                                            headlineInput = headlinePlace.value,
-                                            addressInput = addressPlace.value
+                                            headlinePlaceInput = headlinePlace.value,
+                                            addressPlaceInput = addressPlace.value,
+                                            ownerKey = act.mAuth.uid
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет

@@ -63,6 +63,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
         filledUserInfo: UserInfoClass? = UserInfoClass()
     ) {
 
+        act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberFromDb by rememberSaveable {
             mutableStateOf(filledUserInfo?.phoneNumber)
@@ -152,10 +154,6 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
-
-            Text(text = city)
-
             if(filledUserInfo?.city != "Выбери город"){
 
                 act.chooseCityNavigation.chosenCity = CitiesList(filledUserInfo?.city, "")
@@ -166,6 +164,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                 act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
             }
+
+            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
+
+            Text(text = city)
+
+
 
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
@@ -234,6 +238,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
                                             if (result){
 
+                                                act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+
                                                 navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 
                                                 // показываем ТОСТ
@@ -292,6 +298,8 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                         // в качестве колбака придет булин. Если опубликовано, то:
 
                                         if (result){
+
+                                            act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
                                             navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 

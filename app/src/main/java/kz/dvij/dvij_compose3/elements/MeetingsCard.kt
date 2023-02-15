@@ -60,7 +60,7 @@ class MeetingsCard(val act: MainActivity) {
                 .clickable {
                     // При клике на карточку - передаем на Main Activity meetingKey. Ключ берем из дата класса мероприятия
 
-                    meetingKey.value = meetingItem.key.toString()
+                    meetingKey.value = meetingItem.key
 
                     // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
 

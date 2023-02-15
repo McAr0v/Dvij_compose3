@@ -371,16 +371,17 @@ fun fieldPasswordComponent (
 @SuppressLint("ServiceCast")
 @Composable
 fun fieldHeadlineComponent (
-    act: MainActivity
+    act: MainActivity,
+    inputHeadline: String? = ""
 ): String {
 
     // создаем переменную текст - это значение функция возвращает
 
-    var text = remember { mutableStateOf("") }
+    var text = remember { mutableStateOf(inputHeadline) }
 
     val maxChar = 40 // максимальное количество символов
 
-    var counter = maxChar - text.value.length // счетчик, который считает сколько осталось символов
+    var counter = maxChar - (text.value?.length ?: 0) // счетчик, который считает сколько осталось символов
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
@@ -415,7 +416,7 @@ fun fieldHeadlineComponent (
                 shape = RoundedCornerShape(50.dp) // скругление границ
             ),
 
-        value = text.value, // значение поля
+        value = text.value ?: "Empty", // значение поля
 
         // on valueChange - это действие при изменении значения
         onValueChange = { newText ->
@@ -474,7 +475,7 @@ fun fieldHeadlineComponent (
         isError = isTextError.value // в поле isError передаем нашу переменную, которая хранит состояние - ошибка или нет
     )
 
-    return text.value
+    return text.value ?: "Empty"
 
 }
 
@@ -661,6 +662,9 @@ fun fieldPhoneComponent(
                 tint = Grey60,
                 modifier = Modifier.size(20.dp) // размер иконки
             )
+        },
+        placeholder = {
+            Text(text = mask)
         }
 
     )

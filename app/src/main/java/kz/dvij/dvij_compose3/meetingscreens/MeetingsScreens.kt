@@ -293,7 +293,11 @@ class MeetingsScreens (val act: MainActivity) {
             // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ МЕРОПРИЯТИЯ --------------
 
             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                FloatingButton { navController.navigate(CREATE_MEETINGS_SCREEN) }
+                FloatingButton {
+                    meetingKey.value = "0"
+
+                    navController.navigate(CREATE_MEETINGS_SCREEN)
+                }
             }
         }
     }

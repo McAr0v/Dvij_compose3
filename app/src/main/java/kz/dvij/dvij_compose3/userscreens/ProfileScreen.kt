@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.IconText
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
@@ -305,6 +306,8 @@ fun ProfileScreen (
                             Button(
 
                                 onClick = {
+
+                                    activity.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
                                     navController.navigate(CREATE_USER_INFO_SCREEN)
 
