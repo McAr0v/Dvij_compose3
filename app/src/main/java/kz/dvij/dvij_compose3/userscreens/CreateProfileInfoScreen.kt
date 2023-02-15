@@ -148,7 +148,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo?.instagram) // форма телеграма
+            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo?.telegram) // форма телеграма
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
