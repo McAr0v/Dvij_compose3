@@ -481,12 +481,13 @@ fun fieldHeadlineComponent (
 
 @Composable
 fun fieldDescriptionComponent (
-    act: MainActivity
+    act: MainActivity,
+    description: String = ""
 ): String {
 
     // переменная text возвращает значение при вызове функции
 
-    var text = remember { mutableStateOf("") }
+    var text = remember { mutableStateOf(description) }
 
     val maxChar = 300 // максимальное количество вводимых символов
 
@@ -675,12 +676,13 @@ fun fieldPhoneComponent(
 
 @Composable
 fun fieldPriceComponent (
-    act: MainActivity
+    act: MainActivity,
+    inputPrice: String = ""
 ): String {
 
     // переменная текст - та, которая возвращается из функции
 
-    var text = remember { mutableStateOf("") }
+    var text = remember { mutableStateOf(inputPrice) }
 
     val maxChar = 8 // максимальное количество символов
 

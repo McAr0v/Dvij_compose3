@@ -489,7 +489,7 @@ class PlaceViewScreen (val act: MainActivity) {
                         if (placeInfo.value.instagram != null && placeInfo.value.instagram != INSTAGRAM_URL) {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!) },
+                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!, INSTAGRAM_URL) },
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)
@@ -516,7 +516,7 @@ class PlaceViewScreen (val act: MainActivity) {
                         if (placeInfo.value.telegram != null && placeInfo.value.telegram != TELEGRAM_URL) {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!) },
+                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!, TELEGRAM_URL) },
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)

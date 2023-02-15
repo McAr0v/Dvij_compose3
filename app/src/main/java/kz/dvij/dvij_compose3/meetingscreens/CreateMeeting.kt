@@ -333,19 +333,30 @@ class CreateMeeting(private val act: MainActivity) {
 
             }
 
-
-
-
-
-
-
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
-            
-            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram) // форма инстаграма
+
+            val instagram = if (filledMeeting?.instagram != INSTAGRAM_URL && filledMeeting?.instagram != null && meetingKey != "0") {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledMeeting.instagram) // форма инстаграма
+
+            } else {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+
+            }
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram) // форма телеграма
+            val telegram = if (filledMeeting?.telegram != TELEGRAM_URL && filledMeeting?.telegram != null && meetingKey != "0") {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledMeeting.telegram) // форма телеграма
+
+            } else {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
@@ -361,11 +372,28 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_price)) // подпись перед формой
 
-            price = fieldPriceComponent(act = activity) // Форма цены за билет
+            price = if (filledMeeting?.price != "" && filledMeeting?.price != null && meetingKey != "0") {
+
+                fieldPriceComponent(act = activity, filledMeeting.price) // Форма цены за билет
+
+            } else {
+
+                fieldPriceComponent(act = activity) // Форма цены за билет
+
+            }
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            description = fieldDescriptionComponent(act = activity) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+            description = if (filledMeeting?.description != "" && filledMeeting?.description != null && meetingKey != "0"){
+
+                fieldDescriptionComponent(act = activity, filledMeeting?.description) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+
+            } else {
+
+                fieldDescriptionComponent(act = activity)
+            }
+
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 
@@ -435,8 +463,8 @@ class CreateMeeting(private val act: MainActivity) {
                                             finishTime = timeFinishResult,
                                             image1 = it,
                                             city = city,
-                                            instagram = INSTAGRAM_URL + instagram,
-                                            telegram = TELEGRAM_URL + telegram,
+                                            instagram = instagram,
+                                            telegram = telegram,
                                             placeKey = placeInfo.placeKey ?: "Empty",
                                             headlinePlaceInput = headlinePlace.value,
                                             addressPlaceInput = addressPlace.value,

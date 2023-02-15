@@ -456,7 +456,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7" && meetingInfo.value.whatsapp != "" && meetingInfo.value.whatsapp != "+7") {
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7" && meetingInfo.value.whatsapp != "" && meetingInfo.value.whatsapp != "+7" && meetingInfo.value.whatsapp != "+77") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!) },
@@ -482,7 +482,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != INSTAGRAM_URL) {
 
                         IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!) },
+                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!, INSTAGRAM_URL) },
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
@@ -505,7 +505,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != TELEGRAM_URL) {
 
                         IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!) },
+                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!, TELEGRAM_URL) },
                             modifier = Modifier.background(Grey90, shape = RoundedCornerShape(50))
                         ) {
 
