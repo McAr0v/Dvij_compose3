@@ -597,7 +597,7 @@ fun fieldPhoneComponent(
     var focusColor = remember { mutableStateOf(Grey40) } // изначальный цвет фокуса
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
-    var returnText = "+7$phone" // переменная, которая возвращается из функции
+    var returnText = phone //"+7$phone" // переменная, которая возвращается из функции
 
     TextField(
         value = phone, // значение поля

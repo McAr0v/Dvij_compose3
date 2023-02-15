@@ -22,7 +22,7 @@ class CallAndWhatsapp(val act: MainActivity) {
             // если права даны, то запускаем набор номера
 
             val intent = Intent(Intent.ACTION_CALL)
-            val url = PHONE_URL + phoneNumber
+            val url = PHONE_URL + "+7${phoneNumber}"
             intent.data = Uri.parse(url)
             act.startActivity(intent)
 
@@ -35,7 +35,7 @@ class CallAndWhatsapp(val act: MainActivity) {
     // ------ ФУНКЦИЯ ПЕРЕХОДА НА ДИАЛОГ В ВАТСАП -------
 
     fun writeInWhatsapp (phoneNumber: String){
-        val url = WHATSAPP_URL + phoneNumber // генерируем ссылку на Whatsapp
+        val url = WHATSAPP_URL + "+7${phoneNumber}" // генерируем ссылку на Whatsapp
         val intent = Intent(Intent.ACTION_VIEW) // Инициализируем интент
         intent.data = Uri.parse(url) // Парсим URL, который создали выше
         act.startActivity(intent) // запускаем активити на переход в Ватсапп

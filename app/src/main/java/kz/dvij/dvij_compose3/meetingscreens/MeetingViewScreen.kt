@@ -392,7 +392,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ----- КНОПКА ПОЗВОНИТЬ --------
 
-                    if (meetingInfo.value.phone != null) {
+                    if (meetingInfo.value.phone != null && meetingInfo.value.phone != "7") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.makeACall(meetingInfo.value.phone!!) },
@@ -411,7 +411,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "+77") {
+                    if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!) },

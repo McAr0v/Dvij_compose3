@@ -234,11 +234,11 @@ fun ProfileScreen (
 
                             SpacerTextWithLine(headline = "Whatsapp")
 
-                            if (userInfo.value.whatsapp != "+77") {
+                            if (userInfo.value.whatsapp != "7") {
 
                                 userInfo.value.whatsapp?.let {
                                     androidx.compose.material3.Text(
-                                        text = it,
+                                        text = "+7${it}",
                                         style = Typography.titleMedium,
                                         color = Grey10
                                     )

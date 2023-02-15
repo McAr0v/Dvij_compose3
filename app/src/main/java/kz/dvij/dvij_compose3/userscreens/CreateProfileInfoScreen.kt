@@ -64,7 +64,14 @@ class CreateProfileInfoScreen (val act: MainActivity) {
     ) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
+        var phoneNumberFromDb by rememberSaveable {
+            mutableStateOf(filledUserInfo?.phoneNumber)
+        }
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
+        var phoneNumberWhatsappFromDb by rememberSaveable {
+            mutableStateOf(filledUserInfo?.whatsapp)
+        }
+
         var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
 
@@ -97,24 +104,43 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Телефон")
 
-            var numberFromDatabase = filledUserInfo?.phoneNumber
+            val phone = if (phoneNumberFromDb != null && phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != ""){
 
-            val phone = if (numberFromDatabase != "+7" && numberFromDatabase != null){
-                fieldPhoneComponent(numberFromDatabase, onPhoneChanged = { numberFromDatabase = it }) // форма телефона
+                fieldPhoneComponent(phoneNumberFromDb!!, onPhoneChanged = { phoneNumberFromDb = it }) // форма телефона
+
             } else {
+
                 fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+
             }
+            
+
 
 
             // --- ФОРМА WHATSAPP ----
 
             SpacerTextWithLine(headline = "Whatsapp")
 
-            val whatsapp = fieldPhoneComponent(
-                phoneNumberWhatsapp,
-                onPhoneChanged = { phoneNumberWhatsapp = it },
-                icon = painterResource(id = R.drawable.whatsapp)
-            )
+            val whatsapp = if (phoneNumberFromDb != null && phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != ""){
+
+                fieldPhoneComponent(
+                    phoneNumberWhatsappFromDb!!,
+                    onPhoneChanged = { phoneNumberWhatsappFromDb = it },
+                    icon = painterResource(id = R.drawable.whatsapp),
+                    mask = "+7 (XXX) XXX XX XX"
+                )
+
+            } else {
+
+                fieldPhoneComponent(
+                    phoneNumberWhatsapp,
+                    onPhoneChanged = { phoneNumberWhatsapp = it },
+                    icon = painterResource(id = R.drawable.whatsapp)
+                )
+
+            }
+
+
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
 
@@ -126,7 +152,21 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
+            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
+
+            Text(text = city)
+
+            if(filledUserInfo?.city != "Выбери город"){
+
+                act.chooseCityNavigation.chosenCity = CitiesList(filledUserInfo?.city, "")
+
+
+            } else if (act.chooseCityNavigation.chosenCity.cityName != filledUserInfo.city) {
+
+                act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+
+            }
+
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
@@ -155,7 +195,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                         if (avatar != null){
 
                             // запускаем сжатие изображения
-                            val compressedImage = act.photoHelper.compressImage(act, avatar!!)
+                            val compressedImage = act.photoHelper.compressImage(act, avatar)
 
                             // после сжатия запускаем функцию загрузки сжатого фота в Storage
 
@@ -174,7 +214,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                         name = name,
                                         surname = surname,
                                         email = email,
-                                        phoneNumber = phoneNumber,
+                                        phoneNumber = phone,
                                         whatsapp = whatsapp,
                                         instagram = instagram,
                                         telegram = telegram,
@@ -233,15 +273,13 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     name = name,
                                     surname = surname,
                                     email = email,
-                                    phoneNumber = phoneNumber,
+                                    phoneNumber = phone,
                                     whatsapp = whatsapp,
                                     instagram = instagram,
                                     telegram = telegram,
                                     userKey = auth.uid,
                                     city = city
                                 )
-
-                                Log.d ("MyLog", "$filledUser")
 
                                 // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
@@ -260,7 +298,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                             // показываем ТОСТ
                                             Toast.makeText(
                                                 act,
-                                                "Данные пользователя успешно опубликованы",
+                                                "Данные пользователя успешно отредактированы",
                                                 Toast.LENGTH_SHORT
                                             ).show()
 

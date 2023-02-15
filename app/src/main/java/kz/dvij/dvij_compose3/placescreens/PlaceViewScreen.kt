@@ -432,7 +432,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         // ----- КНОПКА ПОЗВОНИТЬ --------
 
-                        if (placeInfo.value.phone != null) {
+                        if (placeInfo.value.phone != null && placeInfo.value.phone != "7") {
 
                             IconButton(
                                 onClick = { act.callAndWhatsapp.makeACall(placeInfo.value.phone!!) },
@@ -459,7 +459,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                        if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "+77") {
+                        if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "7") {
 
                             IconButton(
                                 onClick = { act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!) },
