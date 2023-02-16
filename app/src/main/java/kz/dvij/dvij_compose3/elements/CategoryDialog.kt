@@ -84,7 +84,7 @@ class CategoryDialog (val act: MainActivity) {
 
                 if (categoryArray.isEmpty()){
                     // если список пустой, то тогда в список добавить созданную категорию по умолчанию
-                    categoriesList.value = listOf(chosenMeetingCategory)
+                    categoriesList.value = listOf(CategoriesList("Выбери категорию", "Default"))
                 } else {
                     // если список не пустой, то тогда добавить данные с БД
                     categoriesList.value = categoryArray
@@ -123,7 +123,7 @@ class CategoryDialog (val act: MainActivity) {
 
                 if (categoryArray.isEmpty()){
                     // если список пустой, то тогда в список добавить созданную категорию по умолчанию
-                    categoriesList.value = listOf(chosenPlaceCategory)
+                    categoriesList.value = listOf(CategoriesList("Выбери категорию", "Default"))
                 } else {
                     // если список не пустой, то тогда добавить данные с БД
                     categoriesList.value = categoryArray
@@ -162,7 +162,7 @@ class CategoryDialog (val act: MainActivity) {
 
                 if (stockArray.isEmpty()){
                     // если список пустой, то тогда в список добавить созданную категорию по умолчанию
-                    categoriesList.value = listOf(chosenPlaceCategory)
+                    categoriesList.value = listOf(CategoriesList("Выбери категорию", "Default"))
                 } else {
                     // если список не пустой, то тогда добавить данные с БД
                     categoriesList.value = stockArray
@@ -181,7 +181,9 @@ class CategoryDialog (val act: MainActivity) {
     // -------- КНОПКА ВЫБОРА КАТЕГОРИИ МЕРОПРИЯТИЯ-----------
 
     @Composable
-    fun meetingCategorySelectButton(onClick: ()-> Unit): CategoriesList {
+    fun meetingCategorySelectButton(categoryName: MutableState<String>, onClick: ()-> Unit): String? {
+
+
 
         Button(
             onClick = {
@@ -191,29 +193,31 @@ class CategoryDialog (val act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (chosenMeetingCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
-                    2.dp
-                } else {
+                width = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
                     0.dp
-                }, color = if (chosenMeetingCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
-                    Grey60
                 } else {
+                    2.dp
+                }, color = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
                     Grey95
+                } else {
+                    Grey60
                 }
             ),
 
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenMeetingCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
-                    Grey95
-                } else {
+                backgroundColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
                     PrimaryColor
-                },
-                contentColor = if (chosenMeetingCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
-                    Grey60
                 } else {
+                    Grey95
+
+                },
+                contentColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
                     Grey100
+                } else {
+                    Grey60
+
                 },
             ),
             shape = RoundedCornerShape(50) // скругленные углы кнопки
@@ -221,18 +225,33 @@ class CategoryDialog (val act: MainActivity) {
 
             Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
 
-            Text(
-                    text = chosenMeetingCategory.categoryName!!, // текст кнопки
+            if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+
+                Text(
+                    text = categoryName.value!!, // текст кнопки
                     style = Typography.labelMedium, // стиль текста
-                    color = if (chosenMeetingCategory.categoryName == act.resources.getString(R.string.cm_no_category)) {
+                    color = if (categoryName.value == "Выбери категорию") {
                         Grey60
                     } else {
                         Grey100
                     }
                 )
 
+            } else {
+
+                Text(
+                    text = "Выбери категорию", // текст кнопки
+                    style = Typography.labelMedium, // стиль текста
+                    color = Grey60
+                )
+
+            }
+
+
+
+
         }
-        return chosenMeetingCategory
+        return categoryName.value
     }
 
     // -------- КНОПКА ВЫБОРА КАТЕГОРИИ ЗАВЕДЕНИЯ-----------
@@ -353,7 +372,7 @@ class CategoryDialog (val act: MainActivity) {
     // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ МЕРОПРИЯТИЯ
 
     @Composable
-    fun CategoryMeetingChooseDialog(categoriesList: MutableState<List<CategoriesList>> ,onDismiss: () -> Unit) {
+    fun CategoryMeetingChooseDialog(categoryName: MutableState<String>,categoriesList: MutableState<List<CategoriesList>>, onDismiss: () -> Unit) {
 
         // ------ САМ ДИАЛОГ ---------
 
@@ -437,8 +456,8 @@ class CategoryDialog (val act: MainActivity) {
                             .fillMaxWidth()
                             .clickable {
                                 // действие на нажатие на элемент
-                                chosenMeetingCategory =
-                                    category // выбранная категория теперь та, которую выбрали, а не по умолчанию
+                                categoryName.value =
+                                    category.categoryName.toString() // выбранная категория теперь та, которую выбрали, а не по умолчанию
                                 onDismiss() // закрыть диалог
                             }
                         ) {

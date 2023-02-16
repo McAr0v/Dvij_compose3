@@ -165,22 +165,20 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             }
 
-            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
-
-            Text(text = city)
+            // val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
 
 
 
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            if (openCityDialog.value) {
+            /*if (openCityDialog.value) {
                 act.chooseCityNavigation.CityChooseDialog(citiesList) {
                     openCityDialog.value = false
                 }
 
 
-            }
+            }*/
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
 
@@ -223,7 +221,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                         instagram = instagram,
                                         telegram = telegram,
                                         userKey = auth.uid,
-                                        city = city
+                                        city = "Empty"//city
                                     )
 
                                     // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -284,7 +282,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     instagram = instagram,
                                     telegram = telegram,
                                     userKey = auth.uid,
-                                    city = city
+                                    city = "Empty"//city
                                 )
 
                                 // Делаем дополнительную проверку - пользователь зарегистрирован или нет

@@ -86,6 +86,10 @@ class ChooseCityNavigation (val act: MainActivity) {
     @Composable
     fun CityHeaderSideNavigation (citiesList: MutableState<List<CitiesList>>) {
 
+        //val chosenCityCreateWithUser = remember {mutableStateOf(filledUserInfo.city!!)}
+        val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
+        //val chosenCityEdit = remember {mutableStateOf<String>(filledMeeting.category!!)}
+
         // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
 
         Column( // ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КОЛОКНКУ
@@ -136,7 +140,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                     // если значение диалога true то вызываем открытие диалога и передаем ему
                     // значение для закрытия - это значение false
 
-                    CityChooseDialog(citiesList) {openDialog.value = false}
+                    CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {openDialog.value = false}
 
                 }
 
@@ -179,7 +183,7 @@ class ChooseCityNavigation (val act: MainActivity) {
     // --------- САМ ВСПЛЫВАЮЩИЙ ДИАЛОГ С ВЫБОРОМ ГОРОДА ------------
 
     @Composable
-    fun CityChooseDialog (citiesList: MutableState<List<CitiesList>> ,onDismiss: ()-> Unit){
+    fun CityChooseDialog (cityName: MutableState<String>, citiesList: MutableState<List<CitiesList>>, onDismiss: ()-> Unit){
 
 
         // ------ САМ ДИАЛОГ ---------
@@ -265,7 +269,8 @@ class ChooseCityNavigation (val act: MainActivity) {
                             .fillMaxWidth()
                             .clickable {
                             // действие на нажатие на элемент
-                            chosenCity = city // выбранный город теперь тот, который выбрали, а не по умолчанию
+                            cityName.value =
+                                city.cityName.toString() // выбранный город теперь тот, который выбрали, а не по умолчанию
                             onDismiss() // закрыть диалог
                             }
                         ) {
@@ -282,7 +287,7 @@ class ChooseCityNavigation (val act: MainActivity) {
     }
 
     @Composable
-    fun citySelectButton(onClick: ()-> Unit): CitiesList {
+    fun citySelectButton(cityName: MutableState<String>, onClick: ()-> Unit): String? {
 
         Button(
             onClick = {
@@ -292,29 +297,31 @@ class ChooseCityNavigation (val act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
-                    2.dp
-                } else {
+                width = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
                     0.dp
-                }, color = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
-                    Grey60
                 } else {
+                    2.dp
+                }, color = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
                     Grey95
+                } else {
+                    Grey60
+
                 }
             ),
 
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
-                    Grey95
-                } else {
+                backgroundColor = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
                     PrimaryColor
-                },
-                contentColor = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
-                    Grey60
+
                 } else {
+                    Grey95
+                },
+                contentColor = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
                     Grey100
+                } else {
+                    Grey60
                 },
             ),
             shape = RoundedCornerShape(50) // скругленные углы кнопки
@@ -322,17 +329,29 @@ class ChooseCityNavigation (val act: MainActivity) {
 
             Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
 
-            Text(
-                text = chosenCity.cityName!!, // текст кнопки
-                style = Typography.labelMedium, // стиль текста
-                color = if (chosenCity.cityName == act.resources.getString(R.string.cm_no_city)) {
-                    Grey60
-                } else {
-                    Grey100
-                }
-            )
+            if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
+
+                Text(
+                    text = cityName.value, // текст кнопки
+                    style = Typography.labelMedium, // стиль текста
+                    color = if (cityName.value == "Выбери город") {
+                        Grey60
+                    } else {
+                        Grey100
+                    }
+                )
+
+            } else {
+
+                Text(
+                    text = "Выбери город", // текст кнопки
+                    style = Typography.labelMedium, // стиль текста
+                    color = Grey60
+                )
+
+            }
 
         }
-        return chosenCity
+        return chosenCity.cityName
     }
 }

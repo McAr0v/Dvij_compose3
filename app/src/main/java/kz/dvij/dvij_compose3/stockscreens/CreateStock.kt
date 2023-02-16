@@ -241,7 +241,7 @@ class CreateStock (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
+            //val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
 
 
             // СДЕЛАТЬ ДИАЛОГ ВЫБОРА ЗАВЕДЕНИЯ
@@ -257,11 +257,11 @@ class CreateStock (val act: MainActivity) {
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            if (openCityDialog.value) {
+            /*if (openCityDialog.value) {
                 act.chooseCityNavigation.CityChooseDialog(citiesList) {
                     openCityDialog.value = false
                 }
-            }
+            }*/
 
             SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
 
@@ -299,7 +299,7 @@ class CreateStock (val act: MainActivity) {
                         finishDay = finishDay,
                         description = description,
                         category = category,
-                        city = city
+                        city = "Empty"//city
                     )
 
                     if (checkData != 0) {
@@ -350,7 +350,7 @@ class CreateStock (val act: MainActivity) {
                                         keyStock = stockDatabaseManager.stockDatabase.push().key,
                                         keyPlace = placeInfo.placeKey ?: "Empty",
                                         keyCreator = auth.uid,
-                                        city = city,
+                                        city = "Empty",//city,
                                         startDate = startDay,
                                         finishDate = finishDay,
                                         inputHeadlinePlace = headlinePlace.value,

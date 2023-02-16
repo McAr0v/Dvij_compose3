@@ -103,7 +103,7 @@ class CreatePlace (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
+            // val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
 
             SpacerTextWithLine(headline = "Адрес") // подпись перед формой
 
@@ -119,11 +119,11 @@ class CreatePlace (val act: MainActivity) {
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            if (openCityDialog.value) {
+            /*if (openCityDialog.value) {
                 act.chooseCityNavigation.CityChooseDialog(citiesList) {
                     openCityDialog.value = false
                 }
-            }
+            }*/
 
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
@@ -185,7 +185,7 @@ class CreatePlace (val act: MainActivity) {
                         closeTime = closeTimeResult,
                         description = description,
                         category = category,
-                        city = city,
+                        city = "Empty",//city,
                         address = address
                     )
 
@@ -238,7 +238,7 @@ class CreatePlace (val act: MainActivity) {
                                             telegram = TELEGRAM_URL + telegram,
                                             instagram = INSTAGRAM_URL + instagram,
                                             category = category,
-                                            city = city,
+                                            //city = city,
                                             address = address,
                                             placeKey = placesDatabaseManager.placeDatabase.push().key,
                                             owner = auth.uid,
