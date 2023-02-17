@@ -352,6 +352,6 @@ class ChooseCityNavigation (val act: MainActivity) {
             }
 
         }
-        return chosenCity.cityName
+        return cityName.value
     }
 }

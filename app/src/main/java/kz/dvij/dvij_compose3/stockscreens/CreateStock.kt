@@ -76,7 +76,7 @@ class CreateStock (val act: MainActivity) {
         var headlinePlace = remember {mutableStateOf("")} // инициализируем переменную заголовка места, введенного вручную
         var addressPlace = remember {mutableStateOf("")} // инициализирууем переменную адреса места, введенного вручную
 
-        var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
+        // var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
 
         // Инициализируем переменную списка мест
         val placesList = remember {
@@ -137,12 +137,12 @@ class CreateStock (val act: MainActivity) {
 
                 // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
 
-                placeInfo = choosePlaceDialog.placeSelectButton {
+                /*placeInfo = choosePlaceDialog.placeSelectButton {
                     openPlaceDialog.value = true
                     openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
                     headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
                     addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
-                }
+                }.toString()*/
 
                 Spacer(modifier = Modifier.width(10.dp))
 
@@ -233,11 +233,11 @@ class CreateStock (val act: MainActivity) {
 
             // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
 
-            if (openPlaceDialog.value) {
+            /*if (openPlaceDialog.value) {
                 choosePlaceDialog.PlaceChooseDialog(placesList = placesList) {
                     openPlaceDialog.value = false
                 }
-            }
+            }*/
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -348,7 +348,7 @@ class CreateStock (val act: MainActivity) {
                                         description = description,
                                         category = category,
                                         keyStock = stockDatabaseManager.stockDatabase.push().key,
-                                        keyPlace = placeInfo.placeKey ?: "Empty",
+                                        //keyPlace = placeInfo.placeKey ?: "Empty",
                                         keyCreator = auth.uid,
                                         city = "Empty",//city,
                                         startDate = startDay,
@@ -373,7 +373,7 @@ class CreateStock (val act: MainActivity) {
                                                 // сбрасываем выбранное заведение, чтобы потом не отображался последний выбор
 
                                                 choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
-                                                placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
+                                                //placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
 
                                                 // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                 act.categoryDialog.chosenStockCategory = CategoriesList ("Выбери категорию", "Default")

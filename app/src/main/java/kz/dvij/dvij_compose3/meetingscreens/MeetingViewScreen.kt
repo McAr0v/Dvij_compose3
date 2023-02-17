@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -44,7 +45,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun MeetingViewScreen (meetingKey: MutableState<String>, navController: NavController, placeKey: MutableState<String>, filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>){
+    fun MeetingViewScreen (meetingKey: MutableState<String>, navController: NavController, placeKey: MutableState<String>, filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>){
 
 
         // Переменная, которая содержит в себе информацию о мероприятии
@@ -153,6 +154,23 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         meetingInfo.value.key?.let {
                             act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
+
+                                Log.d("MyLog", "Заполненное заведение до ${filledPlaceInfoFromAct.value}")
+
+                                if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
+
+                                    filledPlaceInfoFromAct.value = placeInfo.value
+
+                                } else {
+
+                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                        placeName = meeting.headlinePlaceInput,
+                                        address = meeting.addressPlaceInput
+                                    )
+
+                                }
+
+                                Log.d("MyLog", "Заполненное заведение после ${filledPlaceInfoFromAct.value}")
 
                                 filledMeetingInfoFromAct.value = meeting
                                 navController.navigate(CREATE_MEETINGS_SCREEN)
@@ -529,7 +547,8 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 
-                placeInfo.value.placeKey?.let {
+                if (meetingInfo.value.placeKey != "Empty" && meetingInfo.value.placeKey != "" && meetingInfo.value.placeKey != "null" && meetingInfo.value.placeKey != null
+                    && placeInfo.value.placeKey != "Empty" && placeInfo.value.placeKey != "" && placeInfo.value.placeKey != "null" && placeInfo.value.placeKey != null) {
 
                     Text(
                         text = "Место проведения",
@@ -545,9 +564,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                }
-
-                if (meetingInfo.value.placeKey == "Empty"){
+                } else {
 
                     Text(
                         text = "Место проведения",

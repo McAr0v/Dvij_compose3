@@ -7,9 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -139,7 +137,48 @@ class MainActivity : ComponentActivity() {
             }
 
             val meetingInfo = remember {
-                mutableStateOf(MeetingsAdsClass())
+                mutableStateOf(MeetingsAdsClass(
+                    key = "",
+                    category = "Выбери категорию",
+                    headline = "",
+                    description = "",
+                    price = "",
+                    phone = "",
+                    whatsapp = "",
+                    data = "",
+                    startTime = "",
+                    finishTime = "",
+                    image1 = "",
+                    city = "Выбери город",
+                    instagram = "",
+                    telegram = "",
+                    placeKey = "",
+                    headlinePlaceInput = "",
+                    addressPlaceInput = "",
+                    ownerKey = "")
+                )
+            }
+
+            val placeInfo = remember {
+                mutableStateOf(PlacesAdsClass(
+
+                    logo = "",
+                    placeKey = "",
+                    placeName = "Выбери заведение",
+                    placeDescription = "",
+                    phone = "",
+                    whatsapp = "",
+                    telegram = "",
+                    instagram = "",
+                    category = "",
+                    city = "",
+                    address = "",
+                    owner = "",
+                    openTime = "",
+                    closeTime = ""
+
+                )
+                )
             }
 
             chooseCityNavigation.readCityDataFromDb(citiesList)
@@ -334,8 +373,8 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, meetingKey = meetingKey.value)}
-                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
+                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}

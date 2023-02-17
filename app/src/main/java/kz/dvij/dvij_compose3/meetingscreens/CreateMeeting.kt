@@ -81,7 +81,11 @@ class CreateMeeting(private val act: MainActivity) {
             addressPlaceInput = "",
             ownerKey = ""
         ),
-        meetingKey: String
+        filledPlace: PlacesAdsClass = PlacesAdsClass(
+            placeName = "Выбери заведение",
+            placeKey = ""
+        ),
+        createOrEdit: String
     ) {
 
         Log.d ("MyLog", "$filledMeeting")
@@ -100,14 +104,25 @@ class CreateMeeting(private val act: MainActivity) {
         }
 
 
+
+
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
         var userWhatsappNumber by rememberSaveable { mutableStateOf(filledUserInfo.whatsapp) }
         var phoneNumberWhatsappFromDb by rememberSaveable {
             mutableStateOf(filledMeeting.whatsapp)
         }
 
+        var placeKey by rememberSaveable { mutableStateOf(filledPlace.placeKey) }
+        var placeKeyFromMeetingData by rememberSaveable { mutableStateOf(filledMeeting.placeKey) }
+
+        val chosenPlace = remember {mutableStateOf(filledPlace)} // инициализируем переменную заголовка места, введенного вручную
+
         val headlinePlace = remember {mutableStateOf(filledMeeting.headlinePlaceInput)} // инициализируем переменную заголовка места, введенного вручную
         val addressPlace = remember {mutableStateOf(filledMeeting.addressPlaceInput)} // инициализирууем переменную адреса места, введенного вручную
+        val changeTypePlace = remember {mutableStateOf(false)} // инициализируем переменную заголовка места, введенного вручную
+
+        var finishHeadlinePlace by rememberSaveable { mutableStateOf("") }
+        var finishAddressPlace by rememberSaveable { mutableStateOf("") }
 
         val chosenMeetingCategoryCreate = remember {mutableStateOf("Выбери категорию")}
         val chosenMeetingCategoryEdit = remember {mutableStateOf<String>(filledMeeting.category!!)}
@@ -125,7 +140,7 @@ class CreateMeeting(private val act: MainActivity) {
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
 
 
-        var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
+        var placeInfo = "Выбери заведение" // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
 
         val openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
@@ -156,6 +171,48 @@ class CreateMeeting(private val act: MainActivity) {
         // Считываем список моих заведений
         placesDatabaseManager.readPlaceMyDataFromDb(placesList)
 
+        /*if (filledMeeting.placeKey == null || filledMeeting.placeKey == "null" || filledMeeting.placeKey == "" || chosenPlace.value.placeKey == null || chosenPlace.value.placeKey == "null" || chosenPlace.value.placeKey == ""){
+
+
+
+            openFieldPlace.value = true
+
+        }*/
+
+
+
+        if (chosenPlace.value.placeKey != null && chosenPlace.value.placeKey != "" && chosenPlace.value.placeKey != "null" && chosenPlace.value.placeKey != placeKey ){
+
+            placesDatabaseManager.readOnePlaceFromDataBase(chosenPlace,
+                chosenPlace.value.placeKey!!
+            ){
+                placeKey = chosenPlace.value.placeKey
+            }
+
+            openFieldPlace.value = false
+
+
+        }
+
+        if (chosenPlace.value.placeKey == null || chosenPlace.value.placeKey == "" || chosenPlace.value.placeKey == "null"){
+
+            if (chosenPlace.value.placeName != ""){
+                chosenPlace.value = PlacesAdsClass(
+                    placeName = "Выбери заведение",
+                    placeKey = ""
+                )
+            }
+
+            openFieldPlace.value = true
+
+
+        }
+
+
+
+
+
+
         // --------- САМ КОНТЕНТ СТРАНИЦЫ -----------------
 
         Column(
@@ -173,7 +230,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_image)) // подпись перед формой
 
-            val image1 = if (filledMeeting.image1 != null && filledMeeting.image1 != "" && meetingKey != "0"){
+            val image1 = if (filledMeeting.image1 != null && filledMeeting.image1 != "" && createOrEdit != "0"){
                 chooseImageDesign(filledMeeting.image1) // Изображение мероприятия
             } else {
                 chooseImageDesign()
@@ -181,7 +238,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_headline)) // подпись перед формой
 
-            headline = if (filledMeeting.headline != null && filledMeeting.headline != "" && meetingKey != "0"){
+            headline = if (filledMeeting.headline != null && filledMeeting.headline != "" && createOrEdit != "0"){
                 fieldHeadlineComponent(act = activity, filledMeeting.headline) // форма заголовка
             } else {
                 fieldHeadlineComponent(act = activity) // форма заголовка
@@ -189,7 +246,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            if (filledMeeting.category != null && filledMeeting.category != "Выбери категорию" && filledMeeting.category != "" && meetingKey != "0") {
+            if (filledMeeting.category != null && filledMeeting.category != "Выбери категорию" && filledMeeting.category != "" && createOrEdit != "0") {
 
                 category = act.categoryDialog.meetingCategorySelectButton(categoryName = chosenMeetingCategoryEdit) { openCategoryDialog.value = true }.toString()
 
@@ -202,7 +259,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             if (openCategoryDialog.value) {
 
-                if (meetingKey != "0"){
+                if (createOrEdit != "0"){
 
                     act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenMeetingCategoryEdit, categoriesList) {
                         openCategoryDialog.value = false
@@ -235,12 +292,10 @@ class CreateMeeting(private val act: MainActivity) {
 
                 // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
 
-                placeInfo = choosePlaceDialog.placeSelectButton {
+                placeInfo = choosePlaceDialog.placeSelectButton (chosenOutPlace = chosenPlace) {
                     openPlaceDialog.value = true
                     openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
-                    headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
-                    addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
-                }
+                }.toString()
 
                 Spacer(modifier = Modifier.width(10.dp))
 
@@ -256,7 +311,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                             // если выбираем ввести вручную, а уже выбрано заведение из списка
                             // то сбрасываем выбранное заведение из списка
-                            choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
                         }
 
                     },
@@ -321,9 +376,24 @@ class CreateMeeting(private val act: MainActivity) {
 
                 ) {
                     SpacerTextWithLine(headline = "Название места проведения")
-                    headlinePlace.value = fieldTextComponent("Введите название места") // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+
+                    if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
+                        finishHeadlinePlace = fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+                    } else {
+                        finishHeadlinePlace = fieldTextComponent("Введите название места")
+                    }
+
                     SpacerTextWithLine(headline = "Адрес места проведения")
-                    addressPlace.value = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+
+                    if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
+
+                        finishAddressPlace = fieldTextComponent("Введите адрес места", addressPlace.value)
+
+                    } else {
+
+                        finishAddressPlace = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+
+                    }
                 }
             }
 
@@ -332,19 +402,27 @@ class CreateMeeting(private val act: MainActivity) {
             // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
 
             if (openPlaceDialog.value) {
-                choosePlaceDialog.PlaceChooseDialog(placesList = placesList) {
+
+                choosePlaceDialog.PlaceChooseDialog(placesList = placesList, chosenOutPlace = chosenPlace, ifChoose = changeTypePlace) {
+                    openFieldPlace.value = false
                     openPlaceDialog.value = false
                 }
             }
 
+            if (changeTypePlace.value){
+                headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
+                addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
+                !changeTypePlace.value
+            }
+
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            if (filledMeeting.city != null && filledMeeting.city != "Выбери город" && filledMeeting.city != "" && meetingKey != "0") {
+            if (filledMeeting.city != null && filledMeeting.city != "Выбери город" && filledMeeting.city != "" && createOrEdit != "0") {
 
                 city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString() // Кнопка выбора города
 
 
-            } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && meetingKey == "0") {
+            } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
 
             city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString() // Кнопка выбора города
 
@@ -357,13 +435,13 @@ class CreateMeeting(private val act: MainActivity) {
 
             if (openCityDialog.value) {
 
-                if (filledMeeting.city != null && filledMeeting.city != "Выбери город" && filledMeeting.city != "" && meetingKey != "0"){
+                if (filledMeeting.city != null && filledMeeting.city != "Выбери город" && filledMeeting.city != "" && createOrEdit != "0"){
 
                     act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityEdit, citiesList) {
                         openCityDialog.value = false
                     }
 
-                } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && meetingKey == "0"){
+                } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0"){
 
                     act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithUser, citiesList) {
                         openCityDialog.value = false
@@ -382,11 +460,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
-            phone = if (phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != "" && phoneNumberFromDb != null && meetingKey != "0"){
+            phone = if (phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != "" && phoneNumberFromDb != null && createOrEdit != "0"){
 
                 fieldPhoneComponent(phoneNumberFromDb!!, onPhoneChanged = { phoneNumberFromDb = it }) // форма телефона
 
-            } else if (filledUserInfo.phoneNumber != "+7" && filledUserInfo.phoneNumber != "+77" && filledUserInfo.phoneNumber != "" && filledUserInfo.phoneNumber != null && meetingKey == "0") {
+            } else if (filledUserInfo.phoneNumber != "+7" && filledUserInfo.phoneNumber != "+77" && filledUserInfo.phoneNumber != "" && filledUserInfo.phoneNumber != null && createOrEdit == "0") {
 
                 fieldPhoneComponent(userPhoneNumber!!, onPhoneChanged = { userPhoneNumber = it }) // форма телефона
 
@@ -402,11 +480,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             // --- ФОРМА WHATSAPP ----
 
-            whatsapp = if (phoneNumberWhatsappFromDb != null && phoneNumberWhatsappFromDb != "+7" && phoneNumberWhatsappFromDb != "+77" && phoneNumberWhatsappFromDb != "" && meetingKey != "0"){
+            whatsapp = if (phoneNumberWhatsappFromDb != null && phoneNumberWhatsappFromDb != "+7" && phoneNumberWhatsappFromDb != "+77" && phoneNumberWhatsappFromDb != "" && createOrEdit != "0"){
 
                 fieldPhoneComponent(phoneNumberWhatsappFromDb!!, onPhoneChanged = { phoneNumberWhatsappFromDb = it }) // форма телефона
 
-            } else if (userWhatsappNumber != "+7" && userWhatsappNumber != "+77" && userWhatsappNumber != "" && userWhatsappNumber != null && meetingKey == "0") {
+            } else if (userWhatsappNumber != "+7" && userWhatsappNumber != "+77" && userWhatsappNumber != "" && userWhatsappNumber != null && createOrEdit == "0") {
 
                 fieldPhoneComponent(userWhatsappNumber!!, onPhoneChanged = { userWhatsappNumber = it }) // форма телефона
 
@@ -418,11 +496,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
 
-            val instagram = if (filledMeeting.instagram != "" && filledMeeting.instagram != null && meetingKey != "0") {
+            val instagram = if (filledMeeting.instagram != "" && filledMeeting.instagram != null && createOrEdit != "0") {
 
                 fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledMeeting.instagram) // форма инстаграма
 
-            } else if (filledUserInfo.instagram != "" && filledUserInfo.instagram != null && meetingKey == "0") {
+            } else if (filledUserInfo.instagram != "" && filledUserInfo.instagram != null && createOrEdit == "0") {
 
                 fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledUserInfo.instagram) // форма инстаграма
 
@@ -435,11 +513,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = if (filledMeeting.telegram != "" && filledMeeting.telegram != null && meetingKey != "0") {
+            val telegram = if (filledMeeting.telegram != "" && filledMeeting.telegram != null && createOrEdit != "0") {
 
                 fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledMeeting.telegram) // форма телеграма
 
-            } else if (filledUserInfo.telegram != "" && filledUserInfo.telegram != null && meetingKey == "0") {
+            } else if (filledUserInfo.telegram != "" && filledUserInfo.telegram != null && createOrEdit == "0") {
 
                 fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo.telegram) // форма телеграма
 
@@ -463,7 +541,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_price)) // подпись перед формой
 
-            price = if (filledMeeting.price != "" && filledMeeting.price != null && meetingKey != "0") {
+            price = if (filledMeeting.price != "" && filledMeeting.price != null && createOrEdit != "0") {
 
                 fieldPriceComponent(act = activity, filledMeeting.price) // Форма цены за билет
 
@@ -476,7 +554,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            description = if (filledMeeting.description != "" && filledMeeting.description != null && meetingKey != "0"){
+            description = if (filledMeeting.description != "" && filledMeeting.description != null && createOrEdit != "0"){
 
                 fieldDescriptionComponent(act = activity, filledMeeting.description) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
 
@@ -501,6 +579,8 @@ class CreateMeeting(private val act: MainActivity) {
                         // действие на нажатие
 
                         // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
+
+                        Log.d ("MyLog", city)
 
                         val checkData = checkDataOnCreateMeeting(image1, headline, phone, dataResult, timeStartResult, description, category, city)
 
@@ -556,9 +636,9 @@ class CreateMeeting(private val act: MainActivity) {
                                             city = city,
                                             instagram = instagram,
                                             telegram = telegram,
-                                            placeKey = placeInfo.placeKey ?: "Empty",
-                                            headlinePlaceInput = headlinePlace.value,
-                                            addressPlaceInput = addressPlace.value,
+                                            placeKey = chosenPlace.value.placeKey ?: "Empty",
+                                            headlinePlaceInput = finishHeadlinePlace,
+                                            addressPlaceInput = finishAddressPlace,
                                             ownerKey = act.mAuth.uid
                                         )
 
@@ -576,7 +656,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                     // сбрасываем выбранное заведение, чтобы потом не отображался последний выбор
                                                     choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
-                                                    placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
+                                                    placeInfo = "Выбери заведение"
 
                                                     // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
                                                     act.categoryDialog.chosenMeetingCategory = CategoriesList ("Выбери категорию", "Default")

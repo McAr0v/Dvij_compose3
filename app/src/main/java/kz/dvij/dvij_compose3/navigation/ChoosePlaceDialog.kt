@@ -33,7 +33,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
     // --------- САМ ВСПЛЫВАЮЩИЙ ДИАЛОГ С ВЫБОРОМ Заведений ------------
 
     @Composable
-    fun PlaceChooseDialog (placesList: MutableState<List<PlacesAdsClass>>, onDismiss: ()-> Unit){
+    fun PlaceChooseDialog (placesList: MutableState<List<PlacesAdsClass>>, chosenOutPlace: MutableState<PlacesAdsClass>, ifChoose: MutableState<Boolean>, onDismiss: ()-> Unit){
 
 
         // ------ САМ ДИАЛОГ ---------
@@ -119,7 +119,8 @@ class ChoosePlaceDialog (val act: MainActivity) {
                             .fillMaxWidth()
                             .clickable {
                                 // действие на нажатие на элемент
-                                chosenPlace = place // выбранный город теперь тот, который выбрали, а не по умолчанию
+                                chosenOutPlace.value = place // выбранный город теперь тот, который выбрали, а не по умолчанию
+                                ifChoose.value = true
                                 onDismiss() // закрыть диалог
                             }
                         ) {
@@ -136,7 +137,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
     }
 
     @Composable
-    fun placeSelectButton(onClick: ()-> Unit): PlacesAdsClass {
+    fun placeSelectButton(chosenOutPlace: MutableState<PlacesAdsClass>, onClick: ()-> Unit): String? {
 
         Button(
             onClick = {
@@ -146,11 +147,11 @@ class ChoosePlaceDialog (val act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (chosenPlace.placeName == "Выбери заведение") {
+                width = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
                     2.dp
                 } else {
                     0.dp
-                }, color = if (chosenPlace.placeName == "Выбери заведение") {
+                }, color = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
                     Grey60
                 } else {
                     Grey95
@@ -160,12 +161,12 @@ class ChoosePlaceDialog (val act: MainActivity) {
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (chosenPlace.placeName == "Выбери заведение") {
+                backgroundColor = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
                     Grey95
                 } else {
                     PrimaryColor
                 },
-                contentColor = if (chosenPlace.placeName == "Выбери заведение") {
+                contentColor = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
                     Grey60
                 } else {
                     Grey100
@@ -177,9 +178,9 @@ class ChoosePlaceDialog (val act: MainActivity) {
             Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
 
             Text(
-                text = chosenPlace.placeName!!, // текст кнопки
+                text = chosenOutPlace.value.placeName!!, // текст кнопки
                 style = Typography.labelMedium, // стиль текста
-                color = if (chosenPlace.placeName == "Выбери заведение") {
+                color = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
                     Grey60
                 } else {
                     Grey100
@@ -187,7 +188,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
             )
 
         }
-        return chosenPlace
+        return chosenOutPlace.value.placeName
     }
 
 }
