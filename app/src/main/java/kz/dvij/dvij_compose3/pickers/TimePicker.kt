@@ -24,7 +24,7 @@ import java.util.*
 // ------- ВЫБОР ВРЕМЕНИ ----------
 
 @Composable
-fun timePicker(): String {
+fun timePicker(inputTime: String = ""): String {
 
     var timeResult = "" // возвращаемая переменная
 
@@ -37,7 +37,7 @@ fun timePicker(): String {
 
     mCalendar.time = Date() // инициализируем текущее время
 
-    val mClock = remember{ mutableStateOf("") } // создаем переменную, в которую будем записывать время
+    val mClock = remember{ mutableStateOf(inputTime) } // создаем переменную, в которую будем записывать время
 
     // инициализируем диалог выбора времени
     val mClockPickerDialog = TimePickerDialog(

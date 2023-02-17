@@ -60,10 +60,31 @@ class CreateProfileInfoScreen (val act: MainActivity) {
     fun CreateUserInfoScreen (
         navController: NavController,
         citiesList: MutableState<List<CitiesList>>,
-        filledUserInfo: UserInfoClass? = UserInfoClass()
+        filledUserInfo: UserInfoClass = UserInfoClass(
+            avatar = "",
+            name = "",
+            surname = "",
+            email = "",
+            phoneNumber = "",
+            whatsapp = "",
+            instagram = "",
+            telegram = "",
+            userKey = "",
+            city = "Выбери город"
+        )
     ) {
 
-        act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+        // --- ПЕРЕМЕННЫЕ ГОРОДА ---
+
+
+        // Значение города по умолчанию
+        val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
+
+        // Выбранный город из данных мероприятия. Используется при редактировании
+        val chosenCity = remember {mutableStateOf(filledUserInfo.city!!)}
+
+        // Переменная, передаваемая в БД
+        var city by rememberSaveable { mutableStateOf("Выбери город") }
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberFromDb by rememberSaveable {
@@ -154,31 +175,43 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            if(filledUserInfo?.city != "Выбери город"){
 
-                act.chooseCityNavigation.chosenCity = CitiesList(filledUserInfo?.city, "")
+            // Если при редактировании в пользователе есть город
 
+            if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && filledUserInfo.city != "Empty") {
 
-            } else if (act.chooseCityNavigation.chosenCity.cityName != filledUserInfo.city) {
+                // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCity) {openCityDialog.value = true}.toString()
 
-                act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+            } else {
+
+                // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
 
             }
-
-            // val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString()
-
-
 
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            /*if (openCityDialog.value) {
-                act.chooseCityNavigation.CityChooseDialog(citiesList) {
-                    openCityDialog.value = false
+            if (openCityDialog.value) {
+
+                if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && filledUserInfo.city != "Empty"){
+
+                    // Если при редактировании в мероприятии есть город, Передаем ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCity, citiesList) {
+                        openCityDialog.value = false
+                    }
+
+                } else {
+
+                    // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {
+                        openCityDialog.value = false
+                    }
                 }
-
-
-            }*/
+            }
+            
+            Spacer(modifier = Modifier.height(20.dp))
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
 
@@ -221,7 +254,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                         instagram = instagram,
                                         telegram = telegram,
                                         userKey = auth.uid,
-                                        city = "Empty"//city
+                                        city = city
                                     )
 
                                     // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -282,7 +315,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     instagram = instagram,
                                     telegram = telegram,
                                     userKey = auth.uid,
-                                    city = "Empty"//city
+                                    city = city
                                 )
 
                                 // Делаем дополнительную проверку - пользователь зарегистрирован или нет

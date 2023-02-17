@@ -36,6 +36,7 @@ import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.CREATE_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
+import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingViewScreen(val act: MainActivity) {
@@ -173,7 +174,7 @@ class MeetingViewScreen(val act: MainActivity) {
                                 Log.d("MyLog", "Заполненное заведение после ${filledPlaceInfoFromAct.value}")
 
                                 filledMeetingInfoFromAct.value = meeting
-                                navController.navigate(CREATE_MEETINGS_SCREEN)
+                                navController.navigate(EDIT_MEETINGS_SCREEN)
 
 
                             }

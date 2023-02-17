@@ -70,6 +70,7 @@
     <string name="go_to_home">Вернуться на главную страницу</string>
     <string name="choose_city">Выбери город:</string>
     <string name="create_meeting">Создание мероприятия</string>
+    <string name="edit_meeting">Редактирование мероприятия</string>
     <string name="create_place">Создание места</string>
     <string name="create_stock">Создание акции</string>
     <string name="push_button">Опубликовать</string>
@@ -187,6 +188,7 @@
     <string name="cm_success">Твое мероприятие успешно опубликовано! Сейчас его все увидят!</string>
     <string name="cm_start_in">Начинаем в</string>
     <string name="cm_choose_image">Выбери картинку</string>
+    <string name="cm_choose_place">Выбери заведение или введи название и адрес места</string>
 
     <!-- Создание заведения -->
     <string name="cp_no_place_name">Как называется твое заведение?</string>

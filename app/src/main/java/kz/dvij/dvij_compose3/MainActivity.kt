@@ -133,6 +133,13 @@ class MainActivity : ComponentActivity() {
                     name = "",
                     surname = "",
                     email = "",
+                    city = "Выбери город",
+                    avatar = "",
+                    phoneNumber = "",
+                    whatsapp = "",
+                    instagram = "",
+                    telegram = "",
+                    userKey = ""
                 ))
             }
 
@@ -297,6 +304,7 @@ class MainActivity : ComponentActivity() {
                                 ADS_ROOT -> R.string.side_ad
                                 BUGS_ROOT -> R.string.side_report_bug
                                 CREATE_MEETINGS_SCREEN -> R.string.create_meeting
+                                EDIT_MEETINGS_SCREEN -> R.string.edit_meeting
                                 CREATE_PLACES_SCREEN -> R.string.create_place
                                 CREATE_STOCK_SCREEN -> R.string.create_stock
                                 MEETING_VIEW -> R.string.meetings
@@ -373,7 +381,8 @@ class MainActivity : ComponentActivity() {
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
+                        composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}

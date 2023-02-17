@@ -10,8 +10,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -23,7 +25,7 @@ import java.util.*
 
 
 @Composable
-fun dataPicker(act: MainActivity): String{
+fun dataPicker(act: MainActivity, inputDate: String = ""): String{
 
     var dataResult = "" // возвращаемая переменная
     val mContext = LocalContext.current // инициализируем контекст
@@ -36,7 +38,7 @@ fun dataPicker(act: MainActivity): String{
 
     mCalendar.time = Date() // берем из календаря текущую дату
 
-    val mDate = remember{ mutableStateOf("") } // создам переменную дата
+    val mDate = remember{ mutableStateOf(inputDate) } // создам переменную дата
 
     // создаем переменную с диалогом выбора даты
 
