@@ -195,6 +195,8 @@ class MainActivity : ComponentActivity() {
             val stockKey = remember { mutableStateOf("") }
             val startPage = remember { mutableStateOf(MEETINGS_ROOT) }
 
+            val cityName = remember { mutableStateOf(userInfo.value.city!!) }
+
             val context = LocalContext.current // контекст для тостов
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
@@ -329,7 +331,7 @@ class MainActivity : ComponentActivity() {
                             //user = mAuth.currentUser,
                             navController = navController, scaffoldState = scaffoldState, userInfo = userInfo) // Аватарка
 
-                        chooseCityNavigation.CityHeaderSideNavigation(citiesList) // Меню с выбором города находится теперь в отдельном классе
+                        chooseCityNavigation.CityHeaderSideNavigation(cityName,citiesList) // Меню с выбором города находится теперь в отдельном классе
 
                         sideComponents.BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
                             navController = navController, // Передаем NavController

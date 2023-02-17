@@ -84,11 +84,11 @@ class ChooseCityNavigation (val act: MainActivity) {
     // ------ ФУНКЦИЯ ОТОБРАЖЕНИЯ В БОКОВОМ МЕНЮ ГОРОДА -------------
 
     @Composable
-    fun CityHeaderSideNavigation (citiesList: MutableState<List<CitiesList>>) {
+    fun CityHeaderSideNavigation (cityName: MutableState<String>, citiesList: MutableState<List<CitiesList>>) {
 
-        //val chosenCityCreateWithUser = remember {mutableStateOf(filledUserInfo.city!!)}
-        val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
-        //val chosenCityEdit = remember {mutableStateOf<String>(filledMeeting.category!!)}
+
+        val chosenCityCreateWithoutUser = remember {mutableStateOf<String>("Выбери город")}
+
 
         // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
 
@@ -140,7 +140,17 @@ class ChooseCityNavigation (val act: MainActivity) {
                     // если значение диалога true то вызываем открытие диалога и передаем ему
                     // значение для закрытия - это значение false
 
-                    CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {openDialog.value = false}
+                    if (cityName.value != "Выбери город") {
+
+                        CityChooseDialog(cityName = cityName, citiesList) {openDialog.value = false}
+
+                    } else {
+
+                        CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {openDialog.value = false}
+
+                    }
+
+
 
                 }
 
@@ -157,12 +167,28 @@ class ChooseCityNavigation (val act: MainActivity) {
                 Spacer(modifier = Modifier.width(15.dp))
 
                 // -------------- НАЗВАНИЕ ГОРОДА -------------------
-                androidx.compose.material.Text(
-                    text = chosenCity.cityName!!, // из chosenCity достаем название города
-                    style = Typography.labelLarge, // Стиль текста
-                    modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
-                    color = Grey40 // цвет текста
-                )
+
+                if (cityName.value != "Выбери город" && cityName.value != "" ) {
+
+                    androidx.compose.material.Text(
+                        text = cityName.value!!, // из chosenCity достаем название города
+                        style = Typography.labelLarge, // Стиль текста
+                        modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                        color = Grey40 // цвет текста
+                    )
+
+                } else {
+
+                    androidx.compose.material.Text(
+                        text = chosenCityCreateWithoutUser.value!!, // из chosenCity достаем название города
+                        style = Typography.labelLarge, // Стиль текста
+                        modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                        color = Grey40 // цвет текста
+                    )
+
+                }
+
+
 
                 // разделитель между текстом и иконкой
                 Spacer(modifier = Modifier.width(15.dp))
