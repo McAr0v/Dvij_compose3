@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserInfo
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
@@ -188,6 +189,27 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
+            val stockInfo = remember {
+                mutableStateOf(StockAdsClass(
+
+                    image = "",
+                    headline = "",
+                    description = "",
+                    category = "",
+                    keyStock = "",
+                    keyPlace = "",
+                    keyCreator = "",
+                    city = "",
+                    startDate = "",
+                    finishDate = "",
+                    inputHeadlinePlace = "",
+                    inputAddressPlace = ""
+
+                )
+                )
+            }
+
+
             chooseCityNavigation.readCityDataFromDb(citiesList)
 
             val meetingKey = remember { mutableStateOf("") }
@@ -195,7 +217,7 @@ class MainActivity : ComponentActivity() {
             val stockKey = remember { mutableStateOf("") }
             val startPage = remember { mutableStateOf(MEETINGS_ROOT) }
 
-            val cityName = remember { mutableStateOf(userInfo.value.city!!) }
+            val cityName = remember { mutableStateOf("Выбери город") }
 
             val context = LocalContext.current // контекст для тостов
 
@@ -204,15 +226,14 @@ class MainActivity : ComponentActivity() {
 
             // --- Если пользователь вошел и подтвердил почту, в общем авторизован
 
-            if (mAuth.currentUser != null && mAuth.currentUser!!.isEmailVerified) {
+            if (mAuth.currentUser != null && mAuth.currentUser!!.isEmailVerified && userInfo.value.userKey != mAuth.uid) {
 
                 mAuth.uid?.let {
                     userDatabaseManager.readOneUserFromDataBase(userInfo, it) { result ->
 
-                        if (!result) {
+                        if (result) {
 
-                            startPage.value = CREATE_USER_INFO_SCREEN
-
+                            cityName.value = userInfo.value.city.toString()
 
                         }
 
@@ -220,6 +241,8 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
+
+
 
             val coroutineScope = rememberCoroutineScope() // инициализируем Корутину
             val scaffoldState = rememberScaffoldState() // Инициализируем состояние Scaffold
@@ -365,7 +388,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController, // указываем navController
-                        startDestination = MEETINGS_ROOT //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
+                        startDestination = startPage.value //MEETINGS_ROOT // При первом открытии приложения какой элемент будет выбран по умолчанию сразу
                     ) {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
@@ -388,8 +411,9 @@ class MainActivity : ComponentActivity() {
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey)}
-                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList)}
-                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey)}
+                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, "0")}
+                        composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, stockKey.value)}
+                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey, stockInfo, placeInfo)}
                         composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
 
                     }

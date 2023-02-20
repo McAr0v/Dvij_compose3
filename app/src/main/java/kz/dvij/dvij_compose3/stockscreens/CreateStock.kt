@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,10 +34,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
-import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateStock
 import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
@@ -48,7 +46,7 @@ class CreateStock (val act: MainActivity) {
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО АКЦИЮ
 
-    val choosePlaceDialog = ChoosePlaceDialog(act)
+    private val choosePlaceDialog = ChoosePlaceDialog(act)
 
 
     // ---- АКЦИЯ ПО УМОЛЧАНИЮ -------
@@ -63,40 +61,158 @@ class CreateStock (val act: MainActivity) {
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    fun CreateStockScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
+    fun CreateStockScreen (
+        navController: NavController,
+        citiesList: MutableState<List<CitiesList>>,
+        filledUserInfo: UserInfoClass = UserInfoClass(),
+        filledStock: StockAdsClass = StockAdsClass(
 
+            image = "",
+            headline = "",
+            description = "",
+            category = "",
+            keyStock = "",
+            keyPlace = "",
+            keyCreator = "",
+            city = "",
+            startDate = "",
+            finishDate = "",
+            inputHeadlinePlace = "",
+            inputAddressPlace = ""
+
+        ),
+        // Заполненое заведение, подаваемое извне. Если не передать, значения по умолчанию:
+        filledPlace: PlacesAdsClass = PlacesAdsClass(
+            placeName = "Выбери заведение",
+            placeKey = ""
+        ),
+
+        // Тип страницы - редактирование или создание
+        createOrEdit: String
+    ) {
+
+        val stockDatabaseManager = StockDatabaseManager(act = act)
         val placesDatabaseManager = PlacesDatabaseManager(act = act)
 
+        // ------ ПЕРЕМЕННАЯ ДЛЯ ВЫБОРА ЗАВЕДЕНИЯ ---------
 
-        var openLoading = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
-        val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
-        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
-        val openPlaceDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ЗАВЕДЕНИЙ
-        val openFieldPlace = remember { mutableStateOf(false) } // инициализируем переменную, открывающую формы ЗАВЕДЕНИЙ
-        var headlinePlace = remember {mutableStateOf("")} // инициализируем переменную заголовка места, введенного вручную
-        var addressPlace = remember {mutableStateOf("")} // инициализирууем переменную адреса места, введенного вручную
+        // КЛЮЧ ЗАВЕДЕНИЯ ИЗ ПОДАННОГО ИЗВНЕ ЗАВЕДЕНИЯ
+        var placeKey by rememberSaveable { mutableStateOf(filledPlace.placeKey) }
 
-        // var placeInfo = PlacesAdsClass (placeName = "Выбери заведение") // инициализируем ЗАВЕДЕНИЕ ПО УМОЛЧАНИЮ
+        // ДАННЫЕ ВЫБРАННОГО МЕСТА
+        val chosenPlace = remember {mutableStateOf(filledPlace)}
 
-        // Инициализируем переменную списка мест
+        // ЗАГОЛОВОК ЗАВЕДЕНИЯ ВВЕДЕННОГО ВРУЧНУЮ ИЗ БД
+        val headlinePlace = remember {mutableStateOf(filledStock.inputHeadlinePlace)}
+
+        // АДРЕС ЗАВЕДЕНИЯ ВВЕДЕННОГО ВРУЧНУЮ ИЗ БД
+        val addressPlace = remember {mutableStateOf(filledStock.inputAddressPlace)}
+
+        // ПЕРЕКЛЮЧЕНИЕ ТИПА ЗАВЕДЕНИЯ - ИЗ СПИСКА ИЛИ НАПИСАТЬ АДРЕС ВРУЧНУЮ
+        val changeTypePlace = remember {mutableStateOf(false)}
+
+        // ЗАГОЛОВОК ЗАВЕДЕНИЯ, ПЕРЕДАВАЕМЫЙ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        var finishHeadlinePlace by rememberSaveable { mutableStateOf("") }
+
+        // АДРЕС ЗАВЕДЕНИЯ, ПЕРЕДАВАЕМЫЙ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        var finishAddressPlace by rememberSaveable { mutableStateOf("") }
+
+        // ПОКАЗАТЬ / СКРЫТЬ ФОРМЫ ДЛЯ ВВОДА ВРУЧНУЮ ЗАГОЛОВКА И АДРЕСА ЗАВЕДЕНИЯ
+        val openFieldPlace = remember { mutableStateOf(false) }
+
+        // ----- СПИСКИ -----
+
+        // Список категорий
+        val categoriesList = remember {mutableStateOf(listOf<CategoriesList>())}
+
+        // Список мест
         val placesList = remember {
             mutableStateOf(listOf<PlacesAdsClass>())
         }
 
+        // --------- ПЕРЕМЕННЫЕ ДЛЯ ВЫБОРА КАТЕГОРИИ МЕРОПРИЯТИЯ ------------
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
+        val chosenStockCategoryCreate = remember {mutableStateOf("Выбери категорию")}
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПРИШЕДШАЯ ИЗ БД
+        val chosenStockCategoryEdit = remember {mutableStateOf<String>(filledStock.category!!)}
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        var category by rememberSaveable { mutableStateOf("Выбери категорию") }
+
+
+        // --- ПЕРЕМЕННЫЕ ДИАЛОГОВ ---
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
+        val openCityDialog = remember { mutableStateOf(false) } // диалог ГОРОДА
+        val openPlaceDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
+
+
+        // --- ПЕРЕМЕННЫЕ ГОРОДА ---
+
+        // Выбранный город из данных пользователя. Используется при создании
+        val chosenCityCreateWithUser = remember {mutableStateOf(filledUserInfo.city!!)}
+
+        // Значение города по умолчанию
+        val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
+
+        // Выбранный город из данных мероприятия. Используется при редактировании
+        val chosenCityEdit = remember {mutableStateOf<String>(filledStock.city!!)}
+
+        // Переменная, передаваемая в БД
+        var city by rememberSaveable { mutableStateOf("Выбери город") }
+
+
         // Считываем список моих заведений
         placesDatabaseManager.readPlaceMyDataFromDb(placesList)
 
+
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
-
-        // Инициализируем переменную списка категорий
-
-        val categoriesList = remember {
-            mutableStateOf(listOf<CategoriesList>())
-        }
 
         // Запускаем функцию считывания списка категорий с базы данных
 
         act.categoryDialog.readStockCategoryDataFromDb(categoriesList)
+
+        // ------- СЧИТЫВАЕМ ПОЛНУЮ ИНФОРМАЦИЮ О ВЫБРАННОМ ЗАВЕДЕНИИ------
+
+        // Если у выбранного места есть ключ, и он не равен ключу, ранее выбранного заведения, то...
+
+        if (chosenPlace.value.placeKey != null && chosenPlace.value.placeKey != "" && chosenPlace.value.placeKey != "null" && chosenPlace.value.placeKey != placeKey ){
+
+            // --- ЧИТАЕМ ДАННЫЕ О ЗАВЕДЕНИИ ---
+            placesDatabaseManager.readOnePlaceFromDataBase(chosenPlace, chosenPlace.value.placeKey!!){
+
+                //Если заведение считалось, указываем ключ выбранного заведения в отдельную переменную
+                placeKey = chosenPlace.value.placeKey
+            }
+
+            // --- Закрываем формы для ввода заведения вручную
+            openFieldPlace.value = false
+
+        }
+
+        // Если ключа у выбранного места нет, то указываем значение по умолчанию
+
+        if (chosenPlace.value.placeKey == null || chosenPlace.value.placeKey == "" || chosenPlace.value.placeKey == "null"){
+
+            // Доп условие, если выбранное место так же не имеет и названия.
+            // ЕСЛИ ЕСТЬ НАЗВАНИЕ, ТО ТОГДА ЭТО ЗАВЕДЕНИЕ, ВВЕДЕННОЕ ВРУЧНУЮ!
+
+            if (chosenPlace.value.placeName != ""){
+                chosenPlace.value = PlacesAdsClass(
+                    placeName = "Выбери заведение",
+                    placeKey = ""
+                )
+            }
+
+            // --- Открываем формы для ввода заведения вручную
+            openFieldPlace.value = true
+
+        }
+
+        var placeInfo = "Выбери заведение"
 
 
 
@@ -115,15 +231,34 @@ class CreateStock (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Фото акции") // подпись перед формой
 
-            val image1 = chooseImageDesign() // Изображение акции
+            val image1 = if (filledStock.image != null && filledStock.image != "" && createOrEdit != "0"){
+                // Если при редактировании есть картинка, подгружаем картинку
+                chooseImageDesign(filledStock.image)
+            } else {
+                // Если нет - стандартный выбор картинки
+                chooseImageDesign()
+            }
 
             SpacerTextWithLine(headline = "Заголовок акции") // подпись перед формой
 
-            val headline = fieldHeadlineComponent(act = act) // форма заголовка
+            val headline = if (filledStock.headline != null && filledStock.headline != "" && createOrEdit != "0"){
+                // Если при редактировании есть заголовок, заполняем его в форму
+                fieldHeadlineComponent(act = act, filledStock.headline)
+            } else {
+                // Если нет - поле ввода пустое
+                fieldHeadlineComponent(act = act) // форма заголовка
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            val category = act.categoryDialog.stockCategorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
+            category = if (filledStock.category != null && filledStock.category != "Выбери категорию" && filledStock.category != "" && createOrEdit != "0") {
+                // Если при редактировании есть категория, передаем ее в кнопку
+                act.categoryDialog.meetingCategorySelectButton(categoryName = chosenStockCategoryEdit) { openCategoryDialog.value = true }.toString()
+
+            } else {
+                // Если нет - передаем пустое значение
+                act.categoryDialog.meetingCategorySelectButton (categoryName = chosenStockCategoryCreate) { openCategoryDialog.value = true }.toString()
+            }
 
             SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
 
@@ -137,12 +272,14 @@ class CreateStock (val act: MainActivity) {
 
                 // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
 
-                /*placeInfo = choosePlaceDialog.placeSelectButton {
-                    openPlaceDialog.value = true
+                placeInfo = choosePlaceDialog.placeSelectButton (chosenOutPlace = chosenPlace) {
+
+                    // ДЕЙСТВИЯ НА НАЖАТИЕ НА КНОПКУ
+
+                    openPlaceDialog.value = true // открываем диалог выбора заведения
                     openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
-                    headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
-                    addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
-                }.toString()*/
+
+                }.toString()
 
                 Spacer(modifier = Modifier.width(10.dp))
 
@@ -151,16 +288,18 @@ class CreateStock (val act: MainActivity) {
                 Button(
                     onClick = {
 
+                        // Если открыт диалог ввода заведения вручную
                         if (openFieldPlace.value){
-                            openFieldPlace.value = false
+                            openFieldPlace.value = false // закрываем диалог
                         } else {
-                            openFieldPlace.value = true
+
+                            // Если закрыт
+                            openFieldPlace.value = true // Открываем)
 
                             // если выбираем ввести вручную, а уже выбрано заведение из списка
                             // то сбрасываем выбранное заведение из списка
-                            choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
+                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
                         }
-
                     },
 
                     // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
@@ -214,6 +353,8 @@ class CreateStock (val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // --- ПОДЛОЖКА ПОД ФОРМЫ -----
+
                 Column(
 
                     modifier = Modifier
@@ -223,25 +364,104 @@ class CreateStock (val act: MainActivity) {
 
                 ) {
                     SpacerTextWithLine(headline = "Название места проведения")
-                    headlinePlace.value = fieldTextComponent("Введите название места") // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+
+                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ ЗАГОЛОВОК ЗАВЕДЕНИЯ
+
+                    finishHeadlinePlace = if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
+
+                        // Передаем заголовок в текстовое поле
+                        fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+
+                    } else {
+                        // Если не пришел - показываем пустое поле
+                        fieldTextComponent("Введите название места")
+                    }
+
                     SpacerTextWithLine(headline = "Адрес места проведения")
-                    addressPlace.value = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+
+                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ АДРЕС ЗАВЕДЕНИЯ
+
+                    finishAddressPlace = if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
+
+                        // Передаем адрес в текстовое поле
+                        fieldTextComponent("Введите адрес места", addressPlace.value)
+
+                    } else {
+                        // Если не пришел - показываем пустое поле
+                        fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+
+                    }
                 }
             }
 
 
-
             // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
 
-            /*if (openPlaceDialog.value) {
-                choosePlaceDialog.PlaceChooseDialog(placesList = placesList) {
-                    openPlaceDialog.value = false
+            if (openPlaceDialog.value) {
+
+                choosePlaceDialog.PlaceChooseDialog(placesList = placesList, chosenOutPlace = chosenPlace, ifChoose = changeTypePlace) {
+                    // Функции при закрытии диалога
+                    openFieldPlace.value = false // Закрываем отображение полей ввода вручную
+                    openPlaceDialog.value = false // Закрываем сам вспылвающий диалог выбора заведений
                 }
-            }*/
+            }
+
+            // --- ЕСЛИ ИЗ БД ПРИШЛИ ЗАГОЛОВОК И АДРЕС ЗАВЕДЕНИЯ,
+            // НО ПОЛЬЗОВАТЕЛЬ ВЫБРАЛ ЗАВЕДЕНИЕ ИЗ СПИСКА
+
+            if (changeTypePlace.value){
+                headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
+                addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
+                !changeTypePlace.value // Говорим, что мы сбросили значения, теперь в них ничего нет
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
-            //val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
+            // Если при редактировании в мероприятии есть город
+
+            if (filledStock.city != null && filledStock.city != "Выбери город" && filledStock.city != "" && createOrEdit != "0") {
+
+                // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString()
+
+            } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
+
+                // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString()
+
+            } else {
+
+                // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+
+            }
+
+            // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
+
+            if (openCityDialog.value) {
+
+                if (filledStock.city != null && filledStock.city != "Выбери город" && filledStock.city != "" && createOrEdit != "0"){
+
+                    // Если при редактировании в мероприятии есть город, Передаем ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityEdit, citiesList) {
+                        openCityDialog.value = false
+                    }
+
+                } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0"){
+
+                    // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithUser, citiesList) {
+                        openCityDialog.value = false
+                    }
+
+                } else {
+
+                    // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {
+                        openCityDialog.value = false
+                    }
+                }
+            }
 
 
             // СДЕЛАТЬ ДИАЛОГ ВЫБОРА ЗАВЕДЕНИЯ
@@ -250,30 +470,36 @@ class CreateStock (val act: MainActivity) {
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
             if (openCategoryDialog.value) {
-                act.categoryDialog.CategoryStockChooseDialog(categoriesList) {
-                    openCategoryDialog.value = false
+
+                // ЕСЛИ РЕДАКТИРОВАНИЕ
+                if (createOrEdit != "0"){
+                    // Передаем переменную, содержащую название категории из БД
+                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenStockCategoryEdit, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
+
+                } else { // Если создание
+
+                    // Передаем переменную, в которую поместим категорию по умолчанию
+                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenStockCategoryCreate, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
                 }
             }
 
-            // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            /*if (openCityDialog.value) {
-                act.chooseCityNavigation.CityChooseDialog(citiesList) {
-                    openCityDialog.value = false
-                }
-            }*/
 
             SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
 
-            var startDay = dataPicker(act = act) // выбор даты начала
+            var startDay = dataPicker(act = act, inputDate = filledStock.startDate ?: "Empty") // выбор даты начала
 
             SpacerTextWithLine(headline = "Дата завершения акции") // подпись перед формой
 
-            var finishDay = dataPicker(act = act) // выбор даты завершения
+            var finishDay = dataPicker(act = act, inputDate = filledStock.finishDate ?: "Empty") // выбор даты завершения
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ Акции
+            var description = fieldDescriptionComponent(act = act, description = filledStock.description ?: "Empty") // ФОРМА ОПИСАНИЯ Акции
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 

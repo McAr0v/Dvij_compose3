@@ -383,6 +383,37 @@ class StockDatabaseManager (val act: MainActivity) {
         })
     }
 
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОЙ АКЦИИ --------
+
+    fun readOneStockFromDataBaseReturnClass(key: String, callback: (result: StockAdsClass)-> Unit){
+
+        stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val stock = item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА акции
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("stockData") // добираесся до следующей папки внутри - папка с данными о акции
+                        .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акции
+
+
+                    // если мероприятие не нал и ключ акции совпадает с ключем из БД, то...
+                    if (stock != null && stock.keyStock == key) {
+
+                        callback (stock)
+
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 
     fun readStockInPlaceFromDb(stockList: MutableState<List<StockAdsClass>>, placeKey: String){

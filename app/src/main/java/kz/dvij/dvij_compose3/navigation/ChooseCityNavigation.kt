@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
@@ -86,8 +87,7 @@ class ChooseCityNavigation (val act: MainActivity) {
     @Composable
     fun CityHeaderSideNavigation (cityName: MutableState<String>, citiesList: MutableState<List<CitiesList>>) {
 
-
-        val chosenCityCreateWithoutUser = remember {mutableStateOf<String>("Выбери город")}
+        Log.d ("MyLog", "Город - ${cityName.value}")
 
 
         // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
@@ -140,15 +140,9 @@ class ChooseCityNavigation (val act: MainActivity) {
                     // если значение диалога true то вызываем открытие диалога и передаем ему
                     // значение для закрытия - это значение false
 
-                    if (cityName.value != "Выбери город") {
+                    CityChooseDialog(cityName = cityName, citiesList) {openDialog.value = false}
 
-                        CityChooseDialog(cityName = cityName, citiesList) {openDialog.value = false}
 
-                    } else {
-
-                        CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {openDialog.value = false}
-
-                    }
 
 
 
@@ -180,7 +174,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 } else {
 
                     androidx.compose.material.Text(
-                        text = chosenCityCreateWithoutUser.value!!, // из chosenCity достаем название города
+                        text = "Выбери город", // из chosenCity достаем название города
                         style = Typography.labelLarge, // Стиль текста
                         modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
                         color = Grey40 // цвет текста

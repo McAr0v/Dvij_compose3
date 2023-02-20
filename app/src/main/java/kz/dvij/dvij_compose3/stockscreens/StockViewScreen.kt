@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.stockscreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,8 +28,11 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
+import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
+import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class StockViewScreen (val act: MainActivity) {
@@ -37,7 +41,7 @@ class StockViewScreen (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun StockViewScreen (key: String, navController: NavController, placeKey: MutableState<String>){
+    fun StockViewScreen (key: String, navController: NavController, placeKey: MutableState<String>, filledStockInfoFromAct: MutableState<StockAdsClass>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>){
 
         // Переменная, которая содержит в себе информацию об акции
         val stockInfo = remember {
@@ -135,6 +139,61 @@ class StockViewScreen (val act: MainActivity) {
                 verticalArrangement = Arrangement.Top
 
             ) {
+
+                Button(
+
+                    onClick = {
+
+                        stockInfo.value.keyStock?.let {
+                            act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(it){ stock ->
+
+                                if (stock.keyPlace != null && stock.keyPlace != "null" && stock.keyPlace != "") {
+
+                                    filledPlaceInfoFromAct.value = placeInfo.value
+
+                                } else {
+
+                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                        placeName = stock.inputHeadlinePlace,
+                                        address = stock.inputAddressPlace
+                                    )
+
+                                }
+
+
+
+                                filledStockInfoFromAct.value = stock
+                                navController.navigate(EDIT_STOCK_SCREEN)
+
+
+                            }
+                        }
+
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth() // кнопка на всю ширину
+                        .height(50.dp)// высота - 50
+                        .padding(horizontal = 30.dp), // отступы от краев
+                    shape = RoundedCornerShape(50), // скругление углов
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = SuccessColor, // цвет кнопки
+                        contentColor = Grey100 // цвет контента на кнопке
+                    )
+                ) {
+                    Text(
+                        text = "Редактировать",
+                        style = Typography.labelMedium
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    androidx.compose.material.Icon(
+                        painter = painterResource(id = R.drawable.ic_publish),
+                        contentDescription = stringResource(id = R.string.cd_publish_button),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
 
                 // -------- НАЗВАНИЕ АКЦИИ ----------
 
