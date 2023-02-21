@@ -253,11 +253,11 @@ class CreateStock (val act: MainActivity) {
 
             category = if (filledStock.category != null && filledStock.category != "Выбери категорию" && filledStock.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
-                act.categoryDialog.meetingCategorySelectButton(categoryName = chosenStockCategoryEdit) { openCategoryDialog.value = true }.toString()
+                act.categoryDialog.categorySelectButton(categoryName = chosenStockCategoryEdit) { openCategoryDialog.value = true }.toString()
 
             } else {
                 // Если нет - передаем пустое значение
-                act.categoryDialog.meetingCategorySelectButton (categoryName = chosenStockCategoryCreate) { openCategoryDialog.value = true }.toString()
+                act.categoryDialog.categorySelectButton (categoryName = chosenStockCategoryCreate) { openCategoryDialog.value = true }.toString()
             }
 
             SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
@@ -476,14 +476,14 @@ class CreateStock (val act: MainActivity) {
                 // ЕСЛИ РЕДАКТИРОВАНИЕ
                 if (createOrEdit != "0"){
                     // Передаем переменную, содержащую название категории из БД
-                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenStockCategoryEdit, categoriesList) {
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryEdit, categoriesList) {
                         openCategoryDialog.value = false
                     }
 
                 } else { // Если создание
 
                     // Передаем переменную, в которую поместим категорию по умолчанию
-                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenStockCategoryCreate, categoriesList) {
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryCreate, categoriesList) {
                         openCategoryDialog.value = false
                     }
                 }

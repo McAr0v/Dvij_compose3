@@ -42,9 +42,6 @@ fun checkDataOnCreateMeeting (
 
     if (image1 == null || headline == "" || phone == "+77" || dataResult == "" || timeStartResult == "" || description == "" || category == "Выбери категорию" || city == "Выбери город" ) {
 
-
-
-
             if (headline == "") {
                 result = R.string.cm_no_headline
             }

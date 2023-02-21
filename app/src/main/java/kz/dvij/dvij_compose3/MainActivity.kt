@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserInfo
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
@@ -44,6 +43,7 @@ import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.meetingscreens.MeetingViewScreen
 import kz.dvij.dvij_compose3.meetingscreens.MeetingsScreens
 import kz.dvij.dvij_compose3.placescreens.PlaceViewScreen
+import kz.dvij.dvij_compose3.placescreens.PlacesScreens
 import kz.dvij.dvij_compose3.stockscreens.StockScreen
 import kz.dvij.dvij_compose3.stockscreens.StockViewScreen
 import kz.dvij.dvij_compose3.userscreens.AccountScreens
@@ -62,31 +62,30 @@ class MainActivity : ComponentActivity() {
 
     val mAuth = FirebaseAuth.getInstance()  // берем из файрбаз аутентикейшн
 
-    val accountScreens = AccountScreens(act = this)
-    val accountHelper = AccountHelper(this)
+    private val accountScreens = AccountScreens(act = this)
+    private val accountHelper = AccountHelper(this)
     val chooseCityNavigation = ChooseCityNavigation (this)
-    val createMeeting = CreateMeeting (this)
-    val sideComponents = SideComponents (this)
+    private val createMeeting = CreateMeeting (this)
+    private val sideComponents = SideComponents (this)
     val meetingDatabaseManager = MeetingDatabaseManager( this)
     val meetingsScreens = MeetingsScreens(this)
     val stockScreen = StockScreen(this)
     val placesScreens = PlacesScreens(this)
     val photoHelper = PhotoHelper(this)
-    val meetingViewScreen = MeetingViewScreen(this)
+    private val meetingViewScreen = MeetingViewScreen(this)
     val callAndWhatsapp = CallAndWhatsapp(this)
     val categoryDialog = CategoryDialog(this)
     val meetingsCard = MeetingsCard(this)
     val placesCard = PlacesCard(this)
-    val createPlace = CreatePlace(this)
+    private val createPlace = CreatePlace(this)
     val placesDatabaseManager = PlacesDatabaseManager(this)
-    val placeViewScreen = PlaceViewScreen(this)
-    val createStock = CreateStock (this)
+    private val placeViewScreen = PlaceViewScreen(this)
+    private val createStock = CreateStock (this)
     val stockCard = StockCard (this)
     val stockDatabaseManager = StockDatabaseManager(this)
-    val stockViewScreen = StockViewScreen(this)
-    val choosePlaceDialog = ChoosePlaceDialog(this)
-    val createProfileInfoScreen = CreateProfileInfoScreen(this)
-    val userDatabaseManager = UserDatabaseManager(this)
+    private val stockViewScreen = StockViewScreen(this)
+    private val createProfileInfoScreen = CreateProfileInfoScreen(this)
+    private val userDatabaseManager = UserDatabaseManager(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
     var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
@@ -125,9 +124,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
+            // Список, в который поместим города из БД
+
             val citiesList = remember {
                 mutableStateOf(listOf<CitiesList>())
             }
+
+            // Данные о пользователе с БД
 
             val userInfo = remember {
                 mutableStateOf(UserInfoClass(
@@ -143,6 +146,8 @@ class MainActivity : ComponentActivity() {
                     userKey = ""
                 ))
             }
+
+            // Данные о мероприятии. Используется для переходов на разные экраны
 
             val meetingInfo = remember {
                 mutableStateOf(MeetingsAdsClass(
@@ -167,6 +172,8 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
+            // Данные о заведении. Используется для переходов на разные экраны
+
             val placeInfo = remember {
                 mutableStateOf(PlacesAdsClass(
 
@@ -189,6 +196,8 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
+            // Данные о акции. Используется для переходов на разные экраны
+
             val stockInfo = remember {
                 mutableStateOf(StockAdsClass(
 
@@ -210,16 +219,18 @@ class MainActivity : ComponentActivity() {
             }
 
 
+            // Читаем список городов
             chooseCityNavigation.readCityDataFromDb(citiesList)
+
+            // Переменные ключей для МЗА. Используются для переходов на разные страницы
 
             val meetingKey = remember { mutableStateOf("") }
             val placeKey = remember { mutableStateOf("") }
             val stockKey = remember { mutableStateOf("") }
             val startPage = remember { mutableStateOf(MEETINGS_ROOT) }
 
+            // Город по умолчанию
             val cityName = remember { mutableStateOf("Выбери город") }
-
-            val context = LocalContext.current // контекст для тостов
 
             val navController = rememberNavController() // обязательная строчка для того, чтобы нижнее меню и боковое меню работало. Инициализируем navController
             // он нужен для того, чтобы определять, куда вернуться, если нажать кнопку "Назад", какой элемент сейчас выбран и тд.
@@ -228,18 +239,20 @@ class MainActivity : ComponentActivity() {
 
             if (mAuth.currentUser != null && mAuth.currentUser!!.isEmailVerified && userInfo.value.userKey != mAuth.uid) {
 
-                mAuth.uid?.let {
-                    userDatabaseManager.readOneUserFromDataBase(userInfo, it) { result ->
+                // Считываем данные пользователя с БД
+
+                mAuth.uid?.let { uid ->
+                    userDatabaseManager.readOneUserFromDataBase(userInfo, uid) { result ->
 
                         if (result) {
+                            // Если успешно, то в переменную userInfo функция автоматически добавит информацию о пользователе
 
+                            // так же сменим город по умолчанию на город, который указан в данных пользователя
                             cityName.value = userInfo.value.city.toString()
 
                         }
-
                     }
                 }
-
             }
 
 
@@ -268,7 +281,7 @@ class MainActivity : ComponentActivity() {
                         || currentRoute == RESET_PASSWORD_SUCCESS
                     ) {
 
-                            // ------- ТО НИЧЕ НЕ ДЕЛАТЬ))) -----------
+                        // НЕ ПОКАЗЫВАТЬ НИКАКОЕ НИЖНЕЕ МЕНЮ
 
                     } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
 
@@ -288,7 +301,7 @@ class MainActivity : ComponentActivity() {
 
                     ){
 
-                            // ------- ТО НИЧЕ НЕ ДЕЛАТЬ))) -----------
+                        // НЕ ПОКАЗЫВАТЬ ТОПБАР
 
                     } else if (currentRoute == MEETING_VIEW){
 
@@ -351,7 +364,6 @@ class MainActivity : ComponentActivity() {
                         sideComponents.HeaderSideNavigation() // HEADER - Логотип
 
                         sideComponents.AvatarBoxSideNavigation(
-                            //user = mAuth.currentUser,
                             navController = navController, scaffoldState = scaffoldState, userInfo = userInfo) // Аватарка
 
                         chooseCityNavigation.CityHeaderSideNavigation(cityName,citiesList) // Меню с выбором города находится теперь в отдельном классе
@@ -363,8 +375,6 @@ class MainActivity : ComponentActivity() {
 
                         sideComponents.SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
 
-
-
                 }
                 )
 
@@ -374,8 +384,6 @@ class MainActivity : ComponentActivity() {
 
 
             { paddingValues ->
-
-
 
                 Column(
                     Modifier
@@ -393,29 +401,46 @@ class MainActivity : ComponentActivity() {
 
                         // прописываем путь элемента, нажав на который куда нужно перейти
 
+                        // --- СТРАНИЦЫ МЕРОПРИЯТИЙ -----
+
                         composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey)}
+                        composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
+                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
+
+                        // ---- СТРАНИЦЫ ЗАВЕДЕНИЙ ----
+
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey)}
+                        composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value ,createOrEdit = "0")}
+                        composable(EDIT_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value, filledPlace = placeInfo.value, createOrEdit = EDIT_PLACES_SCREEN)}
+                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey, placeInfo)}
+
+                        // ----- СТРАНИЦЫ АКЦИЙ ------
+
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey)}
+                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
+                        composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, stockKey.value)}
+                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey, stockInfo, placeInfo)}
+
+                        // ----- СТРАНИЦЫ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -----
+
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity, userInfo)}
-                        composable(ABOUT_ROOT) { AboutScreen()}
-                        composable(POLICY_ROOT) { PrivatePolicyScreen()}
-                        composable(ADS_ROOT) { AdsScreen() }
-                        composable(BUGS_ROOT) { BugsScreen() }
+                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
+
+                        // ---- СТРАНИЦЫ РЕГИСТРАЦИИ / АВТОРИЗАЦИИ ----
+
                         composable(REG_ROOT) {accountScreens.SignInUpPage(switch = REGISTRATION, navController = navController)}
                         composable(LOG_IN_ROOT) {accountScreens.SignInUpPage(switch = SIGN_IN, navController = navController)}
                         composable(THANK_YOU_PAGE_ROOT) {accountScreens.ThankYouPage(navController = navController)}
                         composable(FORGOT_PASSWORD_ROOT) {accountScreens.ForgotPasswordPage(navController = navController)}
                         composable(RESET_PASSWORD_SUCCESS) {accountScreens.ResetPasswordSuccess(navController = navController)}
-                        composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
-                        composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
-                        composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value ,createOrEdit = "0")}
-                        composable(EDIT_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value, filledPlace = placeInfo.value, createOrEdit = EDIT_PLACES_SCREEN)}
-                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey, placeInfo)}
-                        composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
-                        composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, stockKey.value)}
-                        composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey, stockInfo, placeInfo)}
-                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
+
+                        // ---- ПРОЧИЕ СТРАНИЦЫ -------
+
+                        composable(ABOUT_ROOT) { AboutScreen()}
+                        composable(POLICY_ROOT) { PrivatePolicyScreen()}
+                        composable(ADS_ROOT) { AdsScreen() }
+                        composable(BUGS_ROOT) { BugsScreen() }
 
                     }
                 }

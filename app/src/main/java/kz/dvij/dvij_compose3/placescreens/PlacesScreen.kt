@@ -1,4 +1,4 @@
-package kz.dvij.dvij_compose3.tapesscreens
+package kz.dvij.dvij_compose3.placescreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,8 +30,6 @@ class PlacesScreens (val act: MainActivity) {
 
     private val databaseManager = PlacesDatabaseManager(act) // инициализируем датабаз менеджер
 
-    private val user = act.mAuth.currentUser
-
     // создаем заведение по умолчанию
     private val default = PlacesAdsClass (
         placeDescription = "Default"
@@ -40,7 +38,7 @@ class PlacesScreens (val act: MainActivity) {
     @Composable
     fun PlacesScreen(navController: NavController, placeKey: MutableState<String>) {
 
-        Column() {
+        Column {
 
             TabMenu(bottomPage = PLACES_ROOT, navController, activity = act, placesKey = placeKey)
 

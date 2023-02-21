@@ -36,8 +36,6 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateMeeting(private val act: MainActivity) {
 
-    private val meetingDatabase = MeetingDatabaseManager(act)
-
     // ------ КЛАСС СОЗДАНИЯ МЕРОПРИЯТИЯ ----------
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
@@ -303,11 +301,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             if (filledMeeting.category != null && filledMeeting.category != "Выбери категорию" && filledMeeting.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
-                category = act.categoryDialog.meetingCategorySelectButton(categoryName = chosenMeetingCategoryEdit) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton(categoryName = chosenMeetingCategoryEdit) { openCategoryDialog.value = true }.toString()
 
             } else {
                 // Если нет - передаем пустое значение
-                category = act.categoryDialog.meetingCategorySelectButton (categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton (categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }.toString()
         }
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
@@ -317,14 +315,14 @@ class CreateMeeting(private val act: MainActivity) {
                 // ЕСЛИ РЕДАКТИРОВАНИЕ
                 if (createOrEdit != "0"){
                     // Передаем переменную, содержащую название категории из БД
-                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenMeetingCategoryEdit, categoriesList) {
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenMeetingCategoryEdit, categoriesList) {
                         openCategoryDialog.value = false
                     }
 
                 } else { // Если создание
 
                     // Передаем переменную, в которую поместим категорию по умолчанию
-                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenMeetingCategoryCreate, categoriesList) {
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenMeetingCategoryCreate, categoriesList) {
                         openCategoryDialog.value = false
                     }
                 }
@@ -856,9 +854,9 @@ class CreateMeeting(private val act: MainActivity) {
                                 } else {
 
                                     // запускаем сжатие изображения
-                                    val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
+                                    val compressedImage = activity.photoHelper.compressImage(activity, image1)
 
-                                    // после сжатия запускаем функцию загрузки сжатого фота в Storage
+                                    // после сжатия запускаем функцию загрузки сжатого фото в Storage
 
                                     activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
 
@@ -871,6 +869,8 @@ class CreateMeeting(private val act: MainActivity) {
                                             // заполняем мероприятие
 
                                             val finishFilledMeeting = if (createOrEdit != "0") {
+
+                                                // Если это страница редактирования
 
                                                 MeetingsAdsClass(
                                                     key = filledMeeting.key,
@@ -894,6 +894,8 @@ class CreateMeeting(private val act: MainActivity) {
                                                 )
 
                                             } else {
+
+                                                // Если это страница создания
 
                                                 MeetingsAdsClass(
                                                     key = meetingDatabaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
@@ -936,6 +938,8 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                         if (createOrEdit != "0"){
 
+                                                            // Если это редактирование
+
                                                             Toast.makeText(
                                                                 activity,
                                                                 "Твое мероприятие успешно отредактировано",
@@ -943,6 +947,8 @@ class CreateMeeting(private val act: MainActivity) {
                                                             ).show()
 
                                                         } else {
+
+                                                            // Если это создание
 
                                                             Toast.makeText(
                                                                 activity,
@@ -970,8 +976,6 @@ class CreateMeeting(private val act: MainActivity) {
                                         }
                                     }
                                 }
-
-
                             }
                         }
                     },

@@ -42,7 +42,13 @@ class PlaceViewScreen (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun PlaceViewScreen (key: String, navController: NavController, meetingKey: MutableState<String>, stockKey: MutableState<String>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>){
+    fun PlaceViewScreen (
+        key: String, // Ключ заведения, для считываения данных о заведении
+        navController: NavController,
+        meetingKey: MutableState<String>, // КЛЮЧ МЕРОПРИЯТИЯ ДЛЯ ПЕРЕХОДА НА КЛИК ПО КАРТОЧКЕ МЕРОПРИЯТИЯ
+        stockKey: MutableState<String>, // КЛЮЧ АКЦИЙ для перехода на клик по карточке Акции
+        filledPlaceInfoFromAct: MutableState<PlacesAdsClass> // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+    ){
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
@@ -159,49 +165,59 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 ) {
 
-                    Button(
+                    // ------ КНОПКА РЕДАКТИРОВАТЬ ------
 
-                        onClick = {
+                    if (placeInfo.value.owner == act.mAuth.uid){
 
-                            placeInfo.value.placeKey?.let {
-                                act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
+                        // ----- ЕСЛИ КЛЮЧ АВТОРА СОВПОДАЕТ С МОИ КЛЮЧОМ, ТО ДОСТУПНА КНОПКА РЕДАКТИРОВАТЬ ------
 
-                                    filledPlaceInfoFromAct.value = place
-                                    navController.navigate(EDIT_PLACES_SCREEN)
+                        Button(
 
+                            onClick = {
+
+                                // Считываем данные о заведении
+                                placeInfo.value.placeKey?.let {
+                                    act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
+
+                                        // если пришел дата класс заведения, присваеваем его в переменную на МАИН АКТИВИТИ
+                                        filledPlaceInfoFromAct.value = place
+
+                                        // Переходим на страницу редактирования
+                                        navController.navigate(EDIT_PLACES_SCREEN)
+
+                                    }
                                 }
-                            }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth() // кнопка на всю ширину
+                                .height(50.dp)// высота - 50
+                                .padding(horizontal = 30.dp), // отступы от краев
+                            shape = RoundedCornerShape(50), // скругление углов
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = SuccessColor, // цвет кнопки
+                                contentColor = Grey100 // цвет контента на кнопке
+                            )
+                        ) {
+                            Text(
+                                text = "Редактировать",
+                                style = Typography.labelMedium
+                            )
 
+                            Spacer(modifier = Modifier.width(10.dp))
 
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth() // кнопка на всю ширину
-                            .height(50.dp)// высота - 50
-                            .padding(horizontal = 30.dp), // отступы от краев
-                        shape = RoundedCornerShape(50), // скругление углов
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = SuccessColor, // цвет кнопки
-                            contentColor = Grey100 // цвет контента на кнопке
-                        )
-                    ) {
-                        Text(
-                            text = "Редактировать",
-                            style = Typography.labelMedium
-                        )
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        androidx.compose.material.Icon(
-                            painter = painterResource(id = R.drawable.ic_publish),
-                            contentDescription = stringResource(id = R.string.cd_publish_button),
-                            modifier = Modifier.size(20.dp)
-                        )
+                            androidx.compose.material.Icon(
+                                painter = painterResource(id = R.drawable.ic_publish),
+                                contentDescription = stringResource(id = R.string.cd_publish_button),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
+
+
 
                     // -------- НАЗВАНИЕ ЗАВЕДЕНИЯ ----------
 
-                    if (placeInfo.value.placeName != null) {
+                    if (placeInfo.value.placeName != null && placeInfo.value.placeName != "" && placeInfo.value.placeName != "null") {
 
                         Text(
                             text = placeInfo.value.placeName!!,
@@ -212,7 +228,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     // ------- ГОРОД ------------
 
-                    if (placeInfo.value.city != null) {
+                    if (placeInfo.value.city != null && placeInfo.value.city != "" && placeInfo.value.city != "null" && placeInfo.value.city != "Выбери город") {
 
                         Text(
                             text = placeInfo.value.city!!,
@@ -223,7 +239,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     // ------- АДРЕС ------------
 
-                    if (placeInfo.value.address != null) {
+                    if (placeInfo.value.address != null && placeInfo.value.address != "" && placeInfo.value.address != "null") {
 
                         Text(
                             text = placeInfo.value.address!!,
@@ -246,7 +262,7 @@ class PlaceViewScreen (val act: MainActivity) {
                         // -------- КАТЕГОРИЯ заведения ----------
 
 
-                        if (placeInfo.value.category != null) {
+                        if (placeInfo.value.category != null && placeInfo.value.category != "" && placeInfo.value.category != "null" && placeInfo.value.category != "Выбери категорию") {
 
                             Button(
                                 onClick = {
@@ -319,18 +335,18 @@ class PlaceViewScreen (val act: MainActivity) {
                                 // Если не авторизован, условие else
 
                                 if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                    act.placesDatabaseManager.favIconPlace(key) {
+                                    act.placesDatabaseManager.favIconPlace(key) { inFav ->
 
                                         // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
-                                        if (it) {
+                                        if (inFav) {
 
                                             // Убираем из избранных
-                                            act.placesDatabaseManager.removeFavouritePlace(key) {
+                                            act.placesDatabaseManager.removeFavouritePlace(key) { yes ->
 
                                                 // Если пришел колбак, что успешно
 
-                                                if (it) {
+                                                if (yes) {
 
                                                     iconTextFavColor.value =
                                                         Grey40 // При нажатии окрашиваем текст и иконку в белый
@@ -351,11 +367,11 @@ class PlaceViewScreen (val act: MainActivity) {
 
                                             // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                            act.placesDatabaseManager.addFavouritePlace(key) {
+                                            act.placesDatabaseManager.addFavouritePlace(key) { notInFav ->
 
                                                 // Если пришел колбак, что успешно
 
-                                                if (it) {
+                                                if (notInFav) {
 
                                                     iconTextFavColor.value =
                                                         PrimaryColor // При нажатии окрашиваем текст и иконку в черный
@@ -423,22 +439,6 @@ class PlaceViewScreen (val act: MainActivity) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 
-                        // --- ДАТА ----
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.5f)
-                        ) {
-                            if (placeInfo.value.openTime != null) {
-                                HeadlineAndDesc(
-                                    headline = placeInfo.value.openTime!!, desc = act.getString(
-                                        R.string.cm_date2
-                                    )
-                                )
-                            }
-                        }
-
                         // ---- ВРЕМЯ -----
 
                         Column(
@@ -455,9 +455,9 @@ class PlaceViewScreen (val act: MainActivity) {
                                         "${placeInfo.value.openTime} - ${placeInfo.value.closeTime}"
                                     },
                                     desc = if (placeInfo.value.closeTime == "") {
-                                        act.getString(R.string.cm_start_in)
+                                        "Открываемся в"
                                     } else {
-                                        act.getString(R.string.cm_all_time)
+                                        "Режим работы"
                                     } //
                                 )
                             }
@@ -467,7 +467,10 @@ class PlaceViewScreen (val act: MainActivity) {
                     Spacer(modifier = Modifier.height(10.dp))
 
 
-                    SpacerTextWithLine(headline = stringResource(id = R.string.meeting_call_org))
+
+                    // ----- РАЗДЕЛ СВЯЗАТЬСЯ С ОРГАНИЗАТОРОМ -----
+
+                    SpacerTextWithLine(headline = "Контакты заведения")
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -475,10 +478,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         // ----- КНОПКА ПОЗВОНИТЬ --------
 
-                        if (placeInfo.value.phone != null && placeInfo.value.phone != "7") {
+                        if (placeInfo.value.phone != null && placeInfo.value.phone != "7" && placeInfo.value.phone != "+77" && placeInfo.value.phone != "" && placeInfo.value.phone != "null") {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.makeACall(placeInfo.value.phone!!) },
+                                onClick = { act.callAndWhatsapp.makeACall(placeInfo.value.phone!!) }, // функция набора номера
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)
@@ -502,10 +505,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                        if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "7") {
+                        if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "7" && placeInfo.value.whatsapp != "+77" && placeInfo.value.whatsapp != "" && placeInfo.value.whatsapp != "null") {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!) },
+                                onClick = { act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!) }, // Функция перехода в ватсапп
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)
@@ -527,12 +530,12 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         }
 
-                        // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+                        // ---- КНОПКА НАПИСАТЬ В ИНСТАГРАМ -----------
 
-                        if (placeInfo.value.instagram != null && placeInfo.value.instagram != INSTAGRAM_URL) {
+                        if (placeInfo.value.instagram != null && placeInfo.value.instagram != "" && placeInfo.value.instagram != "null") {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!, INSTAGRAM_URL) },
+                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!, INSTAGRAM_URL) }, // Функция перейти на инстаграм
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)
@@ -556,10 +559,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
 
-                        if (placeInfo.value.telegram != null && placeInfo.value.telegram != TELEGRAM_URL) {
+                        if (placeInfo.value.telegram != null && placeInfo.value.telegram != "" && placeInfo.value.telegram != "null") {
 
                             IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!, TELEGRAM_URL) },
+                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!, TELEGRAM_URL) }, // Функция написать в телеграм
                                 modifier = Modifier.background(
                                     Grey90,
                                     shape = RoundedCornerShape(50)
@@ -580,24 +583,27 @@ class PlaceViewScreen (val act: MainActivity) {
                             )
 
                         }
-
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+
+
                     // ---------- ОПИСАНИЕ -------------
 
-                    Text(
-                        text = stringResource(id = R.string.about_meeting),
-                        style = Typography.titleMedium,
-                        color = Grey10
-                    )
 
-                    Spacer(modifier = Modifier.height(20.dp))
 
-                    if (placeInfo.value.placeDescription != null) {
+                    if (placeInfo.value.placeDescription != null && placeInfo.value.placeDescription != "" && placeInfo.value.placeDescription != "null") {
+
+                        Text(
+                            text = "О заведении",
+                            style = Typography.titleMedium,
+                            color = Grey10
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
                             text = placeInfo.value.placeDescription!!,
@@ -612,8 +618,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
             item {
 
+                // ---- МЕРОПРИЯТИЯ ЭТОГО ЗАВЕДЕНИЯ -----
+
                 Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     text = "Мероприятия этого заведения",
                     style = Typography.titleMedium,
                     color = Grey10
@@ -626,7 +634,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 items(meetingsList.value) { item ->
 
-                    Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                         // сам шаблон карточки мероприятия
                         act.meetingsCard.MeetingCard(
                             navController = navController,
@@ -644,102 +652,10 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     Column(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 20.dp)) {
+                        .padding(horizontal = 20.dp, vertical = 20.dp)) {
 
                         Text(
                             text = "У этого места пока нет мероприятий",
-                            style = Typography.bodyMedium,
-                            color = Grey10
-                        )
-
-                    }
-
-                }
-
-            } else {
-
-                // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
-
-                item {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-
-                        // крутилка индикатор
-
-                        CircularProgressIndicator(
-                            color = PrimaryColor,
-                            strokeWidth = 3.dp,
-                            modifier = Modifier.size(40.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(20.dp))
-
-                        // текст рядом с крутилкой
-
-                        Text(
-                            text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
-                        )
-
-                    }
-
-                }
-
-            }
-
-            item {
-
-                Image(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp).height(200.dp),
-                    painter = painterResource(id = R.drawable.korn_concert),
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop
-
-                    )
-
-            }
-
-            item {
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    text = "Акции этого заведения",
-                    style = Typography.titleMedium,
-                    color = Grey10
-                )
-            }
-
-            if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStock)){
-
-                // для каждого элемента из списка указываем шаблон для отображения
-
-                items(stockList.value) { item ->
-
-                    Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                        // сам шаблон карточки акции
-                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
-                    }
-                }
-
-            } else if (stockList.value == listOf(defaultStock)) {
-
-                // ----- ЕСЛИ НЕТ АКЦИЙ -------
-
-                item {
-
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 20.dp)) {
-
-                        Text(
-                            text = "У этого места пока нет акций",
                             style = Typography.bodyMedium,
                             color = Grey10
                         )
@@ -786,8 +702,99 @@ class PlaceViewScreen (val act: MainActivity) {
 
             }
 
+            item {
+
+                // ------- РЕКЛАМНЫЙ БАННЕР -------
+
+                Image(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp).height(200.dp),
+                    painter = painterResource(id = R.drawable.korn_concert),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop
+
+                    )
+
+            }
+
+            item {
+
+                // ---- АКЦИИ ЭТОГО ЗАВЕДЕНИЯ -----
+
+                Text(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    text = "Акции этого заведения",
+                    style = Typography.titleMedium,
+                    color = Grey10
+                )
+            }
+
+            if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStock)){
+
+                // для каждого элемента из списка указываем шаблон для отображения
+
+                items(stockList.value) { item ->
+
+                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        // сам шаблон карточки акции
+                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                    }
+                }
+
+            } else if (stockList.value == listOf(defaultStock)) {
+
+                // ----- ЕСЛИ НЕТ АКЦИЙ -------
+
+                item {
+
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 20.dp)) {
+
+                        Text(
+                            text = "У этого места пока нет акций",
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+
+                    }
+
+                }
+
+            } else {
+
+                // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                item {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        // крутилка индикатор
+
+                        CircularProgressIndicator(
+                            color = PrimaryColor,
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(40.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        // текст рядом с крутилкой
+
+                        Text(
+                            text = stringResource(id = R.string.ss_loading),
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+
+                    }
+                }
+            }
         }
-
     }
-
 }

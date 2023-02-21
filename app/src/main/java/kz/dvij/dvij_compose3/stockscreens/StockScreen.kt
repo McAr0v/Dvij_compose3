@@ -33,8 +33,6 @@ class StockScreen(val act: MainActivity) {
     private val databaseManager = StockDatabaseManager(act = act)
     private val stockCard = StockCard(act)
 
-    private val user = act.mAuth.currentUser
-
     // создаем акцию по умолчанию
     private val default = StockAdsClass (
         description = "Default"
