@@ -635,7 +635,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
-            dataResult = if (filledMeeting.data != "" && filledMeeting.data != null && createOrEdit == "0"){
+            dataResult = if (filledMeeting.data != "" && filledMeeting.data != null && createOrEdit != "0"){
 
                 dataPicker(act, filledMeeting.data) // Если есть данные о мероприятии , передаем дату из мероприятия
 
@@ -651,7 +651,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_start_time)) // подпись перед формой
 
-            timeStartResult = if (filledMeeting.startTime != "" && filledMeeting.startTime != null && createOrEdit == "0"){
+            timeStartResult = if (filledMeeting.startTime != "" && filledMeeting.startTime != null && createOrEdit != "0"){
 
                 timePicker(filledMeeting.startTime) // Если есть данные о мероприятии , передаем время из мероприятия
 
@@ -668,7 +668,7 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_finish_time)) // подпись перед формой
 
-            timeFinishResult = if (filledMeeting.finishTime != "" && filledMeeting.finishTime != null && createOrEdit == "0"){
+            timeFinishResult = if (filledMeeting.finishTime != "" && filledMeeting.finishTime != null && createOrEdit != "0"){
 
                 timePicker(filledMeeting.finishTime) // Если есть данные о мероприятии , передаем время из мероприятия
 
