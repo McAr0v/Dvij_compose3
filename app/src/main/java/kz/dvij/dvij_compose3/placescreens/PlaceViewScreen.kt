@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.placescreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,13 +34,15 @@ import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
+import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class PlaceViewScreen (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun PlaceViewScreen (key: String, navController: NavController, meetingKey: MutableState<String>, stockKey: MutableState<String>){
+    fun PlaceViewScreen (key: String, navController: NavController, meetingKey: MutableState<String>, stockKey: MutableState<String>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>){
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
@@ -149,12 +152,52 @@ class PlaceViewScreen (val act: MainActivity) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(20.dp),
 
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Top
 
                 ) {
+
+                    Button(
+
+                        onClick = {
+
+                            placeInfo.value.placeKey?.let {
+                                act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
+
+                                    filledPlaceInfoFromAct.value = place
+                                    navController.navigate(EDIT_PLACES_SCREEN)
+
+                                }
+                            }
+
+
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth() // кнопка на всю ширину
+                            .height(50.dp)// высота - 50
+                            .padding(horizontal = 30.dp), // отступы от краев
+                        shape = RoundedCornerShape(50), // скругление углов
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = SuccessColor, // цвет кнопки
+                            contentColor = Grey100 // цвет контента на кнопке
+                        )
+                    ) {
+                        Text(
+                            text = "Редактировать",
+                            style = Typography.labelMedium
+                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        androidx.compose.material.Icon(
+                            painter = painterResource(id = R.drawable.ic_publish),
+                            contentDescription = stringResource(id = R.string.cd_publish_button),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
 
                     // -------- НАЗВАНИЕ ЗАВЕДЕНИЯ ----------
 

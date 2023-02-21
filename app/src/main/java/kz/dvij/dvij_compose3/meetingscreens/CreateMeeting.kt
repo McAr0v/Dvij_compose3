@@ -42,12 +42,6 @@ class CreateMeeting(private val act: MainActivity) {
 
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
-    // ---- МЕРОПРИЯТИЕ ПО УМОЛЧАНИЮ ----------
-
-    val default = MeetingsAdsClass (
-        description = "Default"
-    )
-
     private val choosePlaceDialog = ChoosePlaceDialog(act)
 
 
@@ -641,21 +635,48 @@ class CreateMeeting(private val act: MainActivity) {
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
-            dataResult = dataPicker(act, filledMeeting.data ?: "Empty") // Если есть данные о мероприятии , передаем дату из мероприятия
+            dataResult = if (filledMeeting.data != "" && filledMeeting.data != null && createOrEdit == "0"){
+
+                dataPicker(act, filledMeeting.data) // Если есть данные о мероприятии , передаем дату из мероприятия
+
+            } else {
+
+                dataPicker(act) // Если есть данные о мероприятии , передаем дату из мероприятия
+
+            }
+
 
 
             // ---- ВРЕМЯ НАЧАЛА ------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_start_time)) // подпись перед формой
 
-            timeStartResult = timePicker(filledMeeting.startTime ?: "Empty") // Если есть данные о мероприятии , передаем время из мероприятия
+            timeStartResult = if (filledMeeting.startTime != "" && filledMeeting.startTime != null && createOrEdit == "0"){
+
+                timePicker(filledMeeting.startTime) // Если есть данные о мероприятии , передаем время из мероприятия
+
+            } else {
+
+                timePicker()
+
+            }
+
+
 
 
             // ---- ВРЕМЯ КОНЦА ------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_finish_time)) // подпись перед формой
 
-            timeFinishResult = timePicker(filledMeeting.finishTime ?: "Empty") // Если есть данные о мероприятии , передаем время из мероприятия
+            timeFinishResult = if (filledMeeting.finishTime != "" && filledMeeting.finishTime != null && createOrEdit == "0"){
+
+                timePicker(filledMeeting.finishTime) // Если есть данные о мероприятии , передаем время из мероприятия
+
+            } else {
+
+                timePicker()
+
+            }
 
 
             // ---- ЦЕНА ------

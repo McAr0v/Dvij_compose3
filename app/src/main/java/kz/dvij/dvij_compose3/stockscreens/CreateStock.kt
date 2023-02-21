@@ -410,6 +410,8 @@ class CreateStock (val act: MainActivity) {
             // НО ПОЛЬЗОВАТЕЛЬ ВЫБРАЛ ЗАВЕДЕНИЕ ИЗ СПИСКА
 
             if (changeTypePlace.value){
+                finishHeadlinePlace = ""
+                finishAddressPlace = ""
                 headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
                 addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
                 !changeTypePlace.value // Говорим, что мы сбросили значения, теперь в них ничего нет
@@ -491,15 +493,41 @@ class CreateStock (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
 
-            var startDay = dataPicker(act = act, inputDate = filledStock.startDate ?: "Empty") // выбор даты начала
+            var startDay = if (filledStock.startDate != null && filledStock.startDate != "null" && filledStock.startDate != ""){
+
+                dataPicker(act = act, inputDate = filledStock.startDate) // выбор даты начала
+
+            } else {
+
+                dataPicker(act = act) // выбор даты начала
+
+            }
+
 
             SpacerTextWithLine(headline = "Дата завершения акции") // подпись перед формой
 
-            var finishDay = dataPicker(act = act, inputDate = filledStock.finishDate ?: "Empty") // выбор даты завершения
+            var finishDay = if (filledStock.finishDate != null && filledStock.finishDate != "null" && filledStock.finishDate != "") {
+
+                dataPicker(act = act, inputDate = filledStock.finishDate) // выбор даты завершения
+
+            } else {
+
+                dataPicker(act = act) // выбор даты завершения
+
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            var description = fieldDescriptionComponent(act = act, description = filledStock.description ?: "Empty") // ФОРМА ОПИСАНИЯ Акции
+            val description = if (filledStock.description != null && filledStock.description != "null" && filledStock.description != ""){
+
+                fieldDescriptionComponent(act = act, description = filledStock.description) // ФОРМА ОПИСАНИЯ Акции
+
+            } else {
+
+                fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ Акции
+
+            }
+
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 
@@ -518,6 +546,8 @@ class CreateStock (val act: MainActivity) {
 
                     // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
 
+                    Log.d ("MyLog", "${filledStock.image}")
+
                     val checkData = checkDataOnCreateStock(
                         image1 = image1,
                         headline = headline,
@@ -525,7 +555,11 @@ class CreateStock (val act: MainActivity) {
                         finishDay = finishDay,
                         description = description,
                         category = category,
-                        city = "Empty"//city
+                        city = city,
+                        placeKey = chosenPlace.value.placeKey,
+                        inputAddressPlace = finishAddressPlace,
+                        inputHeadlinePlace = finishHeadlinePlace,
+                        imageUriFromDb = filledStock.image ?: "Empty"
                     )
 
                     if (checkData != 0) {
@@ -550,62 +584,64 @@ class CreateStock (val act: MainActivity) {
 
                         GlobalScope.launch(Dispatchers.IO){
 
-                            // запускаем сжатие изображения
-                            val compressedImage = act.photoHelper.compressImage(act, image1!!)
-
-                            // после сжатия запускаем функцию загрузки сжатого фота в Storage
-
-                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
-
-
-                                Log.d("MyLog", it)
-                                // В качестве колбака придет ссылка на изображение в Storage
-
-                                // Запускаем корутину и публикуем акцию
+                            if (image1 == null){
 
                                 GlobalScope.launch(Dispatchers.Main) {
 
-                                    // заполняем акцию
+                                    val filledStockForDb = StockAdsClass (
 
-                                    val filledStock = StockAdsClass (
-
-                                        image = it,
+                                        image = filledStock.image,
                                         headline = headline,
                                         description = description,
                                         category = category,
-                                        keyStock = stockDatabaseManager.stockDatabase.push().key,
-                                        //keyPlace = placeInfo.placeKey ?: "Empty",
-                                        keyCreator = auth.uid,
-                                        city = "Empty",//city,
+                                        keyStock = filledStock.keyStock,
+                                        keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                        keyCreator = filledStock.keyCreator ?: "Empty",
+                                        city = city,
                                         startDate = startDay,
                                         finishDate = finishDay,
-                                        inputHeadlinePlace = headlinePlace.value,
-                                        inputAddressPlace = addressPlace.value
+                                        inputHeadlinePlace = finishHeadlinePlace,
+                                        inputAddressPlace = finishAddressPlace
 
-                                            )
-
-                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+                                    )
 
                                     if (auth.uid != null) {
 
                                         // Если зарегистрирован, то запускаем функцию публикации акции
 
-                                        stockDatabaseManager.publishStock(filledStock = filledStock) { result ->
+                                        stockDatabaseManager.publishStock(filledStock = filledStockForDb) { result ->
 
                                             // в качестве колбака придет булин. Если опубликована акция то:
 
                                             if (result) {
 
-                                                // сбрасываем выбранное заведение, чтобы потом не отображался последний выбор
+                                                startDay = ""
+                                                finishDay = ""
+                                                city = "Выбери город"
+                                                category = "Выбери категорию"
+                                                finishAddressPlace = ""
+                                                finishHeadlinePlace = ""
+                                                chosenStockCategoryCreate.value = "Выбери категорию"
+                                                chosenCityCreateWithoutUser.value = "Выбери город"
 
-                                                choosePlaceDialog.chosenPlace = PlacesAdsClass(placeName = "Выбери заведение")
-                                                //placeInfo = PlacesAdsClass (placeName = "Выбери заведение")
+                                                chosenPlace.value = PlacesAdsClass(
 
-                                                // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
-                                                act.categoryDialog.chosenStockCategory = CategoriesList ("Выбери категорию", "Default")
+                                                    logo = "",
+                                                    placeKey = "",
+                                                    placeName = "Выбери заведение",
+                                                    placeDescription = "",
+                                                    phone = "",
+                                                    whatsapp = "",
+                                                    telegram = "",
+                                                    instagram = "",
+                                                    category = "",
+                                                    city = "",
+                                                    address = "",
+                                                    owner = "",
+                                                    openTime = "",
+                                                    closeTime = ""
 
-                                                // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
-                                                act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+                                                )
 
                                                 navController.navigate(STOCK_ROOT) {popUpTo(0)} // переходим на страницу акций
 
@@ -629,6 +665,135 @@ class CreateStock (val act: MainActivity) {
 
                                             }
 
+                                        }
+
+                                    }
+
+                                }
+
+                            } else {
+
+                                // запускаем сжатие изображения
+                                val compressedImage = act.photoHelper.compressImage(act, image1)
+
+                                // после сжатия запускаем функцию загрузки сжатого фота в Storage
+
+                                act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
+
+
+                                    Log.d("MyLog", it)
+                                    // В качестве колбака придет ссылка на изображение в Storage
+
+                                    // Запускаем корутину и публикуем акцию
+
+                                    GlobalScope.launch(Dispatchers.Main) {
+
+                                        // заполняем акцию
+
+                                        val filledStockForDb = if (createOrEdit != "0"){
+
+                                            StockAdsClass (
+
+                                                image = it,
+                                                headline = headline,
+                                                description = description,
+                                                category = category,
+                                                keyStock = filledStock.keyStock,
+                                                keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                                keyCreator = filledStock.keyCreator,
+                                                city = city,
+                                                startDate = startDay,
+                                                finishDate = finishDay,
+                                                inputHeadlinePlace = finishHeadlinePlace,
+                                                inputAddressPlace = finishAddressPlace
+
+                                            )
+
+                                        } else {
+
+                                            StockAdsClass (
+
+                                                image = it,
+                                                headline = headline,
+                                                description = description,
+                                                category = category,
+                                                keyStock = stockDatabaseManager.stockDatabase.push().key,
+                                                keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                                keyCreator = auth.uid,
+                                                city = city,
+                                                startDate = startDay,
+                                                finishDate = finishDay,
+                                                inputHeadlinePlace = finishHeadlinePlace,
+                                                inputAddressPlace = finishAddressPlace
+
+                                            )
+
+                                        }
+
+
+                                        // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                        if (auth.uid != null) {
+
+                                            // Если зарегистрирован, то запускаем функцию публикации акции
+
+                                            stockDatabaseManager.publishStock(filledStock = filledStockForDb) { result ->
+
+                                                // в качестве колбака придет булин. Если опубликована акция то:
+
+                                                if (result) {
+
+                                                    startDay = ""
+                                                    finishDay = ""
+                                                    city = "Выбери город"
+                                                    category = "Выбери категорию"
+                                                    finishAddressPlace = ""
+                                                    finishHeadlinePlace = ""
+                                                    chosenStockCategoryCreate.value = "Выбери категорию"
+                                                    chosenCityCreateWithoutUser.value = "Выбери город"
+
+                                                    chosenPlace.value = PlacesAdsClass(
+
+                                                        logo = "",
+                                                        placeKey = "",
+                                                        placeName = "Выбери заведение",
+                                                        placeDescription = "",
+                                                        phone = "",
+                                                        whatsapp = "",
+                                                        telegram = "",
+                                                        instagram = "",
+                                                        category = "",
+                                                        city = "",
+                                                        address = "",
+                                                        owner = "",
+                                                        openTime = "",
+                                                        closeTime = ""
+
+                                                    )
+
+                                                    navController.navigate(STOCK_ROOT) {popUpTo(0)} // переходим на страницу акций
+
+                                                    // показываем ТОСТ
+                                                    Toast.makeText(
+                                                        act,
+                                                        "Твоя акция успешно опубликована",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else {
+
+                                                    // если произошла ошибка и акция не опубликовалась то:
+
+                                                    // Показываем тост
+                                                    Toast.makeText(
+                                                        act,
+                                                        act.resources.getString(R.string.error_text),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+
+                                            }
                                         }
                                     }
                                 }

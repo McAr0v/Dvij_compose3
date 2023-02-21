@@ -149,63 +149,68 @@ class MeetingViewScreen(val act: MainActivity) {
 
             ) {
 
-                Button(
+                if (meetingInfo.value.ownerKey == act.mAuth.uid){
 
-                    onClick = {
+                    Button(
 
-                        meetingInfo.value.key?.let {
-                            act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
+                        onClick = {
 
-                                Log.d("MyLog", "Заполненное заведение до ${filledPlaceInfoFromAct.value}")
+                            meetingInfo.value.key?.let {
+                                act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
 
-                                if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
+                                    Log.d("MyLog", "Заполненное заведение до ${filledPlaceInfoFromAct.value}")
 
-                                    filledPlaceInfoFromAct.value = placeInfo.value
+                                    if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
 
-                                } else {
+                                        filledPlaceInfoFromAct.value = placeInfo.value
 
-                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
-                                        placeName = meeting.headlinePlaceInput,
-                                        address = meeting.addressPlaceInput
-                                    )
+                                    } else {
+
+                                        filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                            placeName = meeting.headlinePlaceInput,
+                                            address = meeting.addressPlaceInput
+                                        )
+
+                                    }
+
+                                    Log.d("MyLog", "Заполненное заведение после ${filledPlaceInfoFromAct.value}")
+
+                                    filledMeetingInfoFromAct.value = meeting
+                                    navController.navigate(EDIT_MEETINGS_SCREEN)
+
 
                                 }
-
-                                Log.d("MyLog", "Заполненное заведение после ${filledPlaceInfoFromAct.value}")
-
-                                filledMeetingInfoFromAct.value = meeting
-                                navController.navigate(EDIT_MEETINGS_SCREEN)
-
-
                             }
-                        }
 
 
 
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка на всю ширину
-                        .height(50.dp)// высота - 50
-                        .padding(horizontal = 30.dp), // отступы от краев
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = SuccessColor, // цвет кнопки
-                        contentColor = Grey100 // цвет контента на кнопке
-                    )
-                ) {
-                    Text(
-                        text = "Редактировать",
-                        style = Typography.labelMedium
-                    )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth() // кнопка на всю ширину
+                            .height(50.dp)// высота - 50
+                            .padding(horizontal = 30.dp), // отступы от краев
+                        shape = RoundedCornerShape(50), // скругление углов
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = SuccessColor, // цвет кнопки
+                            contentColor = Grey100 // цвет контента на кнопке
+                        )
+                    ) {
+                        Text(
+                            text = "Редактировать",
+                            style = Typography.labelMedium
+                        )
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_publish),
-                        contentDescription = stringResource(id = R.string.cd_publish_button),
-                        modifier = Modifier.size(20.dp)
-                    )
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_publish),
+                            contentDescription = stringResource(id = R.string.cd_publish_button),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
                 }
+
 
 
                 // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------

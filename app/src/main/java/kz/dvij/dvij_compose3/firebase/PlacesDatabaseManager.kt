@@ -383,6 +383,35 @@ class PlacesDatabaseManager (val act: MainActivity) {
         })
     }
 
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ --------
+
+    fun readOnePlaceFromDataBaseReturnDataClass(key: String, callback: (result: PlacesAdsClass)-> Unit){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
+
+                    val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА заведения
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("placeData") // добираесся до следующей папки внутри - папка с данными о заведении
+                        .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведеиня
+
+                    // если мероприятие не нал и ключ завдения совпадает с ключем из БД, то...
+                    if (place != null && place.placeKey == key) {
+
+                        callback (place)
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
 
 
 }

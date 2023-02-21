@@ -5,18 +5,46 @@ import kz.dvij.dvij_compose3.R
 
 // ----- ФУНКЦИЯ ПРОВЕРКИ ОБЯЗАТЕЛЬНЫХ ДЛЯ ЗАПОЛНЕНИЯ ПОЛЕЙ -----------
 
-fun checkDataOnCreateStock (image1: Uri?, headline: String, startDay: String, finishDay: String, description: String, category: String, city: String): Int{
+fun checkDataOnCreateStock (
+    image1: Uri?,
+    headline: String,
+    startDay: String,
+    finishDay: String,
+    description: String,
+    category: String,
+    city: String,
+    placeKey: String?,
+    inputHeadlinePlace: String,
+    inputAddressPlace: String,
+    imageUriFromDb: String
+): Int{
 
     // Результат в числах, так как возвращает id сообщения для вывода тоста
 
     var result: Int = 0
 
-    if (image1 == null || headline == "" || startDay == "" || finishDay == "" || description == "" || category == "Выбери категорию" || city == "Выбери город") {
+    if(placeKey == "" || placeKey == "null" || placeKey == null){
 
+        if (inputAddressPlace == "" || inputHeadlinePlace == ""){
 
-        if (image1 == null) {
-            result = R.string.cp_no_image
+            result = R.string.cm_choose_place
+
         }
+    }
+
+    if (image1 == null && imageUriFromDb == "") {
+
+        result = R.string.cs_no_image
+
+    }
+
+    if (image1 == null && imageUriFromDb == "Empty") {
+
+        result = R.string.cs_no_image
+
+    }
+
+    if (image1 == null || headline == "" || startDay == "" || finishDay == "" || description == "" || category == "Выбери категорию" || city == "Выбери город") {
 
         if (headline == "") {
             result = R.string.cs_no_headline

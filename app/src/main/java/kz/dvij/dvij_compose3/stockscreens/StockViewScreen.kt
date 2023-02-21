@@ -140,59 +140,65 @@ class StockViewScreen (val act: MainActivity) {
 
             ) {
 
-                Button(
+                if (stockInfo.value.keyCreator == act.mAuth.uid){
 
-                    onClick = {
+                    Button(
 
-                        stockInfo.value.keyStock?.let {
-                            act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(it){ stock ->
+                        onClick = {
 
-                                if (stock.keyPlace != null && stock.keyPlace != "null" && stock.keyPlace != "") {
+                            stockInfo.value.keyStock?.let {
+                                act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(it){ stock ->
 
-                                    filledPlaceInfoFromAct.value = placeInfo.value
+                                    if (stock.keyPlace != null && stock.keyPlace != "null" && stock.keyPlace != "") {
 
-                                } else {
+                                        filledPlaceInfoFromAct.value = placeInfo.value
 
-                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
-                                        placeName = stock.inputHeadlinePlace,
-                                        address = stock.inputAddressPlace
-                                    )
+                                    } else {
+
+                                        filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                            placeName = stock.inputHeadlinePlace,
+                                            address = stock.inputAddressPlace
+                                        )
+
+                                    }
+
+
+
+                                    filledStockInfoFromAct.value = stock
+                                    navController.navigate(EDIT_STOCK_SCREEN)
+
 
                                 }
-
-
-
-                                filledStockInfoFromAct.value = stock
-                                navController.navigate(EDIT_STOCK_SCREEN)
-
-
                             }
-                        }
 
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка на всю ширину
-                        .height(50.dp)// высота - 50
-                        .padding(horizontal = 30.dp), // отступы от краев
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = SuccessColor, // цвет кнопки
-                        contentColor = Grey100 // цвет контента на кнопке
-                    )
-                ) {
-                    Text(
-                        text = "Редактировать",
-                        style = Typography.labelMedium
-                    )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth() // кнопка на всю ширину
+                            .height(50.dp)// высота - 50
+                            .padding(horizontal = 30.dp), // отступы от краев
+                        shape = RoundedCornerShape(50), // скругление углов
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = SuccessColor, // цвет кнопки
+                            contentColor = Grey100 // цвет контента на кнопке
+                        )
+                    ) {
+                        Text(
+                            text = "Редактировать",
+                            style = Typography.labelMedium
+                        )
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
 
-                    androidx.compose.material.Icon(
-                        painter = painterResource(id = R.drawable.ic_publish),
-                        contentDescription = stringResource(id = R.string.cd_publish_button),
-                        modifier = Modifier.size(20.dp)
-                    )
+                        androidx.compose.material.Icon(
+                            painter = painterResource(id = R.drawable.ic_publish),
+                            contentDescription = stringResource(id = R.string.cd_publish_button),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
                 }
+
+
 
 
                 // -------- НАЗВАНИЕ АКЦИИ ----------
@@ -427,7 +433,7 @@ class StockViewScreen (val act: MainActivity) {
 
                 }
 
-                if (stockInfo.value.keyPlace == "Empty"){
+                if (stockInfo.value.keyPlace == "Empty" || stockInfo.value.keyPlace == "" || stockInfo.value.keyPlace == "null" ){
 
                     Text(
                         text = "Место проведения",

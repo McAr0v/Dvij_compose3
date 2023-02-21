@@ -5,18 +5,30 @@ import kz.dvij.dvij_compose3.R
 
 // ----- ФУНКЦИЯ ПРОВЕРКИ ОБЯЗАТЕЛЬНЫХ ДЛЯ ЗАПОЛНЕНИЯ ПОЛЕЙ -----------
 
-fun checkDataOnCreatePlace (image1: Uri?, headline: String, phone: String, openTime: String, closeTime: String, description: String, category: String, city: String, address: String ): Int{
+fun checkDataOnCreatePlace (
+    image1: Uri?,
+    headline: String,
+    phone: String,
+    openTime: String,
+    closeTime: String,
+    description: String,
+    category: String,
+    city: String,
+    address: String,
+    imageUriFromDb: String
+): Int{
 
     // Результат в числах, так как возвращает id сообщения для вывода тоста
 
     var result: Int = 0
 
+    if (image1 == null && imageUriFromDb == "") {
+
+        result = R.string.cp_no_image
+
+    }
+
     if (image1 == null || headline == "" || phone == "+77" || closeTime == "" || openTime == "" || description == "" || category == "Выбери категорию" || city == "Выбери город" || address == "" ) {
-
-
-        if (image1 == null) {
-            result = R.string.cp_no_image
-        }
 
         if (headline == "") {
             result = R.string.cp_no_place_name

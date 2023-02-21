@@ -36,6 +36,7 @@ import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
+import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.functions.checkDataOnCreatePlace
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
@@ -57,14 +58,91 @@ class CreatePlace (val act: MainActivity) {
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RememberReturnType")
     @Composable
-    fun CreatePlaceScreen (navController: NavController, citiesList: MutableState<List<CitiesList>>) {
+    fun CreatePlaceScreen (
+        navController: NavController,
+        citiesList: MutableState<List<CitiesList>>,
+        filledUserInfo: UserInfoClass = UserInfoClass(), // данные пользователя с БД
+        // Заполненое заведение, подаваемое извне. Если не передать, значения по умолчанию:
+        filledPlace: PlacesAdsClass = PlacesAdsClass(
+            placeName = "",
+            placeKey = "",
+            logo = "",
+            placeDescription = "",
+            phone = "",
+            whatsapp = "",
+            telegram = "",
+            instagram = "",
+            category = "",
+            city = "",
+            address = "",
+            owner = "",
+            openTime = "",
+            closeTime = ""
+        ),
 
-        var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
-        var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
+        // Тип страницы - редактирование или создание
+        createOrEdit: String
+    ) {
 
-        var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
-        val openCategoryDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог КАТЕГОРИИ
-        val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
+        // ------- ПЕРЕМЕННЫЕ ДЛЯ ВВОДА НОМЕРА -----------
+
+        // ПУСТОЙ ТЕЛЕФОН // Переменная, если нет телефона ни в пользователе, ни в мероприятии. ОБЫЧНО ТАК В РЕЖИМЕ СОЗДАНИЯ
+        var phoneNumber by rememberSaveable { mutableStateOf("7") }
+
+        // АВТОЗАПОЛНЕНИЕ ТЕЛЕФОНА ПРИ СОЗДАНИИ // Переменная, если есть номер в профиле пользователя. Применяется в режиме создания для АВТОЗАПОЛНЕНИЯ
+        var userPhoneNumber by rememberSaveable { mutableStateOf(filledUserInfo.phoneNumber) }
+
+        // ПРИ РЕДАКТИРОВАНИИ МЕРОПРИЯТИЯ // Переменная телефона для связи, пришедшая из БД
+        var phoneNumberFromDb by rememberSaveable {mutableStateOf(filledPlace.phone)}
+
+
+
+        // ------ ПЕРЕМЕННЫЕ ДЛЯ ВВОДА WHATSAPP -------------
+
+        // WHATSAPP ПУСТОЙ ТЕЛЕФОН // Переменная, если нет телефона ни в пользователе, ни в мероприятии. ОБЫЧНО ТАК В РЕЖИМЕ СОЗДАНИЯ
+        var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") }
+
+        // WHATSAPP АВТОЗАПОЛНЕНИЕ ТЕЛЕФОНА ПРИ СОЗДАНИИ // Переменная, если есть номер в профиле пользователя. Применяется в режиме создания для АВТОЗАПОЛНЕНИЯ
+        var userWhatsappNumber by rememberSaveable { mutableStateOf(filledUserInfo.whatsapp) }
+
+        // WHATSAPP ПРИ РЕДАКТИРОВАНИИ МЕРОПРИЯТИЯ // Переменная телефона для связи, пришедшая из БД
+        var phoneNumberWhatsappFromDb by rememberSaveable {mutableStateOf(filledPlace.whatsapp)}
+
+
+        // --------- ПЕРЕМЕННЫЕ ДЛЯ ВЫБОРА КАТЕГОРИИ МЕРОПРИЯТИЯ ------------
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
+        val chosenPlaceCategoryCreate = remember {mutableStateOf("Выбери категорию")}
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПРИШЕДШАЯ ИЗ БД
+        val chosenPlaceCategoryEdit = remember {mutableStateOf<String>(filledPlace.category!!)}
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        var category by rememberSaveable { mutableStateOf("Выбери категорию") }
+
+
+
+        // --- ПЕРЕМЕННЫЕ ДИАЛОГОВ ---
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
+        val openCityDialog = remember { mutableStateOf(false) } // диалог ГОРОДА
+
+        // --- ПЕРЕМЕННЫЕ ГОРОДА ---
+
+        // Выбранный город из данных пользователя. Используется при создании
+        val chosenCityCreateWithUser = remember {mutableStateOf(filledUserInfo.city!!)}
+
+        // Значение города по умолчанию
+        val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
+
+        // Выбранный город из данных мероприятия. Используется при редактировании
+        val chosenCityEdit = remember {mutableStateOf<String>(filledPlace.city!!)}
+
+        // Переменная, передаваемая в БД
+        var city by rememberSaveable { mutableStateOf("Выбери город") }
+
+
 
         // -------------- СОДЕРЖИМОЕ СТРАНИЦЫ -----------------
 
@@ -91,75 +169,234 @@ class CreatePlace (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Логотип заведения") // подпись перед формой
 
-            val image1 = chooseImageDesign() // Изображение заведения
+            val image1 = if (filledPlace.logo != null && filledPlace.logo != "" && createOrEdit != "0"){
+
+                // Если при редактировании есть картинка, подгружаем картинку
+                chooseImageDesign(filledPlace.logo)
+
+            } else {
+
+                // Если нет - стандартный выбор картинки
+                chooseImageDesign()
+
+            }
 
             SpacerTextWithLine(headline = "Название заведения") // подпись перед формой
 
-            val headline = fieldHeadlineComponent(act = act) // форма заголовка
+            val headline = if (filledPlace.placeName != null && filledPlace.placeName != "" && createOrEdit != "0"){
+                // Если при редактировании есть заголовок, заполняем его в форму
+                fieldHeadlineComponent(act = act, filledPlace.placeName)
+            } else {
+                // Если нет - поле ввода пустое
+                fieldHeadlineComponent(act = act) // форма заголовка
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
-            val category = act.categoryDialog.placeCategorySelectButton { openCategoryDialog.value = true }.categoryName.toString() // Кнопка выбора категории
+            if (filledPlace.category != null && filledPlace.category != "Выбери категорию" && filledPlace.category != "" && createOrEdit != "0") {
+                // Если при редактировании есть категория, передаем ее в кнопку
+                category = act.categoryDialog.meetingCategorySelectButton(categoryName = chosenPlaceCategoryEdit) { openCategoryDialog.value = true }.toString()
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
-
-            // val city = act.chooseCityNavigation.citySelectButton {openCityDialog.value = true}.cityName.toString() // Кнопка выбора города
-
-            SpacerTextWithLine(headline = "Адрес") // подпись перед формой
-
-            val address = fieldHeadlineComponent(act = act) // форма заголовка
+            } else {
+                // Если нет - передаем пустое значение
+                category = act.categoryDialog.meetingCategorySelectButton (categoryName = chosenPlaceCategoryCreate) { openCategoryDialog.value = true }.toString()
+            }
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
             if (openCategoryDialog.value) {
-                act.categoryDialog.CategoryPlaceChooseDialog(categoriesList) {
-                    openCategoryDialog.value = false
+
+                // ЕСЛИ РЕДАКТИРОВАНИЕ
+                if (createOrEdit != "0"){
+                    // Передаем переменную, содержащую название категории из БД
+                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenPlaceCategoryEdit, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
+
+                } else { // Если создание
+
+                    // Передаем переменную, в которую поместим категорию по умолчанию
+                    act.categoryDialog.CategoryMeetingChooseDialog(categoryName = chosenPlaceCategoryCreate, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
                 }
+            }
+
+            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
+
+            // Если при редактировании в мероприятии есть город
+
+            if (filledPlace.city != null && filledPlace.city != "Выбери город" && filledPlace.city != "" && createOrEdit != "0") {
+
+                // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString()
+
+            } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
+
+                // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString()
+
+            } else {
+
+                // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+
             }
 
             // --- САМ ДИАЛОГ ВЫБОРА ГОРОДА -----
 
-            /*if (openCityDialog.value) {
-                act.chooseCityNavigation.CityChooseDialog(citiesList) {
-                    openCityDialog.value = false
+            if (openCityDialog.value) {
+
+                if (filledPlace.city != null && filledPlace.city != "Выбери город" && filledPlace.city != "" && createOrEdit != "0"){
+
+                    // Если при редактировании в мероприятии есть город, Передаем ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityEdit, citiesList) {
+                        openCityDialog.value = false
+                    }
+
+                } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0"){
+
+                    // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithUser, citiesList) {
+                        openCityDialog.value = false
+                    }
+
+                } else {
+
+                    // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
+                    act.chooseCityNavigation.CityChooseDialog(cityName = chosenCityCreateWithoutUser, citiesList) {
+                        openCityDialog.value = false
+                    }
                 }
-            }*/
+            }
+
+            SpacerTextWithLine(headline = "Адрес") // подпись перед формой
+
+            val address = if (filledPlace.address != null && filledPlace.address != "" && createOrEdit != "0"){
+                // Если при редактировании есть заголовок, заполняем его в форму
+                fieldHeadlineComponent(act = act, filledPlace.address)
+            } else {
+                // Если нет - поле ввода пустое
+                fieldHeadlineComponent(act = act) // форма заголовка
+            }
 
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
 
-            var phone = fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it }) // форма телефона
+            val phone = if (phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != "" && phoneNumberFromDb != null && createOrEdit != "0"){
+
+                // Если при редактировании у мероприятия есть телефон, передаем ПЕРЕМЕННУЮ НОМЕРА С БД
+                fieldPhoneComponent(phoneNumberFromDb!!, onPhoneChanged = { phoneNumberFromDb = it })
+
+            } else if (filledUserInfo.phoneNumber != "+7" && filledUserInfo.phoneNumber != "+77" && filledUserInfo.phoneNumber != "" && filledUserInfo.phoneNumber != null && createOrEdit == "0") {
+
+                // Если при создании у пользователя есть телефон, передаем ПЕРЕМЕННУЮ НОМЕРА ПОЛЬЗОВАТЕЛЯ
+                fieldPhoneComponent(userPhoneNumber!!, onPhoneChanged = { userPhoneNumber = it })
+
+            } else {
+
+                // Во всех остальных случаях передаем переменную пустого номера
+                fieldPhoneComponent(phoneNumber, onPhoneChanged = { phoneNumber = it })
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_whatsapp)) // подпись перед формой
 
 
             // --- ФОРМА WHATSAPP ----
 
-            var whatsapp = fieldPhoneComponent(
-                phoneNumberWhatsapp,
-                onPhoneChanged = { phoneNumberWhatsapp = it },
-                icon = painterResource(id = R.drawable.whatsapp)
-            )
+            val whatsapp = if (phoneNumberWhatsappFromDb != null && phoneNumberWhatsappFromDb != "+7" && phoneNumberWhatsappFromDb != "+77" && phoneNumberWhatsappFromDb != "" && createOrEdit != "0"){
+
+                // Если при редактировании у мероприятия есть whatsapp, передаем ПЕРЕМЕННУЮ WHATSAPP С БД
+                fieldPhoneComponent(phoneNumberWhatsappFromDb!!, onPhoneChanged = { phoneNumberWhatsappFromDb = it }, icon = painterResource(id = R.drawable.whatsapp))
+
+            } else if (userWhatsappNumber != "+7" && userWhatsappNumber != "+77" && userWhatsappNumber != "" && userWhatsappNumber != null && createOrEdit == "0") {
+
+                // Если при создании у пользователя есть whatsapp, передаем ПЕРЕМЕННУЮ WHATSAPP ПОЛЬЗОВАТЕЛЯ
+                fieldPhoneComponent(userWhatsappNumber!!, onPhoneChanged = { userWhatsappNumber = it }, icon = painterResource(id = R.drawable.whatsapp))
+
+            } else {
+
+                // Во всех остальных случаях передаем переменную пустого whatsapp
+                fieldPhoneComponent(phoneNumberWhatsapp, onPhoneChanged = { phoneNumberWhatsapp = it }, icon = painterResource(id = R.drawable.whatsapp))
+
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
 
-            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram) // форма инстаграма
+            val instagram = if (filledPlace.instagram != "" && filledPlace.instagram != null && createOrEdit != "0") {
+
+                // Если при редактировании у мероприятия есть инстаграм, передаем его
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledPlace.instagram)
+
+            } else if (filledUserInfo.instagram != "" && filledUserInfo.instagram != null && createOrEdit == "0") {
+
+                // Если при создании у пользователя есть инстаграм, передаем его
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledUserInfo.instagram)
+
+            } else {
+
+                // Во всех остальных случаях ничего не передаем
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram) // форма телеграма
+            val telegram = if (filledPlace.telegram != "" && filledPlace.telegram != null && createOrEdit != "0") {
+
+                // Если при редактировании у мероприятия есть telegram, передаем его
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledPlace.telegram) // форма телеграма
+
+            } else if (filledUserInfo.telegram != "" && filledUserInfo.telegram != null && createOrEdit == "0") {
+
+                // Если при создании у пользователя есть telegram, передаем его
+                fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo.telegram) // форма телеграма
+
+            } else {
+
+                // Во всех остальных случаях ничего не передаем
+                fieldInstagramComponent(act = act, icon = R.drawable.telegram)
+
+            }
 
             SpacerTextWithLine(headline = "Начало рабочего дня") // подпись перед формой
 
-            var openTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+            val openTimeResult = if (filledPlace.openTime != "" && filledPlace.openTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.openTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
 
             SpacerTextWithLine(headline = "Конец рабочего дня") // подпись перед формой
 
-            var closeTimeResult = timePicker() // ВЫБОР ВРЕМЕНИ - Когда закрывается заведение
+            val closeTimeResult = if (filledPlace.closeTime != "" && filledPlace.closeTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.closeTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
-            var description = fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ ЗАВЕДЕНИЯ
+            val description = if (filledPlace.placeDescription != "" && filledPlace.placeDescription != null && createOrEdit != "0"){
+
+                // Если при редактировании есть описание, передаем его
+                fieldDescriptionComponent(act = act, filledPlace.placeDescription) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+
+            } else {
+
+                // Если нет - пустое поле
+                fieldDescriptionComponent(act = act)
+
+            }
 
             Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
 
@@ -185,8 +422,9 @@ class CreatePlace (val act: MainActivity) {
                         closeTime = closeTimeResult,
                         description = description,
                         category = category,
-                        city = "Empty",//city,
-                        address = address
+                        city = city,
+                        address = address,
+                        imageUriFromDb = filledPlace.logo ?: ""
                     )
 
                     if (checkData != 0) {
@@ -211,41 +449,129 @@ class CreatePlace (val act: MainActivity) {
 
                         GlobalScope.launch(Dispatchers.IO){
 
-                            // запускаем сжатие изображения
-                            val compressedImage = act.photoHelper.compressImage(act, image1!!)
+                            if (image1 == null){
 
-                            // после сжатия запускаем функцию загрузки сжатого фота в Storage
+                                GlobalScope.launch(Dispatchers.Main) {
 
-                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
+                                    // заполняем заведение
+
+                                    val filledPlaceForDb = PlacesAdsClass(
+
+                                        logo = filledPlace.logo,
+                                        placeName = headline,
+                                        placeDescription = description,
+                                        phone = phone,
+                                        whatsapp = whatsapp,
+                                        telegram = telegram,
+                                        instagram = instagram,
+                                        category = category,
+                                        city = city,
+                                        address = address,
+                                        placeKey = filledPlace.placeKey,
+                                        owner = filledPlace.owner,
+                                        openTime = openTimeResult,
+                                        closeTime = closeTimeResult
+
+                                    )
+
+                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                    if (auth.uid != null) {
+
+                                        // Если зарегистрирован, то запускаем функцию публикации заведения
+
+                                        placesDatabaseManager.publishPlace(filledPlaceForDb) { result ->
+
+                                            // в качестве колбака придет булин. Если опубликовано заведение то:
+
+                                            if (result) {
 
 
-                                Log.d("MyLog", it)
-                                // В качестве колбака придет ссылка на изображение в Storage
 
-                                // Запускаем корутину и публикуем заведение
+                                                navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
+
+                                                // показываем ТОСТ
+                                                Toast.makeText(
+                                                    act,
+                                                    "Твое заведение успешно опубликовано",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            } else {
+
+                                                // если произошла ошибка и заведение не опубликовалось то:
+
+                                                // Показываем тост
+                                                Toast.makeText(
+                                                    act,
+                                                    act.resources.getString(R.string.error_text),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                            } else {
+
+                                // запускаем сжатие изображения
+                                val compressedImage = act.photoHelper.compressImage(act, image1)
+
+                                // после сжатия запускаем функцию загрузки сжатого фота в Storage
+
+                                act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
+
+                                    // Запускаем корутину и публикуем заведение
 
                                     GlobalScope.launch(Dispatchers.Main) {
 
                                         // заполняем заведение
 
-                                        val filledPlace = PlacesAdsClass(
+                                        val filledPlaceForDb = if(createOrEdit == "0"){
 
-                                            logo = it,
-                                            placeName = headline,
-                                            placeDescription = description,
-                                            phone = phone,
-                                            whatsapp = whatsapp,
-                                            telegram = TELEGRAM_URL + telegram,
-                                            instagram = INSTAGRAM_URL + instagram,
-                                            category = category,
-                                            //city = city,
-                                            address = address,
-                                            placeKey = placesDatabaseManager.placeDatabase.push().key,
-                                            owner = auth.uid,
-                                            openTime = openTimeResult,
-                                            closeTime = closeTimeResult
+                                            PlacesAdsClass(
 
-                                        )
+                                                logo = it,
+                                                placeName = headline,
+                                                placeDescription = description,
+                                                phone = phone,
+                                                whatsapp = whatsapp,
+                                                telegram = telegram,
+                                                instagram = instagram,
+                                                category = category,
+                                                city = city,
+                                                address = address,
+                                                placeKey = placesDatabaseManager.placeDatabase.push().key,
+                                                owner = auth.uid,
+                                                openTime = openTimeResult,
+                                                closeTime = closeTimeResult
+
+                                            )
+
+                                        } else {
+
+                                            PlacesAdsClass(
+
+                                                logo = it,
+                                                placeName = headline,
+                                                placeDescription = description,
+                                                phone = phone,
+                                                whatsapp = whatsapp,
+                                                telegram = telegram,
+                                                instagram = instagram,
+                                                category = category,
+                                                city = city,
+                                                address = address,
+                                                placeKey = filledPlace.placeKey,
+                                                owner = filledPlace.owner,
+                                                openTime = openTimeResult,
+                                                closeTime = closeTimeResult
+
+                                            )
+
+                                        }
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
@@ -253,17 +579,11 @@ class CreatePlace (val act: MainActivity) {
 
                                             // Если зарегистрирован, то запускаем функцию публикации заведения
 
-                                            placesDatabaseManager.publishPlace(filledPlace) { result ->
+                                            placesDatabaseManager.publishPlace(filledPlaceForDb) { result ->
 
                                                 // в качестве колбака придет булин. Если опубликовано заведение то:
 
                                                 if (result) {
-
-                                                    // сбрасываем выбранную категорию, чтобы потом не отображался последний выбор категории
-                                                    act.categoryDialog.chosenPlaceCategory = CategoriesList ("Выбери категорию", "Default")
-
-                                                    // сбрасываем выбранный город, чтобы потом не отображался последний выбор города
-                                                    act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
                                                     navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
 
@@ -290,7 +610,11 @@ class CreatePlace (val act: MainActivity) {
                                             }
                                         }
                                     }
+                                }
+
                             }
+
+
                         }
                     }
                 },

@@ -198,6 +198,7 @@
     <string name="cp_no_address">Какой адрес у заведения?</string>
 
     <!-- Создание акции -->
+    <string name="cs_no_image">Нет картинки. Без нее никак не опубликовать акцию :(</string>
     <string name="cs_no_headline">Напиши заголовок акции</string>
     <string name="cs_no_start_day">В какой день начало акции?</string>
     <string name="cs_no_finish_day">В какой день заканчивается акция?</string>
