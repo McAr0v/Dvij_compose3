@@ -1,7 +1,6 @@
 package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,26 +26,29 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
-import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
-import kz.dvij.dvij_compose3.navigation.CREATE_MEETINGS_SCREEN
-import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingViewScreen(val act: MainActivity) {
 
     val placesDatabaseManager = PlacesDatabaseManager(act)
-    val placeCard = PlacesCard(act)
+    private val placeCard = PlacesCard(act)
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun MeetingViewScreen (meetingKey: MutableState<String>, navController: NavController, placeKey: MutableState<String>, filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>){
+    fun MeetingViewScreen (
+        meetingKey: MutableState<String>,
+        navController: NavController,
+        placeKey: MutableState<String>,
+        filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>,
+        filledPlaceInfoFromAct: MutableState<PlacesAdsClass>
+    ){
 
 
         // Переменная, которая содержит в себе информацию о мероприятии
@@ -149,6 +151,8 @@ class MeetingViewScreen(val act: MainActivity) {
 
             ) {
 
+                // КНОПКА РЕДАКТИРОВАТЬ
+
                 if (meetingInfo.value.ownerKey == act.mAuth.uid){
 
                     Button(
@@ -157,8 +161,6 @@ class MeetingViewScreen(val act: MainActivity) {
 
                             meetingInfo.value.key?.let {
                                 act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
-
-                                    Log.d("MyLog", "Заполненное заведение до ${filledPlaceInfoFromAct.value}")
 
                                     if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
 
@@ -170,20 +172,13 @@ class MeetingViewScreen(val act: MainActivity) {
                                             placeName = meeting.headlinePlaceInput,
                                             address = meeting.addressPlaceInput
                                         )
-
                                     }
-
-                                    Log.d("MyLog", "Заполненное заведение после ${filledPlaceInfoFromAct.value}")
 
                                     filledMeetingInfoFromAct.value = meeting
                                     navController.navigate(EDIT_MEETINGS_SCREEN)
 
-
                                 }
                             }
-
-
-
                         },
                         modifier = Modifier
                             .fillMaxWidth() // кнопка на всю ширину
@@ -215,7 +210,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
 
-                if (meetingInfo.value.headline != null) {
+                if (meetingInfo.value.headline != null && meetingInfo.value.headline != "null" && meetingInfo.value.headline != "") {
 
                     Text(
                         text = meetingInfo.value.headline!!,
@@ -226,7 +221,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 // ------- ГОРОД ------------
 
-                if (meetingInfo.value.city != null) {
+                if (meetingInfo.value.city != null && meetingInfo.value.city != "null" && meetingInfo.value.city != "") {
 
                     Text(
                         text = meetingInfo.value.city!!,
@@ -249,7 +244,7 @@ class MeetingViewScreen(val act: MainActivity) {
                     // -------- КАТЕГОРИЯ МЕРОПРИЯТИЯ ----------
 
 
-                    if (meetingInfo.value.category != null) {
+                    if (meetingInfo.value.category != null && meetingInfo.value.category != "null" && meetingInfo.value.category != "" && meetingInfo.value.category != "Выбери категорию") {
 
                         Button(
                             onClick = {
@@ -324,11 +319,11 @@ class MeetingViewScreen(val act: MainActivity) {
                                     if (it) {
 
                                         // Убираем из избранных
-                                        act.meetingDatabaseManager.removeFavouriteMeeting(meetingKey.value) {
+                                        act.meetingDatabaseManager.removeFavouriteMeeting(meetingKey.value) { result ->
 
                                             // Если пришел колбак, что успешно
 
-                                            if (it) {
+                                            if (result) {
 
                                                 iconTextFavColor.value = Grey40 // При нажатии окрашиваем текст и иконку в белый
                                                 buttonFavColor.value = Grey80 // При нажатии окрашиваем кнопку в темно-серый
@@ -342,11 +337,11 @@ class MeetingViewScreen(val act: MainActivity) {
 
                                         // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.meetingDatabaseManager.addFavouriteMeeting(meetingKey.value) {
+                                        act.meetingDatabaseManager.addFavouriteMeeting(meetingKey.value) { inFav ->
 
                                             // Если пришел колбак, что успешно
 
-                                            if (it) {
+                                            if (inFav) {
 
                                                 iconTextFavColor.value = PrimaryColor // При нажатии окрашиваем текст и иконку в черный
                                                 buttonFavColor.value = Grey90_2 // Окрашиваем кнопку в главный цвет
@@ -440,7 +435,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 val tenge = act.getString(R.string.ss_tenge)
 
-                if (meetingInfo.value.price != null){
+                if (meetingInfo.value.price != null && meetingInfo.value.price != "null"){
                     HeadlineAndDesc(
                         headline = if (meetingInfo.value.price == ""){
                             stringResource(id = R.string.free_price)
@@ -503,7 +498,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ---- КНОПКА ПЕРЕХОДА В ИНСТАГРАМ -----------
 
-                    if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != INSTAGRAM_URL) {
+                    if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != "null" && meetingInfo.value.instagram != "") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!, INSTAGRAM_URL) },
@@ -526,7 +521,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
 
-                    if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != TELEGRAM_URL) {
+                    if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != "null" && meetingInfo.value.telegram != "") {
 
                         IconButton(
                             onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!, TELEGRAM_URL) },
@@ -565,8 +560,6 @@ class MeetingViewScreen(val act: MainActivity) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     placeCard.PlaceCardSmall(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
-
-                    //placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -612,7 +605,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (meetingInfo.value.description !=null){
+                if (meetingInfo.value.description !=null && meetingInfo.value.description != "null" && meetingInfo.value.description != "" ){
 
                     Text(
                         text = meetingInfo.value.description!!,

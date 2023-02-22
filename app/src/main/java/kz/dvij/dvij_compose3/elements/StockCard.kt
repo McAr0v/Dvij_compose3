@@ -49,12 +49,12 @@ class StockCard (val act: MainActivity) {
             }
         }
 
-        // Переменная счетчика людей, добавивших в избранное заведение
+        // Переменная счетчика людей, добавивших в избранное акцию
         val favCounter = remember {
             mutableStateOf(0)
         }
 
-        // Переменная счетчика просмотра заведения
+        // Переменная счетчика просмотра акции
         val viewCounter = remember {
             mutableStateOf(0)
         }
@@ -63,7 +63,7 @@ class StockCard (val act: MainActivity) {
             mutableStateOf(StockAdsClass())
         }
 
-        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
+        // Считываем данные про акцию и счетчики добавивших в избранное и количество просмотров акции
 
         act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, stockItem.keyStock){
 
@@ -87,7 +87,7 @@ class StockCard (val act: MainActivity) {
                     act.stockDatabaseManager.viewCounterStock(key = stockItem.keyStock) {
 
                         if (it) {
-                            // РАССКОМЕНТИРОВАТЬ ПОСЛЕ ТОГО, КАК СОЗДАМ СТРАНИЦУ ПРОСМОТРА
+
                             navController.navigate(STOCK_VIEW)
 
                         }
@@ -139,7 +139,7 @@ class StockCard (val act: MainActivity) {
                     if (stockItem.category != null) {
 
                         Button(
-                            onClick = { Toast.makeText(act, "Cделать фунцию", Toast.LENGTH_SHORT).show()},
+                            onClick = { Toast.makeText(act, "Сделать функцию", Toast.LENGTH_SHORT).show()},
                             colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
                             shape = RoundedCornerShape(50)
                         ) {
@@ -238,13 +238,10 @@ class StockCard (val act: MainActivity) {
                                 IconText(icon = R.drawable.ic_time, inputText = "${stockItem.startDate} - ${stockItem.finishDate}")
 
                             }
-
                         }
-
                     }
                 }
             }
         }
     }
-
 }

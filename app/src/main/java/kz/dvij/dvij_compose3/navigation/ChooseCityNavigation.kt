@@ -1,6 +1,5 @@
 package kz.dvij.dvij_compose3.navigation
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
@@ -20,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,7 +35,7 @@ class ChooseCityNavigation (val act: MainActivity) {
 
     var chosenCity = CitiesList("Выбери город", "default_city") // задаем выбранный город по умолчанию.
 
-    val cityDatabase = FirebaseDatabase // обращаемся к БД
+    private val cityDatabase = FirebaseDatabase // обращаемся к БД
         .getInstance("https://dvij-compose3-1cf6a-default-rtdb.europe-west1.firebasedatabase.app") // указываем ссылку на БД (без нее не работает)
         .getReference("CitiesList") // Создаем ПАПКУ В БД для списка городов
 
@@ -87,9 +85,6 @@ class ChooseCityNavigation (val act: MainActivity) {
     @Composable
     fun CityHeaderSideNavigation (cityName: MutableState<String>, citiesList: MutableState<List<CitiesList>>) {
 
-        Log.d ("MyLog", "Город - ${cityName.value}")
-
-
         // РАЗДЕЛ БОКОВОГО МЕНЮ С ГОРОДОМ
 
         Column( // ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КОЛОКНКУ
@@ -98,10 +93,9 @@ class ChooseCityNavigation (val act: MainActivity) {
                 .fillMaxWidth() // занимаем всю ширину
                 .padding(20.dp) // отступы
         ) {
-            val context = LocalContext.current // инициализируем контекст для ТОСТОВ
 
             // значение отображения диалога с выбором города. По умолчанию false - закрытый диалог
-            var openDialog = remember {
+            val openDialog = remember {
                 mutableStateOf(false)
             }
 
@@ -142,10 +136,6 @@ class ChooseCityNavigation (val act: MainActivity) {
 
                     CityChooseDialog(cityName = cityName, citiesList) {openDialog.value = false}
 
-
-
-
-
                 }
 
 
@@ -165,7 +155,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 if (cityName.value != "Выбери город" && cityName.value != "" ) {
 
                     androidx.compose.material.Text(
-                        text = cityName.value!!, // из chosenCity достаем название города
+                        text = cityName.value, // из chosenCity достаем название города
                         style = Typography.labelLarge, // Стиль текста
                         modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
                         color = Grey40 // цвет текста
@@ -235,7 +225,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, // вертикальное выравнивание элементов по центру
+                    verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание элементов по центру
                     horizontalArrangement = Arrangement.End // выравнивание по горизонтали
                 ) {
 
@@ -307,7 +297,7 @@ class ChooseCityNavigation (val act: MainActivity) {
     }
 
     @Composable
-    fun citySelectButton(cityName: MutableState<String>, onClick: ()-> Unit): String? {
+    fun citySelectButton(cityName: MutableState<String>, onClick: ()-> Unit): String {
 
         Button(
             onClick = {

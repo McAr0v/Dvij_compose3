@@ -27,9 +27,6 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 class ChoosePlaceDialog (val act: MainActivity) {
 
-    var chosenPlace = PlacesAdsClass(placeName = "Выбери заведение") // задаем выбранное заведение по умолчанию.
-
-
     // --------- САМ ВСПЛЫВАЮЩИЙ ДИАЛОГ С ВЫБОРОМ Заведений ------------
 
     @Composable

@@ -76,14 +76,14 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
         var phoneNumber by rememberSaveable { mutableStateOf("7") } // инициализируем переменную телефонного номера
         var phoneNumberFromDb by rememberSaveable {
-            mutableStateOf(filledUserInfo?.phoneNumber)
+            mutableStateOf(filledUserInfo.phoneNumber)
         }
         var phoneNumberWhatsapp by rememberSaveable { mutableStateOf("7") } // инициализируем переменную номера с whatsapp
         var phoneNumberWhatsappFromDb by rememberSaveable {
-            mutableStateOf(filledUserInfo?.whatsapp)
+            mutableStateOf(filledUserInfo.whatsapp)
         }
 
-        var openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
+        val openLoading = remember {mutableStateOf(false)} // инициализируем переменную, открывающую диалог ИДЕТ ЗАГРУЗКА
         val openCityDialog = remember { mutableStateOf(false) } // инициализируем переменную, открывающую диалог ГОРОДА
 
         Column(
@@ -99,7 +99,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             SpacerTextWithLine(headline = "Аватар") // подпись перед формой
 
-            val avatar = chooseImageDesign(filledUserInfo?.avatar) // Изображение акции
+            val avatar = chooseImageDesign(filledUserInfo.avatar) // Изображение акции
 
             SpacerTextWithLine(headline = "Имя")
 
@@ -344,10 +344,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     }
                                 }
                             }
-
                         }
-
-
                     }
 
                 },

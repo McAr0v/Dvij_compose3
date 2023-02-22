@@ -1,10 +1,9 @@
-package kz.dvij.dvij_compose3.tapesscreens
+package kz.dvij.dvij_compose3.userscreens
 
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.CardDefaults
@@ -12,8 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -22,18 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.dialogs.CitiesList
-import kz.dvij.dvij_compose3.elements.IconText
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.navigation.*
@@ -48,8 +39,6 @@ fun ProfileScreen (
     activity: MainActivity,
     userInfo: MutableState<UserInfoClass>
 ) {
-
-
 
     val accountHelper = AccountHelper(activity)
 
@@ -299,15 +288,11 @@ fun ProfileScreen (
 
                             }
 
-
-
                             Spacer(modifier = Modifier.height(50.dp)) // разделитель
 
                             Button(
 
                                 onClick = {
-
-                                    activity.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
                                     navController.navigate(CREATE_USER_INFO_SCREEN)
 
@@ -401,11 +386,7 @@ fun ProfileScreen (
 
                     }
                 }
-
             }
-
-
-
         }
 
     }
@@ -504,7 +485,6 @@ fun ProfileScreen (
             // ----- ИЛЛЮСТРАЦИЯ ---------
 
             Image(
-                //modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.need_create_account),
                 contentDescription = stringResource(id = R.string.cd_illustration)
             )

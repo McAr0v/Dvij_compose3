@@ -189,7 +189,7 @@ class CreateMeeting(private val act: MainActivity) {
         val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
 
         // Выбранный город из данных мероприятия. Используется при редактировании
-        val chosenCityEdit = remember {mutableStateOf<String>(filledMeeting.city!!)}
+        val chosenCityEdit = remember {mutableStateOf(filledMeeting.city!!)}
 
         // Переменная, передаваемая в БД
         var city by rememberSaveable { mutableStateOf("Выбери город") }
@@ -288,10 +288,10 @@ class CreateMeeting(private val act: MainActivity) {
 
             headline = if (filledMeeting.headline != null && filledMeeting.headline != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
-                fieldHeadlineComponent(act = activity, filledMeeting.headline)
+                fieldHeadlineComponent(filledMeeting.headline)
             } else {
                 // Если нет - поле ввода пустое
-                fieldHeadlineComponent(act = activity) // форма заголовка
+                fieldHeadlineComponent() // форма заголовка
             }
 
 
@@ -301,11 +301,11 @@ class CreateMeeting(private val act: MainActivity) {
 
             if (filledMeeting.category != null && filledMeeting.category != "Выбери категорию" && filledMeeting.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
-                category = act.categoryDialog.categorySelectButton(categoryName = chosenMeetingCategoryEdit) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton(categoryName = chosenMeetingCategoryEdit) { openCategoryDialog.value = true }
 
             } else {
                 // Если нет - передаем пустое значение
-                category = act.categoryDialog.categorySelectButton (categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton (categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }
         }
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
@@ -439,28 +439,28 @@ class CreateMeeting(private val act: MainActivity) {
 
                     // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ ЗАГОЛОВОК ЗАВЕДЕНИЯ
 
-                    if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
+                    finishHeadlinePlace = if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
 
                         // Передаем заголовок в текстовое поле
-                        finishHeadlinePlace = fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+                        fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
 
                     } else {
                         // Если не пришел - показываем пустое поле
-                        finishHeadlinePlace = fieldTextComponent("Введите название места")
+                        fieldTextComponent("Введите название места")
                     }
 
                     SpacerTextWithLine(headline = "Адрес места проведения")
 
                     // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ АДРЕС ЗАВЕДЕНИЯ
 
-                    if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
+                    finishAddressPlace = if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
 
                         // Передаем адрес в текстовое поле
-                        finishAddressPlace = fieldTextComponent("Введите адрес места", addressPlace.value)
+                        fieldTextComponent("Введите адрес места", addressPlace.value)
 
                     } else {
                         // Если не пришел - показываем пустое поле
-                        finishAddressPlace = fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+                        fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
 
                     }
                 }
@@ -499,17 +499,17 @@ class CreateMeeting(private val act: MainActivity) {
             if (filledMeeting.city != null && filledMeeting.city != "Выбери город" && filledMeeting.city != "" && createOrEdit != "0") {
 
                 // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}
 
             } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
 
                 // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}
 
             } else {
 
                 // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}
 
             }
 
@@ -684,12 +684,12 @@ class CreateMeeting(private val act: MainActivity) {
             price = if (filledMeeting.price != "" && filledMeeting.price != null && createOrEdit != "0") {
 
                 // Если при редактировании есть цена, передаем ее
-                fieldPriceComponent(act = activity, filledMeeting.price)
+                fieldPriceComponent(filledMeeting.price)
 
             } else {
 
                 // Если нет - пустое поле
-                fieldPriceComponent(act = activity) // Форма цены за билет
+                fieldPriceComponent() // Форма цены за билет
 
             }
 
@@ -701,12 +701,12 @@ class CreateMeeting(private val act: MainActivity) {
             description = if (filledMeeting.description != "" && filledMeeting.description != null && createOrEdit != "0"){
 
                 // Если при редактировании есть описание, передаем его
-                fieldDescriptionComponent(act = activity, filledMeeting.description) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+                fieldDescriptionComponent(filledMeeting.description) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
 
             } else {
 
                 // Если нет - пустое поле
-                fieldDescriptionComponent(act = activity)
+                fieldDescriptionComponent()
 
             }
 

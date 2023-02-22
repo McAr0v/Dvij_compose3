@@ -48,15 +48,6 @@ class CreateStock (val act: MainActivity) {
 
     private val choosePlaceDialog = ChoosePlaceDialog(act)
 
-
-    // ---- АКЦИЯ ПО УМОЛЧАНИЮ -------
-
-    val defaultStock = StockAdsClass (
-        description = "Default"
-    )
-
-    private val stockDatabaseManager = StockDatabaseManager(act) // ИНИЦИАЛИЗИРОВАТЬ НУЖНО ИМЕННО ТАК, ИНАЧЕ НАЛ
-
     // ----- ЭКРАН СОЗДАНИЯ АКЦИИ --------
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -130,15 +121,15 @@ class CreateStock (val act: MainActivity) {
             mutableStateOf(listOf<PlacesAdsClass>())
         }
 
-        // --------- ПЕРЕМЕННЫЕ ДЛЯ ВЫБОРА КАТЕГОРИИ МЕРОПРИЯТИЯ ------------
+        // --------- ПЕРЕМЕННЫЕ ДЛЯ ВЫБОРА КАТЕГОРИИ АКЦИИ ------------
 
-        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
+        // КАТЕГОРИЯ АКЦИИ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
         val chosenStockCategoryCreate = remember {mutableStateOf("Выбери категорию")}
 
-        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПРИШЕДШАЯ ИЗ БД
-        val chosenStockCategoryEdit = remember {mutableStateOf<String>(filledStock.category!!)}
+        // КАТЕГОРИЯ АКЦИИ ПРИШЕДШАЯ ИЗ БД
+        val chosenStockCategoryEdit = remember {mutableStateOf(filledStock.category!!)}
 
-        // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        // КАТЕГОРИЯ АКЦИИ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
         var category by rememberSaveable { mutableStateOf("Выбери категорию") }
 
 
@@ -159,7 +150,7 @@ class CreateStock (val act: MainActivity) {
         val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
 
         // Выбранный город из данных мероприятия. Используется при редактировании
-        val chosenCityEdit = remember {mutableStateOf<String>(filledStock.city!!)}
+        val chosenCityEdit = remember {mutableStateOf(filledStock.city!!)}
 
         // Переменная, передаваемая в БД
         var city by rememberSaveable { mutableStateOf("Выбери город") }
@@ -229,6 +220,8 @@ class CreateStock (val act: MainActivity) {
             horizontalAlignment = Alignment.Start // выравнивание по горизонтали
         ) {
 
+            // ----- КАРТИНКА -----
+
             SpacerTextWithLine(headline = "Фото акции") // подпись перед формой
 
             val image1 = if (filledStock.image != null && filledStock.image != "" && createOrEdit != "0"){
@@ -239,26 +232,56 @@ class CreateStock (val act: MainActivity) {
                 chooseImageDesign()
             }
 
+
+            // ----- ЗАГОЛОВОК -----
+
             SpacerTextWithLine(headline = "Заголовок акции") // подпись перед формой
 
             val headline = if (filledStock.headline != null && filledStock.headline != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
-                fieldHeadlineComponent(act = act, filledStock.headline)
+                fieldHeadlineComponent(filledStock.headline)
             } else {
                 // Если нет - поле ввода пустое
-                fieldHeadlineComponent(act = act) // форма заголовка
+                fieldHeadlineComponent() // форма заголовка
             }
+
+
+            // ----- КАТЕГОРИЯ -----
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
 
             category = if (filledStock.category != null && filledStock.category != "Выбери категорию" && filledStock.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
-                act.categoryDialog.categorySelectButton(categoryName = chosenStockCategoryEdit) { openCategoryDialog.value = true }.toString()
+                act.categoryDialog.categorySelectButton(categoryName = chosenStockCategoryEdit) { openCategoryDialog.value = true }
 
             } else {
                 // Если нет - передаем пустое значение
-                act.categoryDialog.categorySelectButton (categoryName = chosenStockCategoryCreate) { openCategoryDialog.value = true }.toString()
+                act.categoryDialog.categorySelectButton (categoryName = chosenStockCategoryCreate) { openCategoryDialog.value = true }
             }
+
+            // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
+
+            if (openCategoryDialog.value) {
+
+                // ЕСЛИ РЕДАКТИРОВАНИЕ
+                if (createOrEdit != "0"){
+                    // Передаем переменную, содержащую название категории из БД
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryEdit, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
+
+                } else { // Если создание
+
+                    // Передаем переменную, в которую поместим категорию по умолчанию
+                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryCreate, categoriesList) {
+                        openCategoryDialog.value = false
+                    }
+                }
+            }
+
+
+
+            // ----- ЗАВЕДЕНИЕ -----
 
             SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
 
@@ -417,6 +440,9 @@ class CreateStock (val act: MainActivity) {
                 !changeTypePlace.value // Говорим, что мы сбросили значения, теперь в них ничего нет
             }
 
+
+            // ----- ГОРОД -----
+
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
             // Если при редактировании в мероприятии есть город
@@ -424,17 +450,17 @@ class CreateStock (val act: MainActivity) {
             if (filledStock.city != null && filledStock.city != "Выбери город" && filledStock.city != "" && createOrEdit != "0") {
 
                 // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}
 
             } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
 
                 // Если при создании мероприятия в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}
 
             } else {
 
                 // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}
 
             }
 
@@ -466,30 +492,9 @@ class CreateStock (val act: MainActivity) {
             }
 
 
-            // СДЕЛАТЬ ДИАЛОГ ВЫБОРА ЗАВЕДЕНИЯ
 
 
-            // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
-
-            if (openCategoryDialog.value) {
-
-                // ЕСЛИ РЕДАКТИРОВАНИЕ
-                if (createOrEdit != "0"){
-                    // Передаем переменную, содержащую название категории из БД
-                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryEdit, categoriesList) {
-                        openCategoryDialog.value = false
-                    }
-
-                } else { // Если создание
-
-                    // Передаем переменную, в которую поместим категорию по умолчанию
-                    act.categoryDialog.CategoryChooseDialog(categoryName = chosenStockCategoryCreate, categoriesList) {
-                        openCategoryDialog.value = false
-                    }
-                }
-            }
-
-
+            // ----- ДАТА НАЧАЛА АКЦИИ ---
 
             SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
 
@@ -504,6 +509,8 @@ class CreateStock (val act: MainActivity) {
             }
 
 
+            // ----- ДАТА ЗАВЕРШЕНИЯ АКЦИИ ---
+
             SpacerTextWithLine(headline = "Дата завершения акции") // подпись перед формой
 
             var finishDay = if (filledStock.finishDate != null && filledStock.finishDate != "null" && filledStock.finishDate != "") {
@@ -516,15 +523,19 @@ class CreateStock (val act: MainActivity) {
 
             }
 
+
+
+            // --- ОПИСАНИЕ -----
+
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
 
             val description = if (filledStock.description != null && filledStock.description != "null" && filledStock.description != ""){
 
-                fieldDescriptionComponent(act = act, description = filledStock.description) // ФОРМА ОПИСАНИЯ Акции
+                fieldDescriptionComponent(description = filledStock.description) // ФОРМА ОПИСАНИЯ Акции
 
             } else {
 
-                fieldDescriptionComponent(act = act) // ФОРМА ОПИСАНИЯ Акции
+                fieldDescriptionComponent() // ФОРМА ОПИСАНИЯ Акции
 
             }
 

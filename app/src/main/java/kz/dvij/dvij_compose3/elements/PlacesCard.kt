@@ -2,10 +2,7 @@ package kz.dvij.dvij_compose3.elements
 
 import android.widget.Toast
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Card
@@ -14,27 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
-import kz.dvij.dvij_compose3.firebase.PlacesDialogClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -44,10 +28,10 @@ class PlacesCard (val act: MainActivity) {
     fun PlaceCardSmall (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
-        val meetingCounter = remember{ mutableStateOf("") }
-        val stockCounter = remember{ mutableStateOf("") }
+        val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
+        val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
 
-        // Считываем с базы данных - добавлено ли это мероприятие в избранное?
+        // Считываем с базы данных - добавлено ли это заведение в избранное?
 
         act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
@@ -65,7 +49,7 @@ class PlacesCard (val act: MainActivity) {
             meetingCounter.value = meetingsCounter.toString()
         }
 
-        // Считываем количество мероприятий у этого заведения
+        // Считываем количество акций у этого заведения
 
         act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeItem.placeKey) { stockCounters ->
             stockCounter.value = stockCounters.toString()
@@ -83,12 +67,12 @@ class PlacesCard (val act: MainActivity) {
 
                     // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
 
-                    placeItem.placeKey?.let {
-                        act.placesDatabaseManager.viewCounterPlace(it) {
+                    placeItem.placeKey.let {
+                        act.placesDatabaseManager.viewCounterPlace(it) { result ->
 
                             // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
-                            if (it) {
-                                // РАССКОМЕНТИРОВАТЬ ПОСЛЕ ТОГО, КАК СОЗДАМ СТРАНИЦУ ПРОСМОТРА
+                            if (result) {
+
                                 navController.navigate(PLACE_VIEW)
                             }
                         }
@@ -182,9 +166,6 @@ class PlacesCard (val act: MainActivity) {
 
                             }
 
-
-
-
                             Spacer(modifier = Modifier.height(10.dp))
 
                             Row(
@@ -245,7 +226,6 @@ class PlacesCard (val act: MainActivity) {
                                         color = Grey40
                                     )
                                 }
-
                             }
                         }
                     }
@@ -259,10 +239,10 @@ class PlacesCard (val act: MainActivity) {
     fun PlaceCard (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
-        val meetingCounter = remember{ mutableStateOf("") }
-        val stockCounter = remember{ mutableStateOf("") }
+        val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
+        val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
 
-        // Считываем с базы данных - добавлено ли это мероприятие в избранное?
+        // Считываем с базы данных - добавлено ли это заведение в избранное?
 
         act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
@@ -280,7 +260,7 @@ class PlacesCard (val act: MainActivity) {
             meetingCounter.value = meetingsCounter.toString()
         }
 
-        // Считываем количество мероприятий у этого заведения
+        // Считываем количество акций у этого заведения
 
         act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeItem.placeKey) { stockCounters ->
             stockCounter.value = stockCounters.toString()
@@ -322,12 +302,12 @@ class PlacesCard (val act: MainActivity) {
 
                     // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
 
-                    placeItem.placeKey?.let {
-                        act.placesDatabaseManager.viewCounterPlace(it) {
+                    placeItem.placeKey.let {
+                        act.placesDatabaseManager.viewCounterPlace(it) { result ->
 
                             // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
-                            if (it) {
-                                // РАССКОМЕНТИРОВАТЬ ПОСЛЕ ТОГО, КАК СОЗДАМ СТРАНИЦУ ПРОСМОТРА
+                            if (result) {
+
                                 navController.navigate(PLACE_VIEW)
                             }
                         }
@@ -380,7 +360,7 @@ class PlacesCard (val act: MainActivity) {
                     if (placeItem.category != null) {
 
                         Button(
-                            onClick = { Toast.makeText(act, "Cделать фунцию", Toast.LENGTH_SHORT).show()},
+                            onClick = { Toast.makeText(act, "Сделать фунцию", Toast.LENGTH_SHORT).show()},
                             colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
                             shape = RoundedCornerShape(50)
                         ) {
@@ -459,6 +439,7 @@ class PlacesCard (val act: MainActivity) {
                             }
 
 
+                            // ----- ГОРОД -----
 
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -471,6 +452,9 @@ class PlacesCard (val act: MainActivity) {
                                 )
 
                             }
+
+
+                            // ---- АДРЕС -----
 
                             if (placeItem.address != null){
 
@@ -485,6 +469,8 @@ class PlacesCard (val act: MainActivity) {
 
 
                             Spacer(modifier = Modifier.height(10.dp))
+
+                            // ----- ВРЕМЯ РАБОТЫ ------
 
                             if (placeItem.openTime != null && placeItem.closeTime != null) {
 
@@ -560,11 +546,8 @@ class PlacesCard (val act: MainActivity) {
                                         color = Grey40
                                     )
                                 }
-
                             }
-
                         }
-
                     }
                 }
             }

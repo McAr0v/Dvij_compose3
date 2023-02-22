@@ -5,7 +5,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.ComponentActivity
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageMetadata
@@ -60,12 +59,12 @@ class PhotoHelper (val act: MainActivity) {
 
     private val storageUser = Firebase
         .storage("gs://dvij-compose3-1cf6a.appspot.com")
-        .getReference("Stock") // инициализируем папку, в которую будет сохраняться картинка акций
+        .getReference("User") // инициализируем папку, в которую будет сохраняться картинка акций
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
     private val imageRefUser = storageUser
-        .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
+        .child(act.mAuth.uid ?: "empty") // в папке "User" будет еще папка - для каждого пользователя своя
         .child("image_${System.currentTimeMillis()}") // название изображения
 
 
@@ -117,7 +116,7 @@ class PhotoHelper (val act: MainActivity) {
 
     private fun getWriteSizeImage(bitmap: Bitmap): List<Int>{
 
-        var listOfSize = arrayListOf<Int>(bitmap.width, bitmap.height) // создаем список с входящими размерами картинки
+        val listOfSize = arrayListOf(bitmap.width, bitmap.height) // создаем список с входящими размерами картинки
 
         val width = bitmap.width // ширина
         val height = bitmap.height // высота
@@ -166,7 +165,7 @@ class PhotoHelper (val act: MainActivity) {
 
     }
 
-    // ------ ФУНКЦИЯ ЗАГРУЗКИ ФОТО В FIRESTORE -----------
+    // ------ ФУНКЦИЯ ЗАГРУЗКИ ФОТО В FIRE STORE -----------
 
     suspend fun uploadPhoto(uri: Uri, name: String, mimeType: String?, typePost: String, callback: (url: String)-> Unit){
 

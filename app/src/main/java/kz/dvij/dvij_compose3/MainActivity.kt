@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,6 +47,7 @@ import kz.dvij.dvij_compose3.stockscreens.StockScreen
 import kz.dvij.dvij_compose3.stockscreens.StockViewScreen
 import kz.dvij.dvij_compose3.userscreens.AccountScreens
 import kz.dvij.dvij_compose3.userscreens.CreateProfileInfoScreen
+import kz.dvij.dvij_compose3.userscreens.ProfileScreen
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
     private val userDatabaseManager = UserDatabaseManager(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
-    var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
+    // var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
 
@@ -292,70 +292,75 @@ class MainActivity : ComponentActivity() {
 
                 topBar = { // ------- НА ОПРЕДЕЛЕННЫХ СТРАНИЦАХ НЕ ПОКАЗЫВАТЬ ТОПБАР ----------
 
-                    if ( // если текущий путь - хоть одна из эти страниц
-                        currentRoute == REG_ROOT
-                        || currentRoute == LOG_IN_ROOT
-                        || currentRoute == FORGOT_PASSWORD_ROOT
-                        || currentRoute == THANK_YOU_PAGE_ROOT
-                        || currentRoute == RESET_PASSWORD_SUCCESS
+                    when (currentRoute) {
 
-                    ){
+                        // если текущий путь - хоть одна из эти страниц
+                        REG_ROOT, LOG_IN_ROOT, FORGOT_PASSWORD_ROOT, THANK_YOU_PAGE_ROOT, RESET_PASSWORD_SUCCESS -> {
 
-                        // НЕ ПОКАЗЫВАТЬ ТОПБАР
+                            // НЕ ПОКАЗЫВАТЬ ТОПБАР
 
-                    } else if (currentRoute == MEETING_VIEW){
+                        }
 
-                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА МЕРОПРИЯТИЯ ------------
+                        MEETING_VIEW -> {
 
-                        TopBarWithBackButton(navController = navController, text = R.string.meetings)
+                            // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА МЕРОПРИЯТИЯ ------------
 
-                    } else if (currentRoute == PLACE_VIEW){
+                            TopBarWithBackButton(navController = navController, text = R.string.meetings)
 
-                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА ЗАВЕДЕНИЯ ------------
+                        }
 
-                        TopBarWithBackButton(navController = navController, text = R.string.places)
+                        PLACE_VIEW -> {
 
-                    } else if (currentRoute == STOCK_VIEW){
+                            // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА ЗАВЕДЕНИЯ ------------
 
-                        // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА АКЦИИ ------------
+                            TopBarWithBackButton(navController = navController, text = R.string.places)
 
-                        TopBarWithBackButton(navController = navController, text = R.string.stock)
+                        }
 
-                    } else { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
+                        STOCK_VIEW -> {
 
-                        // в секцию верхнего меню вызываем наше созданное верхнее меню
+                            // ----- ЕСЛИ ПУТЬ - СТРАНИЦА ПРОСМОТРА АКЦИИ ------------
 
-                        TopBarInApp(
-                            topBarName = stringResource(id =
-                            //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
-                            // какая страница открыта
+                            TopBarWithBackButton(navController = navController, text = R.string.stock)
 
-                            // Условие выбора заголовка
-                            when (currentRoute) {
-                                null -> R.string.meetings
-                                MEETINGS_ROOT -> R.string.meetings
-                                PLACES_ROOT -> R.string.places
-                                STOCK_ROOT -> R.string.stock
-                                PROFILE_ROOT -> R.string.profile
-                                ABOUT_ROOT -> R.string.side_about
-                                POLICY_ROOT -> R.string.side_private_policy
-                                ADS_ROOT -> R.string.side_ad
-                                BUGS_ROOT -> R.string.side_report_bug
-                                CREATE_MEETINGS_SCREEN -> R.string.create_meeting
-                                EDIT_MEETINGS_SCREEN -> R.string.edit_meeting
-                                CREATE_PLACES_SCREEN -> R.string.create_place
-                                CREATE_STOCK_SCREEN -> R.string.create_stock
-                                MEETING_VIEW -> R.string.meetings
-                                PLACE_VIEW -> R.string.places
-                                STOCK_VIEW -> R.string.stock
-                                else -> R.string.app_name
+                        }
+
+                        else -> { // ----- ЕСЛИ ТЕКУЩИЙ ПУТЬ ДРУГОЙ---------
+
+                            // в секцию верхнего меню вызываем наше созданное верхнее меню
+
+                            TopBarInApp(
+                                topBarName = stringResource(id =
+                                //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
+                                // какая страница открыта
+
+                                // Условие выбора заголовка
+                                when (currentRoute) {
+                                    null -> R.string.meetings
+                                    MEETINGS_ROOT -> R.string.meetings
+                                    PLACES_ROOT -> R.string.places
+                                    STOCK_ROOT -> R.string.stock
+                                    PROFILE_ROOT -> R.string.profile
+                                    ABOUT_ROOT -> R.string.side_about
+                                    POLICY_ROOT -> R.string.side_private_policy
+                                    ADS_ROOT -> R.string.side_ad
+                                    BUGS_ROOT -> R.string.side_report_bug
+                                    CREATE_MEETINGS_SCREEN -> R.string.create_meeting
+                                    EDIT_MEETINGS_SCREEN -> R.string.edit_meeting
+                                    CREATE_PLACES_SCREEN -> R.string.create_place
+                                    CREATE_STOCK_SCREEN -> R.string.create_stock
+                                    MEETING_VIEW -> R.string.meetings
+                                    PLACE_VIEW -> R.string.places
+                                    STOCK_VIEW -> R.string.stock
+                                    else -> R.string.app_name
                                 }
-                            ),
-                            onNavigationIconClick = {
-                                // в действие на клик передаем корутину для запуска открытия бокового меню
-                                coroutineScope.launch { scaffoldState.drawerState.open() }
-                            }
-                        )
+                                ),
+                                onNavigationIconClick = {
+                                    // в действие на клик передаем корутину для запуска открытия бокового меню
+                                    coroutineScope.launch { scaffoldState.drawerState.open() }
+                                }
+                            )
+                        }
                     }
                 },
 
@@ -424,7 +429,7 @@ class MainActivity : ComponentActivity() {
 
                         // ----- СТРАНИЦЫ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -----
 
-                        composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity, userInfo)}
+                        composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity, userInfo) }
                         composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
 
                         // ---- СТРАНИЦЫ РЕГИСТРАЦИИ / АВТОРИЗАЦИИ ----

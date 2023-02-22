@@ -41,8 +41,8 @@ class SideComponents (private val act: MainActivity) {
             contentAlignment = Alignment.CenterStart // выравнивание
         ){
             Icon( // помещаем логотип как векторную иконку
-                painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.dvij_logo), // задаем логотип
-                contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_logo), // задаем описание для слабослышаших
+                painter = painterResource(id = R.drawable.dvij_logo), // задаем логотип
+                contentDescription = stringResource(id = R.string.cd_logo), // задаем описание для слабослышаших
                 tint = PrimaryColor // окрашиваем логотип
             )
         }
@@ -66,7 +66,7 @@ class SideComponents (private val act: MainActivity) {
             // Заголовок ПОДПИШИСЬ НА ДВИЖ
 
             Text(
-                text = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe), // текст заголовка
+                text = stringResource(id = R.string.subscribe), // текст заголовка
                 color = Grey40, // цвет заголовка
                 style = Typography.labelMedium // стиль заголовка
             )
@@ -92,8 +92,8 @@ class SideComponents (private val act: MainActivity) {
                             .background(Grey95) // фон иконки
                             .padding(10.dp) // отступ внутри до иконки
                             .size(25.dp), // размер иконки
-                        painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.instagram), // сама иконка
-                        contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_instagram), // описание для слабовидящих
+                        painter = painterResource(id = R.drawable.instagram), // сама иконка
+                        contentDescription = stringResource(id = R.string.subscribe_to_instagram), // описание для слабовидящих
                         tint = Grey00 // цвет иконки
                     )
                 }
@@ -116,8 +116,8 @@ class SideComponents (private val act: MainActivity) {
                             .background(Grey95) // фон иконки
                             .padding(10.dp) // отступ внутри до иконки
                             .size(25.dp), // размер иконки
-                        painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.telegram), // сама иконка
-                        contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_telegram), // описание для слабовидящих
+                        painter = painterResource(id = R.drawable.telegram), // сама иконка
+                        contentDescription = stringResource(id = R.string.subscribe_to_telegram), // описание для слабовидящих
                         tint = Grey00 // цвет иконки
                     )
 
@@ -141,8 +141,8 @@ class SideComponents (private val act: MainActivity) {
                             .background(Grey95) // фон иконки
                             .padding(10.dp) // отступ внутри до иконки
                             .size(25.dp), // размер иконки
-                        painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.whatsapp), // сама иконка
-                        contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.subscribe_to_whatsapp), // описание для слабовидящих
+                        painter = painterResource(id = R.drawable.whatsapp), // сама иконка
+                        contentDescription = stringResource(id = R.string.subscribe_to_whatsapp), // описание для слабовидящих
                         tint = Grey00 // цвет иконки
                     )
                 }
@@ -160,19 +160,15 @@ class SideComponents (private val act: MainActivity) {
 
 
         // РАЗДЕЛ С АВАТАРКОй
-        val user = act.mAuth.currentUser // получаем пользователя - авторизован он или нет
+        val loggedUser = act.mAuth.currentUser // получаем пользователя - авторизован он или нет
 
 
 
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину
-        val context = LocalContext.current // инициализируем контекст для ТОСТОВ
-
-        var openRegistrationDialog = remember { mutableStateOf(false) }
-        var openSignInDialog = remember { mutableStateOf(false) }
 
         // УСЛОВИЕ - ЕСЛИ АВТОРИЗОВАН, ТО КОНТЕНТ ОДИН, ЕСЛИ НЕТ, ТО ДРУГОЙ
 
-        if (user != null && user.isEmailVerified) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
+        if (loggedUser != null && loggedUser.isEmailVerified) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
 
             Row( // используем строку
                 modifier = Modifier
@@ -207,9 +203,9 @@ class SideComponents (private val act: MainActivity) {
                             .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
                             .clip(CircleShape))
 
-                } else if (user.photoUrl != null) {
+                } else if (loggedUser.photoUrl != null) {
                     AsyncImage(
-                        model = user.photoUrl,
+                        model = loggedUser.photoUrl,
                         contentDescription = stringResource(id = R.string.icon_user_image),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -217,10 +213,10 @@ class SideComponents (private val act: MainActivity) {
                             .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
                             .clip(CircleShape))
                 } else {
-                    androidx.compose.foundation.Image(
-                        painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.no_user_image), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
+                    Image(
+                        painter = painterResource(id = R.drawable.no_user_image), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
                         contentScale = ContentScale.Crop,
-                        contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.cd_avatar), // описание для слабовидящих
+                        contentDescription = stringResource(id = R.string.cd_avatar), // описание для слабовидящих
                         modifier = Modifier
                             .size(60.dp) // размер аватарки
                             .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
@@ -246,13 +242,13 @@ class SideComponents (private val act: MainActivity) {
                         )
 
                         Text(
-                            text = user.email!!, // сюда нужно передавать email пользователя из БД
+                            text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
                             color = Grey40, // цвет Email
                             style = Typography.labelSmall // стиль текста
                         )
                     }
 
-                } else if (user.displayName == null || user.displayName == ""){
+                } else if (loggedUser.displayName == null || loggedUser.displayName == ""){
 
                     Column(
                         modifier = Modifier
@@ -261,7 +257,7 @@ class SideComponents (private val act: MainActivity) {
                         verticalArrangement = Arrangement.Center
                     ){
                         Text(
-                            text = user.email!!, // сюда нужно передавать email пользователя из БД
+                            text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
                             color = Grey40, // цвет Email
                             style = Typography.labelMedium // стиль текста
                         )
@@ -277,13 +273,13 @@ class SideComponents (private val act: MainActivity) {
                     ){
 
                         Text(
-                            text = user.displayName!!, // сюда нужно передавать имя пользователя из БД
+                            text = loggedUser.displayName!!, // сюда нужно передавать имя пользователя из БД
                             color = Grey40, // цвет имени
                             style = Typography.titleSmall // стиль текста
                         )
 
                         Text(
-                            text = user.email!!, // сюда нужно передавать email пользователя из БД
+                            text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
                             color = Grey40, // цвет Email
                             style = Typography.labelSmall // стиль текста
                         )
@@ -297,13 +293,13 @@ class SideComponents (private val act: MainActivity) {
                 // ИКОНКА РЕДАКТИРОВАТЬ
 
                 Icon(
-                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_edit), // сама иконка
-                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.to_change_location), // описание для слабовидящих
+                    painter = painterResource(id = R.drawable.ic_edit), // сама иконка
+                    contentDescription = stringResource(id = R.string.to_change_location), // описание для слабовидящих
                     tint = Grey40 // цвет иконки
                 )
             }
 
-        } else if (user != null && !user.isEmailVerified){
+        } else if (loggedUser != null && !loggedUser.isEmailVerified){
 
             // если пользователь зарегистрировался, но еще не верифицировал email
             // КОНТЕНТ если не авторизован пользователь
@@ -369,12 +365,12 @@ class SideComponents (private val act: MainActivity) {
                     modifier = Modifier.weight(1f) // колонка займет всю ширину, которая останется после добавления элементов
                 ) {
                     Text( // текст ГОСТЬ
-                        text = stringResource(id = kz.dvij.dvij_compose3.R.string.guest), // сам текст
+                        text = stringResource(id = R.string.guest), // сам текст
                         color = Grey40, // цвет текста
                         style = Typography.titleMedium // стиль текста
                     )
                     Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
-                        text = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register), // сам текст
+                        text = stringResource(id = R.string.login_or_register), // сам текст
                         color = Grey40, // цвет текста
                         style = Typography.labelSmall // стиль текста
                     )
@@ -383,8 +379,8 @@ class SideComponents (private val act: MainActivity) {
                 // ИКОНКА ВХОД
 
                 Icon(
-                    painter = painterResource(id = kz.dvij.dvij_compose3.R.drawable.ic_login), // сама иконка
-                    contentDescription = stringResource(id = kz.dvij.dvij_compose3.R.string.login_or_register), // описание для слабовидящих
+                    painter = painterResource(id = R.drawable.ic_login), // сама иконка
+                    contentDescription = stringResource(id = R.string.login_or_register), // описание для слабовидящих
                     tint = Grey40 // цвет иконки
                 )
             }
@@ -400,7 +396,7 @@ class SideComponents (private val act: MainActivity) {
         scaffoldState: ScaffoldState // Принимаем состояние скаффолда для реализации закрытия бокового меню после нажатия на элемент
     ) {
         // Инициализируем список элементов бокового меню
-        val sideNavigationItemsList = listOf<SideNavigationItems>(
+        val sideNavigationItemsList = listOf(
             SideNavigationItems.About,
             SideNavigationItems.PrivatePolicy,
             SideNavigationItems.Ads,

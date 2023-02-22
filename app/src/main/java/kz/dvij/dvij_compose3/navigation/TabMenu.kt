@@ -42,7 +42,7 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
     // Начинаем делать дизайн меню табов
     // помещаем в контейнер Column
 
-    Column() {
+    Column {
         TabRow( // выбираем TabRow - чтобы табы были по горизонтали
             selectedTabIndex = tabIndex, // указываем, что выбранный индекс это индекс текущей открытой страницы
 

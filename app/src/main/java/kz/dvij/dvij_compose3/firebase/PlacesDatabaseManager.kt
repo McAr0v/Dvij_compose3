@@ -35,7 +35,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
             .setValue(filledPLace).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если мероприятие опубликовано, возвращаем колбак тру
+                    // если заведение опубликовано, возвращаем колбак тру
                     callback (true)
 
                 } else {
@@ -70,9 +70,9 @@ class PlacesDatabaseManager (val act: MainActivity) {
                 }
 
                 if (placeArray.isEmpty()){
-                    placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                    placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
                 } else {
-                    placeList.value = placeArray // если добавились мероприятия в список, то этот новый список и передаем
+                    placeList.value = placeArray // если добавились заведения в список, то этот новый список и передаем
                 }
             }
 
@@ -339,7 +339,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
         )
     }
 
-    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ --------
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ ВОЗВРАЩАЮЩАЯ СПИСОК СЧЕТЧИКОВ --------
 
     fun readOnePlaceFromDataBase(placeInfo: MutableState<PlacesAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
 
@@ -361,7 +361,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
                     val placeFav = item.child("AddedToFavorites").childrenCount
 
                     // считываем данные для счетчика - количество просмотров объявления
-                    var placeViewCount = item
+                    val placeViewCount = item
                         .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
                     // если мероприятие не нал и ключ завдения совпадает с ключем из БД, то...
@@ -383,7 +383,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
         })
     }
 
-    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ --------
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ ВОЗВРАЩАЮЩАЯ ДАТА КЛАСС --------
 
     fun readOnePlaceFromDataBaseReturnDataClass(key: String, callback: (result: PlacesAdsClass)-> Unit){
 

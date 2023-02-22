@@ -1,7 +1,6 @@
 package kz.dvij.dvij_compose3.placescreens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,7 +33,6 @@ import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
-import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -352,7 +350,7 @@ class PlaceViewScreen (val act: MainActivity) {
                                                         Grey40 // При нажатии окрашиваем текст и иконку в белый
                                                     buttonFavColor.value =
                                                         Grey80 // При нажатии окрашиваем кнопку в темно-серый
-                                                    favCounter.value = favCounter.value.toInt() - 1
+                                                    favCounter.value = favCounter.value - 1
 
                                                     // Выводим ТОСТ
                                                     Toast.makeText(

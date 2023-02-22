@@ -23,7 +23,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         description = "Default"
     )
 
-    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ ВОЗВРАЩАЮЩАЯ СПИСОК СЧЕТЧИКИ МЕРОПРИЯТИЯ --------
 
     fun readOneMeetingFromDataBase(meetingInfo: MutableState<MeetingsAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
 
@@ -45,7 +45,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     val meetingFav = item.child("AddedToFavorites").childrenCount
 
                     // считываем данные для счетчика - количество просмотров объявления
-                    var meetingCount = item
+                    val meetingCount = item
                         .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
                     // если мероприятие не нал и ключ мероприятия совпадает с ключем из БД, то...
@@ -67,7 +67,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         })
     }
 
-    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ --------
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ, ВОЗВРАЩАЮЩАЯ ДАТА КЛАСС --------
 
     fun readOneMeetingFromDBReturnClass(key: String, callback: (result: MeetingsAdsClass)-> Unit){
 
@@ -84,13 +84,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
                         .child("meetingData") // добираесся до следующей папки внутри - папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
-
-                    // считываем данные для счетчика - количество добавивших в избранное
-                    val meetingFav = item.child("AddedToFavorites").childrenCount
-
-                    // считываем данные для счетчика - количество просмотров объявления
-                    var meetingCount = item
-                        .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
                     // если мероприятие не нал и ключ мероприятия совпадает с ключем из БД, то...
                     if (meeting != null && meeting.key == key) {

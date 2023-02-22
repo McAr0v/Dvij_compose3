@@ -1,7 +1,6 @@
 package kz.dvij.dvij_compose3.stockscreens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,10 +27,8 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
-import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -82,11 +79,8 @@ class StockViewScreen (val act: MainActivity) {
 
             stockInfo.value.keyPlace?.let { nonNullKeyPlace -> act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = placeInfo, key = nonNullKeyPlace) {
 
-
-
+                }
             }
-            }
-
         }
 
         // Если пользователь авторизован, проверяем, добавлена ли уже акция в избранное, или нет
@@ -140,6 +134,8 @@ class StockViewScreen (val act: MainActivity) {
 
             ) {
 
+                // --- КНОПКА РЕДАКТИРОВАТЬ -----
+
                 if (stockInfo.value.keyCreator == act.mAuth.uid){
 
                     Button(
@@ -162,11 +158,8 @@ class StockViewScreen (val act: MainActivity) {
 
                                     }
 
-
-
                                     filledStockInfoFromAct.value = stock
                                     navController.navigate(EDIT_STOCK_SCREEN)
-
 
                                 }
                             }
@@ -203,7 +196,7 @@ class StockViewScreen (val act: MainActivity) {
 
                 // -------- НАЗВАНИЕ АКЦИИ ----------
 
-                if (stockInfo.value.headline != null) {
+                if (stockInfo.value.headline != null && stockInfo.value.headline != "null" && stockInfo.value.headline != "") {
 
                     Text(
                         text = stockInfo.value.headline!!,
@@ -214,7 +207,7 @@ class StockViewScreen (val act: MainActivity) {
 
                 // ------- ГОРОД ------------
 
-                if (stockInfo.value.city != null) {
+                if (stockInfo.value.city != null && stockInfo.value.city != "null" && stockInfo.value.city != "" && stockInfo.value.city != "Выбери город") {
 
                     Text(
                         text = stockInfo.value.city!!,
@@ -237,7 +230,7 @@ class StockViewScreen (val act: MainActivity) {
                     // -------- КАТЕГОРИЯ акции ----------
 
 
-                    if (stockInfo.value.category != null) {
+                    if (stockInfo.value.category != null && stockInfo.value.category != "null" && stockInfo.value.category != "" && stockInfo.value.category != "Выбери город") {
 
                         Button(
                             onClick = {
@@ -315,11 +308,11 @@ class StockViewScreen (val act: MainActivity) {
 
                                         // Убираем из избранных
 
-                                        act.stockDatabaseManager.removeFavouriteStock(key) {
+                                        act.stockDatabaseManager.removeFavouriteStock(key) { remove ->
 
                                             // Если пришел колбак, что успешно
 
-                                            if (it) {
+                                            if (remove) {
 
                                                 iconTextFavColor.value = Grey40 // При нажатии окрашиваем текст и иконку в белый
                                                 buttonFavColor.value = Grey80 // При нажатии окрашиваем кнопку в темно-серый
@@ -334,11 +327,11 @@ class StockViewScreen (val act: MainActivity) {
 
                                         // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.stockDatabaseManager.addFavouriteStock(key) {
+                                        act.stockDatabaseManager.addFavouriteStock(key) { addToFav ->
 
                                             // Если пришел колбак, что успешно
 
-                                            if (it) {
+                                            if (addToFav) {
 
                                                 iconTextFavColor.value = PrimaryColor // При нажатии окрашиваем текст и иконку в черный
                                                 buttonFavColor.value = Grey90_2 // Окрашиваем кнопку в главный цвет
@@ -399,11 +392,11 @@ class StockViewScreen (val act: MainActivity) {
                         .fillMaxWidth()
                         .weight(0.5f)
                     ) {
-                        if (stockInfo.value.startDate != null){
+                        if (stockInfo.value.startDate != null && stockInfo.value.startDate != "null" && stockInfo.value.startDate != ""){
                             HeadlineAndDesc(headline = stockInfo.value.startDate!!, desc = "Начало акции")
                         }
 
-                        if (stockInfo.value.finishDate != null){
+                        if (stockInfo.value.finishDate != null && stockInfo.value.finishDate != "null" && stockInfo.value.finishDate != ""){
                             HeadlineAndDesc(headline = stockInfo.value.finishDate!!, desc = "Конец акции")
                         }
 
@@ -426,8 +419,6 @@ class StockViewScreen (val act: MainActivity) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     placeCard.PlaceCardSmall(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
-
-                    //placeCard.PlaceCard(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -465,15 +456,16 @@ class StockViewScreen (val act: MainActivity) {
 
                 // ---------- ОПИСАНИЕ -------------
 
-                Text(
-                    text = "Об акции",
-                    style = Typography.titleMedium,
-                    color = Grey10
-                )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                if (stockInfo.value.description !=null && stockInfo.value.description != "null" && stockInfo.value.description != ""){
 
-                if (stockInfo.value.description !=null){
+                    Text(
+                        text = "Об акции",
+                        style = Typography.titleMedium,
+                        color = Grey10
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
                         text = stockInfo.value.description!!,

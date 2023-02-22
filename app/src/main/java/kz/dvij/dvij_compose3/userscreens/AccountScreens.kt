@@ -2,8 +2,6 @@ package kz.dvij.dvij_compose3.userscreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultRegistry
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,13 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,6 +41,7 @@ class AccountScreens(val act: MainActivity) {
 
     // ------- СТРАНИЦА ВХОДА / РЕГИСТРАЦИИ ---------
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     fun SignInUpPage(switch: String, navController: NavController){
 
@@ -101,8 +100,8 @@ class AccountScreens(val act: MainActivity) {
                 // в зависимости от того, что введет пользователь и это содержимое будет
                 // отправляться в Firebase
 
-                var email = remember { mutableStateOf("") }
-                var password = remember { mutableStateOf("") }
+                val email = remember { mutableStateOf("") }
+                val password = remember { mutableStateOf("") }
 
 
                 // --------------- САМ КОНТЕНТ СТРАНИЦЫ ------------------
@@ -499,9 +498,7 @@ class AccountScreens(val act: MainActivity) {
     @Composable
     fun ThankYouPage (navController: NavController){
 
-        Column(
-
-        ) {
+        Column {
 
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 
@@ -681,9 +678,7 @@ class AccountScreens(val act: MainActivity) {
     @Composable
     fun ForgotPasswordPage (navController: NavController) {
 
-        Column(
-
-        ) {
+        Column{
 
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 
@@ -724,26 +719,10 @@ class AccountScreens(val act: MainActivity) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            var email = remember { mutableStateOf("") }
-
-            // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
-            // при фокусе на них окрашивались в нужные цвета
-
-            var focusColorEmail = remember { mutableStateOf(Grey40) }
-
-            var isErrorEmail =
-                remember { mutableStateOf(false) } // состояние формы - ошибка или нет
-            var errorEmailMassage = remember { mutableStateOf("") } // сообщение об ошибке
+            val email = remember { mutableStateOf("") }
 
 
-            val focusManager =
-                LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
-
-
-
-                Spacer(modifier = Modifier.height(40.dp)) // разделитель
-
-
+            Spacer(modifier = Modifier.height(40.dp)) // разделитель
 
 
             // -------------- ИЛЛЮСТРАЦИЯ ------------------
@@ -850,9 +829,7 @@ class AccountScreens(val act: MainActivity) {
     @Composable
     fun ResetPasswordSuccess (navController: NavController){
 
-        Column(
-
-        ) {
+        Column{
 
             // помещаем все содержимое в колонку, чтобы кнопка "Закрыть" была отдельно от остального содержимого
 

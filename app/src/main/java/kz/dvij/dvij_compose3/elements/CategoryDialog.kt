@@ -321,8 +321,6 @@ class CategoryDialog (val act: MainActivity) {
 
                     items(categoriesList.value) { category ->
 
-                        Log.d("MyLog", "Data: ${category.categoryName}")
-
                         // ------------ строка с названием категории -------------
 
                         Column(modifier = Modifier

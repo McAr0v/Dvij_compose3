@@ -112,7 +112,7 @@ class CreatePlace (val act: MainActivity) {
         val chosenPlaceCategoryCreate = remember {mutableStateOf("Выбери категорию")}
 
         // КАТЕГОРИЯ ЗАВЕДЕНИЯ ПРИШЕДШАЯ ИЗ БД
-        val chosenPlaceCategoryEdit = remember {mutableStateOf<String>(filledPlace.category!!)}
+        val chosenPlaceCategoryEdit = remember {mutableStateOf(filledPlace.category!!)}
 
         // КАТЕГОРИЯ ЗАВЕДЕНИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ ПУБЛИКАЦИИ
         var category by rememberSaveable { mutableStateOf("Выбери категорию") }
@@ -134,7 +134,7 @@ class CreatePlace (val act: MainActivity) {
         val chosenCityCreateWithoutUser = remember {mutableStateOf("Выбери город")}
 
         // Выбранный город из данных заведения. Используется при редактировании
-        val chosenCityEdit = remember {mutableStateOf<String>(filledPlace.city!!)}
+        val chosenCityEdit = remember {mutableStateOf(filledPlace.city!!)}
 
         // Переменная, передаваемая в БД
         var city by rememberSaveable { mutableStateOf("Выбери город") }
@@ -187,10 +187,10 @@ class CreatePlace (val act: MainActivity) {
 
             val headline = if (filledPlace.placeName != null && filledPlace.placeName != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
-                fieldHeadlineComponent(act = act, filledPlace.placeName)
+                fieldHeadlineComponent(filledPlace.placeName)
             } else {
                 // Если нет - поле ввода пустое
-                fieldHeadlineComponent(act = act) // форма заголовка
+                fieldHeadlineComponent() // форма заголовка
             }
 
 
@@ -200,11 +200,11 @@ class CreatePlace (val act: MainActivity) {
 
             if (filledPlace.category != null && filledPlace.category != "Выбери категорию" && filledPlace.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
-                category = act.categoryDialog.categorySelectButton(categoryName = chosenPlaceCategoryEdit) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton(categoryName = chosenPlaceCategoryEdit) { openCategoryDialog.value = true }
 
             } else {
                 // Если нет - передаем пустое значение
-                category = act.categoryDialog.categorySelectButton (categoryName = chosenPlaceCategoryCreate) { openCategoryDialog.value = true }.toString()
+                category = act.categoryDialog.categorySelectButton (categoryName = chosenPlaceCategoryCreate) { openCategoryDialog.value = true }
             }
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
@@ -237,17 +237,17 @@ class CreatePlace (val act: MainActivity) {
             if (filledPlace.city != null && filledPlace.city != "Выбери город" && filledPlace.city != "" && createOrEdit != "0") {
 
                 // Передаем в кнопку выбора города ГОРОД ИЗ ЗАВЕДЕНИЯ ДЛЯ РЕДАКТИРОВАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityEdit) {openCityDialog.value = true}
 
             } else if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && createOrEdit == "0") {
 
                 // Если при создании заведения в пользователе есть город, передаем ГОРОД ИЗ БД ПОЛЬЗОВАТЕЛЯ ДЛЯ СОЗДАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithUser) {openCityDialog.value = true}
 
             } else {
 
                 // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}
 
             }
 
@@ -286,10 +286,10 @@ class CreatePlace (val act: MainActivity) {
 
             val address = if (filledPlace.address != null && filledPlace.address != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
-                fieldHeadlineComponent(act = act, filledPlace.address)
+                fieldHeadlineComponent(filledPlace.address)
             } else {
                 // Если нет - поле ввода пустое
-                fieldHeadlineComponent(act = act) // форма заголовка
+                fieldHeadlineComponent() // форма заголовка
             }
 
 
@@ -419,12 +419,12 @@ class CreatePlace (val act: MainActivity) {
             val description = if (filledPlace.placeDescription != "" && filledPlace.placeDescription != null && createOrEdit != "0"){
 
                 // Если при редактировании есть описание, передаем его
-                fieldDescriptionComponent(act = act, filledPlace.placeDescription) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
+                fieldDescriptionComponent(filledPlace.placeDescription) // ФОРМА ОПИСАНИЯ МЕРОПРИЯТИЯ
 
             } else {
 
                 // Если нет - пустое поле
-                fieldDescriptionComponent(act = act)
+                fieldDescriptionComponent()
 
             }
 

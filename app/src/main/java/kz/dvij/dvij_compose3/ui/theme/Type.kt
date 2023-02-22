@@ -50,17 +50,21 @@ val Typography = Typography(
 
     // Обычный текст МАЛЕНЬКИЙ
 
-    bodySmall = TextStyle(fontFamily = sfProFont,
+    bodySmall = TextStyle(
+        fontFamily = sfProFont,
         fontWeight = FontWeight.Normal,
         fontSize = 11.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp),
+        letterSpacing = 0.5.sp
+    ),
 
-displaySmall = TextStyle(fontFamily = sfProFont,
-    fontWeight = FontWeight.Normal,
-    fontSize = 9.sp,
-    lineHeight = 15.sp,
-    letterSpacing = 0.5.sp),
+    displaySmall = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 9.sp,
+        lineHeight = 15.sp,
+        letterSpacing = 0.5.sp
+    ),
 
     // ЗАГОЛОВКИ
 
@@ -98,19 +102,23 @@ displaySmall = TextStyle(fontFamily = sfProFont,
 
     // Подпись БОЛЬШАЯ
 
-    labelLarge = TextStyle(fontFamily = sfProFont,
+    labelLarge = TextStyle(
+        fontFamily = sfProFont,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp),
+        letterSpacing = 0.5.sp
+    ),
 
     // Подпись СРЕДНЯЯ
 
-    labelMedium = TextStyle(fontFamily = sfProFont,
+    labelMedium = TextStyle(
+        fontFamily = sfProFont,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp),
+        letterSpacing = 0.5.sp
+    ),
 
     // Подпись МАЛЕНЬКАЯ
 

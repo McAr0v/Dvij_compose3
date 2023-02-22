@@ -1,7 +1,6 @@
 package kz.dvij.dvij_compose3.elements
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,19 +32,19 @@ fun fieldEmailComponent (
 
     // функция вовзвращает переменную текст, в которую записывается вводимое в поле значение
 
-    var text = remember { mutableStateOf(inputEmail) }
+    val text = remember { mutableStateOf(inputEmail) }
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
-    var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ EMAIL -----------------
@@ -54,8 +53,8 @@ fun fieldEmailComponent (
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -124,14 +123,14 @@ fun fieldEmailComponent (
 
                 Icon(
                     painter = painterResource(R.drawable.ic_error), // иконка ошибки
-                    contentDescription = stringResource(R.string.cd_error_icon), // описание для слабослышащих
+                    contentDescription = stringResource(R.string.cd_error_icon), // описание для слабовидящих
                     tint = AttentionColor, // цвет иконки
                     modifier = Modifier.size(20.dp) // размер иконки
                 )
             } else if (!isTextError.value && text.value != "") {
                 Icon(
                     painter = painterResource(R.drawable.ic_check), // иконка ошибки
-                    contentDescription = stringResource(R.string.cd_right_icon), // описание для слабослышащих
+                    contentDescription = stringResource(R.string.cd_right_icon), // описание для слабовидящих
                     tint = SuccessColor, // цвет иконки
                     modifier = Modifier.size(20.dp) // размер иконки
                 )
@@ -197,7 +196,7 @@ fun fieldEmailComponent (
             color = AttentionColor, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
-    }  else {}
+    }
 
     return text.value!!
 
@@ -210,23 +209,23 @@ fun fieldPasswordComponent (
 
     // создаем переменную text - она возвращает значение
 
-    var text = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf("") }
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
-    var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
     // создаем переменную для скрытия или отображения пароля
 
-    var passwordVisible = remember { mutableStateOf(false) }
+    val passwordVisible = remember { mutableStateOf(false) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ PASSWORD -----------------
@@ -236,8 +235,8 @@ fun fieldPasswordComponent (
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -315,7 +314,7 @@ fun fieldPasswordComponent (
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
-            keyboardType = KeyboardType.Password, // тип клавиатуры (типа удобнее для ввода Email)
+            keyboardType = KeyboardType.Password, // тип клавиатуры (типа удобнее для ввода пароля)
             imeAction = ImeAction.Done // кнопка действия (если не установить это значение, будет перенос на следующую строку. А так действие ГОТОВО)
 
         ),
@@ -362,7 +361,7 @@ fun fieldPasswordComponent (
             color = AttentionColor, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
-    }  else {}
+    }
 
     return text.value
 
@@ -371,21 +370,20 @@ fun fieldPasswordComponent (
 @SuppressLint("ServiceCast")
 @Composable
 fun fieldHeadlineComponent (
-    act: MainActivity,
     inputHeadline: String? = ""
 ): String {
 
     // создаем переменную текст - это значение функция возвращает
 
-    var text = remember { mutableStateOf(inputHeadline) }
+    val text = remember { mutableStateOf(inputHeadline) }
 
     val maxChar = 40 // максимальное количество символов
 
-    var counter = maxChar - (text.value?.length ?: 0) // счетчик, который считает сколько осталось символов
+    val counter = maxChar - (text.value?.length ?: 0) // счетчик, который считает сколько осталось символов
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
     //var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
@@ -393,7 +391,7 @@ fun fieldHeadlineComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
 
@@ -404,8 +402,8 @@ fun fieldHeadlineComponent (
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -481,28 +479,27 @@ fun fieldHeadlineComponent (
 
 @Composable
 fun fieldDescriptionComponent (
-    act: MainActivity,
     description: String = ""
 ): String {
 
     // переменная text возвращает значение при вызове функции
 
-    var text = remember { mutableStateOf(description) }
+    val text = remember { mutableStateOf(description) }
 
     val maxChar = 300 // максимальное количество вводимых символов
 
-    var counter = "${text.value.length} / ${maxChar.toString()}" // счетчик. Считает, сколько осталось символов для ввода
+    val counter = "${text.value.length} / $maxChar" // счетчик. Считает, сколько осталось символов для ввода
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
@@ -511,8 +508,8 @@ fun fieldDescriptionComponent (
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -596,31 +593,29 @@ fun fieldPhoneComponent(
     icon: Painter = painterResource(id = R.drawable.ic_phone),
 ): String {
 
-    var focusColor = remember { mutableStateOf(Grey40) } // изначальный цвет фокуса
-    val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
-
-    var returnText = phone //"+7$phone" // переменная, которая возвращается из функции
+    val focusColor = remember { mutableStateOf(Grey40) } // изначальный цвет фокуса
+    val focusManager =
+        LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     TextField(
         value = phone, // значение поля
 
-        onValueChange = { it -> onPhoneChanged(it.take(mask.count {it == maskNumber}))}
-
-        /*{ it ->
-            onPhoneChanged(it.take(mask.count { it == maskNumber }))
-        }*/,
+        onValueChange = { it -> onPhoneChanged(it.take(mask.count { it == maskNumber })) },
 
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone, // тип клавиатуры
             imeAction = ImeAction.Done // кнопка действия
         ),
 
-        visualTransformation = PhoneVisualTransformation(mask, maskNumber), // визуальное изменение. Передаем маску и символ, который нужно заменять в маске
+        visualTransformation = PhoneVisualTransformation(
+            mask,
+            maskNumber
+        ), // визуальное изменение. Передаем маску и символ, который нужно заменять в маске
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -670,26 +665,25 @@ fun fieldPhoneComponent(
 
     )
 
-    return returnText
+    return phone
 }
 
 
 @Composable
 fun fieldPriceComponent (
-    act: MainActivity,
     inputPrice: String = ""
 ): String {
 
     // переменная текст - та, которая возвращается из функции
 
-    var text = remember { mutableStateOf(inputPrice) }
+    val text = remember { mutableStateOf(inputPrice) }
 
     val maxChar = 8 // максимальное количество символов
 
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
     //var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
@@ -697,7 +691,7 @@ fun fieldPriceComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
@@ -707,8 +701,8 @@ fun fieldPriceComponent (
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -793,20 +787,20 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
 
     // создаем переменную текст - это значение функция возвращает
 
-    var text = remember { mutableStateOf(inputText) }
+    val text = remember { mutableStateOf(inputText) }
 
     // создаем переменные для проверки на ошибку и вывода текста сообщения ошибки
 
-    var isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
+    val isTextError = remember { mutableStateOf(false) } // состояние формы - ошибка или нет
 
-    var errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
+    val errorMassage = remember { mutableStateOf("") } // сообщение об ошибке
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
 
@@ -817,8 +811,8 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый
@@ -905,7 +899,7 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
             color = AttentionColor, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
-    }  else {}
+    }
 
     return text.value ?: ""
 
@@ -919,14 +913,14 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
 
 
 
-    var text = remember { mutableStateOf(inputText) }
+    val text = remember { mutableStateOf(inputText) }
 
     val focusManager = LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    var focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey60) }
 
 
 
@@ -937,8 +931,8 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
 
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { it -> // зависимость цвета границы от действия - есть фокус на поле, или нет
-                if (it.isFocused) focusColor.value =
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
                     PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
                     Grey60 // если нет, то в переменные с цветами передать серый

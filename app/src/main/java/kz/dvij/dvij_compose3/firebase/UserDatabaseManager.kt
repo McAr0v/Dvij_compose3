@@ -24,16 +24,16 @@ class UserDatabaseManager (val act: MainActivity) {
     suspend fun publishUser(filledUser: UserInfoClass, callback: (result: Boolean)-> Unit){
 
         userDatabase // записываем в базу данных
-            .child(auth.uid ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ АКЦИИ
+            .child(auth.uid ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ПОЛЬЗОВАТЕЛЯ
             .child("userData") // помещаем в папку
             .setValue(filledUser).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если мероприятие опубликовано, возвращаем колбак тру
+                    // если информация о пользователе опубликована, возвращаем колбак тру
                     callback (true)
 
                 } else {
-                    // если не опубликовано, то возвращаем фалс
+                    // если не опубликована, то возвращаем фалс
                     callback (false)
                 }
             }
@@ -51,12 +51,12 @@ class UserDatabaseManager (val act: MainActivity) {
 
                     val user = item
                         .child("userData")
-                        .getValue(UserInfoClass::class.java) // забираем данные из БД в виде нашего класса акции
+                        .getValue(UserInfoClass::class.java) // забираем данные из БД в виде нашего класса пользователя
 
-                    // если мероприятие не нал и ключ акции совпадает с ключем из БД, то...
+                    // если пользователь не нал и ключ пользователя совпадает с ключем из БД, то...
                     if (user != null && user.userKey == key) {
 
-                        // передаем в переменную нужную акцию
+                        // передаем в переменную пользователя
                         callback (true)
                         userInfo.value = user
 

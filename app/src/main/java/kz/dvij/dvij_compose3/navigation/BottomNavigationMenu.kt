@@ -88,8 +88,6 @@ fun BottomNavigationMenu (navController: NavController) {
     }
 }
 
-
-
 // ----- ЛЕТАЮЩАЯ КНОПКА ДОБАВИТЬ -----------
 
 @Composable

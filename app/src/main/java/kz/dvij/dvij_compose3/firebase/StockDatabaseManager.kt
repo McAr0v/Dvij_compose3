@@ -35,11 +35,11 @@ class StockDatabaseManager (val act: MainActivity) {
             .setValue(filledStock).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если мероприятие опубликовано, возвращаем колбак тру
+                    // если акция опубликована, возвращаем колбак тру
                     callback (true)
 
                 } else {
-                    // если не опубликовано, то возвращаем фалс
+                    // если не опубликована, то возвращаем фалс
                     callback (false)
                 }
             }
@@ -361,7 +361,7 @@ class StockDatabaseManager (val act: MainActivity) {
                     val stockFav = item.child("AddedToFavorites").childrenCount
 
                     // считываем данные для счетчика - количество просмотров акции
-                    var stockViewCount = item
+                    val stockViewCount = item
                         .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
                     // если мероприятие не нал и ключ акции совпадает с ключем из БД, то...
