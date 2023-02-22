@@ -25,12 +25,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.ConfirmDialog
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -71,6 +71,10 @@ class StockViewScreen (val act: MainActivity) {
         val placeInfo = remember {
             mutableStateOf(PlacesAdsClass())
         }
+
+        // --- ПЕРЕМЕННЫЕ ДИАЛОГОВ ---
+
+        val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
 
         // Считываем данные про акцию и счетчики добавивших в избранное и количество просмотров акции
 
@@ -123,6 +127,21 @@ class StockViewScreen (val act: MainActivity) {
                     .height(250.dp),
                 contentScale = ContentScale.Crop
             )
+
+            if (openConfirmChoose.value) {
+
+                ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
+
+                    stockInfo.value.keyStock?.let {
+                        act.stockDatabaseManager.deleteStock(it){
+
+                            navController.navigate(STOCK_ROOT) {popUpTo(0)}
+
+                        }
+                    }
+
+                }
+            }
 
             // --------- КОНТЕНТ ПОД КАРТИНКОЙ ----------
 
@@ -198,14 +217,7 @@ class StockViewScreen (val act: MainActivity) {
                     Button(
 
                         onClick = {
-
-                            stockInfo.value.keyStock?.let {
-                                act.stockDatabaseManager.deleteStock(it){
-
-                                    navController.navigate(STOCK_ROOT) {popUpTo(0)}
-
-                                }
-                            }
+                            openConfirmChoose.value = true
                         },
                         modifier = Modifier
                             .fillMaxWidth() // кнопка на всю ширину

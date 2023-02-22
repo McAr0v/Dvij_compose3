@@ -26,6 +26,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
+import kz.dvij.dvij_compose3.elements.ConfirmDialog
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
@@ -81,6 +82,8 @@ class MeetingViewScreen(val act: MainActivity) {
         val placeInfo = remember {
             mutableStateOf(PlacesAdsClass())
         }
+
+        val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
 
 
         // Считываем данные про мероприятие и счетчики добавивших в избранное и количество просмотров мероприятия
@@ -139,6 +142,21 @@ class MeetingViewScreen(val act: MainActivity) {
                     .height(250.dp),
                 contentScale = ContentScale.Crop
             )
+
+            if (openConfirmChoose.value) {
+
+                ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
+
+                    meetingInfo.value.key?.let {
+                        act.meetingDatabaseManager.deleteMeeting(it){
+
+                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+
+                        }
+                    }
+
+                }
+            }
 
             // --------- КОНТЕНТ ПОД КАРТИНКОЙ ----------
 
@@ -212,14 +230,8 @@ class MeetingViewScreen(val act: MainActivity) {
                     Button(
 
                         onClick = {
+                            openConfirmChoose.value = true
 
-                            meetingInfo.value.key?.let {
-                                act.meetingDatabaseManager.deleteMeeting(it){
-
-                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
-
-                                }
-                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth() // кнопка на всю ширину

@@ -28,13 +28,13 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
+import kz.dvij.dvij_compose3.elements.ConfirmDialog
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -94,6 +94,8 @@ class PlaceViewScreen (val act: MainActivity) {
             description = "Default"
         )
 
+        val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
+
         // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
 
         act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, key){
@@ -128,6 +130,21 @@ class PlaceViewScreen (val act: MainActivity) {
         // Считываем акции заведения
 
         placeInfo.value.placeKey?.let { act.stockDatabaseManager.readStockInPlaceFromDb(stockList = stockList, placeKey = it) }
+
+        if (openConfirmChoose.value) {
+
+            ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
+
+                placeInfo.value.placeKey?.let {
+                    act.placesDatabaseManager.deletePlace(it){
+
+                        navController.navigate(PLACES_ROOT) {popUpTo(0)}
+
+                    }
+                }
+
+            }
+        }
 
 
         // ---------- КОНТЕНТ СТРАНИЦЫ --------------
@@ -220,13 +237,8 @@ class PlaceViewScreen (val act: MainActivity) {
 
                             onClick = {
 
-                                placeInfo.value.placeKey?.let {
-                                    act.placesDatabaseManager.deletePlace(it){
+                                openConfirmChoose.value = true
 
-                                        navController.navigate(PLACES_ROOT) {popUpTo(0)}
-
-                                    }
-                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth() // кнопка на всю ширину
