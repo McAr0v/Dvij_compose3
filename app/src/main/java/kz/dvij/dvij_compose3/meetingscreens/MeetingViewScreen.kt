@@ -33,6 +33,7 @@ import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingViewScreen(val act: MainActivity) {
@@ -199,12 +200,56 @@ class MeetingViewScreen(val act: MainActivity) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.ic_publish),
-                            contentDescription = stringResource(id = R.string.cd_publish_button),
+                            contentDescription = "Кнопка редактировать",
                             modifier = Modifier.size(20.dp)
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // ------ КНОПКА УДАЛЕНИЯ ------
+
+                    Button(
+
+                        onClick = {
+
+                            meetingInfo.value.key?.let {
+                                act.meetingDatabaseManager.deleteMeeting(it){
+
+                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth() // кнопка на всю ширину
+                            .height(50.dp)// высота - 50
+                            .padding(horizontal = 30.dp), // отступы от краев
+                        shape = RoundedCornerShape(50), // скругление углов
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = SuccessColor, // цвет кнопки
+                            contentColor = Grey100 // цвет контента на кнопке
+                        )
+                    ) {
+                        Text(
+                            text = "Удалить",
+                            style = Typography.labelMedium
+                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_publish),
+                            contentDescription = "Кнопка удалить",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
                 }
+
+
 
 
 

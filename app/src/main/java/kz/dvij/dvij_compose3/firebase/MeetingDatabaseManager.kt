@@ -294,6 +294,25 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         }
     }
 
+    // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ----------
+
+    fun deleteMeeting(key: String, callback: (result: Boolean)-> Unit){
+
+        // если ключ пользователя не будет нал, то выполнится функция
+
+        activity.mAuth.uid?.let {
+            meetingDatabase // обращаемся к БД
+                .child(key) // заходим в папку с уникальным ключем мероприятия
+                .removeValue() // удаляем значение
+        }?.addOnCompleteListener {
+            // слушаем выполнение. Если успешно сделано, то...
+            if (it.isSuccessful){
+                // возвращаем колбак ТРУ
+                callback (true)
+            }
+        }
+    }
+
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ ИЗ ИЗБРАННОГО ----------
 
     fun removeFavouriteMeeting(key: String, callback: (result: Boolean)-> Unit){

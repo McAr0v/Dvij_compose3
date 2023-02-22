@@ -34,6 +34,8 @@ import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
+import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class PlaceViewScreen (val act: MainActivity) {
@@ -209,6 +211,48 @@ class PlaceViewScreen (val act: MainActivity) {
                                 modifier = Modifier.size(20.dp)
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // ------ КНОПКА УДАЛЕНИЯ ------
+
+                        Button(
+
+                            onClick = {
+
+                                placeInfo.value.placeKey?.let {
+                                    act.placesDatabaseManager.deletePlace(it){
+
+                                        navController.navigate(PLACES_ROOT) {popUpTo(0)}
+
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth() // кнопка на всю ширину
+                                .height(50.dp)// высота - 50
+                                .padding(horizontal = 30.dp), // отступы от краев
+                            shape = RoundedCornerShape(50), // скругление углов
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = SuccessColor, // цвет кнопки
+                                contentColor = Grey100 // цвет контента на кнопке
+                            )
+                        ) {
+                            Text(
+                                text = "Удалить",
+                                style = Typography.labelMedium
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            androidx.compose.material.Icon(
+                                painter = painterResource(id = R.drawable.ic_publish),
+                                contentDescription = "Кнопка удалить",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
 
 

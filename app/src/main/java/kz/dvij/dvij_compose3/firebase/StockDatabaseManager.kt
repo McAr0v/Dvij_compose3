@@ -45,6 +45,25 @@ class StockDatabaseManager (val act: MainActivity) {
             }
     }
 
+    // --- ФУНКЦИЯ УДАЛЕНИЯ АКЦИИ ----------
+
+    fun deleteStock(key: String, callback: (result: Boolean)-> Unit){
+
+        // если ключ пользователя не будет нал, то выполнится функция
+
+        act.mAuth.uid?.let {
+            stockDatabase // обращаемся к БД
+                .child(key) // заходим в папку с уникальным ключем акции
+                .removeValue() // удаляем значение
+        }?.addOnCompleteListener {
+            // слушаем выполнение. Если успешно сделано, то...
+            if (it.isSuccessful){
+                // возвращаем колбак ТРУ
+                callback (true)
+            }
+        }
+    }
+
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 
     fun readStockDataFromDb(stockList: MutableState<List<StockAdsClass>>){

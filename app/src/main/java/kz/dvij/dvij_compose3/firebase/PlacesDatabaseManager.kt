@@ -45,6 +45,25 @@ class PlacesDatabaseManager (val act: MainActivity) {
             }
     }
 
+    // --- ФУНКЦИЯ УДАЛЕНИЯ Заведения----------
+
+    fun deletePlace(key: String, callback: (result: Boolean)-> Unit){
+
+        // если ключ пользователя не будет нал, то выполнится функция
+
+        act.mAuth.uid?.let {
+            placeDatabase // обращаемся к БД
+                .child(key) // заходим в папку с уникальным ключем заведения
+                .removeValue() // удаляем значение
+        }?.addOnCompleteListener {
+            // слушаем выполнение. Если успешно сделано, то...
+            if (it.isSuccessful){
+                // возвращаем колбак ТРУ
+                callback (true)
+            }
+        }
+    }
+
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ЗАВЕДЕНИЙ С БАЗЫ ДАННЫХ --------
 
     fun readPlaceDataFromDb(placeList: MutableState<List<PlacesAdsClass>>){
