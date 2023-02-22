@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.meetingscreens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
@@ -9,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -17,8 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.dialogs.CategoriesList
+import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
+import kz.dvij.dvij_compose3.pickers.dataPicker
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingsScreens (val act: MainActivity) {
@@ -54,8 +59,27 @@ class MeetingsScreens (val act: MainActivity) {
             mutableStateOf(listOf<MeetingsAdsClass>())
         }
 
+        // инициализируем список мероприятий
+        val sortedMeetingsList = remember {
+            mutableStateOf(listOf<MeetingsAdsClass>())
+        }
+
         // обращаемся к базе данных и записываем в список мероприятий мероприятия
         databaseManager.readMeetingDataFromDb(meetingsList)
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
+        var category by rememberSaveable { mutableStateOf("Выбери категорию") }
+        val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
+        val chosenMeetingCategoryCreate = remember {mutableStateOf("Выбери категорию")}
+        // ----- СПИСКИ -----
+
+        // Список категорий
+        val categoriesList = remember {mutableStateOf(listOf<CategoriesList>())}
+        // Запускаем функцию считывания списка категорий с базы данных
+        act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
+
+        val openSorting = remember { mutableStateOf(false) } // список отсортированных мероприятий
 
         // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 
@@ -69,9 +93,51 @@ class MeetingsScreens (val act: MainActivity) {
             verticalArrangement = Arrangement.Center
         ) {
 
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(Grey80)) {
+
+                val filterDate = dataPicker(act = act)
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                category = act.categoryDialog.categorySelectButton(categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                IconButton(onClick = { if (filterDate != "" || category != "Выбери категорию"){
+
+                    Log.d("MyLog", category)
+
+                    act.meetingDatabaseManager.filterMeeting(sortedMeetingsList, filterDate, category)
+                    openSorting.value = true
+
+
+                }
+
+                }) {
+
+                    Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = "")
+
+                }
+
+            }
+
+            // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
+
+            if (openCategoryDialog.value) {
+
+                act.categoryDialog.CategoryChooseDialog(categoryName = chosenMeetingCategoryCreate, categoriesList) {
+                    openCategoryDialog.value = false
+                }
+
+            }
+
+
+
             // ---- ЕСЛИ ЗАГРУЗИЛИСЬ МЕРОПРИЯТИЯ С БД --------
 
-            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
+            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default) && !openSorting.value){
 
                 // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -95,7 +161,31 @@ class MeetingsScreens (val act: MainActivity) {
                         )
                     }
                 }
-            } else if (meetingsList.value == listOf(default)){
+            } else if (sortedMeetingsList.value.isNotEmpty() && sortedMeetingsList.value != listOf(default) && openSorting.value){
+
+            // ---- ЛЕНИВАЯ КОЛОНКА --------
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Grey95),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ){
+
+                // для каждого элемента из списка указываем шаблон для отображения
+
+                items(sortedMeetingsList.value){ item ->
+
+                    // сам шаблон карточки мероприятия
+                    act.meetingsCard.MeetingCard(
+                        navController = navController,
+                        meetingItem = item,
+                        meetingKey = meetingKey
+                    )
+                }
+            }
+        }else if (meetingsList.value == listOf(default) || sortedMeetingsList.value == listOf(default)){
 
                 // ----- ЕСЛИ НЕТ МЕРОПРИЯТИЙ -------
 

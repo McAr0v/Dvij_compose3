@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.pickers
 
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,8 @@ import java.util.*
 @Composable
 fun dataPicker(act: MainActivity, inputDate: String = ""): String{
 
+    // https://www.geeksforgeeks.org/material-design-date-picker-in-android/ - настройка внешнего вида дата пикера
+
     var dataResult = "" // возвращаемая переменная
     val mContext = LocalContext.current // инициализируем контекст
 
@@ -33,6 +36,7 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
     val mYear: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
     val mMonth: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
     val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+
 
     mCalendar.time = Date() // берем из календаря текущую дату
 

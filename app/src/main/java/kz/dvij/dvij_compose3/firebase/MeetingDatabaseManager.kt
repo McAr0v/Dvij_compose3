@@ -530,6 +530,76 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
+    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ МЕРОПРИЯТИЙ --------
+
+    fun filterMeeting(
+        meetingsList: MutableState<List<MeetingsAdsClass>>,
+        date: String = "",
+        category: String = "Выбери категорию"
+    ){
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            // функция при изменении данных в БД
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val meetingArray = ArrayList<MeetingsAdsClass>()
+
+                for (item in snapshot.children){
+
+                    // Считываем каждое мероприятие для сравнения
+
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        .child("info") // папка с информацией о мероприятии
+                        .children.iterator().next() // папка уникального ключа пользователя. Пропускаем ее
+                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                    if (meeting != null) {
+
+                        if (date == "" && category == "Выбери категорию") {
+
+
+                        } else if (date != "" && category == "Выбери категорию") {
+
+                            if (meeting.data == date) {
+
+                                meetingArray.add(meeting)
+
+                            }
+
+                        } else if (date == "" && category != "Выбери категорию") {
+
+                            if (meeting.category == category) {
+
+                                meetingArray.add(meeting)
+
+                            }
+
+                        } else {
+
+                            if (meeting.data == date && meeting.category == category) {
+
+                                meetingArray.add(meeting)
+
+                            }
+
+                        }
+                    }
+                    }
+
+                if (meetingArray.isEmpty()){
+                    meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
+                } else {
+                    meetingsList.value = meetingArray
+                }
+            }
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
 
 
 }
