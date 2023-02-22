@@ -405,7 +405,6 @@ class AccountScreens(val act: MainActivity) {
 
                             accountHelper.signInWithGoogle() // запускаем функцию регистрации через Google
 
-
                         }
 
 

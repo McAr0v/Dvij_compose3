@@ -31,6 +31,7 @@ import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.UserDatabaseManager
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PROFILE_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.Grey100
@@ -59,8 +60,16 @@ class CreateProfileInfoScreen (val act: MainActivity) {
             telegram = "",
             userKey = "",
             city = "Выбери город"
-        )
+        ),
+        // Тип страницы - редактирование или создание
+        createOrEdit: String
     ) {
+
+        val nameFromDb = remember {mutableStateOf(filledUserInfo.name)}
+        val surnameFromDb = remember {mutableStateOf(filledUserInfo.surname)}
+        val emailFromDb = remember {mutableStateOf(filledUserInfo.email)}
+        val instagramFromDb = remember {mutableStateOf(filledUserInfo.instagram)}
+        val telegramFromDb = remember {mutableStateOf(filledUserInfo.telegram)}
 
         // --- ПЕРЕМЕННЫЕ ГОРОДА ---
 
@@ -97,21 +106,69 @@ class CreateProfileInfoScreen (val act: MainActivity) {
             horizontalAlignment = Alignment.Start // выравнивание по горизонтали
         ) {
 
+            // ---- АВАТАР ------
+
             SpacerTextWithLine(headline = "Аватар") // подпись перед формой
 
-            val avatar = chooseImageDesign(filledUserInfo.avatar) // Изображение акции
+            val avatar = if (filledUserInfo.avatar != null && filledUserInfo.avatar != "" && createOrEdit != "0"){
+
+                // Если при редактировании есть картинка, подгружаем картинку
+                chooseImageDesign(filledUserInfo.avatar)
+
+            } else {
+
+                // Если нет - стандартный выбор картинки
+                chooseImageDesign()
+
+            }
+
+
+            // ---- ИМЯ ------
 
             SpacerTextWithLine(headline = "Имя")
 
-            val name = fieldTextComponent("Введи своё имя", filledUserInfo?.name) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+            val name = if (filledUserInfo.name != null && filledUserInfo.name != "" && createOrEdit != "0" ){
+
+                fieldTextComponent("Введи своё имя", nameFromDb.value)
+
+            } else {
+
+                fieldTextComponent("Введи своё имя")
+
+            }
+
+
+            // ---- ФАМИЛИЯ -------
 
             SpacerTextWithLine(headline = "Фамилия")
 
-            val surname = fieldTextComponent("Введи свою фамилию", filledUserInfo?.surname) // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+            val surname = if (filledUserInfo.surname != null && filledUserInfo.surname != "" && createOrEdit != "0" ){
+
+                fieldTextComponent("Введи свою фамилию", surnameFromDb.value)
+
+            } else {
+
+                fieldTextComponent("Введи свою фамилию")
+
+            }
+
+
+            // ---- EMAIL ---------
 
             SpacerTextWithLine(headline = "Email")
 
-            val email = fieldEmailComponent(act = act, filledUserInfo?.email)
+            val email = if (filledUserInfo.email != null && filledUserInfo.email != "" && createOrEdit != "0" ) {
+
+                fieldEmailComponent(act = act, emailFromDb.value)
+
+            } else {
+
+                fieldEmailComponent(act = act)
+
+            }
+
+
+            // ----- ТЕЛЕФОН --------
 
             SpacerTextWithLine(headline = "Телефон")
 
@@ -153,13 +210,38 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
 
 
+            // ------ ИНСТАГРАМ -------
+
             SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
 
-            val instagram = fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = filledUserInfo?.instagram) // форма инстаграма
+            val instagram = if (filledUserInfo.instagram != null && filledUserInfo.instagram != "" && createOrEdit != "0" ){
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram, inputText = instagramFromDb.value) // форма инстаграма
+
+            } else {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.instagram)
+
+            }
+
+
+            // ------ ТЕЛЕГРАМ -------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
 
-            val telegram = fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = filledUserInfo?.telegram) // форма телеграма
+            val telegram = if (filledUserInfo.telegram != null && filledUserInfo.telegram != "" && createOrEdit != "0" ) {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.telegram, inputText = telegramFromDb.value) // форма телеграма
+
+            } else {
+
+                fieldInstagramComponent(act = act, icon = R.drawable.telegram)
+
+            }
+
+
+
+            // ---- ГОРОД ------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
 
@@ -169,12 +251,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
             if (filledUserInfo.city != null && filledUserInfo.city != "Выбери город" && filledUserInfo.city != "" && filledUserInfo.city != "Empty") {
 
                 // Передаем в кнопку выбора города ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCity) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCity) {openCityDialog.value = true}
 
             } else {
 
                 // В ОСТАЛЬНЫХ СЛУЧАЯХ - ПЕРЕДАЕМ ГОРОД ПО УМОЛЧАНИЮ
-                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}.toString()
+                city = act.chooseCityNavigation.citySelectButton(cityName = chosenCityCreateWithoutUser) {openCityDialog.value = true}
 
             }
 
@@ -294,7 +376,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                 // заполняем
 
                                 val filledUser = UserInfoClass(
-                                    avatar = filledUserInfo?.avatar,
+                                    avatar = filledUserInfo.avatar,
                                     name = name,
                                     surname = surname,
                                     email = email,

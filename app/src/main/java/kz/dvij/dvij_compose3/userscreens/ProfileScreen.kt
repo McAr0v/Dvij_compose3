@@ -40,6 +40,15 @@ fun ProfileScreen (
     userInfo: MutableState<UserInfoClass>
 ) {
 
+    if (activity.mAuth.uid != null){
+
+        activity.userDatabaseManager.readOneUserFromDataBase(userInfo, activity.mAuth.uid!!){
+
+        }
+
+    }
+
+
     val accountHelper = AccountHelper(activity)
 
     // ------ ЕСЛИ USER НЕ РАВЕН NULL И  ПОДТВЕРДИЛ EMAIL ------

@@ -85,10 +85,9 @@ class MainActivity : ComponentActivity() {
     val stockDatabaseManager = StockDatabaseManager(this)
     private val stockViewScreen = StockViewScreen(this)
     private val createProfileInfoScreen = CreateProfileInfoScreen(this)
-    private val userDatabaseManager = UserDatabaseManager(this)
+    val userDatabaseManager = UserDatabaseManager(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
-    // var callOnPhoneResultLauncher: ActivityResultLauncher<Intent>? = null
 
 
 
@@ -123,6 +122,10 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+
+            val authKey = remember {
+                mutableStateOf(mAuth)
+            }
 
             // Список, в который поместим города из БД
 
@@ -430,7 +433,7 @@ class MainActivity : ComponentActivity() {
                         // ----- СТРАНИЦЫ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -----
 
                         composable(PROFILE_ROOT) { ProfileScreen(mAuth.currentUser, navController, this@MainActivity, userInfo) }
-                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value)}
+                        composable(CREATE_USER_INFO_SCREEN) {createProfileInfoScreen.CreateUserInfoScreen(navController = navController, citiesList = citiesList, userInfo.value, CREATE_USER_INFO_SCREEN)}
 
                         // ---- СТРАНИЦЫ РЕГИСТРАЦИИ / АВТОРИЗАЦИИ ----
 

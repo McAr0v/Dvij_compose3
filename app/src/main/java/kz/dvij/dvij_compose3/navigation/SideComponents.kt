@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
@@ -154,7 +155,7 @@ class SideComponents (private val act: MainActivity) {
     fun AvatarBoxSideNavigation(
         navController: NavController, // принимаем навконтроллер чтобы переходить на страницу профиля
         scaffoldState: ScaffoldState, // принимаем скаффолд стейт, чтобы потом можно было после нажатия закрывать боковое меню
-        userInfo: MutableState<UserInfoClass>
+        userInfo: MutableState<UserInfoClass>,
     ) {
 
 
@@ -167,6 +168,8 @@ class SideComponents (private val act: MainActivity) {
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину
 
         // УСЛОВИЕ - ЕСЛИ АВТОРИЗОВАН, ТО КОНТЕНТ ОДИН, ЕСЛИ НЕТ, ТО ДРУГОЙ
+
+
 
         if (loggedUser != null && loggedUser.isEmailVerified) { // КОНТЕНТ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
 

@@ -184,7 +184,7 @@ class AccountHelper (val act: MainActivity) {
 
     // --------- ФУНКЦИЯ ПОЛУЧЕНИЯ ДОСТУПА К АККАУНТУ ГУГЛ НА ТЕЛЕФОНЕ ------------
 
-    fun getSignInClient (): GoogleSignInClient {
+    private fun getSignInClient (): GoogleSignInClient {
 
         // функция получает доступ приложения к аккаунту гугл с телефона
 
