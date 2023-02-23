@@ -123,10 +123,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val authKey = remember {
-                mutableStateOf(mAuth)
-            }
-
             // Список, в который поместим города из БД
 
             val citiesList = remember {
@@ -231,6 +227,12 @@ class MainActivity : ComponentActivity() {
             val placeKey = remember { mutableStateOf("") }
             val stockKey = remember { mutableStateOf("") }
             val startPage = remember { mutableStateOf(MEETINGS_ROOT) }
+
+            // Переменные для запоминания фильтра в МЕРОПРИЯТИЯХ
+
+            val meetingCategoryForFilter = remember { mutableStateOf("Выбери категорию") }
+            val meetingDateForFilter = remember { mutableStateOf("Выбери дату") }
+
 
             // Город по умолчанию
             val cityName = remember { mutableStateOf("Выбери город") }
@@ -411,7 +413,7 @@ class MainActivity : ComponentActivity() {
 
                         // --- СТРАНИЦЫ МЕРОПРИЯТИЙ -----
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingDateForFilter = meetingDateForFilter)}
                         composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}

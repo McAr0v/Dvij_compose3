@@ -28,7 +28,17 @@ import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН И ФУНКЦИОНАЛ ТАБОВ (МОИ, ИЗБРАННЫЕ, ЛЕНТА) В РАЗДЕЛАХ МЕРОПРИЯТИЯ, ЗАВЕДЕНИЯ, АКЦИИ
 
-fun TabMenu (bottomPage: String, navController: NavController, activity: MainActivity, meetingKey: MutableState<String>? = null, placesKey: MutableState<String>? = null, stockKey: MutableState<String>? = null){
+fun TabMenu (
+    bottomPage: String,
+    navController: NavController,
+    activity: MainActivity,
+    meetingKey: MutableState<String>? = null,
+    placesKey: MutableState<String>? = null,
+    stockKey: MutableState<String>? = null,
+    cityForFilter: MutableState<String>? = null,
+    meetingCategoryForFilter: MutableState<String>? = null,
+    meetingDateForFilter: MutableState<String>? = null
+){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
     // (Смотри Horizontal Pager)
@@ -91,8 +101,12 @@ fun TabMenu (bottomPage: String, navController: NavController, activity: MainAct
                     // в завимисости от того, какой индекс страницы
                     when (page) {
                         0 -> meetingKey?.let {
-                            activity.meetingsScreens.MeetingsTapeScreen(navController = navController,
-                                it
+                            activity.meetingsScreens.MeetingsTapeScreen(
+                                navController = navController,
+                                meetingKey = it,
+                                cityForFilter = cityForFilter!!,
+                                meetingCategoryForFilter = meetingCategoryForFilter!!,
+                                meetingDateForFilter = meetingDateForFilter!!
                             )
                         } // мероприятия Лента
                         1 -> meetingKey?.let {

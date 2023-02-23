@@ -7,8 +7,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Text
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -91,9 +90,12 @@ fun BottomNavigationMenu (navController: NavController) {
 // ----- ЛЕТАЮЩАЯ КНОПКА ДОБАВИТЬ -----------
 
 @Composable
-fun FloatingButton(onClick: () -> Unit ){
+fun FloatingButton(
+    onClick: () -> Unit
+){
 
     // помещаем кнопку в BOX
+
     Box(
         modifier = Modifier
             .fillMaxSize() // занять полный размер
@@ -115,11 +117,107 @@ fun FloatingButton(onClick: () -> Unit ){
                 .padding(16.dp) // отступы
                 .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
         ) {
+
             // ------- СОДЕРЖИМОЕ КНОПКИ --------
             Icon(
                 painter = painterResource(id = R.drawable.ic_add), // сама иконка
                 contentDescription = stringResource(id = R.string.cd_create) // описание для слабовидящих
             )
+
+        }
+    }
+}
+
+// ----- ЛЕТАЮЩАЯ КНОПКА ДОБАВИТЬ -----------
+
+@Composable
+fun FloatingFilterButton(
+    city: String = "Выбери город",
+    category: String = "Выбери категорию",
+    date: String = "Выбери дату",
+    typeOfFilter: String,
+    onClick: () -> Unit
+){
+
+    val counter = when (typeOfFilter){
+
+        "cityCategoryDate" -> {
+            " (3)"
+        }
+        "cityCategory" -> {
+            " (2)"
+        }
+        "cityDate" -> {
+            " (2)"
+        }
+        "city" -> {
+            " (1)"
+        }
+        "categoryDate" -> {
+            " (2)"
+        }
+        "category" -> {
+            " (1)"
+        }
+        "date" -> {
+            " (1)"
+        }
+        "noFilter" -> {
+            ""
+        }
+
+        else -> {""}
+    }
+
+    val containerColor = remember {
+        mutableStateOf(SuccessColor)
+    }
+
+    if (city != "Выбери город" || category != "Выбери категорию" || date != "Выбери дату") {
+        containerColor.value = SuccessColor
+    } else {
+        containerColor.value = Grey90
+    }
+
+    // помещаем кнопку в BOX
+    Box(
+        modifier = Modifier
+            .fillMaxSize() // занять полный размер
+            .fillMaxWidth() // занять всю ширину
+            .fillMaxHeight() // занять всю высоту
+    ) {
+
+        // --- САМА КНОПКА -------
+
+        FloatingActionButton(
+
+            onClick = { // действие на нажатие
+                onClick()
+            },
+            shape = CircleShape, // форма кнопки
+            contentColor = Grey00, // цвет содержимого кнопки
+            containerColor = containerColor.value, // цвет фона кнопки
+            modifier = Modifier
+                .padding(16.dp) // отступы
+                .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
+        ) {
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.padding(15.dp)
+            ){
+
+                Text(text = "Фильтр$counter", color = Grey00)
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter), // сама иконка
+                    contentDescription = "Кнопка фильтра" // описание для слабовидящих
+                )
+
+            }
         }
     }
 }

@@ -155,6 +155,97 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
+
+    fun readFilteredMeetingDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>, filter: String){
+
+        val removeQuery = getFilter(filter)
+
+        val typeFilter = getTypeOfFilter(removeQuery)
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+
+                for (item in snapshot.children){
+
+                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        .child("info") // следующая папка с информацией о мероприятии
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+
+                    val getFilter = item
+                        .child("filterInfo").getValue(FilterClass::class.java)
+
+                    if (meeting != null && getFilter != null) {
+
+                        when (typeFilter){
+
+                            "cityCategoryDate" -> {
+
+                                if (getFilter.cityCategoryDate == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "cityCategory" -> {
+                                if (getFilter.cityCategory == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "cityDate" -> {
+                                if (getFilter.cityDate == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "city" -> {
+                                if (getFilter.city == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "categoryDate" -> {
+                                if (getFilter.categoryDate == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "category" -> {
+                                if (getFilter.category == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "date" -> {
+                                if (getFilter.date == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+                            "noFilter" -> {
+                                if (getFilter.noFilter == filter){
+                                    meetingArray.add(meeting)
+                                }
+                            }
+
+                        }
+
+                    } // если мероприятие не пустое, добавляем в список
+
+                }
+
+                if (meetingArray.isEmpty()){
+                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                } else {
+                    val reversedList = meetingArray.asReversed()
+                    meetingsList.value = reversedList // если добавились мероприятия в список, то этот новый список и передаем
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
 
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ МЕРОПРИЯТИЙ --------
@@ -186,7 +277,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                 if (meetingArray.isEmpty()){
                     meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
-                    meetingsList.value = meetingArray // если список не пустой, то возвращаем мои мероприятия с БД
+                    meetingsList.value = meetingArray.asReversed() // если список не пустой, то возвращаем мои мероприятия с БД
                 }
             }
 
@@ -241,7 +332,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                 if (meetingArray.isEmpty()){
                     meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
-                    meetingsList.value = meetingArray // если список не пустой, то возвращаем избранные мероприятия с БД
+                    meetingsList.value = meetingArray.asReversed() // если список не пустой, то возвращаем избранные мероприятия с БД
                 }
             }
             // в функцию onCancelled пока ничего не добавляем
@@ -255,6 +346,17 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     suspend fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
 
+        val filledFilter = FilterClass(
+            cityCategoryDate = createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            cityCategory = createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty"),
+            cityDate = createFilter(city = filledMeeting.city ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            city = createFilter(city = filledMeeting.city ?: "Empty"),
+            categoryDate = createFilter(category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            category = createFilter(category = filledMeeting.category ?: "Empty"),
+            date = createFilter(date = filledMeeting.data ?: "Empty"),
+            noFilter = createFilter()
+        )
+
         meetingDatabase // записываем в базу данных
             .child(filledMeeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
             .child("info") // помещаем данные в папку info
@@ -263,14 +365,30 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
             .setValue(filledMeeting).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если мероприятие опубликовано, возвращаем колбак тру
-                    callback (true)
+
+                    // если мероприятие опубликовано, запускаем публикацию фильтра
+                    meetingDatabase
+                        .child(filledMeeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
+                        .child("filterInfo") // помещаем данные в папку info
+                        .setValue(filledFilter).addOnCompleteListener { filterIsPublish ->
+
+                            if (filterIsPublish.isSuccessful){
+
+                                callback (true)
+
+                            } else {
+                                // если не опубликован фильтр, то возвращаем фалс
+                                callback (false)
+                            }
+                        }
 
                 } else {
                     // если не опубликовано, то возвращаем фалс
                     callback (false)
                 }
             }
+
+
     }
 
     // --- ФУНКЦИЯ ДОБАВЛЕНИЯ МЕРОПРИЯТИЯ В ИЗБРАННОЕ ---------
@@ -553,75 +671,50 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         return filter.split("_")
     }
 
-    // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ МЕРОПРИЯТИЙ --------
+    fun getTypeOfFilter(inputList: List<String>): String{
 
-    fun filterMeeting(
-        meetingsList: MutableState<List<MeetingsAdsClass>>,
-        date: String = "",
-        category: String = "Выбери категорию"
-    ){
-        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+        var result = ""
 
-            // функция при изменении данных в БД
-            override fun onDataChange(snapshot: DataSnapshot) {
+        val city = inputList[0]
+        val category = inputList[1]
+        val date = inputList[2]
 
-                val meetingArray = ArrayList<MeetingsAdsClass>()
+        if (city != "Выбери город" && category != "Выбери категорию" && date != "Выбери дату"){
 
-                for (item in snapshot.children){
+            result = "cityCategoryDate"
 
-                    // Считываем каждое мероприятие для сравнения
+        } else if (city != "Выбери город" && category != "Выбери категорию"){
 
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                        .child("info") // папка с информацией о мероприятии
-                        .children.iterator().next() // папка уникального ключа пользователя. Пропускаем ее
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
-                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+            result = "cityCategory"
 
-                    if (meeting != null) {
+        } else if (city != "Выбери город" && date != "Выбери дату"){
 
-                        if (date == "" && category == "Выбери категорию") {
+            result = "cityDate"
 
+        } else if (city != "Выбери город"){
 
-                        } else if (date != "" && category == "Выбери категорию") {
+            result = "city"
 
-                            if (meeting.data == date) {
+        } else if (category != "Выбери категорию" && date != "Выбери дату"){
 
-                                meetingArray.add(meeting)
+            result = "categoryDate"
 
-                            }
+        } else if (category != "Выбери категорию"){
 
-                        } else if (date == "" && category != "Выбери категорию") {
+            result = "category"
 
-                            if (meeting.category == category) {
+        } else if (date != "Выбери дату"){
 
-                                meetingArray.add(meeting)
+            result = "date"
 
-                            }
+        } else {
 
-                        } else {
+            result = "noFilter"
 
-                            if (meeting.data == date && meeting.category == category) {
-
-                                meetingArray.add(meeting)
-
-                            }
-
-                        }
-                    }
-                    }
-
-                if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
-                } else {
-                    meetingsList.value = meetingArray
-                }
-            }
-            // в функцию onCancelled пока ничего не добавляем
-            override fun onCancelled(error: DatabaseError) {}
         }
-        )
+
+
+        return result
     }
-
-
 
 }

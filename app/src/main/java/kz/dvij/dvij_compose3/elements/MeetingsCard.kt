@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.elements
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -148,7 +149,63 @@ class MeetingsCard(val act: MainActivity) {
                             imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
                             contentDescription = stringResource(id = R.string.cd_fav_icon), // описание для слабовидящих
                             modifier = Modifier
-                                .size(24.dp), // размер иконки
+                                .size(24.dp)
+                                .clickable {
+                                    // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это мероприятие -----
+                                    // Если не авторизован, условие else
+
+                                    if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                        act.meetingDatabaseManager.favIconMeeting(meetingItem.key) {
+
+                                            // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                            if (it) {
+
+                                                // Убираем из избранных
+                                                act.meetingDatabaseManager.removeFavouriteMeeting(meetingItem.key) { result ->
+
+                                                    // Если пришел колбак, что успешно
+
+                                                    if (result) {
+
+                                                        iconFavColor.value = Grey00 // При нажатии окрашиваем кнопку в темно-серый
+
+                                                        // Выводим ТОСТ
+                                                        Toast.makeText(act,act.getString(R.string.delete_from_fav),
+                                                            Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+
+                                            } else {
+
+                                                // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                                act.meetingDatabaseManager.addFavouriteMeeting(meetingItem.key) { inFav ->
+
+                                                    // Если пришел колбак, что успешно
+
+                                                    if (inFav) {
+
+                                                        iconFavColor.value = PrimaryColor // Окрашиваем кнопку в главный цвет
+
+                                                        // Выводим ТОСТ
+                                                        Toast.makeText(act,act.getString(R.string.add_to_fav),
+                                                            Toast.LENGTH_SHORT).show()
+
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+
+                                        // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                        Toast
+                                            .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
+                                            .show()
+                                    }
+                                }, // размер иконки
                             tint = iconFavColor.value // Цвет иконки
                         )
 
