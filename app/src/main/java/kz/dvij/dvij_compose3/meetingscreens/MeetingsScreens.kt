@@ -20,10 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
-import kz.dvij.dvij_compose3.elements.CategoryDialog
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.pickers.dataPicker
+import kz.dvij.dvij_compose3.pickers.dataPickerWithRemember
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingsScreens (val act: MainActivity) {
@@ -54,28 +55,39 @@ class MeetingsScreens (val act: MainActivity) {
     @Composable
     fun MeetingsTapeScreen (navController: NavController, meetingKey: MutableState<String>){
 
+        // ----- СПИСКИ -----
+
         // инициализируем список мероприятий
         val meetingsList = remember {
             mutableStateOf(listOf<MeetingsAdsClass>())
         }
 
-        // инициализируем список мероприятий
-        val sortedMeetingsList = remember {
-            mutableStateOf(listOf<MeetingsAdsClass>())
+        // Список, в который поместим города из БД
+
+        val citiesList = remember {
+            mutableStateOf(listOf<CitiesList>())
         }
+
+        // Читаем список городов
+        act.chooseCityNavigation.readCityDataFromDb(citiesList)
+
+        val openCityDialog = remember { mutableStateOf(false) } // диалог ГОРОДА
+
+        // Список категорий
+        val categoriesList = remember {mutableStateOf(listOf<CategoriesList>())}
+
+        val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
+
+        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
+        val filterCategory = remember {mutableStateOf("Выбери категорию")}
+        val filterDate = remember {mutableStateOf("Выбери дату")}
+
+        // Значение города по умолчанию
+        val filterCity = remember {mutableStateOf("Выбери город")}
 
         // обращаемся к базе данных и записываем в список мероприятий мероприятия
         databaseManager.readMeetingDataFromDb(meetingsList)
 
-        // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
-        var category by rememberSaveable { mutableStateOf("Выбери категорию") }
-        val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
-        // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПО УМОЛЧАНИЮ ПРИ СОЗДАНИИ
-        val chosenMeetingCategoryCreate = remember {mutableStateOf("Выбери категорию")}
-        // ----- СПИСКИ -----
-
-        // Список категорий
-        val categoriesList = remember {mutableStateOf(listOf<CategoriesList>())}
         // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
 
@@ -90,44 +102,102 @@ class MeetingsScreens (val act: MainActivity) {
                 .padding(horizontal = 10.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
 
-            Row(modifier = Modifier
+            Column(modifier = Modifier
                 .fillMaxWidth()
-                .background(Grey80)) {
+                .background(Grey80),
+            ) {
 
-                val filterDate = dataPicker(act = act)
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey80)) {
 
-                Spacer(modifier = Modifier.width(10.dp))
 
-                category = act.categoryDialog.categorySelectButton(categoryName = chosenMeetingCategoryCreate) { openCategoryDialog.value = true }
+                    filterDate.value = dataPickerWithRemember(act = act, filterDate)
 
-                Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                IconButton(onClick = { if (filterDate != "" || category != "Выбери категорию"){
+                    IconButton(onClick = { if (filterDate.value != "Выбери дату" || filterCategory.value != "Выбери категорию" || filterCity.value != "Выбери город"){
 
-                    Log.d("MyLog", category)
+                        val query = act.meetingDatabaseManager.createFilter(city = filterCity.value, category = filterCategory.value, date = filterDate.value)
 
-                    act.meetingDatabaseManager.filterMeeting(sortedMeetingsList, filterDate, category)
-                    openSorting.value = true
+                        val removeQuery = act.meetingDatabaseManager.getFilter(query)
 
+                        filterCategory.value = removeQuery[1]
+                        filterDate.value = removeQuery[2]
+                        filterCity.value = removeQuery[0]
+
+                        //act.meetingDatabaseManager.filterMeeting(sortedMeetingsList, filterDate, category)
+                        //openSorting.value = true
+                        Log.d ("MyLog", filterCategory.value )
+                        Log.d ("MyLog", filterDate.value )
+                        Log.d ("MyLog", filterCity.value )
+
+                    }
+
+                    }) {
+
+                        Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = "")
+
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    IconButton(onClick = {
+
+                        val query = act.meetingDatabaseManager.createFilter()
+
+                        val removeQuery = act.meetingDatabaseManager.getFilter(query)
+
+                        filterCategory.value = removeQuery[1]
+                        filterDate.value = removeQuery[2]
+                        filterCity.value = removeQuery[0]
+
+                        Log.d ("MyLog", filterCategory.value )
+                        Log.d ("MyLog", filterDate.value )
+                        Log.d ("MyLog", filterCity.value )
+
+                        //act.meetingDatabaseManager.filterMeeting(sortedMeetingsList, filterDate, category)
+                        //openSorting.value = true
+
+                    }) {
+
+                        Icon(painter = painterResource(id = R.drawable.ic_delete), contentDescription = "")
+
+                    }
 
                 }
 
-                }) {
+                Spacer(modifier = Modifier.height(10.dp))
 
-                    Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = "")
+                filterCategory.value = act.categoryDialog.categorySelectButton(categoryName = filterCategory) { openCategoryDialog.value = true }
 
+                Spacer(modifier = Modifier.width(10.dp))
+
+                filterCity.value = act.chooseCityNavigation.citySelectButton(cityName = filterCity) {openCityDialog.value = true}
+            }
+
+            if (openCityDialog.value) {
+
+                // Если при редактировании в мероприятии есть город, Передаем ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                act.chooseCityNavigation.CityChooseDialog(
+                    cityName = filterCity,
+                    citiesList
+                ) {
+                    openCityDialog.value = false
                 }
 
             }
+
+
 
             // --- САМ ДИАЛОГ ВЫБОРА КАТЕГОРИИ -----
 
             if (openCategoryDialog.value) {
 
-                act.categoryDialog.CategoryChooseDialog(categoryName = chosenMeetingCategoryCreate, categoriesList) {
+                act.categoryDialog.CategoryChooseDialog(categoryName = filterCategory, categoriesList) {
                     openCategoryDialog.value = false
                 }
 
@@ -137,7 +207,7 @@ class MeetingsScreens (val act: MainActivity) {
 
             // ---- ЕСЛИ ЗАГРУЗИЛИСЬ МЕРОПРИЯТИЯ С БД --------
 
-            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default) && !openSorting.value){
+            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
 
                 // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -161,31 +231,7 @@ class MeetingsScreens (val act: MainActivity) {
                         )
                     }
                 }
-            } else if (sortedMeetingsList.value.isNotEmpty() && sortedMeetingsList.value != listOf(default) && openSorting.value){
-
-            // ---- ЛЕНИВАЯ КОЛОНКА --------
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Grey95),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ){
-
-                // для каждого элемента из списка указываем шаблон для отображения
-
-                items(sortedMeetingsList.value){ item ->
-
-                    // сам шаблон карточки мероприятия
-                    act.meetingsCard.MeetingCard(
-                        navController = navController,
-                        meetingItem = item,
-                        meetingKey = meetingKey
-                    )
-                }
-            }
-        }else if (meetingsList.value == listOf(default) || sortedMeetingsList.value == listOf(default)){
+            } else if (meetingsList.value == listOf(default)){
 
                 // ----- ЕСЛИ НЕТ МЕРОПРИЯТИЙ -------
 

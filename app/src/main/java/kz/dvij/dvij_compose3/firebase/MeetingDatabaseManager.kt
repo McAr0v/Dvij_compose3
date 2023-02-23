@@ -530,6 +530,29 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
+    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА -----
+
+    fun createFilter (city: String = "Выбери город", category: String = "Выбери категорию", date: String = "Выбери дату"): String{
+
+        val stringBuilder = StringBuilder()
+        val arrayTempFilter = listOf(city, category, date)
+
+        for ((index, string) in arrayTempFilter.withIndex()){
+
+            stringBuilder.append(string)
+            if (index != arrayTempFilter.size - 1) stringBuilder.append("_")
+
+        }
+
+        return stringBuilder.toString()
+
+    }
+
+    fun getFilter(filter: String): List<String> {
+
+        return filter.split("_")
+    }
+
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ МЕРОПРИЯТИЙ --------
 
     fun filterMeeting(
@@ -537,7 +560,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         date: String = "",
         category: String = "Выбери категорию"
     ){
-
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
