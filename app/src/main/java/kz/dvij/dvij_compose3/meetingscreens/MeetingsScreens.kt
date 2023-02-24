@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.meetingscreens
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.background
@@ -10,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,13 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.dialogs.CategoriesList
-import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
-import kz.dvij.dvij_compose3.pickers.dataPicker
-import kz.dvij.dvij_compose3.pickers.dataPickerWithRemember
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingsScreens (val act: MainActivity) {
@@ -40,13 +36,16 @@ class MeetingsScreens (val act: MainActivity) {
 
     // ------ ЭКРАН, ВНУТРИ КОТОРОГО ТАБЫ С ИЗБРАННЫМ, ЛЕНТОЙ И МОИМИ ---------
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MeetingsScreen (
         navController: NavController,
         meetingKey: MutableState<String>,
         cityForFilter: MutableState<String>,
         meetingCategoryForFilter: MutableState<String>,
-        meetingDateForFilter: MutableState<String>
+        meetingStartDateForFilter: MutableState<String>,
+        meetingFinishDateForFilter: MutableState<String>,
+        meetingSortingForFilter: MutableState<String>,
     ) {
         Column {
 
@@ -59,7 +58,9 @@ class MeetingsScreens (val act: MainActivity) {
                 meetingKey,
                 cityForFilter = cityForFilter,
                 meetingCategoryForFilter = meetingCategoryForFilter,
-                meetingDateForFilter = meetingDateForFilter
+                meetingStartDateForFilter = meetingStartDateForFilter,
+                meetingFinishDateForFilter = meetingFinishDateForFilter,
+                meetingSortingForFilter = meetingSortingForFilter
             )
 
         }
@@ -68,13 +69,16 @@ class MeetingsScreens (val act: MainActivity) {
 
     // ---- ЛЕНТА МЕРОПРИЯТИЙ ----------
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MeetingsTapeScreen (
         navController: NavController,
         meetingKey: MutableState<String>,
         cityForFilter: MutableState<String>,
         meetingCategoryForFilter: MutableState<String>,
-        meetingDateForFilter: MutableState<String>
+        meetingStartDateForFilter: MutableState<String>,
+        meetingFinishDateForFilter: MutableState<String>,
+        meetingSortingForFilter: MutableState<String>,
     ){
 
         // ----- СПИСКИ -----
@@ -88,26 +92,37 @@ class MeetingsScreens (val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
-        val filter = databaseManager.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingDateForFilter.value)
+        val filter = databaseManager.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
 
         val removeQuery = databaseManager.getFilter(filter)
 
         val typeFilter = databaseManager.getTypeOfFilter(removeQuery)
 
 
-        databaseManager.readFilteredMeetingDataFromDb(meetingsList, filter)
+        databaseManager.readFilteredMeetingDataFromDb(
+            meetingsList = meetingsList,
+            cityForFilter = cityForFilter,
+            meetingCategoryForFilter = meetingCategoryForFilter,
+            meetingStartDateForFilter = meetingStartDateForFilter,
+            meetingFinishDateForFilter = meetingFinishDateForFilter,
+            meetingSortingForFilter = meetingSortingForFilter
+        )
 
         if (openFilterDialog.value){
 
             filterDialog.FilterChooseDialog(
                 cityForFilter = cityForFilter,
                 meetingCategoryForFilter = meetingCategoryForFilter,
-                meetingDateForFilter = meetingDateForFilter
+                meetingStartDateForFilter = meetingStartDateForFilter,
+                meetingFinishDateForFilter = meetingFinishDateForFilter,
+                meetingSortingForFilter = meetingSortingForFilter
             ) {
                openFilterDialog.value = false
             }
 
         }
+
+
 
         Surface(modifier = Modifier.fillMaxSize()) {
 
@@ -195,12 +210,12 @@ class MeetingsScreens (val act: MainActivity) {
                 }
             }
 
-            // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ МЕРОПРИЯТИЯ --------------
+            // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
             FloatingFilterButton(
                 city = cityForFilter.value,
                 category = meetingCategoryForFilter.value,
-                date = meetingDateForFilter.value,
+                date = meetingStartDateForFilter.value,
                 typeOfFilter = typeFilter
             ) {
                 openFilterDialog.value = true

@@ -1,8 +1,10 @@
 package kz.dvij.dvij_compose3.pickers
 
 import android.app.DatePickerDialog
+import android.os.Build
 import android.util.Log
 import android.widget.DatePicker
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -21,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.time.Duration.Companion.nanoseconds
 
 
 @Composable
@@ -37,6 +42,10 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
     val mYear: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
     val mMonth: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
     val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+
+    Log.d ("MyLog", mYear.toString())
+    Log.d ("MyLog", mMonth.toString())
+    Log.d ("MyLog", mDay.toString())
 
 
     mCalendar.time = Date() // берем из календаря текущую дату
@@ -132,8 +141,10 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
     return dataResult
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): String{
+
 
     // https://www.geeksforgeeks.org/material-design-date-picker-in-android/ - настройка внешнего вида дата пикера
 
@@ -142,10 +153,11 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
 
     val mCalendar = Calendar.getInstance() // инициализируем календарь
 
-    val mYear: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
-    val mMonth: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
-    val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+    // СЮДА ВСТАВИТЬ ВМЕСТО mCalendat.get условие, что если есть входящая дата, то выбирает ее
 
+    val mYear1: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
+    val mMonth2: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
+    val mDay3: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
 
     mCalendar.time = Date() // берем из календаря текущую дату
 
@@ -173,10 +185,14 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
                     else -> act.getString(R.string.december)
                 }
             } $mYear"
-        }, mYear, mMonth, mDay
+        }, mYear1, mMonth2, mDay3
     )
 
     mDatePickerDialog.datePicker.minDate = mCalendar.timeInMillis // берем минимальную дату для возможности выбора (сегодня)
+
+
+
+
 
     // ---- КНОПКА ЗАПУСКА ВЫБОРА ДАТЫ -----
 

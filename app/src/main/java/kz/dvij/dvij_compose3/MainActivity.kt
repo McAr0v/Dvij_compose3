@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -94,6 +96,7 @@ class MainActivity : ComponentActivity() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("RememberReturnType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,7 +170,10 @@ class MainActivity : ComponentActivity() {
                     placeKey = "",
                     headlinePlaceInput = "",
                     addressPlaceInput = "",
-                    ownerKey = "")
+                    ownerKey = "",
+                    createdTime = "",
+                    dateInNumber = ""
+                )
                 )
             }
 
@@ -231,7 +237,31 @@ class MainActivity : ComponentActivity() {
             // Переменные для запоминания фильтра в МЕРОПРИЯТИЯХ
 
             val meetingCategoryForFilter = remember { mutableStateOf("Выбери категорию") }
-            val meetingDateForFilter = remember { mutableStateOf("Выбери дату") }
+            val meetingStartDateForFilter = remember { mutableStateOf("Выбери дату") }
+            val meetingFinishDateForFilter = remember { mutableStateOf("Выбери дату") }
+            val meetingSortingForFilter = remember { mutableStateOf("По умолчанию") }
+
+            if (meetingFinishDateForFilter.value == "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату" ){
+
+                meetingFinishDateForFilter.value = meetingStartDateForFilter.value
+
+            } else if (meetingStartDateForFilter.value == "Выбери дату"){
+
+                meetingFinishDateForFilter.value = meetingStartDateForFilter.value
+
+            } else if (meetingFinishDateForFilter.value != "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату"){
+
+                val meetingStartDateForFilterNumber = meetingDatabaseManager.getSplitData(meetingStartDateForFilter.value)
+                val meetingFinishDateForFilterNumber = meetingDatabaseManager.getSplitData(meetingFinishDateForFilter.value)
+
+                val startNumberDate = meetingDatabaseManager.getDataNumber(meetingStartDateForFilterNumber)
+                val finishNumberDate = meetingDatabaseManager.getDataNumber(meetingFinishDateForFilterNumber)
+
+                if (startNumberDate > finishNumberDate){
+                    meetingFinishDateForFilter.value = meetingStartDateForFilter.value
+                }
+
+            }
 
 
             // Город по умолчанию
@@ -413,7 +443,7 @@ class MainActivity : ComponentActivity() {
 
                         // --- СТРАНИЦЫ МЕРОПРИЯТИЙ -----
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingDateForFilter = meetingDateForFilter)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingStartDateForFilter = meetingStartDateForFilter, meetingFinishDateForFilter = meetingFinishDateForFilter, meetingSortingForFilter = meetingSortingForFilter)}
                         composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}

@@ -1,6 +1,8 @@
 package kz.dvij.dvij_compose3.navigation
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -22,6 +24,7 @@ import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -37,7 +40,9 @@ fun TabMenu (
     stockKey: MutableState<String>? = null,
     cityForFilter: MutableState<String>? = null,
     meetingCategoryForFilter: MutableState<String>? = null,
-    meetingDateForFilter: MutableState<String>? = null
+    meetingStartDateForFilter: MutableState<String>? = null,
+    meetingFinishDateForFilter: MutableState<String>? = null,
+    meetingSortingForFilter: MutableState<String>? = null
 ){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
@@ -106,7 +111,9 @@ fun TabMenu (
                                 meetingKey = it,
                                 cityForFilter = cityForFilter!!,
                                 meetingCategoryForFilter = meetingCategoryForFilter!!,
-                                meetingDateForFilter = meetingDateForFilter!!
+                                meetingStartDateForFilter = meetingStartDateForFilter!!,
+                                meetingFinishDateForFilter = meetingFinishDateForFilter!!,
+                                meetingSortingForFilter = meetingSortingForFilter!!
                             )
                         } // мероприятия Лента
                         1 -> meetingKey?.let {

@@ -1,5 +1,7 @@
 package kz.dvij.dvij_compose3.elements
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,11 +34,14 @@ class FilterDialog (val act: MainActivity) {
 
     // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun FilterChooseDialog(
         cityForFilter: MutableState<String>,
         meetingCategoryForFilter: MutableState<String>,
-        meetingDateForFilter: MutableState<String>,
+        meetingStartDateForFilter: MutableState<String>,
+        meetingFinishDateForFilter: MutableState<String>,
+        meetingSortingForFilter: MutableState<String>,
         onDismiss: () -> Unit
     ) {
 
@@ -45,6 +50,8 @@ class FilterDialog (val act: MainActivity) {
         val citiesList = remember {
             mutableStateOf(listOf<CitiesList>())
         }
+
+        val sortingList = listOf("По умолчанию", "Сначала новые", "Сначала старые", "Дата: По возрастанию", "Дата: По убыванию")
 
         // Читаем список городов
         act.chooseCityNavigation.readCityDataFromDb(citiesList)
@@ -55,6 +62,8 @@ class FilterDialog (val act: MainActivity) {
         val openCategoryDialog = remember { mutableStateOf(false) } // диалог КАТЕГОРИИ
 
         val openCityDialog = remember { mutableStateOf(false) } // диалог ГОРОДА
+
+        val openSortingDialog = remember { mutableStateOf(false) } // диалог сортировки
 
         // Запускаем функцию считывания списка категорий с базы данных
         act.categoryDialog.readMeetingCategoryDataFromDb(categoriesList)
@@ -96,7 +105,7 @@ class FilterDialog (val act: MainActivity) {
                     // --------- ЗАГОЛОВОК ----------
 
                     Text(
-                        text = "Сортировка", // текст заголовка
+                        text = "Фильтр", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
                         color = Grey10, // цвет заголовка
                         modifier = Modifier.weight(1f)
@@ -122,6 +131,8 @@ class FilterDialog (val act: MainActivity) {
                     .padding(bottom = 20.dp),
                 ) {
 
+                    SpacerTextWithLine(headline = "Город")
+
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
                         cityForFilter.value = act.chooseCityNavigation.citySelectButton(cityName = cityForFilter) {openCityDialog.value = true}
@@ -139,6 +150,8 @@ class FilterDialog (val act: MainActivity) {
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
+
+                    SpacerTextWithLine(headline = "Категория")
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -158,22 +171,71 @@ class FilterDialog (val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    SpacerTextWithLine(headline = "Период")
+
+                    Text(text = "Начало периода", color = Grey40)
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
-                        meetingDateForFilter.value = dataPickerWithRemember(act = act, meetingDateForFilter)
+                        meetingStartDateForFilter.value = dataPickerWithRemember(act = act, meetingStartDateForFilter)
 
                         Spacer(modifier = Modifier.width(10.dp))
 
-                        if (meetingDateForFilter.value != "Выбери дату"){
+                        if (meetingStartDateForFilter.value != "Выбери дату"){
 
-                            IconButton(onClick = { meetingDateForFilter.value = "Выбери дату" }) {
+                            IconButton(onClick = { meetingStartDateForFilter.value = "Выбери дату" }) {
 
                                 Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
 
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(text = "Конец периода:", color = Grey40)
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+
+                        meetingFinishDateForFilter.value = dataPickerWithRemember(act = act, meetingFinishDateForFilter)
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        if (meetingFinishDateForFilter.value != "Выбери дату"){
+
+                            IconButton(onClick = { meetingFinishDateForFilter.value = "Выбери дату" }) {
+
+                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+
+                            }
+                        }
+                    }
+
                 }
+
+                SpacerTextWithLine(headline = "Сортировка")
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+
+                    meetingSortingForFilter.value = act.categoryDialog.categorySelectButton(categoryName = meetingSortingForFilter) { openSortingDialog.value = true }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    if (meetingSortingForFilter.value != "По умолчанию"){
+
+                        IconButton(onClick = { meetingSortingForFilter.value = "По умолчанию" }) {
+
+                            Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
@@ -191,7 +253,8 @@ class FilterDialog (val act: MainActivity) {
                             val removeQuery = act.meetingDatabaseManager.getFilter(query)
 
                             meetingCategoryForFilter.value = removeQuery[1]
-                            meetingDateForFilter.value = removeQuery[2]
+                            meetingStartDateForFilter.value = removeQuery[2]
+                            meetingFinishDateForFilter.value = removeQuery[2]
                             cityForFilter.value = removeQuery[0]
 
                         }
@@ -200,6 +263,8 @@ class FilterDialog (val act: MainActivity) {
                     }
 
                 }
+
+
 
                 if (openCityDialog.value) {
 
@@ -223,6 +288,120 @@ class FilterDialog (val act: MainActivity) {
 
                 }
 
+                // --- САМ ДИАЛОГ ВЫБОРА Сортировки -----
+
+                if (openSortingDialog.value) {
+
+                    SortingDialog(sorting = meetingSortingForFilter, list = sortingList) {
+                        openSortingDialog.value = false
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
+
+    @Composable
+    fun SortingDialog(sorting: MutableState<String>, list: List<String>, onDismiss: () -> Unit) {
+
+        // ------ САМ ДИАЛОГ ---------
+
+        Dialog(
+            onDismissRequest = { onDismiss() } // действие на нажатие за пределами диалога
+        ) {
+
+            // -------- СОДЕРЖИМОЕ ДИАЛОГА ---------
+
+            Column(
+                modifier = Modifier
+                    .border(
+                        2.dp, // толщина границы
+                        color = Grey80, // цвет границы
+                        shape = RoundedCornerShape(20.dp) // скругление углов
+                    )
+                    .background(
+                        Grey95, // цвет фона
+                        shape = RoundedCornerShape(20.dp) // скругление углов
+                    )
+                    .padding(20.dp) // отступы
+                    .fillMaxWidth() // занять всю ширину
+
+            ) {
+
+
+                // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically, // вертикальное выравнивание элементов по центру
+                    horizontalArrangement = Arrangement.End // выравнивание по горизонтали
+                ) {
+
+                    // --------- ЗАГОЛОВОК ----------
+
+                    Text(
+                        text = stringResource(id = R.string.cat_default), // текст заголовка
+                        style = Typography.titleMedium, // стиль заголовка
+                        color = Grey10, // цвет заголовка
+                        modifier = Modifier.weight(1f)
+                    ) // занять всю оставшуюся ширину
+
+                    Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+                    // ------------- ИКОНКА ЗАКРЫТЬ ----------------
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close), // сама иконка
+                        contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
+                        tint = Grey10, // цвет иконки
+                        modifier = Modifier.clickable { onDismiss() } // действие на нажатие
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                // ---------- СПИСОК Категорий -------------
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth() // занять ширину
+                        .background(
+                            Grey100, // цвет фона
+                            shape = RoundedCornerShape(10.dp) // скругление углов
+                        )
+                        .padding(20.dp), // отступ
+                    verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами
+
+                ) {
+
+                    items(list) { item ->
+
+                        // ------------ строка с названием категории -------------
+
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // действие на нажатие на элемент
+                                sorting.value =
+                                    item // выбранная категория теперь та, которую выбрали, а не по умолчанию
+                                onDismiss() // закрыть диалог
+                            }
+                        ) {
+
+                            Text(
+                                text = item, // само название категории
+                                color = Grey00, // цвет текста
+                                style = Typography.bodyMedium // стиль текста
+                            )
+
+                        }
+                    }
+                }
             }
         }
     }

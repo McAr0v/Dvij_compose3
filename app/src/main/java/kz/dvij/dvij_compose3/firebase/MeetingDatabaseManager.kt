@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -8,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.R
 
 class MeetingDatabaseManager (private val activity: MainActivity) {
 
@@ -157,71 +159,133 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
 
-    fun readFilteredMeetingDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>, filter: String){
+    fun readFilteredMeetingDataFromDb(
+        meetingsList: MutableState<List<MeetingsAdsClass>>,
+        cityForFilter: MutableState<String>,
+        meetingCategoryForFilter: MutableState<String>,
+        meetingStartDateForFilter: MutableState<String>,
+        meetingFinishDateForFilter: MutableState<String>,
+        meetingSortingForFilter: MutableState<String>,
+    ){
 
-        val removeQuery = getFilter(filter)
+        // Определяем тип фильтра
+        val typeFilter = getTypeOfFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
 
-        val typeFilter = getTypeOfFilter(removeQuery)
+        var filter = ""
+
+        filter = createFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
+
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+                val meetingArray =
+                    ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
 
-                for (item in snapshot.children){
+                for (item in snapshot.children) {
 
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
-                        .child("info") // следующая папка с информацией о мероприятии
-                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
-                        .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
+                    val meeting =
+                        item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                            .child("info") // следующая папка с информацией о мероприятии
+                            .children.iterator()
+                            .next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                     val getFilter = item
                         .child("filterInfo").getValue(FilterClass::class.java)
 
+
+
                     if (meeting != null && getFilter != null) {
 
-                        when (typeFilter){
+                        // разделяем дату на день, месяц, год
+                        val removeDataFromDb = getSplitData(meeting.data!!)
+
+                        // получаем число в нужном формате - ГодМесяцДень
+                        val meetingDataNumber = getDataNumber(removeDataFromDb)
+
+                        if (meetingStartDateForFilter.value != "Выбери дату" && meetingFinishDateForFilter.value != "Выбери дату") {
+
+                            val startDayList = getSplitData(meetingStartDateForFilter.value)
+                            val finishDayList = getSplitData(meetingFinishDateForFilter.value)
+
+                            val startDayNumber = getDataNumber(startDayList)
+                            val finishDayNumber = getDataNumber(finishDayList)
+
+                            checkDatePeriod(
+                                meetingDate = meeting.dateInNumber!!,
+                                startFilterDay = startDayNumber,
+                                finishFilterDay = finishDayNumber
+                            ) {
+
+                                filter = if (it) {
+
+                                    createFilter(
+                                        city = cityForFilter.value,
+                                        category = meetingCategoryForFilter.value,
+                                        meeting.data
+                                    )
+
+                                } else {
+
+                                    createFilter(
+                                        city = cityForFilter.value,
+                                        category = meetingCategoryForFilter.value,
+                                        date = meetingStartDateForFilter.value
+                                    )
+
+                                }
+
+                            }
+
+                        }
+
+
+                        // Log.d ("MyLog", meetingDataNumber)
+
+                        when (typeFilter) {
 
                             "cityCategoryDate" -> {
 
-                                if (getFilter.cityCategoryDate == filter){
+                                if (getFilter.cityCategoryDate == filter) {
                                     meetingArray.add(meeting)
                                 }
+
                             }
                             "cityCategory" -> {
-                                if (getFilter.cityCategory == filter){
+                                if (getFilter.cityCategory == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "cityDate" -> {
-                                if (getFilter.cityDate == filter){
+                                if (getFilter.cityDate == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "city" -> {
-                                if (getFilter.city == filter){
+                                if (getFilter.city == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "categoryDate" -> {
-                                if (getFilter.categoryDate == filter){
+                                if (getFilter.categoryDate == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "category" -> {
-                                if (getFilter.category == filter){
+                                if (getFilter.category == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "date" -> {
-                                if (getFilter.date == filter){
+                                if (getFilter.date == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
                             "noFilter" -> {
-                                if (getFilter.noFilter == filter){
+                                if (getFilter.noFilter == filter) {
                                     meetingArray.add(meeting)
                                 }
                             }
@@ -232,18 +296,42 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                 }
 
-                if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                if (meetingArray.isEmpty()) {
+                    meetingsList.value =
+                        listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
                 } else {
-                    val reversedList = meetingArray.asReversed()
+
+
+                    //val reversedList = meetingArray.asReversed()
+
+                    val reversedList = sortedMeetingList(
+                        meetingArray,
+                        meetingSortingForFilter.value
+                    )
                     meetingsList.value = reversedList // если добавились мероприятия в список, то этот новый список и передаем
+
+
                 }
+
             }
 
             // в функцию onCancelled пока ничего не добавляем
             override fun onCancelled(error: DatabaseError) {}
         }
         )
+    }
+
+    fun sortedMeetingList (meetingsList: List<MeetingsAdsClass>, query: String): List<MeetingsAdsClass>{
+
+        return when (query) {
+
+            "Сначала новые" -> meetingsList.sortedBy { it.createdTime }.asReversed()
+            "Сначала старые" -> meetingsList.sortedBy { it.createdTime }
+            "Дата: По возрастанию" -> meetingsList.sortedBy { it.dateInNumber }
+            "Дата: По убыванию" -> meetingsList.sortedBy { it.dateInNumber }.asReversed()
+            else -> meetingsList.asReversed()
+        }
+
     }
 
 
@@ -669,6 +757,62 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     fun getFilter(filter: String): List<String> {
 
         return filter.split("_")
+    }
+
+    fun getSplitData(date: String): List<String> {
+
+        return date.split(" ")
+    }
+
+    fun getSplitDataFromDb(date: String): String {
+        val splitDate = date.split(" ")
+        return getDataNumber(splitDate)
+    }
+
+    fun getDataNumber(list: List<String>): String {
+
+        val year = list[2]
+        val day = when (list[0]){
+
+            "1" -> "01"
+            "2" -> "02"
+            "3" -> "03"
+            "4" -> "04"
+            "5" -> "05"
+            "6" -> "06"
+            "7" -> "07"
+            "8" -> "08"
+            "9" -> "09"
+            else -> list[0]
+        }
+        val month = when (list[1]) {
+
+            activity.getString(R.string.january) -> "01"
+            activity.getString(R.string.february) -> "02"
+            activity.getString(R.string.march) -> "03"
+            activity.getString(R.string.april) -> "04"
+            activity.getString(R.string.may) -> "05"
+            activity.getString(R.string.june) -> "06"
+            activity.getString(R.string.july) -> "07"
+            activity.getString(R.string.august) -> "08"
+            activity.getString(R.string.september) -> "09"
+            activity.getString(R.string.october) -> "10"
+            activity.getString(R.string.november) -> "11"
+            else -> "12"
+
+        }
+
+        return year + month + day
+    }
+
+    fun checkDatePeriod (meetingDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
+
+        if (startFilterDay.toInt() <= meetingDate.toInt() && meetingDate.toInt() <= finishFilterDay.toInt()) {
+
+            callback (true)
+
+        }
+
     }
 
     fun getTypeOfFilter(inputList: List<String>): String{

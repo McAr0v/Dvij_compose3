@@ -2,7 +2,9 @@ package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import kz.dvij.dvij_compose3.MainActivity
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -33,6 +35,8 @@ import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.time.LocalTime
+import java.util.Calendar
 
 class CreateMeeting(private val act: MainActivity) {
 
@@ -45,6 +49,7 @@ class CreateMeeting(private val act: MainActivity) {
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("RememberReturnType")
     @Composable
@@ -723,6 +728,11 @@ class CreateMeeting(private val act: MainActivity) {
 
                     onClick = {
 
+                        val calendar = Calendar.getInstance()
+
+                        val currentTime = calendar.timeInMillis // инициализируем календарь //LocalTime.now().toNanoOfDay()
+
+
                         // действие на нажатие
 
                         // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
@@ -739,7 +749,7 @@ class CreateMeeting(private val act: MainActivity) {
                             chosenPlace.value.placeKey,
                             finishHeadlinePlace,
                             finishAddressPlace,
-                            filledMeeting.image1 ?: ""
+                            filledMeeting.image1 ?: "",
                         )
 
                         if (checkData != 0) {
@@ -789,7 +799,9 @@ class CreateMeeting(private val act: MainActivity) {
                                             placeKey = chosenPlace.value.placeKey ?: "",
                                             headlinePlaceInput = finishHeadlinePlace,
                                             addressPlaceInput = finishAddressPlace,
-                                            ownerKey = act.mAuth.uid
+                                            ownerKey = act.mAuth.uid,
+                                            createdTime = filledMeeting.createdTime,
+                                            dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -890,7 +902,9 @@ class CreateMeeting(private val act: MainActivity) {
                                                     placeKey = chosenPlace.value.placeKey ?: "",
                                                     headlinePlaceInput = finishHeadlinePlace,
                                                     addressPlaceInput = finishAddressPlace,
-                                                    ownerKey = act.mAuth.uid
+                                                    ownerKey = act.mAuth.uid,
+                                                    createdTime = filledMeeting.createdTime,
+                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
                                                 )
 
                                             } else {
@@ -915,7 +929,9 @@ class CreateMeeting(private val act: MainActivity) {
                                                     placeKey = chosenPlace.value.placeKey ?: "",
                                                     headlinePlaceInput = finishHeadlinePlace,
                                                     addressPlaceInput = finishAddressPlace,
-                                                    ownerKey = act.mAuth.uid
+                                                    ownerKey = act.mAuth.uid,
+                                                    createdTime = currentTime.toString(),
+                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
                                                 )
 
                                             }

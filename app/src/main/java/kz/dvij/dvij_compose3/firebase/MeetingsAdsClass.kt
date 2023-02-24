@@ -21,4 +21,6 @@ data class MeetingsAdsClass(
     val headlinePlaceInput: String? = null,
     val addressPlaceInput: String? = null,
     val ownerKey: String? = null,
+    val dateInNumber: String? = null,
+    val createdTime: String? = null,
 )

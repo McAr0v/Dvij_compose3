@@ -185,11 +185,11 @@ class CategoryDialog (val act: MainActivity) {
             // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             border = BorderStroke(
-                width = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+                width = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
                     0.dp
                 } else {
                     2.dp
-                }, color = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+                }, color = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
                     Grey95
                 } else {
                     Grey60
@@ -199,13 +199,13 @@ class CategoryDialog (val act: MainActivity) {
             // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
 
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+                backgroundColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
                     PrimaryColor
                 } else {
                     Grey95
 
                 },
-                contentColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+                contentColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
                     Grey100
                 } else {
                     Grey60
@@ -217,12 +217,12 @@ class CategoryDialog (val act: MainActivity) {
 
             Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
 
-            if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию") {
+            if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
 
                 Text(
                     text = categoryName.value, // текст кнопки
                     style = Typography.labelMedium, // стиль текста
-                    color = if (categoryName.value == "Выбери категорию") {
+                    color = if (categoryName.value == "Выбери категорию" || categoryName.value == "По умолчанию") {
                         Grey60
                     } else {
                         Grey100
@@ -231,11 +231,25 @@ class CategoryDialog (val act: MainActivity) {
 
             } else {
 
-                Text(
-                    text = "Выбери категорию", // текст кнопки
-                    style = Typography.labelMedium, // стиль текста
-                    color = Grey60
-                )
+                if (categoryName.value == "Выбери категорию"){
+
+                    Text(
+                        text = "Выбери категорию", // текст кнопки
+                        style = Typography.labelMedium, // стиль текста
+                        color = Grey60
+                    )
+
+                } else {
+
+                    Text(
+                        text = "По умолчанию", // текст кнопки
+                        style = Typography.labelMedium, // стиль текста
+                        color = Grey60
+                    )
+
+                }
+
+
             }
         }
         return categoryName.value
