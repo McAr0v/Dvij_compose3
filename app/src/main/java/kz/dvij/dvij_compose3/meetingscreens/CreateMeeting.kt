@@ -173,6 +173,10 @@ class CreateMeeting(private val act: MainActivity) {
         var whatsapp = "" // инициализируем whatsapp
 
         var dataResult = "" // инициализируем выбор даты
+
+        val chosenDataResult = remember {mutableStateOf("")}
+
+
         var timeStartResult = "" // инициализируем выбор времени начала мероприятия
         var timeFinishResult = "" // инициализируем выбор времени конца мероприятия
 
@@ -634,17 +638,18 @@ class CreateMeeting(private val act: MainActivity) {
             }
 
 
+
             // ---- ДАТА ------
 
             SpacerTextWithLine(headline = stringResource(id = R.string.cm_date)) // подпись перед формой
 
             dataResult = if (filledMeeting.data != "" && filledMeeting.data != null && createOrEdit != "0"){
 
-                dataPicker(act, filledMeeting.data) // Если есть данные о мероприятии , передаем дату из мероприятия
+                dataPicker(act, filledMeeting.data, chosenDataResult) // Если есть данные о мероприятии , передаем дату из мероприятия
 
             } else {
 
-                dataPicker(act) // Если есть данные о мероприятии , передаем дату из мероприятия
+                dataPicker(act, chosenDate = chosenDataResult) // Если есть данные о мероприятии , передаем дату из мероприятия
 
             }
 

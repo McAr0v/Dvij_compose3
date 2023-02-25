@@ -67,6 +67,26 @@ class PhotoHelper (val act: MainActivity) {
         .child(act.mAuth.uid ?: "empty") // в папке "User" будет еще папка - для каждого пользователя своя
         .child("image_${System.currentTimeMillis()}") // название изображения
 
+    // ---- Функция удаления изображений ------
+
+    fun deleteMeetingImage (imageUrl: String, callback: (result: Boolean) -> Unit){
+
+        storageMeetings.storage.getReferenceFromUrl(imageUrl).delete().addOnCompleteListener {
+
+            if (it.isSuccessful) {
+
+                callback (true)
+
+            } else {
+
+                callback (false)
+
+            }
+
+        }
+
+    }
+
 
 
     // ------ ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЯ -------

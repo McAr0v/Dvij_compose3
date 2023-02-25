@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -88,45 +89,87 @@ class ChoosePlaceDialog (val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                if (placesList.value != listOf<PlacesAdsClass>(
+                        PlacesAdsClass(
+                            logo=null,
+                            placeName=null,
+                            placeDescription= "Default",
+                            phone=null,
+                            whatsapp=null,
+                            telegram=null,
+                            instagram=null,
+                            category=null,
+                            city=null,
+                            address=null,
+                            placeKey=null,
+                            owner=null,
+                            openTime=null,
+                            closeTime=null
+                )
+                    )) {
 
+                    // ---------- СПИСОК ЗАВЕДЕНИЙ -------------
 
-                // ---------- СПИСОК ЗАВЕДЕНИЙ -------------
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth() // занять ширину
-                        .background(
-                            Grey100, // цвет фона
-                            shape = RoundedCornerShape(10.dp) // скругление углов
-                        )
-                        .padding(20.dp), // отступ
-                    verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка
-
-                ){
-
-                    // наполнение ленивой колонки
-
-                    // берем каждый item из списка и заполняем шаблон
-
-                    items (placesList.value) { place->
-
-                        // ------------ строка с названием заведения -------------
-
-                        Column(modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                // действие на нажатие на элемент
-                                chosenOutPlace.value = place // выбранный город теперь тот, который выбрали, а не по умолчанию
-                                ifChoose.value = true
-                                onDismiss() // закрыть диалог
-                            }
-                        ) {
-                            Text(
-                                text = place.placeName!!, // само название города
-                                color = Grey40, // цвет текста
-                                style = Typography.bodyMedium // стиль текста
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth() // занять ширину
+                            .background(
+                                Grey100, // цвет фона
+                                shape = RoundedCornerShape(10.dp) // скругление углов
                             )
+                            .padding(20.dp), // отступ
+                        verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка
+
+                    ) {
+
+
+                        // наполнение ленивой колонки
+
+                        // берем каждый item из списка и заполняем шаблон
+
+                        items(placesList.value) { place ->
+
+                            // ------------ строка с названием заведения -------------
+
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    // действие на нажатие на элемент
+                                    chosenOutPlace.value =
+                                        place // выбранный город теперь тот, который выбрали, а не по умолчанию
+                                    ifChoose.value = true
+                                    onDismiss() // закрыть диалог
+                                }
+                            ) {
+                                Text(
+                                    text = place.placeName!!, // само название города
+                                    color = Grey40, // цвет текста
+                                    style = Typography.bodyMedium // стиль текста
+                                )
+                            }
                         }
+
+                    }
+
+                } else {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Grey100, // цвет фона
+                                shape = RoundedCornerShape(10.dp) // скругление углов
+                    )
+                            .padding(20.dp), // отступ
+                        verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка)
+                    ){
+
+                        Text(
+                            text = "У тебя еще нет созданных заведений", // само название города
+                            color = Grey40, // цвет текста
+                            style = Typography.bodyMedium // стиль текста
+                        )
+
                     }
                 }
             }

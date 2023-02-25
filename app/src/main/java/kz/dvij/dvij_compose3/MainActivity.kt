@@ -43,6 +43,7 @@ import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.meetingscreens.MeetingViewScreen
 import kz.dvij.dvij_compose3.meetingscreens.MeetingsScreens
+import kz.dvij.dvij_compose3.pickers.getTodayDate
 import kz.dvij.dvij_compose3.placescreens.PlaceViewScreen
 import kz.dvij.dvij_compose3.placescreens.PlacesScreens
 import kz.dvij.dvij_compose3.stockscreens.StockScreen
@@ -50,6 +51,7 @@ import kz.dvij.dvij_compose3.stockscreens.StockViewScreen
 import kz.dvij.dvij_compose3.userscreens.AccountScreens
 import kz.dvij.dvij_compose3.userscreens.CreateProfileInfoScreen
 import kz.dvij.dvij_compose3.userscreens.ProfileScreen
+import java.util.*
 
 // https://www.youtube.com/watch?v=AlSjt_2GU5A - регистрация с имейлом и паролем
 // https://ericampire.com/firebase-auth-with-jetpack-compose - тоже надо почитать, много полезного. Наверное даже предпочтительнее
@@ -251,8 +253,8 @@ class MainActivity : ComponentActivity() {
 
             } else if (meetingFinishDateForFilter.value != "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату"){
 
-                val meetingStartDateForFilterNumber = meetingDatabaseManager.getSplitData(meetingStartDateForFilter.value)
-                val meetingFinishDateForFilterNumber = meetingDatabaseManager.getSplitData(meetingFinishDateForFilter.value)
+                val meetingStartDateForFilterNumber = meetingDatabaseManager.splitData(meetingStartDateForFilter.value)
+                val meetingFinishDateForFilterNumber = meetingDatabaseManager.splitData(meetingFinishDateForFilter.value)
 
                 val startNumberDate = meetingDatabaseManager.getDataNumber(meetingStartDateForFilterNumber)
                 val finishNumberDate = meetingDatabaseManager.getDataNumber(meetingFinishDateForFilterNumber)

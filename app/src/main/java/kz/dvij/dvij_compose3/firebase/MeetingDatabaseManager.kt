@@ -10,6 +10,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.pickers.getTodayDate
 
 class MeetingDatabaseManager (private val activity: MainActivity) {
 
@@ -175,6 +176,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
         filter = createFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
 
+        val dateInMillis = System.currentTimeMillis()/1000 // инициализируем календарь
+
+        val today = getTodayDate(dateInMillis.toString())
+
+        val todayInRightFormat = getSplitDataFromDb(today.toString())
+
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
@@ -201,21 +208,30 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     if (meeting != null && getFilter != null) {
 
                         // разделяем дату на день, месяц, год
-                        val removeDataFromDb = getSplitData(meeting.data!!)
+                        val removeDataFromDb = splitData(meeting.data!!)
 
                         // получаем число в нужном формате - ГодМесяцДень
-                        val meetingDataNumber = getDataNumber(removeDataFromDb)
+                        val meetingDataNumber = meeting.dateInNumber!!.toInt()//getDataNumber(removeDataFromDb)
+
+                        if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                            deleteMeeting(meeting.key!!, meeting.image1!!){
+
+                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+
+                            }
+                        }
 
                         if (meetingStartDateForFilter.value != "Выбери дату" && meetingFinishDateForFilter.value != "Выбери дату") {
 
-                            val startDayList = getSplitData(meetingStartDateForFilter.value)
-                            val finishDayList = getSplitData(meetingFinishDateForFilter.value)
+                            val startDayList = splitData(meetingStartDateForFilter.value)
+                            val finishDayList = splitData(meetingFinishDateForFilter.value)
 
                             val startDayNumber = getDataNumber(startDayList)
                             val finishDayNumber = getDataNumber(finishDayList)
 
                             checkDatePeriod(
-                                meetingDate = meeting.dateInNumber!!,
+                                meetingDate = meeting.dateInNumber,
                                 startFilterDay = startDayNumber,
                                 finishFilterDay = finishDayNumber
                             ) {
@@ -329,7 +345,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
             "Сначала старые" -> meetingsList.sortedBy { it.createdTime }
             "Дата: По возрастанию" -> meetingsList.sortedBy { it.dateInNumber }
             "Дата: По убыванию" -> meetingsList.sortedBy { it.dateInNumber }.asReversed()
-            else -> meetingsList.asReversed()
+            else -> meetingsList.sortedBy { it.createdTime }.asReversed() //meetingsList.asReversed()
         }
 
     }
@@ -502,21 +518,31 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ----------
 
-    fun deleteMeeting(key: String, callback: (result: Boolean)-> Unit){
+    fun deleteMeeting(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){
 
-        // если ключ пользователя не будет нал, то выполнится функция
+        activity.photoHelper.deleteMeetingImage(imageUrl){ resultDeletingImage ->
 
-        activity.mAuth.uid?.let {
-            meetingDatabase // обращаемся к БД
-                .child(key) // заходим в папку с уникальным ключем мероприятия
-                .removeValue() // удаляем значение
-        }?.addOnCompleteListener {
-            // слушаем выполнение. Если успешно сделано, то...
-            if (it.isSuccessful){
-                // возвращаем колбак ТРУ
-                callback (true)
+            if (resultDeletingImage) {
+
+                Log.d ("MyLog", "Картинка была успешно автоматически удалена")
+
+                // если ключ пользователя не будет нал, то выполнится функция
+
+                activity.mAuth.uid?.let {
+                    meetingDatabase // обращаемся к БД
+                        .child(key) // заходим в папку с уникальным ключем мероприятия
+                        .removeValue() // удаляем значение
+                }?.addOnCompleteListener {
+                    // слушаем выполнение. Если успешно сделано, то...
+                    if (it.isSuccessful){
+                        // возвращаем колбак ТРУ
+                        callback (true)
+                    }
+                }
+
             }
         }
+
     }
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ ИЗ ИЗБРАННОГО ----------
@@ -754,38 +780,31 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     }
 
-    fun getFilter(filter: String): List<String> {
+    // ----- Функция разделения фильтра на отдельные элементы -----
+
+    fun splitFilter(filter: String): List<String> {
 
         return filter.split("_")
     }
 
-    fun getSplitData(date: String): List<String> {
+    // ---- Функция разделения даты на отдельные элементы ----
+    fun splitData(date: String): List<String> {
 
         return date.split(" ")
     }
 
+    // Функция превращения даты из БД в нужный формат
+
     fun getSplitDataFromDb(date: String): String {
-        val splitDate = date.split(" ")
-        return getDataNumber(splitDate)
+        val splitDate = date.split(" ") // разбиваем дату
+        return getDataNumber(splitDate) // переконвертируем в нужный формат и возвращаем
     }
 
-    fun getDataNumber(list: List<String>): String {
+    // ---- Функция превращения ТЕКСТА МЕСЯЦА в ЧИСЛО
 
-        val year = list[2]
-        val day = when (list[0]){
+    fun monthToNumber (month: String): String{
 
-            "1" -> "01"
-            "2" -> "02"
-            "3" -> "03"
-            "4" -> "04"
-            "5" -> "05"
-            "6" -> "06"
-            "7" -> "07"
-            "8" -> "08"
-            "9" -> "09"
-            else -> list[0]
-        }
-        val month = when (list[1]) {
+        return when (month) {
 
             activity.getString(R.string.january) -> "01"
             activity.getString(R.string.february) -> "02"
@@ -798,12 +817,63 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
             activity.getString(R.string.september) -> "09"
             activity.getString(R.string.october) -> "10"
             activity.getString(R.string.november) -> "11"
-            else -> "12"
+            activity.getString(R.string.december) -> "12"
+            else -> month
 
         }
+    }
+
+    fun numberToNameOfMonth (month: Int): String {
+
+        return when (month+1) {
+            1 -> activity.getString(R.string.january)
+            2 -> activity.getString(R.string.february)
+            3 -> activity.getString(R.string.march)
+            4 -> activity.getString(R.string.april)
+            5 -> activity.getString(R.string.may)
+            6 -> activity.getString(R.string.june)
+            7 -> activity.getString(R.string.july)
+            8 -> activity.getString(R.string.august)
+            9 -> activity.getString(R.string.september)
+            10 -> activity.getString(R.string.october)
+            11 -> activity.getString(R.string.november)
+            else -> activity.getString(R.string.december)
+        }
+
+    }
+
+    // ---- Функция добавления 0 в начале числа
+
+    private fun numberWithZero (number: String): String {
+
+        return when (number){
+
+            "1" -> "01"
+            "2" -> "02"
+            "3" -> "03"
+            "4" -> "04"
+            "5" -> "05"
+            "6" -> "06"
+            "7" -> "07"
+            "8" -> "08"
+            "9" -> "09"
+            else -> number
+        }
+
+    }
+
+    // ---- Функция получения числа даты в нужном формате для фильтра -----
+
+    fun getDataNumber(list: List<String>): String {
+
+        val year = list[2] // год берем как есть
+        val day = numberWithZero(list[0]) // день превращаем в нужный формат с нулем в начале
+        val month = monthToNumber(list[1]) // названия месяцев превращаем в цифры
 
         return year + month + day
     }
+
+    // ---- Функция проверки - попадает ли наша дата в диапазон фильтра, заданного пользователем ----
 
     fun checkDatePeriod (meetingDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
 
@@ -814,6 +884,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         }
 
     }
+
+    // ----- Функция определения типа фильтра для корректной фильтрации -------
 
     fun getTypeOfFilter(inputList: List<String>): String{
 

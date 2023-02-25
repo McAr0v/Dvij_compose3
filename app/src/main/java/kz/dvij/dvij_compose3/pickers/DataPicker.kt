@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.pickers
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Build
 import android.util.Log
@@ -23,29 +24,53 @@ import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.time.Duration.Companion.nanoseconds
 
 
 @Composable
-fun dataPicker(act: MainActivity, inputDate: String = ""): String{
+fun dataPicker(act: MainActivity, inputDate: String = "", chosenDate: MutableState<String>? = null): String{
 
     // https://www.geeksforgeeks.org/material-design-date-picker-in-android/ - настройка внешнего вида дата пикера
+
+    var chosenDay: String = "" // Инициализируем число, которую мы уже выбрали и которая сразу будет отмечена на календаре
+    var chosenMonth: String = "" // Инициализируем месяц, который мы уже выбрали и который сразу будет отмечен на календаре
+    var chosenYear: String = "" // Инициализируем год, который мы уже выбрали и который сразу будет отмечен на календаре
+
+    if (chosenDate?.value != null && chosenDate.value != "Выбери дату" && chosenDate.value != ""){
+
+        val splitData = act.meetingDatabaseManager.splitData(chosenDate.value) // Разбиваем полученную дату на составляющие
+
+        chosenDay = splitData[0] // указываем число
+        chosenMonth = act.meetingDatabaseManager.monthToNumber(splitData[1]) // превращаем название месяца в цифру
+        chosenYear = splitData[2] // указываем год
+
+    }
 
     var dataResult = "" // возвращаемая переменная
     val mContext = LocalContext.current // инициализируем контекст
 
     val mCalendar = Calendar.getInstance() // инициализируем календарь
 
-    val mYear: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
-    val mMonth: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
-    val mDay: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+    // Переменные числа / месяца / года, выбранные при открывании диалога
 
-    Log.d ("MyLog", mYear.toString())
-    Log.d ("MyLog", mMonth.toString())
-    Log.d ("MyLog", mDay.toString())
+    val mYear1: Int = if (chosenYear != ""){
+        chosenYear.toInt()
+    } else {
+        mCalendar.get(Calendar.YEAR) // инициализируем год
+    }
+
+    val mMonth1: Int = if (chosenMonth != ""){
+        chosenMonth.toInt()-1 // здесь -1 обязательно - тут это уебанская система считать с 0. Типа январь это 0, февраль 1 и тд
+    } else {
+        mCalendar.get(Calendar.MONTH)// инициализируем месяц
+    }
+
+    val mDay1: Int = if (chosenDay != ""){
+        chosenDay.toInt()
+    } else {
+        mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+    }
 
 
     mCalendar.time = Date() // берем из календаря текущую дату
@@ -60,23 +85,8 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
         // дополнительные настройки
 
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth ${
-                when (mMonth+1) {
-                    1 -> act.getString(R.string.january)
-                    2 -> act.getString(R.string.february)
-                    3 -> act.getString(R.string.march)
-                    4 -> act.getString(R.string.april)
-                    5 -> act.getString(R.string.may)
-                    6 -> act.getString(R.string.june)
-                    7 -> act.getString(R.string.july)
-                    8 -> act.getString(R.string.august)
-                    9 -> act.getString(R.string.september)
-                    10 -> act.getString(R.string.october)
-                    11 -> act.getString(R.string.november)
-                    else -> act.getString(R.string.december)
-                }
-            } $mYear"
-        }, mYear, mMonth, mDay
+            mDate.value = "$mDayOfMonth ${act.meetingDatabaseManager.numberToNameOfMonth(mMonth)} $mYear"
+        }, mYear1, mMonth1, mDay1
     )
 
     mDatePickerDialog.datePicker.minDate = mCalendar.timeInMillis // берем минимальную дату для возможности выбора (сегодня)
@@ -136,6 +146,10 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
         )
     }
 
+    if (chosenDate != null){
+        chosenDate.value = mDate.value
+    }
+
     dataResult = mDate.value // помещаем в возвращаемую переменную выбранную дату
 
     return dataResult
@@ -143,8 +157,21 @@ fun dataPicker(act: MainActivity, inputDate: String = ""): String{
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): String{
+fun dataPickerWithRemember(act: MainActivity, chosenDay: MutableState<String>, ifChooseDay: MutableState<String>): String{
 
+    var inputDate: String = "" // Инициализируем число, которую мы уже выбрали и которая сразу будет отмечена на календаре
+    var inputMonth: String = "" // Инициализируем месяц, который мы уже выбрали и который сразу будет отмечен на календаре
+    var inputYear: String = "" // Инициализируем год, который мы уже выбрали и который сразу будет отмечен на календаре
+
+    if (chosenDay.value != "Выбери дату"){
+
+        val splitData = act.meetingDatabaseManager.splitData(ifChooseDay.value) // Разбиваем полученную дату на составляющие
+
+        inputDate = splitData[0] // указываем число
+        inputMonth = act.meetingDatabaseManager.monthToNumber(splitData[1]) // превращаем название месяца в цифру
+        inputYear = splitData[2] // указываем год
+
+    }
 
     // https://www.geeksforgeeks.org/material-design-date-picker-in-android/ - настройка внешнего вида дата пикера
 
@@ -153,11 +180,23 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
 
     val mCalendar = Calendar.getInstance() // инициализируем календарь
 
-    // СЮДА ВСТАВИТЬ ВМЕСТО mCalendat.get условие, что если есть входящая дата, то выбирает ее
+    // Переменные числа / месяца / года, выбранные при открывании диалога
 
-    val mYear1: Int = mCalendar.get(Calendar.YEAR) // инициализируем год
-    val mMonth2: Int = mCalendar.get(Calendar.MONTH)// инициализируем месяц
-    val mDay3: Int = mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+    val mYear1: Int = if (inputYear != ""){
+        inputYear.toInt()
+    } else {
+        mCalendar.get(Calendar.YEAR) // инициализируем год
+    }
+    val mMonth2: Int = if (inputMonth != ""){
+        inputMonth.toInt()-1 // здесь -1 обязательно - тут это уебанская система считать с 0. Типа январь это 0, февраль 1 и тд
+    } else {
+        mCalendar.get(Calendar.MONTH)// инициализируем месяц
+    }
+    val mDay3: Int = if (inputDate != ""){
+        inputDate.toInt()
+    } else {
+        mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
+    }
 
     mCalendar.time = Date() // берем из календаря текущую дату
 
@@ -169,29 +208,11 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
         // дополнительные настройки
 
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth ${
-                when (mMonth+1) {
-                    1 -> act.getString(R.string.january)
-                    2 -> act.getString(R.string.february)
-                    3 -> act.getString(R.string.march)
-                    4 -> act.getString(R.string.april)
-                    5 -> act.getString(R.string.may)
-                    6 -> act.getString(R.string.june)
-                    7 -> act.getString(R.string.july)
-                    8 -> act.getString(R.string.august)
-                    9 -> act.getString(R.string.september)
-                    10 -> act.getString(R.string.october)
-                    11 -> act.getString(R.string.november)
-                    else -> act.getString(R.string.december)
-                }
-            } $mYear"
+            chosenDay.value = "$mDayOfMonth ${act.meetingDatabaseManager.numberToNameOfMonth(mMonth)} $mYear"
         }, mYear1, mMonth2, mDay3
     )
 
     mDatePickerDialog.datePicker.minDate = mCalendar.timeInMillis // берем минимальную дату для возможности выбора (сегодня)
-
-
-
 
 
     // ---- КНОПКА ЗАПУСКА ВЫБОРА ДАТЫ -----
@@ -208,13 +229,13 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
 
         border = BorderStroke(
             // толщина границы
-            width = if (mDate.value == "" || mDate.value == "Выбери дату" ) {
+            width = if (chosenDay.value == "" || chosenDay.value == "Выбери дату" ) {
                 2.dp
             } else {
                 0.dp
             },
             // цвет границы
-            color = if (mDate.value == "" || mDate.value == "Выбери дату") {
+            color = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
                 Grey60
             } else {
                 Grey95
@@ -223,12 +244,12 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
 
         // цвета кнопки
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (mDate.value == "" || mDate.value == "Выбери дату") {
+            backgroundColor = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
                 Grey95
             } else {
                 PrimaryColor
             },
-            contentColor = if (mDate.value == "" || mDate.value == "Выбери дату") {
+            contentColor = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
                 Grey60
             } else {
                 Grey100
@@ -242,16 +263,29 @@ fun dataPickerWithRemember(act: MainActivity, mDate: MutableState<String>): Stri
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = if (mDate.value == "" || mDate.value == "Выбери дату") {
+            text = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
                 stringResource(id = R.string.piker_date)
-            } else {mDate.value},
+            } else {chosenDay.value},
             style = Typography.labelMedium
         )
     }
 
-    dataResult = mDate.value // помещаем в возвращаемую переменную выбранную дату
+    dataResult = chosenDay.value // помещаем в возвращаемую переменную выбранную дату
 
     return dataResult
+}
+
+@SuppressLint("SimpleDateFormat")
+fun getTodayDate (timeInMilliseconds: String): String?{
+
+    return try {
+        val format = SimpleDateFormat ("dd MM yyyy")
+        val netDate = Date(timeInMilliseconds.toLong()*1000)
+        format.format(netDate)
+    } catch (e: Exception){
+        e.toString()
+    }
+
 }
 
 

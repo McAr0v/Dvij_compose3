@@ -147,14 +147,15 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                    meetingInfo.value.key?.let {
-                        act.meetingDatabaseManager.deleteMeeting(it){
+                    meetingInfo.value.key?.let { key ->
+                        meetingInfo.value.image1?.let { url ->
+                            act.meetingDatabaseManager.deleteMeeting(key, url){
 
-                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+                                navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
 
+                            }
                         }
                     }
-
                 }
             }
 

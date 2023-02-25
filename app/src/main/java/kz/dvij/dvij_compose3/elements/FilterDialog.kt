@@ -179,7 +179,7 @@ class FilterDialog (val act: MainActivity) {
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
-                        meetingStartDateForFilter.value = dataPickerWithRemember(act = act, meetingStartDateForFilter)
+                        meetingStartDateForFilter.value = dataPickerWithRemember(act = act, meetingStartDateForFilter, meetingStartDateForFilter)
 
                         Spacer(modifier = Modifier.width(10.dp))
 
@@ -201,7 +201,7 @@ class FilterDialog (val act: MainActivity) {
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
-                        meetingFinishDateForFilter.value = dataPickerWithRemember(act = act, meetingFinishDateForFilter)
+                        meetingFinishDateForFilter.value = dataPickerWithRemember(act = act, meetingFinishDateForFilter, meetingFinishDateForFilter)
 
                         Spacer(modifier = Modifier.width(10.dp))
 
@@ -250,7 +250,7 @@ class FilterDialog (val act: MainActivity) {
 
                             val query = act.meetingDatabaseManager.createFilter()
 
-                            val removeQuery = act.meetingDatabaseManager.getFilter(query)
+                            val removeQuery = act.meetingDatabaseManager.splitFilter(query)
 
                             meetingCategoryForFilter.value = removeQuery[1]
                             meetingStartDateForFilter.value = removeQuery[2]

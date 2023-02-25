@@ -94,7 +94,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         val filter = databaseManager.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
 
-        val removeQuery = databaseManager.getFilter(filter)
+        val removeQuery = databaseManager.splitFilter(filter)
 
         val typeFilter = databaseManager.getTypeOfFilter(removeQuery)
 
