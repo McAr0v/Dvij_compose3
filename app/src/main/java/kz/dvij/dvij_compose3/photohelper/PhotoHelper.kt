@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.SystemClock
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import com.google.firebase.ktx.Firebase
@@ -19,6 +20,8 @@ import java.io.ByteArrayOutputStream
 
 class PhotoHelper (val act: MainActivity) {
 
+    private var currentTime = System.nanoTime()
+
     // ----- STORAGE МЕРОПРИЯТИЙ -----------
 
     private val storageMeetings = Firebase
@@ -29,7 +32,7 @@ class PhotoHelper (val act: MainActivity) {
 
     private val imageRefMeetings = storageMeetings
         .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
-        .child("image_${System.currentTimeMillis()}") // название изображения
+        .child("image_${System.nanoTime()}_${System.currentTimeMillis()}") // название изображения
 
     // ----- STORAGE ЗАВЕДЕНИЙ -----------
 

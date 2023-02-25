@@ -23,6 +23,7 @@ import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.util.*
 
 class MeetingsScreens (val act: MainActivity) {
 
@@ -87,7 +88,6 @@ class MeetingsScreens (val act: MainActivity) {
         val meetingsList = remember {
             mutableStateOf(listOf<MeetingsAdsClass>())
         }
-
 
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ

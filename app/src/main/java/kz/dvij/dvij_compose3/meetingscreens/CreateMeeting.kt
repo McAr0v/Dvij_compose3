@@ -3,6 +3,7 @@ package kz.dvij.dvij_compose3.meetingscreens
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import kz.dvij.dvij_compose3.MainActivity
@@ -69,7 +70,7 @@ class CreateMeeting(private val act: MainActivity) {
             data = "",
             startTime = "",
             finishTime = "",
-            image1 = "",
+            image1 = null,
             city = "Выбери город",
             instagram = "",
             telegram = "",
@@ -289,6 +290,10 @@ class CreateMeeting(private val act: MainActivity) {
                 // Если нет - стандартный выбор картинки
                 chooseImageDesign()
             }
+
+            Log.d("MyLog", "$image1")
+            
+            Text(text = "dsf", modifier = Modifier.clickable { Log.d ("MyLog", "image_${System.currentTimeMillis()}") })
 
 
             // --- Заголовок ----
@@ -735,7 +740,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                         val calendar = Calendar.getInstance()
 
-                        val currentTime = calendar.timeInMillis // инициализируем календарь //LocalTime.now().toNanoOfDay()
+                        val currentTime = System.currentTimeMillis()/1000 //calendar.timeInMillis // инициализируем календарь //LocalTime.now().toNanoOfDay()
 
 
                         // действие на нажатие
@@ -779,7 +784,9 @@ class CreateMeeting(private val act: MainActivity) {
 
                             GlobalScope.launch(Dispatchers.IO){
 
-                                if (image1 == null) {
+                                Log.d ("My Log", image1.toString())
+
+                                if (image1 == null && createOrEdit != "0") {
                                     // такое условие возможно только при редактировании
 
                                     GlobalScope.launch(Dispatchers.Main) {
@@ -868,14 +875,110 @@ class CreateMeeting(private val act: MainActivity) {
                                         }
                                     }
 
-                                } else {
+                                } else if (createOrEdit == "0"){
 
                                     // запускаем сжатие изображения
-                                    val compressedImage = activity.photoHelper.compressImage(activity, image1)
+                                    val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
 
                                     // после сжатия запускаем функцию загрузки сжатого фото в Storage
 
-                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
+                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage$currentTime", "image/jpg", MEETINGS_ROOT){
+
+                                        // В качестве колбака придет ссылка на изображение в Storage
+
+                                        // Запускаем корутину и публикуем мероприятие
+
+                                        GlobalScope.launch(Dispatchers.Main) {
+
+                                            // заполняем мероприятие
+
+                                            // Если это страница создания
+                                            val finishFilledMeeting = MeetingsAdsClass(
+                                                    key = meetingDatabaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
+                                                    category = category,
+                                                    headline = headline,
+                                                    description = description,
+                                                    price = price,
+                                                    phone = phone,
+                                                    whatsapp = whatsapp,
+                                                    data = dataResult,
+                                                    startTime = timeStartResult,
+                                                    finishTime = timeFinishResult,
+                                                    image1 = it,
+                                                    city = city,
+                                                    instagram = instagram,
+                                                    telegram = telegram,
+                                                    placeKey = chosenPlace.value.placeKey ?: "",
+                                                    headlinePlaceInput = finishHeadlinePlace,
+                                                    addressPlaceInput = finishAddressPlace,
+                                                    ownerKey = act.mAuth.uid,
+                                                    createdTime = currentTime.toString(),
+                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
+                                                )
+
+                                            // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                            if (auth.uid != null) {
+
+                                                // Если зарегистрирован, то запускаем функцию публикации мероприятия
+
+                                                meetingDatabaseManager.publishMeeting(finishFilledMeeting){ result ->
+
+                                                    // в качестве колбака придет булин. Если опубликовано мероприятие то:
+
+                                                    if (result){
+
+                                                        navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
+
+                                                        // показываем ТОСТ
+
+                                                        if (createOrEdit != "0"){
+
+                                                            // Если это редактирование
+
+                                                            Toast.makeText(
+                                                                activity,
+                                                                "Твое мероприятие успешно отредактировано",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                        } else {
+
+                                                            // Если это создание
+
+                                                            Toast.makeText(
+                                                                activity,
+                                                                act.resources.getString(R.string.cm_success),
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+                                                        }
+
+
+                                                    } else {
+
+                                                        // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                                        // Показываем тост
+                                                        Toast.makeText(
+                                                            activity,
+                                                            act.resources.getString(R.string.error_text),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+
+                                    // запускаем сжатие изображения
+                                    val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
+
+                                    // после сжатия запускаем функцию загрузки сжатого фото в Storage
+
+                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage$currentTime", "image/jpg", MEETINGS_ROOT){
 
                                         // В качестве колбака придет ссылка на изображение в Storage
 

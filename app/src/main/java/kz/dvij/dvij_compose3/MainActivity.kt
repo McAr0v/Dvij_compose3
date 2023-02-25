@@ -447,7 +447,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingStartDateForFilter = meetingStartDateForFilter, meetingFinishDateForFilter = meetingFinishDateForFilter, meetingSortingForFilter = meetingSortingForFilter)}
                         composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
-                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = meetingKey.value)}
+                        composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
 
                         // ---- СТРАНИЦЫ ЗАВЕДЕНИЙ ----

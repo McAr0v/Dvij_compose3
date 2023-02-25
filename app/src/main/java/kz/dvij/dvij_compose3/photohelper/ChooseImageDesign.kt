@@ -30,10 +30,12 @@ import kz.dvij.dvij_compose3.ui.theme.*
 @Composable
 fun chooseImageDesign (inputImageUrl: String? = ""): Uri? {
 
+    val clearImage: Uri? = null
+
     val imageUrl = remember {
         mutableStateOf(inputImageUrl)
     }
-    val selectImage = remember { mutableStateOf<Uri?>(null) } // создаем пустое значение Uri
+    val selectImage = remember { mutableStateOf<Uri?>(clearImage) } // создаем пустое значение Uri
 
     // запускаем Галерею и получаем Uri нашей картинки
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
