@@ -3,7 +3,6 @@ package kz.dvij.dvij_compose3.pickers
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Build
-import android.util.Log
 import android.widget.DatePicker
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -39,10 +38,10 @@ fun dataPicker(act: MainActivity, inputDate: String = "", chosenDate: MutableSta
 
     if (chosenDate?.value != null && chosenDate.value != "Выбери дату" && chosenDate.value != ""){
 
-        val splitData = act.meetingDatabaseManager.splitData(chosenDate.value) // Разбиваем полученную дату на составляющие
+        val splitData = act.filterFunctions.splitData(chosenDate.value) // Разбиваем полученную дату на составляющие
 
         chosenDay = splitData[0] // указываем число
-        chosenMonth = act.meetingDatabaseManager.monthToNumber(splitData[1]) // превращаем название месяца в цифру
+        chosenMonth = act.filterFunctions.monthToNumber(splitData[1]) // превращаем название месяца в цифру
         chosenYear = splitData[2] // указываем год
 
     }
@@ -72,7 +71,6 @@ fun dataPicker(act: MainActivity, inputDate: String = "", chosenDate: MutableSta
         mCalendar.get(Calendar.DAY_OF_MONTH)// инициализируем день
     }
 
-
     mCalendar.time = Date() // берем из календаря текущую дату
 
     val mDate = remember{ mutableStateOf(inputDate) } // создам переменную дата
@@ -85,7 +83,7 @@ fun dataPicker(act: MainActivity, inputDate: String = "", chosenDate: MutableSta
         // дополнительные настройки
 
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth ${act.meetingDatabaseManager.numberToNameOfMonth(mMonth)} $mYear"
+            mDate.value = "$mDayOfMonth ${act.filterFunctions.numberToNameOfMonth(mMonth)} $mYear"
         }, mYear1, mMonth1, mDay1
     )
 
@@ -165,10 +163,10 @@ fun dataPickerWithRemember(act: MainActivity, chosenDay: MutableState<String>, i
 
     if (chosenDay.value != "Выбери дату"){
 
-        val splitData = act.meetingDatabaseManager.splitData(ifChooseDay.value) // Разбиваем полученную дату на составляющие
+        val splitData = act.filterFunctions.splitData(ifChooseDay.value) // Разбиваем полученную дату на составляющие
 
         inputDate = splitData[0] // указываем число
-        inputMonth = act.meetingDatabaseManager.monthToNumber(splitData[1]) // превращаем название месяца в цифру
+        inputMonth = act.filterFunctions.monthToNumber(splitData[1]) // превращаем название месяца в цифру
         inputYear = splitData[2] // указываем год
 
     }
@@ -208,7 +206,7 @@ fun dataPickerWithRemember(act: MainActivity, chosenDay: MutableState<String>, i
         // дополнительные настройки
 
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            chosenDay.value = "$mDayOfMonth ${act.meetingDatabaseManager.numberToNameOfMonth(mMonth)} $mYear"
+            chosenDay.value = "$mDayOfMonth ${act.filterFunctions.numberToNameOfMonth(mMonth)} $mYear"
         }, mYear1, mMonth2, mDay3
     )
 
@@ -276,7 +274,7 @@ fun dataPickerWithRemember(act: MainActivity, chosenDay: MutableState<String>, i
 }
 
 @SuppressLint("SimpleDateFormat")
-fun getTodayDate (timeInMilliseconds: String): String?{
+fun convertMillisecondsToDate (timeInMilliseconds: String): String?{
 
     return try {
         val format = SimpleDateFormat ("dd MM yyyy")
@@ -285,6 +283,12 @@ fun getTodayDate (timeInMilliseconds: String): String?{
     } catch (e: Exception){
         e.toString()
     }
+
+}
+
+fun getTodayInMilliseconds(): Long {
+
+    return System.currentTimeMillis()/1000
 
 }
 

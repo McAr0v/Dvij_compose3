@@ -37,6 +37,8 @@ fun timePicker(inputTime: String = ""): String {
 
     mCalendar.time = Date() // инициализируем текущее время
 
+
+
     val mClock = remember{ mutableStateOf(inputTime) } // создаем переменную, в которую будем записывать время
 
     // инициализируем диалог выбора времени

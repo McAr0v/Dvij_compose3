@@ -46,7 +46,7 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
         ) {
 
 
-            // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
+            // ------- ЗАГЛОВОК и КНОПКИ -----------
 
             Row(
                 modifier = Modifier
@@ -78,7 +78,11 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // ---- КНОПКИ -------
+
             Column(modifier = Modifier.fillMaxWidth()) {
+
+                // ------ КНОПКА ДА -----------
 
                 Button(onClick = { onClick() }) {
 
@@ -88,14 +92,15 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+
+                // --------- КНОПКА НЕТ -----
+
                 Button(onClick = { onDismiss() }) {
 
                     Text(text = "Нет, отмена")
 
                 }
             }
-
-
         }
     }
 }

@@ -30,14 +30,13 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateMeeting
 import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.time.LocalTime
-import java.util.Calendar
 
 class CreateMeeting(private val act: MainActivity) {
 
@@ -46,6 +45,8 @@ class CreateMeeting(private val act: MainActivity) {
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО ОБЪЯВЛЕНИЕ
 
     private val choosePlaceDialog = ChoosePlaceDialog(act)
+
+    private val filterFunctions = FilterFunctions(act)
 
 
     // ------- ЭКРАН СОЗДАНИЯ МЕРОПРИЯТИЯ ------------
@@ -158,7 +159,7 @@ class CreateMeeting(private val act: MainActivity) {
         val chosenMeetingCategoryCreate = remember {mutableStateOf("Выбери категорию")}
 
         // КАТЕГОРИЯ МЕРОПРИЯТИЯ ПРИШЕДШАЯ ИЗ БД
-        val chosenMeetingCategoryEdit = remember {mutableStateOf<String>(filledMeeting.category!!)}
+        val chosenMeetingCategoryEdit = remember {mutableStateOf(filledMeeting.category!!)}
 
         // КАТЕГОРИЯ МЕРОПРИЯТИЯ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
         var category by rememberSaveable { mutableStateOf("Выбери категорию") }
@@ -223,6 +224,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         // Считываем список моих заведений
         placesDatabaseManager.readPlaceMyDataFromDb(placesList)
+
 
 
         // ------- СЧИТЫВАЕМ ПОЛНУЮ ИНФОРМАЦИЮ О ВЫБРАННОМ ЗАВЕДЕНИИ------
@@ -738,8 +740,6 @@ class CreateMeeting(private val act: MainActivity) {
 
                     onClick = {
 
-                        val calendar = Calendar.getInstance()
-
                         val currentTime = System.currentTimeMillis()/1000 //calendar.timeInMillis // инициализируем календарь //LocalTime.now().toNanoOfDay()
 
 
@@ -784,8 +784,6 @@ class CreateMeeting(private val act: MainActivity) {
 
                             GlobalScope.launch(Dispatchers.IO){
 
-                                Log.d ("My Log", image1.toString())
-
                                 if (image1 == null && createOrEdit != "0") {
                                     // такое условие возможно только при редактировании
 
@@ -813,7 +811,7 @@ class CreateMeeting(private val act: MainActivity) {
                                             addressPlaceInput = finishAddressPlace,
                                             ownerKey = act.mAuth.uid,
                                             createdTime = filledMeeting.createdTime,
-                                            dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
+                                            dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
                                         )
 
                                         // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -882,7 +880,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                                     // после сжатия запускаем функцию загрузки сжатого фото в Storage
 
-                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage$currentTime", "image/jpg", MEETINGS_ROOT){
+                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
 
                                         // В качестве колбака придет ссылка на изображение в Storage
 
@@ -913,7 +911,7 @@ class CreateMeeting(private val act: MainActivity) {
                                                     addressPlaceInput = finishAddressPlace,
                                                     ownerKey = act.mAuth.uid,
                                                     createdTime = currentTime.toString(),
-                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
+                                                    dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
                                                 )
 
                                             // Делаем дополнительную проверку - пользователь зарегистрирован или нет
@@ -978,7 +976,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                                     // после сжатия запускаем функцию загрузки сжатого фото в Storage
 
-                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage$currentTime", "image/jpg", MEETINGS_ROOT){
+                                    activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
 
                                         // В качестве колбака придет ссылка на изображение в Storage
 
@@ -1012,7 +1010,7 @@ class CreateMeeting(private val act: MainActivity) {
                                                     addressPlaceInput = finishAddressPlace,
                                                     ownerKey = act.mAuth.uid,
                                                     createdTime = filledMeeting.createdTime,
-                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
+                                                    dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
                                                 )
 
                                             } else {
@@ -1039,7 +1037,7 @@ class CreateMeeting(private val act: MainActivity) {
                                                     addressPlaceInput = finishAddressPlace,
                                                     ownerKey = act.mAuth.uid,
                                                     createdTime = currentTime.toString(),
-                                                    dateInNumber = act.meetingDatabaseManager.getSplitDataFromDb(dataResult)
+                                                    dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
                                                 )
 
                                             }

@@ -221,6 +221,9 @@ class StockCard (val act: MainActivity) {
 
                             Spacer(modifier = Modifier.height(10.dp))
 
+
+                            // ----- ГОРОД --------
+
                             if (stockItem.city != null){
 
                                 androidx.compose.material3.Text(
@@ -232,6 +235,8 @@ class StockCard (val act: MainActivity) {
                             }
 
                             Spacer(modifier = Modifier.height(10.dp))
+
+                            // ----- ДАТА ПРОВЕДЕНИЯ ------
 
                             if (stockItem.startDate != null && stockItem.finishDate != null) {
 

@@ -219,7 +219,7 @@ class MeetingsCard(val act: MainActivity) {
 
                         if (meetingItem.headline!=null){
                             Text(
-                                text = meetingItem.headline, // title - заголовок мероприятия, который должен приходить из базы данных
+                                text = meetingItem.headline, // заголовок мероприятия, который должен приходить из базы данных
                                 color = Grey00, // цвет текста
                                 style = Typography.titleLarge // стиль текста
                             )

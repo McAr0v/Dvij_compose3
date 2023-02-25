@@ -168,6 +168,9 @@ class PlacesCard (val act: MainActivity) {
 
                             Spacer(modifier = Modifier.height(10.dp))
 
+
+                            // ------ МЕРОПРИЯТИЯ --------
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -200,6 +203,9 @@ class PlacesCard (val act: MainActivity) {
                                 }
 
                                 Spacer(modifier = Modifier.width(10.dp))
+
+
+                                // -------- АКЦИИ ---------
 
                                 Button(
                                     onClick = {},

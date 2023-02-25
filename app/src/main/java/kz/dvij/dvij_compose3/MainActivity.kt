@@ -36,6 +36,7 @@ import kz.dvij.dvij_compose3.elements.CategoryDialog
 import kz.dvij.dvij_compose3.elements.MeetingsCard
 import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.elements.StockCard
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.ChooseCityNavigation
 import kz.dvij.dvij_compose3.navigation.*
@@ -43,7 +44,6 @@ import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.meetingscreens.MeetingViewScreen
 import kz.dvij.dvij_compose3.meetingscreens.MeetingsScreens
-import kz.dvij.dvij_compose3.pickers.getTodayDate
 import kz.dvij.dvij_compose3.placescreens.PlaceViewScreen
 import kz.dvij.dvij_compose3.placescreens.PlacesScreens
 import kz.dvij.dvij_compose3.stockscreens.StockScreen
@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
     private val stockViewScreen = StockViewScreen(this)
     private val createProfileInfoScreen = CreateProfileInfoScreen(this)
     val userDatabaseManager = UserDatabaseManager(this)
+    val filterFunctions = FilterFunctions(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
@@ -253,11 +254,11 @@ class MainActivity : ComponentActivity() {
 
             } else if (meetingFinishDateForFilter.value != "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату"){
 
-                val meetingStartDateForFilterNumber = meetingDatabaseManager.splitData(meetingStartDateForFilter.value)
-                val meetingFinishDateForFilterNumber = meetingDatabaseManager.splitData(meetingFinishDateForFilter.value)
+                val meetingStartDateForFilterNumber = filterFunctions.splitData(meetingStartDateForFilter.value)
+                val meetingFinishDateForFilterNumber = filterFunctions.splitData(meetingFinishDateForFilter.value)
 
-                val startNumberDate = meetingDatabaseManager.getDataNumber(meetingStartDateForFilterNumber)
-                val finishNumberDate = meetingDatabaseManager.getDataNumber(meetingFinishDateForFilterNumber)
+                val startNumberDate = filterFunctions.getDataNumber(meetingStartDateForFilterNumber)
+                val finishNumberDate = filterFunctions.getDataNumber(meetingFinishDateForFilterNumber)
 
                 if (startNumberDate > finishNumberDate){
                     meetingFinishDateForFilter.value = meetingStartDateForFilter.value

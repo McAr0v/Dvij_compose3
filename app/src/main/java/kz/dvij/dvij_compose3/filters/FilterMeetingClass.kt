@@ -1,6 +1,6 @@
-package kz.dvij.dvij_compose3.firebase
+package kz.dvij.dvij_compose3.filters
 
-data class FilterClass(
+data class FilterMeetingClass(
     val cityCategoryDate: String? = null,
     val cityCategory: String? = null,
     val cityDate: String? = null,

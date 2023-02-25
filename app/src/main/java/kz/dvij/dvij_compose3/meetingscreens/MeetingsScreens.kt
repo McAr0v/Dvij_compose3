@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.FilterDialog
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -29,6 +30,7 @@ class MeetingsScreens (val act: MainActivity) {
 
     private val databaseManager = act.meetingDatabaseManager // инициализируем датабаз менеджер
     private val filterDialog = FilterDialog(act)
+    private val filterFunctions = FilterFunctions(act)
 
     // создаем мероприятие по умолчанию
     private val default = MeetingsAdsClass (
@@ -92,11 +94,11 @@ class MeetingsScreens (val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
-        val filter = databaseManager.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
+        val filter = filterFunctions.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
 
-        val removeQuery = databaseManager.splitFilter(filter)
+        val removeQuery = filterFunctions.splitFilter(filter)
 
-        val typeFilter = databaseManager.getTypeOfFilter(removeQuery)
+        val typeFilter = filterFunctions.getTypeOfFilter(removeQuery)
 
 
         databaseManager.readFilteredMeetingDataFromDb(

@@ -9,8 +9,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
-import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.pickers.getTodayDate
+import kz.dvij.dvij_compose3.filters.FilterFunctions
+import kz.dvij.dvij_compose3.filters.FilterMeetingClass
+import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
+import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
 
 class MeetingDatabaseManager (private val activity: MainActivity) {
 
@@ -26,9 +28,15 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         description = "Default"
     )
 
+    private val filterFunctions = FilterFunctions(activity)
+
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ ВОЗВРАЩАЮЩАЯ СПИСОК СЧЕТЧИКИ МЕРОПРИЯТИЯ --------
 
-    fun readOneMeetingFromDataBase(meetingInfo: MutableState<MeetingsAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
+    fun readOneMeetingFromDataBase(
+        meetingInfo: MutableState<MeetingsAdsClass>, // сюда записываться информация о мероприятии
+        key: String, // ключ мероприятия
+        callback: (result: List<Int>)-> Unit // калбак
+    ){
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
@@ -36,12 +44,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                 for (item in snapshot.children){
 
-                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
-
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val meeting = item //путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                         .child("info") // Папка инфо
-                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри - папка с данными о мероприятии
+                        .children.iterator().next() // путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                     // считываем данные для счетчика - количество добавивших в избранное
@@ -82,10 +88,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val meeting = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                         .child("info") // Папка инфо
-                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри - папка с данными о мероприятии
+                        .children.iterator().next() // путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                     // если мероприятие не нал и ключ мероприятия совпадает с ключем из БД, то...
@@ -95,7 +101,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                         callback (meeting)
 
-
                     }
                 }
             }
@@ -104,7 +109,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     }
 
 
-    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
+    // ------ВЕРОЯТНО УЖЕ НЕ НУЖНА. ЕСЛИ ЗА МЕСЯЦ ТАК И НЕ ИСПОЛЬЗУЮ, УДАЛИТЬ. 25.02.23 написано это. ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
 
     fun readMeetingDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
 
@@ -158,7 +163,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
-    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ --------
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ С ФИЛЬТРОМ --------
 
     fun readFilteredMeetingDataFromDb(
         meetingsList: MutableState<List<MeetingsAdsClass>>,
@@ -170,100 +175,116 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     ){
 
         // Определяем тип фильтра
-        val typeFilter = getTypeOfFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
+        val typeFilter = filterFunctions.getTypeOfFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
 
-        var filter = ""
+        // Создаем фильтр из пришедших выбранных пользователем данных
+        var filter = filterFunctions.createFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
 
-        filter = createFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
 
-        val dateInMillis = System.currentTimeMillis()/1000 // инициализируем календарь
+        // Время в миллисекундах СЕГОДНЯ
+        val dateInMillis = getTodayInMilliseconds()
 
-        val today = getTodayDate(dateInMillis.toString())
+        // Конвертируем дату из миллисекунд в обычную дату 2 февраля 2023
+        val today = convertMillisecondsToDate(dateInMillis.toString())
 
-        val todayInRightFormat = getSplitDataFromDb(today.toString())
-
+        // ДАТА - СЕГОДНЯ В НУЖНОМ ФОРМАТЕ 20230202
+        val todayInRightFormat = filterFunctions.getSplitDataFromDb(today.toString())
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray =
-                    ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
 
                 for (item in snapshot.children) {
 
+                    // читаем мероприятие
                     val meeting =
-                        item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                             .child("info") // следующая папка с информацией о мероприятии
-                            .children.iterator()
-                            .next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("meetingData") // папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
+                    // Читаем фильтр из мероприятия
                     val getFilter = item
-                        .child("filterInfo").getValue(FilterClass::class.java)
-
+                        .child("filterInfo").getValue(FilterMeetingClass::class.java)
 
 
                     if (meeting != null && getFilter != null) {
 
-                        // разделяем дату на день, месяц, год
-                        val removeDataFromDb = splitData(meeting.data!!)
+                        // читаем число даты для сортировки ГодМесяцДень
+                        val meetingDataNumber = meeting.dateInNumber!!.toInt()
 
-                        // получаем число в нужном формате - ГодМесяцДень
-                        val meetingDataNumber = meeting.dateInNumber!!.toInt()//getDataNumber(removeDataFromDb)
 
+                        // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                        // Если число из мероприятия меньше чем число СЕГОДНЯ
                         if (meetingDataNumber < todayInRightFormat.toInt()) {
 
+                            // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
                             deleteMeeting(meeting.key!!, meeting.image1!!){
-
-                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
-
+                                if(it){
+                                    Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                }
                             }
                         }
 
+                        // ---- ЕСЛИ ДАТЫ НАЧАЛА И КОНЦА ПЕРИОДА ЕСТЬ, ТО
+
                         if (meetingStartDateForFilter.value != "Выбери дату" && meetingFinishDateForFilter.value != "Выбери дату") {
 
-                            val startDayList = splitData(meetingStartDateForFilter.value)
-                            val finishDayList = splitData(meetingFinishDateForFilter.value)
+                            // Разделение дат фильтра на составляющие
+                            val startDayList = filterFunctions.splitData(meetingStartDateForFilter.value)
+                            val finishDayList = filterFunctions.splitData(meetingFinishDateForFilter.value)
 
-                            val startDayNumber = getDataNumber(startDayList)
-                            val finishDayNumber = getDataNumber(finishDayList)
+                            // Получаем дату начала и конца для фильтра в нужном формате
+                            val startDayNumber = filterFunctions.getDataNumber(startDayList)
+                            val finishDayNumber = filterFunctions.getDataNumber(finishDayList)
 
-                            checkDatePeriod(
-                                meetingDate = meeting.dateInNumber,
-                                startFilterDay = startDayNumber,
-                                finishFilterDay = finishDayNumber
-                            ) {
+                            // ПРОВЕРЯЕМ - ПОПАДАЕТ ЛИ НАШЕ МЕРОПРИЯТИЕ В ДИАПАЗОН ДАТ ИЗ ФИЛЬТРА
 
-                                filter = if (it) {
+                            filterFunctions.checkDatePeriod(
+                                meetingDate = meeting.dateInNumber, // дата мероприятия из БД в правильном формате
+                                startFilterDay = startDayNumber, // Начало периода в правильном формате
+                                finishFilterDay = finishDayNumber // конец периода в правильном формате
+                            ) { inPeriod ->
 
-                                    createFilter(
-                                        city = cityForFilter.value,
-                                        category = meetingCategoryForFilter.value,
-                                        meeting.data
+                                // Результат сравнения
+
+                                filter = if (inPeriod) {
+
+                                    // Создаем фильтр, который будет сравниваться с фильтром из БД.
+                                    // Получается, что фильтр будет постоянно меняться и подстраиваться к каждому мероприятию, которое попадает
+                                    // В период
+
+                                    filterFunctions.createFilter(
+                                        city = cityForFilter.value, // город, который выбрал для фильтра пользователь
+                                        category = meetingCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
+                                        meeting.data!! // дата из БД, чтобы фильтр совпал с фильтром из БД и это мероприятие подошло
                                     )
 
                                 } else {
 
-                                    createFilter(
-                                        city = cityForFilter.value,
-                                        category = meetingCategoryForFilter.value,
-                                        date = meetingStartDateForFilter.value
+                                    // если не попадает в диапазон, делаем фильтр как выбрал пользователь и мероприятие не попало в список
+                                    filterFunctions.createFilter(
+                                        city = cityForFilter.value, // город, который выбрал для фильтра пользователь
+                                        category = meetingCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
+                                        date = meetingStartDateForFilter.value // минимальная дата
                                     )
 
                                 }
-
                             }
-
                         }
 
-
-                        // Log.d ("MyLog", meetingDataNumber)
+                        // УКАЗЫВАЕМ, КАКИЕ ФИЛЬТРЫ НАДО БРАТЬ В ЗАВИСИМОСТИ ОТ ТИПА ВЫБРАННОГО ПОЛЬЗОВАТЕЛЕМ ФИЛЬТРА
 
                         when (typeFilter) {
 
                             "cityCategoryDate" -> {
+
+                                // Берем нужную строку из полученных фильтров и сравниваем с выбранным
+                                // Ниже по аналогии
 
                                 if (getFilter.cityCategoryDate == filter) {
                                     meetingArray.add(meeting)
@@ -305,30 +326,22 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     meetingArray.add(meeting)
                                 }
                             }
-
                         }
-
-                    } // если мероприятие не пустое, добавляем в список
-
+                    }
                 }
 
                 if (meetingArray.isEmpty()) {
-                    meetingsList.value =
-                        listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
                 } else {
 
+                    // ---- Сортируем список в зависимости от выбранной настройки ----
 
-                    //val reversedList = meetingArray.asReversed()
-
-                    val reversedList = sortedMeetingList(
-                        meetingArray,
-                        meetingSortingForFilter.value
+                    val sortedList = filterFunctions.sortedMeetingList(
+                        meetingArray, // Передаем сырой список мероприятий
+                        meetingSortingForFilter.value // настройка для сортировки
                     )
-                    meetingsList.value = reversedList // если добавились мероприятия в список, то этот новый список и передаем
-
-
+                    meetingsList.value = sortedList // возвращаем отсортированный список
                 }
-
             }
 
             // в функцию onCancelled пока ничего не добавляем
@@ -336,20 +349,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         }
         )
     }
-
-    fun sortedMeetingList (meetingsList: List<MeetingsAdsClass>, query: String): List<MeetingsAdsClass>{
-
-        return when (query) {
-
-            "Сначала новые" -> meetingsList.sortedBy { it.createdTime }.asReversed()
-            "Сначала старые" -> meetingsList.sortedBy { it.createdTime }
-            "Дата: По возрастанию" -> meetingsList.sortedBy { it.dateInNumber }
-            "Дата: По убыванию" -> meetingsList.sortedBy { it.dateInNumber }.asReversed()
-            else -> meetingsList.sortedBy { it.createdTime }.asReversed() //meetingsList.asReversed()
-        }
-
-    }
-
 
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ МЕРОПРИЯТИЙ --------
@@ -368,10 +367,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
                     if (auth.uid !=null) {
-                        val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        val meeting = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                             .child("info") // следующая папка с информацией о мероприятии
-                            .child(auth.uid!!) // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                            .child("meetingData") // добираемся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .child(auth.uid!!) // путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                            .child("meetingData") // папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                         if (meeting != null) {meetingArray.add(meeting)} //  если мероприятие не нал, то добавляем в список-черновик
@@ -407,15 +406,15 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     // Считываем каждое мероприятие для сравнения
 
                     if (auth.uid !=null) {
-                        val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        val meeting = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                             .child("info") // папка с информацией о мероприятии
                             .children.iterator().next() // папка уникального ключа пользователя. Пропускаем ее
-                            .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                            .child("meetingData") // папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                         // Считываем папку, в которую попадают ключи добавивших в избранное
 
-                        val meetingFav = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                        val meetingFav = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                             .child("AddedToFavorites") // Папка со списком добавивших в избранное
                             .child(auth.uid!!) // ищем папку с ключом пользователя
                             .getValue(String::class.java) // забираем данные из БД если они есть
@@ -448,17 +447,19 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЯ --------
 
-    suspend fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
+    fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
 
-        val filledFilter = FilterClass(
-            cityCategoryDate = createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            cityCategory = createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty"),
-            cityDate = createFilter(city = filledMeeting.city ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            city = createFilter(city = filledMeeting.city ?: "Empty"),
-            categoryDate = createFilter(category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            category = createFilter(category = filledMeeting.category ?: "Empty"),
-            date = createFilter(date = filledMeeting.data ?: "Empty"),
-            noFilter = createFilter()
+        // ---- СОЗДАЕМ ФИЛЬТРЫ ДЛЯ ВЫГРУЗКИ В БД ------
+
+        val filledFilter = FilterMeetingClass(
+            cityCategoryDate = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            cityCategory = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty"),
+            cityDate = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            city = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty"),
+            categoryDate = filterFunctions.createFilter(category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            category = filterFunctions.createFilter(category = filledMeeting.category ?: "Empty"),
+            date = filterFunctions.createFilter(date = filledMeeting.data ?: "Empty"),
+            noFilter = filterFunctions.createFilter()
         )
 
         meetingDatabase // записываем в базу данных
@@ -473,7 +474,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     // если мероприятие опубликовано, запускаем публикацию фильтра
                     meetingDatabase
                         .child(filledMeeting.key ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ МЕРОПРИЯТИЯ
-                        .child("filterInfo") // помещаем данные в папку info
+                        .child("filterInfo") // помещаем данные в папку filterInfo
                         .setValue(filledFilter).addOnCompleteListener { filterIsPublish ->
 
                             if (filterIsPublish.isSuccessful){
@@ -491,8 +492,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     callback (false)
                 }
             }
-
-
     }
 
     // --- ФУНКЦИЯ ДОБАВЛЕНИЯ МЕРОПРИЯТИЯ В ИЗБРАННОЕ ---------
@@ -520,13 +519,17 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     fun deleteMeeting(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){
 
+        // ---- СНАЧАЛА УДАЛЯЕМ КАРТИНКУ ------
+
         activity.photoHelper.deleteMeetingImage(imageUrl){ resultDeletingImage ->
+
+            // ЕСЛИ УДАЛЕНА ->
 
             if (resultDeletingImage) {
 
                 Log.d ("MyLog", "Картинка была успешно автоматически удалена")
 
-                // если ключ пользователя не будет нал, то выполнится функция
+                // если ключ пользователя не будет нал, то выполнится функция удаления уже мероприятия
 
                 activity.mAuth.uid?.let {
                     meetingDatabase // обращаемся к БД
@@ -539,10 +542,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         callback (true)
                     }
                 }
-
             }
         }
-
     }
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ ИЗ ИЗБРАННОГО ----------
@@ -700,15 +701,13 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                 for (item in snapshot.children){
 
-                    // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
-
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val meeting = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                         .child("info") // следующая папка с информацией о мероприятии
-                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .children.iterator().next() // путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                    if (meeting != null && meeting.placeKey == placeKey) {meetingArray.add(meeting)} // если мероприятие не пустое, добавляем в список
+                    if (meeting != null && meeting.placeKey == placeKey) {meetingArray.add(meeting)} // если мероприятие не пустое и ключ заведения совпадает с ключем заведения в мероприятии, добавляем в список
 
                 }
 
@@ -739,10 +738,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                     // создаем переменную meeting, в которую в конце поместим наш ДАТАКЛАСС с объявлением с БД
 
-                    val meeting = item // это как бы первый слой иерархии в папке Meetings. путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
+                    val meeting = item // путь УНИКАЛЬНОГО КЛЮЧА МЕРОПРИЯТИЯ
                         .child("info") // следующая папка с информацией о мероприятии
-                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
-                        .child("meetingData") // добираесся до следующей папки внутри УКПользователя - папка с данными о мероприятии
+                        .children.iterator().next() // путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("meetingData") // папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
                     if (meeting != null && meeting.placeKey == placeKey) {meetingArray.add(meeting)} // если мероприятие не пустое, добавляем в список
@@ -762,175 +761,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
-    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА -----
 
-    fun createFilter (city: String = "Выбери город", category: String = "Выбери категорию", date: String = "Выбери дату"): String{
-
-        val stringBuilder = StringBuilder()
-        val arrayTempFilter = listOf(city, category, date)
-
-        for ((index, string) in arrayTempFilter.withIndex()){
-
-            stringBuilder.append(string)
-            if (index != arrayTempFilter.size - 1) stringBuilder.append("_")
-
-        }
-
-        return stringBuilder.toString()
-
-    }
-
-    // ----- Функция разделения фильтра на отдельные элементы -----
-
-    fun splitFilter(filter: String): List<String> {
-
-        return filter.split("_")
-    }
-
-    // ---- Функция разделения даты на отдельные элементы ----
-    fun splitData(date: String): List<String> {
-
-        return date.split(" ")
-    }
-
-    // Функция превращения даты из БД в нужный формат
-
-    fun getSplitDataFromDb(date: String): String {
-        val splitDate = date.split(" ") // разбиваем дату
-        return getDataNumber(splitDate) // переконвертируем в нужный формат и возвращаем
-    }
-
-    // ---- Функция превращения ТЕКСТА МЕСЯЦА в ЧИСЛО
-
-    fun monthToNumber (month: String): String{
-
-        return when (month) {
-
-            activity.getString(R.string.january) -> "01"
-            activity.getString(R.string.february) -> "02"
-            activity.getString(R.string.march) -> "03"
-            activity.getString(R.string.april) -> "04"
-            activity.getString(R.string.may) -> "05"
-            activity.getString(R.string.june) -> "06"
-            activity.getString(R.string.july) -> "07"
-            activity.getString(R.string.august) -> "08"
-            activity.getString(R.string.september) -> "09"
-            activity.getString(R.string.october) -> "10"
-            activity.getString(R.string.november) -> "11"
-            activity.getString(R.string.december) -> "12"
-            else -> month
-
-        }
-    }
-
-    fun numberToNameOfMonth (month: Int): String {
-
-        return when (month+1) {
-            1 -> activity.getString(R.string.january)
-            2 -> activity.getString(R.string.february)
-            3 -> activity.getString(R.string.march)
-            4 -> activity.getString(R.string.april)
-            5 -> activity.getString(R.string.may)
-            6 -> activity.getString(R.string.june)
-            7 -> activity.getString(R.string.july)
-            8 -> activity.getString(R.string.august)
-            9 -> activity.getString(R.string.september)
-            10 -> activity.getString(R.string.october)
-            11 -> activity.getString(R.string.november)
-            else -> activity.getString(R.string.december)
-        }
-
-    }
-
-    // ---- Функция добавления 0 в начале числа
-
-    private fun numberWithZero (number: String): String {
-
-        return when (number){
-
-            "1" -> "01"
-            "2" -> "02"
-            "3" -> "03"
-            "4" -> "04"
-            "5" -> "05"
-            "6" -> "06"
-            "7" -> "07"
-            "8" -> "08"
-            "9" -> "09"
-            else -> number
-        }
-
-    }
-
-    // ---- Функция получения числа даты в нужном формате для фильтра -----
-
-    fun getDataNumber(list: List<String>): String {
-
-        val year = list[2] // год берем как есть
-        val day = numberWithZero(list[0]) // день превращаем в нужный формат с нулем в начале
-        val month = monthToNumber(list[1]) // названия месяцев превращаем в цифры
-
-        return year + month + day
-    }
-
-    // ---- Функция проверки - попадает ли наша дата в диапазон фильтра, заданного пользователем ----
-
-    fun checkDatePeriod (meetingDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
-
-        if (startFilterDay.toInt() <= meetingDate.toInt() && meetingDate.toInt() <= finishFilterDay.toInt()) {
-
-            callback (true)
-
-        }
-
-    }
-
-    // ----- Функция определения типа фильтра для корректной фильтрации -------
-
-    fun getTypeOfFilter(inputList: List<String>): String{
-
-        var result = ""
-
-        val city = inputList[0]
-        val category = inputList[1]
-        val date = inputList[2]
-
-        if (city != "Выбери город" && category != "Выбери категорию" && date != "Выбери дату"){
-
-            result = "cityCategoryDate"
-
-        } else if (city != "Выбери город" && category != "Выбери категорию"){
-
-            result = "cityCategory"
-
-        } else if (city != "Выбери город" && date != "Выбери дату"){
-
-            result = "cityDate"
-
-        } else if (city != "Выбери город"){
-
-            result = "city"
-
-        } else if (category != "Выбери категорию" && date != "Выбери дату"){
-
-            result = "categoryDate"
-
-        } else if (category != "Выбери категорию"){
-
-            result = "category"
-
-        } else if (date != "Выбери дату"){
-
-            result = "date"
-
-        } else {
-
-            result = "noFilter"
-
-        }
-
-
-        return result
-    }
 
 }

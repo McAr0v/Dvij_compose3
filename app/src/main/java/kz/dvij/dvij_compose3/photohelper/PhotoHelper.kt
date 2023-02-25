@@ -17,10 +17,9 @@ import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import java.io.ByteArrayOutputStream
+import java.util.Calendar
 
 class PhotoHelper (val act: MainActivity) {
-
-    private var currentTime = System.nanoTime()
 
     // ----- STORAGE МЕРОПРИЯТИЙ -----------
 
@@ -30,9 +29,9 @@ class PhotoHelper (val act: MainActivity) {
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
-    private val imageRefMeetings = storageMeetings
+    /*private val imageRefMeetings = storageMeetings
         .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
-        .child("image_${System.nanoTime()}_${System.currentTimeMillis()}") // название изображения
+        .child("image_${System.nanoTime()}_${System.currentTimeMillis()}") // название изображения*/
 
     // ----- STORAGE ЗАВЕДЕНИЙ -----------
 
@@ -42,9 +41,7 @@ class PhotoHelper (val act: MainActivity) {
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
-    private val imageRefPlaces = storagePlaces
-        .child(act.mAuth.uid ?: "empty") // в папке "Places" будет еще папка - для каждого пользователя своя
-        .child("image_${System.currentTimeMillis()}") // название изображения
+
 
     // ----- STORAGE АКЦИЙ -----------
 
@@ -54,9 +51,7 @@ class PhotoHelper (val act: MainActivity) {
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
-    private val imageRefStock = storageStock
-        .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
-        .child("image_${System.currentTimeMillis()}") // название изображения
+
 
     // ----- STORAGE ПОЛЬЗОВАТЕЛЕЙ -----------
 
@@ -66,9 +61,7 @@ class PhotoHelper (val act: MainActivity) {
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
-    private val imageRefUser = storageUser
-        .child(act.mAuth.uid ?: "empty") // в папке "User" будет еще папка - для каждого пользователя своя
-        .child("image_${System.currentTimeMillis()}") // название изображения
+
 
     // ---- Функция удаления изображений ------
 
@@ -121,14 +114,19 @@ class PhotoHelper (val act: MainActivity) {
 
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 20, bytes) // сжимаем изображение до нужного качества
 
+
+
             // помещаем сжатую картинку в хранилище на телефоне
 
             val path: String = MediaStore.Images.Media.insertImage(
                 context.contentResolver,
                 resizedBitmap,
-                "image_${System.currentTimeMillis()}",
+                "compressed_image",
                 null
             )
+
+
+        //"image_${System.currentTimeMillis()}"
 
             // возвращаем путь сжатой картинки
             return Uri.parse(path)
@@ -200,12 +198,20 @@ class PhotoHelper (val act: MainActivity) {
                 .build()
         }
 
+
+
+
         // ------ Если загружаем ФОТО МЕРОПРИЯТИЙ ---------
 
         if (typePost == MEETINGS_ROOT){
 
+            val imageRefMeetings = storageMeetings
+                .child(act.mAuth.uid ?: "empty") // в папке "Meetings" будет еще папка - для каждого пользователя своя
+                .child("image_${System.nanoTime()}_${System.currentTimeMillis()}") // название изображения
+
             if (metadata != null){
                 imageRefMeetings.putFile(uri, metadata).await() // с метаданными
+
             } else {
                 imageRefMeetings.putFile(uri).await() // без метаданных
             }
@@ -213,6 +219,10 @@ class PhotoHelper (val act: MainActivity) {
             callback(imageRefMeetings.downloadUrl.await().toString()) // дожидаемся URL картинки и в качестве колбэка возвращаем
 
         } else if (typePost == PLACES_ROOT){
+
+            val imageRefPlaces = storagePlaces
+                .child(act.mAuth.uid ?: "empty") // в папке "Places" будет еще папка - для каждого пользователя своя
+                .child("image_${System.currentTimeMillis()}") // название изображения
 
             // ----- ЕСЛИ ЗАГРУЖАЕМ ФОТО МЕСТ --------
 
@@ -227,6 +237,10 @@ class PhotoHelper (val act: MainActivity) {
             callback(imageRefPlaces.downloadUrl.await().toString())
 
         } else if (typePost == STOCK_ROOT){
+
+            val imageRefStock = storageStock
+                .child(act.mAuth.uid ?: "empty") // в папке "Stock" будет еще папка - для каждого пользователя своя
+                .child("image_${System.currentTimeMillis()}") // название изображения
 
             // ----- ЕСЛИ ЗАГРУЖАЕМ ФОТО АКЦИЙ --------
 
@@ -243,6 +257,10 @@ class PhotoHelper (val act: MainActivity) {
         } else if (typePost == CREATE_USER_INFO_SCREEN){
 
             // ----- ЕСЛИ ЗАГРУЖАЕМ ФОТО ПОЛЬЗОВАТЕЛЕЙ --------
+
+            val imageRefUser = storageUser
+                .child(act.mAuth.uid ?: "empty") // в папке "User" будет еще папка - для каждого пользователя своя
+                .child("image_${System.currentTimeMillis()}") // название изображения
 
             // То же самое что и в фото мероприятий, только в другую папку
 

@@ -25,7 +25,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ ЗАВЕДЕНИЯ --------
 
-    suspend fun publishPlace(filledPLace: PlacesAdsClass, callback: (result: Boolean)-> Unit){
+    fun publishPlace(filledPLace: PlacesAdsClass, callback: (result: Boolean)-> Unit){
 
         placeDatabase // записываем в базу данных
             .child(filledPLace.placeKey ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ЗАВЕДЕНИЯ

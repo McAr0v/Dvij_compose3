@@ -21,7 +21,7 @@ class UserDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ ПОЛЬЗОВАТЕЛЯ --------
 
-    suspend fun publishUser(filledUser: UserInfoClass, callback: (result: Boolean)-> Unit){
+    fun publishUser(filledUser: UserInfoClass, callback: (result: Boolean)-> Unit){
 
         userDatabase // записываем в базу данных
             .child(auth.uid ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ПОЛЬЗОВАТЕЛЯ

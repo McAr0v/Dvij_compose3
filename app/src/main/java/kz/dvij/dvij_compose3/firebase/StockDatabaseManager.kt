@@ -25,7 +25,7 @@ class StockDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ АКЦИЙ --------
 
-    suspend fun publishStock(filledStock: StockAdsClass, callback: (result: Boolean)-> Unit){
+    fun publishStock(filledStock: StockAdsClass, callback: (result: Boolean)-> Unit){
 
         stockDatabase // записываем в базу данных
             .child(filledStock.keyStock ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ АКЦИИ

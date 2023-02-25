@@ -208,7 +208,7 @@ class AccountHelper (val act: MainActivity) {
     // ------- ФУНКЦИЯ, ЗАПУСКАЮШАЯСЯ ПРИ НАЖАТИИ НА КНОПКУ GOOGLE
 
     fun signInWithGoogle(){
-        signInClient = getSignInClient() // sign in Client - переменная, которая инициализируется не сразу. Мы ее создали как lateinit  и она вверху mainActivity
+        signInClient = getSignInClient() // sign in Client - переменная, которая инициализируется не сразу. Мы ее создали как late init  и она вверху mainActivity
 
         val intent = signInClient.signInIntent
 

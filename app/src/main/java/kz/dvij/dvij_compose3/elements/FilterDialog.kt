@@ -27,10 +27,13 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.pickers.dataPickerWithRemember
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class FilterDialog (val act: MainActivity) {
+
+    private val filterFunctions = FilterFunctions(act)
 
     // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
 
@@ -50,6 +53,8 @@ class FilterDialog (val act: MainActivity) {
         val citiesList = remember {
             mutableStateOf(listOf<CitiesList>())
         }
+
+        // Список доступных вариантов сортировки
 
         val sortingList = listOf("По умолчанию", "Сначала новые", "Сначала старые", "Дата: По возрастанию", "Дата: По убыванию")
 
@@ -93,7 +98,7 @@ class FilterDialog (val act: MainActivity) {
             ) {
 
 
-                // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
+                // ------- ЗАГЛОВОК и КНОПКА ЗАКРЫТЬ -----------
 
                 Row(
                     modifier = Modifier
@@ -131,6 +136,9 @@ class FilterDialog (val act: MainActivity) {
                     .padding(bottom = 20.dp),
                 ) {
 
+
+                    // ----- ГОРОД ------
+
                     SpacerTextWithLine(headline = "Город")
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
@@ -138,6 +146,8 @@ class FilterDialog (val act: MainActivity) {
                         cityForFilter.value = act.chooseCityNavigation.citySelectButton(cityName = cityForFilter) {openCityDialog.value = true}
 
                         Spacer(modifier = Modifier.width(10.dp))
+
+                        // ----- КНОПКА СБРОСА ЭТОГО ЭЛЕМЕНТА ФИЛЬТРА -----
 
                         if (cityForFilter.value != "Выбери город"){
 
@@ -151,6 +161,9 @@ class FilterDialog (val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+
+                    // ----- КАТЕГОРИЯ --------
+
                     SpacerTextWithLine(headline = "Категория")
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
@@ -158,6 +171,9 @@ class FilterDialog (val act: MainActivity) {
                         meetingCategoryForFilter.value = act.categoryDialog.categorySelectButton(categoryName = meetingCategoryForFilter) { openCategoryDialog.value = true }
 
                         Spacer(modifier = Modifier.width(10.dp))
+
+
+                        // ----- КНОПКА СБРОСА ЭТОГО ЭЛЕМЕНТА ФИЛЬТРА -----
 
                         if (meetingCategoryForFilter.value != "Выбери категорию"){
 
@@ -171,6 +187,8 @@ class FilterDialog (val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    // ------- ПЕРИОД ДАТ ----------
+
                     SpacerTextWithLine(headline = "Период")
 
                     Text(text = "Начало периода", color = Grey40)
@@ -179,9 +197,13 @@ class FilterDialog (val act: MainActivity) {
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
+                        // ----- НАЧАЛЬНАЯ ДАТА ---------
+
                         meetingStartDateForFilter.value = dataPickerWithRemember(act = act, meetingStartDateForFilter, meetingStartDateForFilter)
 
                         Spacer(modifier = Modifier.width(10.dp))
+
+                        // ----- КНОПКА СБРОСА ЭТОГО ЭЛЕМЕНТА ФИЛЬТРА -----
 
                         if (meetingStartDateForFilter.value != "Выбери дату"){
 
@@ -195,6 +217,8 @@ class FilterDialog (val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    // --------- КОНЕЧНАЯ ДАТА -------
+
                     Text(text = "Конец периода:", color = Grey40)
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -204,6 +228,8 @@ class FilterDialog (val act: MainActivity) {
                         meetingFinishDateForFilter.value = dataPickerWithRemember(act = act, meetingFinishDateForFilter, meetingFinishDateForFilter)
 
                         Spacer(modifier = Modifier.width(10.dp))
+
+                        // ----- КНОПКА СБРОСА ЭТОГО ЭЛЕМЕНТА ФИЛЬТРА -----
 
                         if (meetingFinishDateForFilter.value != "Выбери дату"){
 
@@ -217,6 +243,9 @@ class FilterDialog (val act: MainActivity) {
 
                 }
 
+
+                // ------- СОРТИРОВКА --------------
+
                 SpacerTextWithLine(headline = "Сортировка")
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
@@ -224,6 +253,8 @@ class FilterDialog (val act: MainActivity) {
                     meetingSortingForFilter.value = act.categoryDialog.categorySelectButton(categoryName = meetingSortingForFilter) { openSortingDialog.value = true }
 
                     Spacer(modifier = Modifier.width(10.dp))
+
+                    // ----- КНОПКА СБРОСА ЭТОГО ЭЛЕМЕНТА ФИЛЬТРА -----
 
                     if (meetingSortingForFilter.value != "По умолчанию"){
 
@@ -237,6 +268,9 @@ class FilterDialog (val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+
+                // ---- КНОПКИ ПРИНЯТЬ И СБРОСИТЬ
+
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
                     Button(onClick = { onDismiss() }) {
@@ -248,9 +282,9 @@ class FilterDialog (val act: MainActivity) {
                     Button(
                         onClick = {
 
-                            val query = act.meetingDatabaseManager.createFilter()
+                            val query = filterFunctions.createFilter()
 
-                            val removeQuery = act.meetingDatabaseManager.splitFilter(query)
+                            val removeQuery = filterFunctions.splitFilter(query)
 
                             meetingCategoryForFilter.value = removeQuery[1]
                             meetingStartDateForFilter.value = removeQuery[2]
@@ -265,15 +299,17 @@ class FilterDialog (val act: MainActivity) {
                 }
 
 
+                // ------- ДИАЛОГ ВЫБОРА ГОРОДА ---------
 
                 if (openCityDialog.value) {
 
-                    // Если при редактировании в мероприятии есть город, Передаем ГОРОД ИЗ МЕРОПРИЯТИЯ ДЛЯ РЕДАКТИРОВАНИЯ
+                    // Если в настройках пользователя или в боковой панели пользователем выбран город, то передаем его
+
                     act.chooseCityNavigation.CityChooseDialog(
-                        cityName = cityForFilter,
-                        citiesList
+                        cityName = cityForFilter, // приходит с mainActivity
+                        citiesList // список городов
                     ) {
-                        openCityDialog.value = false
+                        openCityDialog.value = false // действие на закрытие диалога
                     }
 
                 }
@@ -282,30 +318,40 @@ class FilterDialog (val act: MainActivity) {
 
                 if (openCategoryDialog.value) {
 
-                    act.categoryDialog.CategoryChooseDialog(categoryName = meetingCategoryForFilter, categoriesList) {
-                        openCategoryDialog.value = false
+                    act.categoryDialog.CategoryChooseDialog(
+                        categoryName = meetingCategoryForFilter, // Название категории, приходит с mainActivity
+                        categoriesList // список категорий
+                    ) {
+                        openCategoryDialog.value = false // действие на закрытие диалога
                     }
 
                 }
 
-                // --- САМ ДИАЛОГ ВЫБОРА Сортировки -----
+                // --- САМ ДИАЛОГ ВЫБОРА ТИПА СОРТИРОВКИ -----
 
                 if (openSortingDialog.value) {
 
-                    SortingDialog(sorting = meetingSortingForFilter, list = sortingList) {
-                        openSortingDialog.value = false
+                    SortingDialog(
+                        sorting = meetingSortingForFilter, // приходит с mainActivity
+                        list = sortingList // список доступных типов сортировки
+                    ) {
+                        openSortingDialog.value = false // действие на закрытие диалога
                     }
-
                 }
-
             }
         }
     }
 
-    // ----- ДИАЛОГ ВЫБОРА КАТЕГОРИИ
+
+
+    // ----- ДИАЛОГ ВЫБОРА СОРТИРОВКИ ----------
 
     @Composable
-    fun SortingDialog(sorting: MutableState<String>, list: List<String>, onDismiss: () -> Unit) {
+    fun SortingDialog(
+        sorting: MutableState<String>,
+        list: List<String>,
+        onDismiss: () -> Unit
+    ) {
 
         // ------ САМ ДИАЛОГ ---------
 
@@ -332,7 +378,7 @@ class FilterDialog (val act: MainActivity) {
             ) {
 
 
-                // ------- ЗАГЛОВОК ВЫБЕРИТЕ КАТЕГОРИЮ и КНОПКА ЗАКРЫТЬ -----------
+                // ------- ЗАГЛОВОК и КНОПКА ЗАКРЫТЬ -----------
 
                 Row(
                     modifier = Modifier
@@ -344,7 +390,7 @@ class FilterDialog (val act: MainActivity) {
                     // --------- ЗАГОЛОВОК ----------
 
                     Text(
-                        text = stringResource(id = R.string.cat_default), // текст заголовка
+                        text = "Выбери тип сортировки", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
                         color = Grey10, // цвет заголовка
                         modifier = Modifier.weight(1f)
@@ -365,7 +411,7 @@ class FilterDialog (val act: MainActivity) {
                 Spacer(modifier = Modifier.height(20.dp))
 
 
-                // ---------- СПИСОК Категорий -------------
+                // ---------- СПИСОК Сортировки -------------
 
                 LazyColumn(
                     modifier = Modifier
@@ -381,20 +427,20 @@ class FilterDialog (val act: MainActivity) {
 
                     items(list) { item ->
 
-                        // ------------ строка с названием категории -------------
+                        // ------------ строка с названием сортировок -------------
 
                         Column(modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 // действие на нажатие на элемент
                                 sorting.value =
-                                    item // выбранная категория теперь та, которую выбрали, а не по умолчанию
+                                    item // выбранная сортировка теперь та, которую выбрали, а не по умолчанию
                                 onDismiss() // закрыть диалог
                             }
                         ) {
 
                             Text(
-                                text = item, // само название категории
+                                text = item, // само название сортировки
                                 color = Grey00, // цвет текста
                                 style = Typography.bodyMedium // стиль текста
                             )

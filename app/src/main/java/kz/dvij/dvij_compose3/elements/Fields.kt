@@ -27,7 +27,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 
 @Composable
 fun fieldEmailComponent (
-    act: MainActivity, inputEmail: String? = ""
+    act: MainActivity,
+    inputEmail: String? = ""
 ): String {
 
     // функция вовзвращает переменную текст, в которую записывается вводимое в поле значение
