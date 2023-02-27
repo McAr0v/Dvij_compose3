@@ -1,6 +1,8 @@
 package kz.dvij.dvij_compose3.stockscreens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,10 +24,12 @@ import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.StockCard
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.nio.file.DirectoryStream.Filter
 
 // функция превью экрана
 class StockScreen(val act: MainActivity) {
@@ -33,18 +37,40 @@ class StockScreen(val act: MainActivity) {
     private val databaseManager = StockDatabaseManager(act = act)
     private val stockCard = StockCard(act)
 
+    private val filterFunctions = FilterFunctions(act)
+
     // создаем акцию по умолчанию
     private val default = StockAdsClass (
         description = "Default"
     )
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotConstructor")
     @Composable
-    fun StockScreen(navController: NavController, act: MainActivity, stockKey: MutableState<String>) {
+    fun StockScreen(
+        navController: NavController,
+        act: MainActivity,
+        stockKey: MutableState<String>,
+        cityForFilter: MutableState<String>,
+        stockCategoryForFilter: MutableState<String>,
+        stockStartDateForFilter: MutableState<String>,
+        stockFinishDateForFilter: MutableState<String>,
+        stockSortingForFilter: MutableState<String>
+    ) {
 
         Column {
 
-            TabMenu(bottomPage = STOCK_ROOT, navController, act, stockKey = stockKey)
+            TabMenu(
+                bottomPage = STOCK_ROOT,
+                navController,
+                act,
+                stockKey = stockKey,
+                cityForFilter = cityForFilter,
+                stockCategoryForFilter = stockCategoryForFilter,
+                stockSortingForFilter = stockSortingForFilter,
+                stockStartDateForFilter = stockStartDateForFilter,
+                stockFinishDateForFilter = stockFinishDateForFilter
+            )
         }
 
     }
@@ -52,12 +78,28 @@ class StockScreen(val act: MainActivity) {
     // ----- ЛЕНТА АКЦИЙ ----------
 
     @Composable
-    fun StockTapeScreen(navController: NavController, stockKey: MutableState<String>) {
+    fun StockTapeScreen(
+        navController: NavController,
+        stockKey: MutableState<String>,
+        cityForFilter: MutableState<String>,
+        stockCategoryForFilter: MutableState<String>,
+        stockStartDateForFilter: MutableState<String>,
+        stockFinishDateForFilter: MutableState<String>,
+        stockSortingForFilter: MutableState<String>
+    ) {
 
         // инициализируем список акций
         val stockList = remember {
             mutableStateOf(listOf<StockAdsClass>())
         }
+
+        val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
+
+        val filter = filterFunctions.createFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value)
+
+        val removeQuery = filterFunctions.splitFilter(filter)
+
+        val typeFilter = filterFunctions.getTypeOfFilter(removeQuery)
 
         // обращаемся к базе данных и записываем в список акций
         databaseManager.readStockDataFromDb(stockList)

@@ -42,7 +42,11 @@ fun TabMenu (
     meetingCategoryForFilter: MutableState<String>? = null,
     meetingStartDateForFilter: MutableState<String>? = null,
     meetingFinishDateForFilter: MutableState<String>? = null,
-    meetingSortingForFilter: MutableState<String>? = null
+    meetingSortingForFilter: MutableState<String>? = null,
+    stockCategoryForFilter: MutableState<String>? = null,
+    stockStartDateForFilter: MutableState<String>? = null,
+    stockFinishDateForFilter: MutableState<String>? = null,
+    stockSortingForFilter: MutableState<String>? = null
 ){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
@@ -140,7 +144,16 @@ fun TabMenu (
                 else -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> stockKey?.let { activity.stockScreen.StockTapeScreen(navController = navController, stockKey = it) } // Акции Лента
+                        0 -> stockKey?.let { activity.stockScreen.StockTapeScreen(
+                            navController = navController,
+                            stockKey = it,
+                            cityForFilter = cityForFilter!!,
+                            stockCategoryForFilter = stockCategoryForFilter!!,
+                            stockStartDateForFilter = stockStartDateForFilter!!,
+                            stockFinishDateForFilter = stockFinishDateForFilter!!,
+                            stockSortingForFilter = stockSortingForFilter!!
+
+                        ) } // Акции Лента
                         1 -> stockKey?.let { activity.stockScreen.StockFavScreen(navController = navController, stockKey = it) } // Акции Избранные
                         else -> stockKey?.let { activity.stockScreen.StockMyScreen(navController = navController, stockKey = it) } // Акции МОИ
                     }

@@ -244,6 +244,14 @@ class MainActivity : ComponentActivity() {
             val meetingFinishDateForFilter = remember { mutableStateOf("Выбери дату") }
             val meetingSortingForFilter = remember { mutableStateOf("По умолчанию") }
 
+            // Переменные для запоминания фильтра в АКЦИЯХ
+
+            val stockCategoryForFilter = remember { mutableStateOf("Выбери категорию") }
+            val stockStartDateForFilter = remember { mutableStateOf("Выбери дату") }
+            val stockFinishDateForFilter = remember { mutableStateOf("Выбери дату") }
+            val stockSortingForFilter = remember { mutableStateOf("По умолчанию") }
+
+
             if (meetingFinishDateForFilter.value == "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату" ){
 
                 meetingFinishDateForFilter.value = meetingStartDateForFilter.value
@@ -460,7 +468,7 @@ class MainActivity : ComponentActivity() {
 
                         // ----- СТРАНИЦЫ АКЦИЙ ------
 
-                        composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey)}
+                        composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey, cityForFilter = cityName, stockCategoryForFilter = stockCategoryForFilter, stockStartDateForFilter = stockStartDateForFilter, stockFinishDateForFilter = stockFinishDateForFilter, stockSortingForFilter = stockSortingForFilter)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
                         composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, stockKey.value)}
                         composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey, stockInfo, placeInfo)}

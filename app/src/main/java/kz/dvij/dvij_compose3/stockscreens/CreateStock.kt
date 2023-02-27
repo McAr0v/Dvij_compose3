@@ -34,6 +34,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
+import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.functions.checkDataOnCreateStock
 import kz.dvij.dvij_compose3.navigation.ChoosePlaceDialog
@@ -47,6 +48,8 @@ class CreateStock (val act: MainActivity) {
     private val auth = Firebase.auth // инициализируем для УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ, ПУБЛИКУЮЩЕГО АКЦИЮ
 
     private val choosePlaceDialog = ChoosePlaceDialog(act)
+
+    private val filterFunctions = FilterFunctions(act)
 
     // ----- ЭКРАН СОЗДАНИЯ АКЦИИ --------
 
@@ -553,6 +556,8 @@ class CreateStock (val act: MainActivity) {
 
                 onClick = {
 
+                    val currentTime = System.currentTimeMillis()/1000 // инициализируем календарь //LocalTime.now().toNanoOfDay()
+
                     // действие на нажатие
 
                     // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
@@ -595,7 +600,7 @@ class CreateStock (val act: MainActivity) {
 
                         GlobalScope.launch(Dispatchers.IO){
 
-                            if (image1 == null){
+                            if (image1 == null && createOrEdit != "0"){
 
                                 GlobalScope.launch(Dispatchers.Main) {
 
@@ -612,7 +617,10 @@ class CreateStock (val act: MainActivity) {
                                         startDate = startDay,
                                         finishDate = finishDay,
                                         inputHeadlinePlace = finishHeadlinePlace,
-                                        inputAddressPlace = finishAddressPlace
+                                        inputAddressPlace = finishAddressPlace,
+                                        createTime = filledStock.createTime,
+                                        startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                        finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
 
                                     )
 
@@ -685,7 +693,7 @@ class CreateStock (val act: MainActivity) {
                             } else {
 
                                 // запускаем сжатие изображения
-                                val compressedImage = act.photoHelper.compressImage(act, image1)
+                                val compressedImage = act.photoHelper.compressImage(act, image1!!)
 
                                 // после сжатия запускаем функцию загрузки сжатого фота в Storage
 
@@ -716,7 +724,10 @@ class CreateStock (val act: MainActivity) {
                                                 startDate = startDay,
                                                 finishDate = finishDay,
                                                 inputHeadlinePlace = finishHeadlinePlace,
-                                                inputAddressPlace = finishAddressPlace
+                                                inputAddressPlace = finishAddressPlace,
+                                                createTime = filledStock.createTime,
+                                                startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                                finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
 
                                             )
 
@@ -735,7 +746,10 @@ class CreateStock (val act: MainActivity) {
                                                 startDate = startDay,
                                                 finishDate = finishDay,
                                                 inputHeadlinePlace = finishHeadlinePlace,
-                                                inputAddressPlace = finishAddressPlace
+                                                inputAddressPlace = finishAddressPlace,
+                                                createTime = currentTime.toString(),
+                                                startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                                finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
 
                                             )
 
