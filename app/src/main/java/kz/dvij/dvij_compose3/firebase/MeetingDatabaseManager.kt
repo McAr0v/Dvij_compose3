@@ -216,20 +216,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         // читаем число даты для сортировки ГодМесяцДень
                         val meetingDataNumber = meeting.dateInNumber!!.toInt()
 
-
-                        // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
-
-                        // Если число из мероприятия меньше чем число СЕГОДНЯ
-                        if (meetingDataNumber < todayInRightFormat.toInt()) {
-
-                            // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                            deleteMeeting(meeting.key!!, meeting.image1!!){
-                                if(it){
-                                    Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
-                                }
-                            }
-                        }
-
                         // ---- ЕСЛИ ДАТЫ НАЧАЛА И КОНЦА ПЕРИОДА ЕСТЬ, ТО
 
                         if (meetingStartDateForFilter.value != "Выбери дату" && meetingFinishDateForFilter.value != "Выбери дату") {
@@ -287,43 +273,173 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                 // Ниже по аналогии
 
                                 if (getFilter.cityCategoryDate == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
+
+
                                 }
 
                             }
                             "cityCategory" -> {
                                 if (getFilter.cityCategory == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "cityDate" -> {
                                 if (getFilter.cityDate == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "city" -> {
                                 if (getFilter.city == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "categoryDate" -> {
                                 if (getFilter.categoryDate == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "category" -> {
                                 if (getFilter.category == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "date" -> {
                                 if (getFilter.date == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                             "noFilter" -> {
                                 if (getFilter.noFilter == filter) {
-                                    meetingArray.add(meeting)
+
+                                    // ---- АВТОМАТИЧЕСКОЕ УДАЛЕНИЕ МЕРОПРИЯТИЯ ----
+
+                                    // Если число из мероприятия меньше чем число СЕГОДНЯ
+                                    if (meetingDataNumber < todayInRightFormat.toInt()) {
+
+                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
+                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        meetingArray.add(meeting)
+
+                                    }
                                 }
                             }
                         }
