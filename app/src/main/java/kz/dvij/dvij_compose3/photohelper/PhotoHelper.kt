@@ -83,6 +83,26 @@ class PhotoHelper (val act: MainActivity) {
 
     }
 
+    // ---- Функция удаления изображений ------
+
+    fun deleteStockImage (imageUrl: String, callback: (result: Boolean) -> Unit){
+
+        storageStock.storage.getReferenceFromUrl(imageUrl).delete().addOnCompleteListener {
+
+            if (it.isSuccessful) {
+
+                callback (true)
+
+            } else {
+
+                callback (false)
+
+            }
+
+        }
+
+    }
+
 
 
     // ------ ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЯ -------

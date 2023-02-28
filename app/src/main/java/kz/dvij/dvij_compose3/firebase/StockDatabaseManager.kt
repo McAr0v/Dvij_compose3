@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -9,7 +10,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.filters.FilterFunctions
+import kz.dvij.dvij_compose3.filters.FilterMeetingClass
 import kz.dvij.dvij_compose3.filters.FilterStockClass
+import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
+import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
 
 class StockDatabaseManager (val act: MainActivity) {
 
@@ -88,22 +92,397 @@ class StockDatabaseManager (val act: MainActivity) {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ АКЦИИ ----------
 
-    fun deleteStock(key: String, callback: (result: Boolean)-> Unit){
+    fun deleteStock(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){
 
-        // если ключ пользователя не будет нал, то выполнится функция
+        act.photoHelper.deleteStockImage(imageUrl = imageUrl){ deletedImage ->
 
-        act.mAuth.uid?.let {
-            stockDatabase // обращаемся к БД
-                .child(key) // заходим в папку с уникальным ключем акции
-                .removeValue() // удаляем значение
-        }?.addOnCompleteListener {
-            // слушаем выполнение. Если успешно сделано, то...
-            if (it.isSuccessful){
-                // возвращаем колбак ТРУ
-                callback (true)
+            if (deletedImage){
+
+                Log.d ("MyLog", "Картинка АКЦИИ была успешно автоматически удалена")
+
+                // если ключ пользователя не будет нал, то выполнится функция удаления самого мероприятия
+
+                act.mAuth.uid?.let {
+                    stockDatabase // обращаемся к БД
+                        .child(key) // заходим в папку с уникальным ключем акции
+                        .removeValue() // удаляем значение
+                }?.addOnCompleteListener {
+                    // слушаем выполнение. Если успешно сделано, то...
+                    if (it.isSuccessful){
+                        // возвращаем колбак ТРУ
+                        callback (true)
+                    }
+                }
             }
         }
     }
+
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ФИЛЬТРОВАННЫХ АКЦИЙ С БАЗЫ ДАННЫХ --------
+
+    fun readFilteredStockDataFromDb(
+        stockList: MutableState<List<StockAdsClass>>,
+        cityForFilter: MutableState<String>,
+        stockCategoryForFilter: MutableState<String>,
+        stockStartDateForFilter: MutableState<String>,
+        stockFinishDateForFilter: MutableState<String>,
+        stockSortingForFilter: MutableState<String>,
+    ){
+
+        // Определяем тип фильтра
+        val typeFilter = filterFunctions.getTypeOfStockFilter(listOf(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value, stockFinishDateForFilter.value))
+
+        // Создаем фильтр из пришедших выбранных пользователем данных
+        var filter = filterFunctions.createStockFilter(city = cityForFilter.value, category = stockCategoryForFilter.value, startDate = stockStartDateForFilter.value, finishDate = stockFinishDateForFilter.value)
+
+        // Время в миллисекундах СЕГОДНЯ
+        val dateInMillis = getTodayInMilliseconds()
+
+        // Конвертируем дату из миллисекунд в обычную дату 2 февраля 2023
+        val today = convertMillisecondsToDate(dateInMillis.toString())
+
+        // ДАТА - СЕГОДНЯ В НУЖНОМ ФОРМАТЕ 20230202
+        val todayInRightFormat = filterFunctions.getSplitDataFromDb(today.toString())
+
+        stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val stockArray = ArrayList<StockAdsClass>() // создаем пустой список акций
+
+                for (item in snapshot.children){
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val stock = item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА АКЦИИ
+                        .child("info") // следующая папка с информацией об акции
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("stockData") // добираесся до следующей папки внутри УКПользователя - папка с данными об акции
+                        .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
+
+                    // Читаем фильтр из мероприятия
+                    val getFilter = item
+                        .child("filterInfo").getValue(FilterStockClass::class.java)
+
+
+                    if (stock != null && getFilter != null){
+
+                        // читаем числа даты для сортировки ГодМесяцДень
+                        val startDataNumber = stock.startDateNumber!!
+                        val finishDataNumber = stock.finishDateNumber!!
+
+                        // ---- ЕСЛИ ДАТЫ НАЧАЛА И КОНЦА ПЕРИОДА ЕСТЬ, ТО
+
+                        if (stockStartDateForFilter.value != "Выбери дату" && stockFinishDateForFilter.value != "Выбери дату") {
+
+                            // Разделение дат фильтра на составляющие
+                            val startDayList = filterFunctions.splitData(stockStartDateForFilter.value)
+                            val finishDayList = filterFunctions.splitData(stockFinishDateForFilter.value)
+
+                            // Получаем дату начала и конца для фильтра в нужном формате
+                            val startDayNumber = filterFunctions.getDataNumber(startDayList)
+                            val finishDayNumber = filterFunctions.getDataNumber(finishDayList)
+
+                            // ПРОВЕРЯЕМ - ПОПАДАЕТ ЛИ НАША АКЦИЯ В ДИАПАЗОН ДАТ ИЗ ФИЛЬТРА
+
+                            filterFunctions.checkStockDatePeriod(
+                                stockStartDate = startDataNumber, // дата начала акции из БД в правильном формате
+                                stockFinishDate = finishDataNumber, // дата завершения акции из БД в правильном формате
+                                startFilterDay = startDayNumber, // Начало периода в правильном формате
+                                finishFilterDay = finishDayNumber // конец периода в правильном формате
+                            ) { inPeriod ->
+
+                                // Результат сравнения
+
+                                filter = if (inPeriod) {
+
+                                    // Создаем фильтр, который будет сравниваться с фильтром из БД.
+                                    // Получается, что фильтр будет постоянно меняться и подстраиваться к каждому мероприятию, которое попадает
+                                    // В период
+
+                                    filterFunctions.createStockFilter(
+                                        city = cityForFilter.value, // город, который выбрал для фильтра пользователь
+                                        category = stockCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
+                                        startDate = stock.startDate!!, // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                        finishDate = stock.finishDate!! // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                    )
+
+                                } else {
+
+                                    // если не попадает в диапазон, делаем фильтр как выбрал пользователь и акция не попала в список
+
+
+                                    filterFunctions.createStockFilter(
+                                        city = cityForFilter.value, // город, который выбрал для фильтра пользователь
+                                        category = stockCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
+                                        startDate = stockStartDateForFilter.value, // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                        finishDate = stockFinishDateForFilter.value // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                    )
+                                }
+                            }
+                        }
+
+                        // УКАЗЫВАЕМ, КАКИЕ ФИЛЬТРЫ НАДО БРАТЬ В ЗАВИСИМОСТИ ОТ ТИПА ВЫБРАННОГО ПОЛЬЗОВАТЕЛЕМ ФИЛЬТРА
+
+                        when (typeFilter){
+
+                            "cityCategoryStartFinish" -> {if (getFilter.cityCategoryStartFinish == filter) {
+
+                                if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                    deleteStock(stock.keyStock!!, stock.image!!){
+                                        if(it){
+                                            Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        }
+                                    }
+                                } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityCategoryStart" -> {
+                                if (getFilter.cityCategoryStart == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityCategoryFinish" -> {
+                                if (getFilter.cityCategoryFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityStartFinish" -> {
+                                if (getFilter.cityStartFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityCategory" -> {
+                                if (getFilter.cityCategory == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityFinish" -> {
+                                if (getFilter.cityFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "cityStart" -> {
+                                if (getFilter.cityStart == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "city" -> {
+                                if (getFilter.city == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "categoryStartFinish" -> {
+                                if (getFilter.categoryStartFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "categoryStart" -> {
+                                if (getFilter.categoryStart == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "categoryFinish" -> {
+                                if (getFilter.categoryFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "startFinish" -> {
+                                if (getFilter.startFinish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "category" -> {
+                                if (getFilter.category == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "finish" -> {
+                                if (getFilter.finish == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "start" -> {
+                                if (getFilter.start == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                            "noFilter" -> {
+                                if (getFilter.noFilter == filter) {
+                                    if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
+
+                                        deleteStock(stock.keyStock!!, stock.image!!){
+                                            if(it){
+                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                            }
+                                        }
+                                    } else {
+
+                                        stockArray.add(stock)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (stockArray.isEmpty()){
+                    stockList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
+                } else {
+                    val sortedList = filterFunctions.sortedStockList(stockArray, stockSortingForFilter.value)
+                    stockList.value = sortedList // если добавились акции в список, то этот новый список и передаем
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 

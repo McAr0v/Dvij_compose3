@@ -132,11 +132,13 @@ class StockViewScreen (val act: MainActivity) {
 
                 ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                    stockInfo.value.keyStock?.let {
-                        act.stockDatabaseManager.deleteStock(it){
+                    stockInfo.value.keyStock?.let { key->
+                        stockInfo.value.image?.let { image ->
+                            act.stockDatabaseManager.deleteStock(key, imageUrl = image){
 
-                            navController.navigate(STOCK_ROOT) {popUpTo(0)}
+                                navController.navigate(STOCK_ROOT) {popUpTo(0)}
 
+                            }
                         }
                     }
 

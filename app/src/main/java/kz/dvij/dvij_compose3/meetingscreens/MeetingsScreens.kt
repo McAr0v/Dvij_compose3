@@ -98,7 +98,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         val removeQuery = filterFunctions.splitFilter(filter)
 
-        val typeFilter = filterFunctions.getTypeOfFilter(removeQuery)
+        val typeFilter = filterFunctions.getTypeOfMeetingFilter(removeQuery)
 
 
         databaseManager.readFilteredMeetingDataFromDb(
@@ -112,7 +112,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         if (openFilterDialog.value){
 
-            filterDialog.FilterChooseDialog(
+            filterDialog.FilterMeetingChooseDialog(
                 cityForFilter = cityForFilter,
                 meetingCategoryForFilter = meetingCategoryForFilter,
                 meetingStartDateForFilter = meetingStartDateForFilter,
@@ -214,7 +214,7 @@ class MeetingsScreens (val act: MainActivity) {
 
             // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
-            FloatingFilterButton(
+            FloatingMeetingFilterButton(
                 city = cityForFilter.value,
                 category = meetingCategoryForFilter.value,
                 date = meetingStartDateForFilter.value,

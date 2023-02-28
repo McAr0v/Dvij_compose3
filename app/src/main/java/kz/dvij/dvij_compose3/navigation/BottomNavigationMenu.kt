@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
@@ -128,10 +129,10 @@ fun FloatingButton(
     }
 }
 
-// ----- ЛЕТАЮЩАЯ КНОПКА ДОБАВИТЬ -----------
+// ----- ЛЕТАЮЩАЯ КНОПКА ФИЛЬТРА МЕРОПРИЯТИЙ -----------
 
 @Composable
-fun FloatingFilterButton(
+fun FloatingMeetingFilterButton(
     city: String = "Выбери город",
     category: String = "Выбери категорию",
     date: String = "Выбери дату",
@@ -174,6 +175,93 @@ fun FloatingFilterButton(
     }
 
     if (city != "Выбери город" || category != "Выбери категорию" || date != "Выбери дату") {
+        containerColor.value = SuccessColor
+    } else {
+        containerColor.value = Grey90
+    }
+
+    // помещаем кнопку в BOX
+    Box(
+        modifier = Modifier
+            .fillMaxSize() // занять полный размер
+            .fillMaxWidth() // занять всю ширину
+            .fillMaxHeight() // занять всю высоту
+    ) {
+
+        // --- САМА КНОПКА -------
+
+        FloatingActionButton(
+
+            onClick = { // действие на нажатие
+                onClick()
+            },
+            shape = CircleShape, // форма кнопки
+            contentColor = Grey00, // цвет содержимого кнопки
+            containerColor = containerColor.value, // цвет фона кнопки
+            modifier = Modifier
+                .padding(16.dp) // отступы
+                .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
+        ) {
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.padding(15.dp)
+            ){
+
+                Text(text = "Фильтр$counter", color = Grey00)
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter), // сама иконка
+                    contentDescription = "Кнопка фильтра" // описание для слабовидящих
+                )
+
+            }
+        }
+    }
+}
+
+// ----- ЛЕТАЮЩАЯ КНОПКА ФИЛЬТРА МЕРОПРИЯТИЙ -----------
+
+@Composable
+fun FloatingStockFilterButton(
+    city: String = "Выбери город",
+    category: String = "Выбери категорию",
+    startDate: String = "Выбери дату",
+    finishDate: String = "Выбери дату",
+    typeOfFilter: String,
+    onClick: () -> Unit
+){
+
+    val counter = when (typeOfFilter){
+
+        "cityCategoryStartFinish" -> " (4)"
+        "cityCategoryStart" -> " (3)"
+        "cityCategoryFinish" -> " (3)"
+        "cityStartFinish" -> " (3)"
+        "cityCategory" -> " (2)"
+        "cityFinish" -> " (2)"
+        "cityStart" -> " (2)"
+        "city" -> " (1)"
+        "categoryStartFinish" -> " (3)"
+        "categoryStart" -> " (2)"
+        "categoryFinish" -> " (2)"
+        "startFinish" -> " (2)"
+        "category" -> " (1)"
+        "finish" -> " (1)"
+        "start" -> " (1)"
+        "noFilter" -> ""
+
+        else -> ""
+    }
+
+    val containerColor = remember {
+        mutableStateOf(SuccessColor)
+    }
+
+    if (city != "Выбери город" || category != "Выбери категорию" || startDate != "Выбери дату" || finishDate != "Выбери дату") {
         containerColor.value = SuccessColor
     } else {
         containerColor.value = Grey90

@@ -274,6 +274,28 @@ class MainActivity : ComponentActivity() {
 
             }
 
+            if (stockFinishDateForFilter.value == "Выбери дату" && stockStartDateForFilter.value != "Выбери дату" ){
+
+                stockFinishDateForFilter.value = stockStartDateForFilter.value
+
+            } else if (stockStartDateForFilter.value == "Выбери дату"){
+
+                stockFinishDateForFilter.value = stockStartDateForFilter.value
+
+            } else if (stockFinishDateForFilter.value != "Выбери дату" && stockStartDateForFilter.value != "Выбери дату"){
+
+                val stockStartDateForFilterNumber = filterFunctions.splitData(stockStartDateForFilter.value)
+                val stockFinishDateForFilterNumber = filterFunctions.splitData(stockFinishDateForFilter.value)
+
+                val startNumberDate = filterFunctions.getDataNumber(stockStartDateForFilterNumber)
+                val finishNumberDate = filterFunctions.getDataNumber(stockFinishDateForFilterNumber)
+
+                if (startNumberDate > finishNumberDate){
+                    stockFinishDateForFilter.value = stockStartDateForFilter.value
+                }
+
+            }
+
 
             // Город по умолчанию
             val cityName = remember { mutableStateOf("Выбери город") }

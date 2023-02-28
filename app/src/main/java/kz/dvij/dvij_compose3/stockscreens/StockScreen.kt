@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
@@ -37,6 +38,7 @@ class StockScreen(val act: MainActivity) {
     private val stockCard = StockCard(act)
 
     private val filterFunctions = FilterFunctions(act)
+    private val filterDialog = FilterDialog(act)
 
     // создаем акцию по умолчанию
     private val default = StockAdsClass (
@@ -76,6 +78,7 @@ class StockScreen(val act: MainActivity) {
 
     // ----- ЛЕНТА АКЦИЙ ----------
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun StockTapeScreen(
         navController: NavController,
@@ -94,91 +97,134 @@ class StockScreen(val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
-        val filter = filterFunctions.createMeetingFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value)
+        val filter = filterFunctions.createStockFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value, stockFinishDateForFilter.value)
 
         val removeQuery = filterFunctions.splitFilter(filter)
 
-        val typeFilter = filterFunctions.getTypeOfFilter(removeQuery)
+        val typeFilter = filterFunctions.getTypeOfStockFilter(removeQuery)
 
         // обращаемся к базе данных и записываем в список акций
-        databaseManager.readStockDataFromDb(stockList)
 
-        // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
+        act.stockDatabaseManager.readFilteredStockDataFromDb(
+            stockList = stockList,
+            cityForFilter = cityForFilter,
+            stockCategoryForFilter = stockCategoryForFilter,
+            stockStartDateForFilter = stockStartDateForFilter,
+            stockFinishDateForFilter = stockFinishDateForFilter,
+            stockSortingForFilter = stockSortingForFilter
+        )
 
-        Column (
-            modifier = Modifier
-                .background(Grey95)
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        //databaseManager.readStockDataFromDb(stockList)
 
-            // ---- ЕСЛИ ЗАГРУЗИЛИСЬ АКЦИИ С БД --------
+        if (openFilterDialog.value){
 
-            if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+            filterDialog.FilterStockChooseDialog(
+                cityForFilter = cityForFilter,
+                stockCategoryForFilter = stockCategoryForFilter,
+                stockStartDateForFilter = stockStartDateForFilter,
+                stockFinishDateForFilter = stockFinishDateForFilter,
+                stockSortingForFilter = stockSortingForFilter
+            ) {
+                openFilterDialog.value = false
+            }
 
-                // ---- ЛЕНИВАЯ КОЛОНКА --------
+        }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Grey95),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ){
+        Surface(modifier = Modifier.fillMaxSize()) {
 
-                    // для каждого элемента из списка указываем шаблон для отображения
+            // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 
-                    items(stockList.value){ item ->
+            Column (
+                modifier = Modifier
+                    .background(Grey95)
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
-                        // сам шаблон карточки
-                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                // ---- ЕСЛИ ЗАГРУЗИЛИСЬ АКЦИИ С БД --------
+
+                if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+
+                    // ---- ЛЕНИВАЯ КОЛОНКА --------
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Grey95),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ){
+
+                        // для каждого элемента из списка указываем шаблон для отображения
+                        if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+
+                            items(stockList.value){ item ->
+
+                                // сам шаблон карточки
+                                act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                            }
+
+                        }
+
                     }
-                }
-            } else if (stockList.value == listOf(default)){
+                } else if (stockList.value == listOf(default)){
 
-                // ----- ЕСЛИ НЕТ АКЦИЙ -------
-
-                Text(
-                    text = stringResource(id = R.string.empty_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10
-                )
-
-            } else {
-
-                // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    // крутилка индикатор
-
-                    CircularProgressIndicator(
-                        color = PrimaryColor,
-                        strokeWidth = 3.dp,
-                        modifier = Modifier.size(40.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    // текст рядом с крутилкой
+                    // ----- ЕСЛИ НЕТ АКЦИЙ -------
 
                     Text(
-                        text = stringResource(id = R.string.ss_loading),
+                        text = stringResource(id = R.string.empty_meeting),
                         style = Typography.bodyMedium,
                         color = Grey10
                     )
 
+                } else {
+
+                    // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        // крутилка индикатор
+
+                        CircularProgressIndicator(
+                            color = PrimaryColor,
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(40.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        // текст рядом с крутилкой
+
+                        Text(
+                            text = stringResource(id = R.string.ss_loading),
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+
+                    }
                 }
             }
-        }
 
+            // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
+
+            FloatingStockFilterButton(
+                typeOfFilter = typeFilter,
+                city = cityForFilter.value,
+                category = stockCategoryForFilter.value,
+                startDate = stockStartDateForFilter.value,
+                finishDate = stockFinishDateForFilter.value
+            ) {
+                openFilterDialog.value = true
+            }
+
+        }
     }
 
     @Composable

@@ -3,6 +3,7 @@ package kz.dvij.dvij_compose3.filters
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.StockAdsClass
 
 class FilterFunctions(val act: MainActivity) {
 
@@ -135,9 +136,9 @@ class FilterFunctions(val act: MainActivity) {
         return year + month + day
     }
 
-    // ---- Функция проверки - попадает ли наша дата в диапазон фильтра, заданного пользователем ----
+    // ---- Функция проверки - попадает ли наша дата МЕРОПРИЯТИЯ в диапазон фильтра, заданного пользователем ----
 
-    fun checkDatePeriod (meetingDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
+    fun checkMeetingDatePeriod (meetingDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
 
         if (
             startFilterDay.toInt() <= meetingDate.toInt()
@@ -146,6 +147,20 @@ class FilterFunctions(val act: MainActivity) {
 
             callback (true)
 
+        }
+    }
+
+    // ---- Функция проверки - попадает ли наша дата АКЦИИ в диапазон фильтра, заданного пользователем ----
+
+    fun checkStockDatePeriod (stockStartDate: String, stockFinishDate: String, startFilterDay: String, finishFilterDay: String, callback: (result: Boolean) -> Unit) {
+
+        if (
+            startFilterDay.toInt() > stockFinishDate.toInt()
+            || stockStartDate.toInt() > finishFilterDay.toInt()
+        ) {
+            callback (false)
+        } else {
+            callback (true)
         }
     }
 
@@ -164,9 +179,26 @@ class FilterFunctions(val act: MainActivity) {
 
     }
 
-    // ----- Функция определения типа фильтра для корректной фильтрации -------
+    // ---- ФУНКЦИЯ СОРТИРОВКИ СПИСКА АКЦИЙ В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ТИПА -----
 
-    fun getTypeOfFilter(inputList: List<String>): String{
+    fun sortedStockList (stockList: List<StockAdsClass>, query: String): List<StockAdsClass>{
+
+        return when (query) {
+
+            "Сначала новые" -> stockList.sortedBy { it.createTime }.asReversed() // по дате создания
+            "Сначала старые" -> stockList.sortedBy { it.createTime } // по дате создания
+            "По дате начала акции: По возрастанию" -> stockList.sortedBy { it.startDateNumber } // по дате проведения
+            "По дате начала акции: По убыванию" -> stockList.sortedBy { it.startDateNumber }.asReversed() // по дате проведения
+            "По дате завершения акции: По возрастанию" -> stockList.sortedBy { it.finishDateNumber } // по дате проведения
+            "По дате завершения акции: По убыванию" -> stockList.sortedBy { it.finishDateNumber }.asReversed() // по дате проведения
+            else -> stockList.sortedBy { it.createTime }.asReversed() // по умолчанию - сначала новые
+        }
+
+    }
+
+    // ----- Функция определения типа фильтра для корректной фильтрации МЕРОПРИЯТИЙ-------
+
+    fun getTypeOfMeetingFilter(inputList: List<String>): String{
 
         var result = ""
 
@@ -201,6 +233,86 @@ class FilterFunctions(val act: MainActivity) {
         } else if (date != "Выбери дату"){
 
             result = "date"
+
+        } else {
+
+            result = "noFilter"
+
+        }
+
+        return result
+    }
+
+    // ----- Функция определения типа фильтра для корректной фильтрации АКЦИЙ ------
+
+    fun getTypeOfStockFilter(inputList: List<String>): String{
+
+        var result = ""
+
+        val city = inputList[0]
+        val category = inputList[1]
+        val startDate = inputList[2]
+        val finishDate = inputList[3]
+
+        if (city != "Выбери город" && category != "Выбери категорию" && startDate != "Выбери дату" && finishDate != "Выбери дату"){
+
+            result = "cityCategoryStartFinish"
+
+        } else if (city != "Выбери город" && category != "Выбери категорию" && startDate != "Выбери дату"){
+
+            result = "cityCategoryStart"
+
+        } else if (city != "Выбери город" && category != "Выбери категорию" && finishDate != "Выбери дату"){
+
+            result = "cityCategoryFinish"
+
+        } else if (city != "Выбери город" && startDate != "Выбери дату" && finishDate != "Выбери дату"){
+
+            result = "cityStartFinish"
+
+        } else if (city != "Выбери город" && category != "Выбери категорию"){
+
+            result = "cityCategory"
+
+        } else if (city != "Выбери город" && finishDate != "Выбери дату"){
+
+            result = "cityFinish"
+
+        } else if (city != "Выбери город" && startDate != "Выбери дату"){
+
+            result = "cityStart"
+
+        } else if (city != "Выбери город"){
+
+            result = "city"
+
+        } else if (category != "Выбери категорию" && startDate != "Выбери дату" && finishDate != "Выбери дату"){
+
+            result = "categoryStartFinish"
+
+        } else if (category != "Выбери категорию" && startDate != "Выбери дату"){
+
+            result = "categoryStart"
+
+        } else if (category != "Выбери категорию" && finishDate != "Выбери дату"){
+
+            result = "categoryFinish"
+
+        } else if (startDate != "Выбери дату" && finishDate != "Выбери дату"){
+
+            result = "startFinish"
+
+        } else if (category != "Выбери категорию"){
+
+            result = "category"
+
+        } else if (finishDate != "Выбери дату"){
+
+            result = "finish"
+
+        } else if (startDate != "Выбери дату"){
+
+            result = "start"
 
         } else {
 

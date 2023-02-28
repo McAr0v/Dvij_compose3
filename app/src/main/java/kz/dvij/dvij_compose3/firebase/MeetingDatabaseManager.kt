@@ -175,7 +175,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     ){
 
         // Определяем тип фильтра
-        val typeFilter = filterFunctions.getTypeOfFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
+        val typeFilter = filterFunctions.getTypeOfMeetingFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
 
         // Создаем фильтр из пришедших выбранных пользователем данных
         var filter = filterFunctions.createMeetingFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
@@ -230,7 +230,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                             // ПРОВЕРЯЕМ - ПОПАДАЕТ ЛИ НАШЕ МЕРОПРИЯТИЕ В ДИАПАЗОН ДАТ ИЗ ФИЛЬТРА
 
-                            filterFunctions.checkDatePeriod(
+                            filterFunctions.checkMeetingDatePeriod(
                                 meetingDate = meeting.dateInNumber, // дата мероприятия из БД в правильном формате
                                 startFilterDay = startDayNumber, // Начало периода в правильном формате
                                 finishFilterDay = finishDayNumber // конец периода в правильном формате
@@ -643,7 +643,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
             if (resultDeletingImage) {
 
-                Log.d ("MyLog", "Картинка была успешно автоматически удалена")
+                Log.d ("MyLog", "Картинка мероприятия была успешно автоматически удалена")
 
                 // если ключ пользователя не будет нал, то выполнится функция удаления уже мероприятия
 
