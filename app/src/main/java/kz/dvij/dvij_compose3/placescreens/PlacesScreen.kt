@@ -67,7 +67,7 @@ class PlacesScreens (val act: MainActivity) {
         val timestamp = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
             .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
 
-        Log.d("MyLog", "$timestamp")
+        Log.d("MyLog", timestamp)
 
         // инициализируем список заведений
         val placeList = remember {
@@ -75,7 +75,8 @@ class PlacesScreens (val act: MainActivity) {
         }
 
         // обращаемся к базе данных и записываем в список заведений заведения
-        databaseManager.readPlaceDataFromDb(placeList)
+        //databaseManager.readPlaceDataFromDb(placeList)
+        databaseManager.readPlaceSortedDataFromDb(placeList)
 
         // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 

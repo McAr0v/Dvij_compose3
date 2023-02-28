@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -22,6 +23,8 @@ class PlacesDatabaseManager (val act: MainActivity) {
     val default = PlacesAdsClass (
         placeDescription = "Default"
     )
+
+    private val meetingDatabaseManager = MeetingDatabaseManager(act)
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ ЗАВЕДЕНИЯ --------
 
@@ -92,6 +95,81 @@ class PlacesDatabaseManager (val act: MainActivity) {
                     placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
                 } else {
                     placeList.value = placeArray // если добавились заведения в список, то этот новый список и передаем
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        )
+    }
+
+    // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ЗАВЕДЕНИЙ С БАЗЫ ДАННЫХ --------
+
+    fun readPlaceSortedDataFromDb(placeList: MutableState<List<PlacesAdsClass>>){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val placeFinishArray = arrayListOf<List<String>>()
+
+                val placeArray = ArrayList<PlacesAdsClass>() // создаем пустой список заведений
+
+                for (item in snapshot.children){
+
+                    // создаем переменную place, в которую в конце поместим наш ДАТАКЛАСС с заведением с БД
+
+                    val place = item // это как бы первый слой иерархии в папке Places. путь УНИКАЛЬНОГО КЛЮЧА ЗАВЕДЕНИЯ
+                        .child("info") // следующая папка с информацией о заведении
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("placeData") // добираесся до следующей папки внутри УКПользователя - папка с данными о заведении
+                        .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведений
+
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val placeFav = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество просмотров объявления
+                    val placeViewCount = item
+                        .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
+                    if (place != null){
+
+                        // Считываем количество мероприятий у этого заведения
+
+                        // СДЕЛАТЬ ТАК ЖЕ КАК И В PLACEFAV - СДЕЛАТЬ ДОБАВЛЕНИЕ КЛЮЧА В ОТДЕЛЬНУЮ ПАПКУ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ И АКЦИИ И СООТВЕТСТВЕННО УДАЛЕНИЕ КЛЮЧА ПРИ УДАЛЕНИИ
+
+                        var meetingCount = "0"
+
+                        meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(place.placeKey!!){ meetingsCounter ->
+                           meetingCount = meetingsCounter.toString()
+                        }
+
+                        // Считываем количество акций у этого заведения
+
+                        // СДЕЛАТЬ ТАК ЖЕ КАК И В PLACEFAV - СДЕЛАТЬ ДОБАВЛЕНИЕ КЛЮЧА В ОТДЕЛЬНУЮ ПАПКУ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ И АКЦИИ И СООТВЕТСТВЕННО УДАЛЕНИЕ КЛЮЧА ПРИ УДАЛЕНИИ
+
+                        var stockCount = "0"
+
+                        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = place.placeKey) { stockCounters ->
+                            stockCount = stockCounters.toString()
+                        }
+
+                        val list = listOf<String>(place.placeKey, place.city!!, place.category!!, placeFav.toString(), placeViewCount.toString(), meetingCount.toString(), stockCount.toString())
+
+                        placeFinishArray.add(list)
+
+                        placeArray.add(place)
+
+                    }
+
+                }
+
+                if (placeArray.isEmpty()){
+                    placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
+                } else {
+                    placeList.value = placeArray // если добавились заведения в список, то этот новый список и передаем
+                    Log.d("MyLog", "$placeFinishArray")
                 }
             }
 
