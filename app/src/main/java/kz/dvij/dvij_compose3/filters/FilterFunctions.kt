@@ -3,6 +3,7 @@ package kz.dvij.dvij_compose3.filters
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 
 class FilterFunctions(val act: MainActivity) {
@@ -195,6 +196,24 @@ class FilterFunctions(val act: MainActivity) {
         }
 
     }
+
+    // ---- ФУНКЦИЯ СОРТИРОВКИ СПИСКА Заведений В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ТИПА -----
+
+    /*fun sortedPlaceList (placesList: List<PlacesAdsClass>, query: String): List<PlacesAdsClass>{
+
+        return when (query) {
+
+            // вместо it.createTime вставить функцию считывания информации о количестве добавивших в избранное
+            "Сначала новые" -> placesList.sortedBy { it.createTime }.asReversed() // по дате создания
+            "Сначала старые" -> placesList.sortedBy { it.createTime } // по дате создания
+            "По дате начала акции: По возрастанию" -> placesList.sortedBy { it.startDateNumber } // по дате проведения
+            "По дате начала акции: По убыванию" -> placesList.sortedBy { it.startDateNumber }.asReversed() // по дате проведения
+            "По дате завершения акции: По возрастанию" -> placesList.sortedBy { it.finishDateNumber } // по дате проведения
+            "По дате завершения акции: По убыванию" -> placesList.sortedBy { it.finishDateNumber }.asReversed() // по дате проведения
+            else -> placesList.sortedBy { it.createTime }.asReversed() // по умолчанию - сначала новые
+        }
+
+    }*/
 
     // ----- Функция определения типа фильтра для корректной фильтрации МЕРОПРИЯТИЙ-------
 

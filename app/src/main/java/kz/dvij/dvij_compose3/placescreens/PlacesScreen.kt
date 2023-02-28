@@ -1,5 +1,8 @@
 package kz.dvij.dvij_compose3.placescreens
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,6 +27,10 @@ import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 // функция превью экрана
 class PlacesScreens (val act: MainActivity) {
@@ -35,6 +42,7 @@ class PlacesScreens (val act: MainActivity) {
         placeDescription = "Default"
     )
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun PlacesScreen(navController: NavController, placeKey: MutableState<String>) {
 
@@ -48,8 +56,18 @@ class PlacesScreens (val act: MainActivity) {
 
     // ----- ЛЕНТА ЗАВЕДЕНИЙ -------
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun PlacesTapeScreen(navController: NavController, placeKey: MutableState<String>) {
+
+        val date = Date()
+
+        Log.d("MyLog", "$date")
+
+        val timestamp = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
+
+        Log.d("MyLog", "$timestamp")
 
         // инициализируем список заведений
         val placeList = remember {
