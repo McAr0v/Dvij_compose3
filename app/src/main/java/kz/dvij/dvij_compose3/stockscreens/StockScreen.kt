@@ -29,7 +29,6 @@ import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
-import java.nio.file.DirectoryStream.Filter
 
 // функция превью экрана
 class StockScreen(val act: MainActivity) {
@@ -95,7 +94,7 @@ class StockScreen(val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
-        val filter = filterFunctions.createFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value)
+        val filter = filterFunctions.createMeetingFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value)
 
         val removeQuery = filterFunctions.splitFilter(filter)
 

@@ -282,7 +282,7 @@ class FilterDialog (val act: MainActivity) {
                     Button(
                         onClick = {
 
-                            val query = filterFunctions.createFilter()
+                            val query = filterFunctions.createMeetingFilter()
 
                             val removeQuery = filterFunctions.splitFilter(query)
 

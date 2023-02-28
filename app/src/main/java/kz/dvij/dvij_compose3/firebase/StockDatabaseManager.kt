@@ -8,8 +8,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.filters.FilterFunctions
+import kz.dvij.dvij_compose3.filters.FilterStockClass
 
 class StockDatabaseManager (val act: MainActivity) {
+
+    private val filterFunctions = FilterFunctions(act)
 
     // --- ИНИЦИАЛИЗИРУЕМ БАЗУ ДАННЫХ -------
 
@@ -27,6 +31,29 @@ class StockDatabaseManager (val act: MainActivity) {
 
     fun publishStock(filledStock: StockAdsClass, callback: (result: Boolean)-> Unit){
 
+        // ---- СОЗДАЕМ ФИЛЬТРЫ ДЛЯ ВЫГРУЗКИ В БД ------
+
+        val filledFilter = FilterStockClass (
+
+            cityCategoryStartFinish = filterFunctions.createStockFilter(filledStock.city!!, category = filledStock.category!!, startDate = filledStock.startDate!!, finishDate = filledStock.finishDate!!),
+            cityCategoryStart = filterFunctions.createStockFilter(filledStock.city, category = filledStock.category, startDate = filledStock.startDate),
+            cityCategoryFinish = filterFunctions.createStockFilter(filledStock.city, category = filledStock.category, finishDate = filledStock.finishDate),
+            cityStartFinish = filterFunctions.createStockFilter(filledStock.city, startDate = filledStock.startDate, finishDate = filledStock.finishDate),
+            cityCategory = filterFunctions.createStockFilter(filledStock.city, category = filledStock.category),
+            cityFinish = filterFunctions.createStockFilter(filledStock.city, finishDate = filledStock.finishDate),
+            cityStart = filterFunctions.createStockFilter(filledStock.city, startDate = filledStock.startDate),
+            city = filterFunctions.createStockFilter(filledStock.city),
+            categoryStartFinish = filterFunctions.createStockFilter(category = filledStock.category, startDate = filledStock.startDate, finishDate = filledStock.finishDate),
+            categoryStart = filterFunctions.createStockFilter(category = filledStock.category, startDate = filledStock.startDate),
+            categoryFinish = filterFunctions.createStockFilter(category = filledStock.category, finishDate = filledStock.finishDate),
+            startFinish = filterFunctions.createStockFilter(startDate = filledStock.startDate, finishDate = filledStock.finishDate),
+            category = filterFunctions.createStockFilter(category = filledStock.category),
+            finish = filterFunctions.createStockFilter(finishDate = filledStock.finishDate),
+            start = filterFunctions.createStockFilter(startDate = filledStock.startDate),
+            noFilter = filterFunctions.createStockFilter()
+
+        )
+
         stockDatabase // записываем в базу данных
             .child(filledStock.keyStock ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ АКЦИИ
             .child("info") // помещаем данные в папку info
@@ -35,8 +62,22 @@ class StockDatabaseManager (val act: MainActivity) {
             .setValue(filledStock).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если акция опубликована, возвращаем колбак тру
-                    callback (true)
+
+                    // если акция опубликована, запускаем публикацию фильтра
+                    stockDatabase
+                        .child(filledStock.keyStock ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ АКЦИИ
+                        .child("filterInfo") // помещаем данные в папку filterInfo
+                        .setValue(filledFilter).addOnCompleteListener { filterIsPublish ->
+
+                            if (filterIsPublish.isSuccessful){
+
+                                callback (true)
+
+                            } else {
+                                // если не опубликован фильтр, то возвращаем фалс
+                                callback (false)
+                            }
+                        }
 
                 } else {
                     // если не опубликована, то возвращаем фалс

@@ -6,12 +6,30 @@ import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 
 class FilterFunctions(val act: MainActivity) {
 
-    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА -----
+    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА МЕРОПРИЯТИЙ -----
 
-    fun createFilter (city: String = "Выбери город", category: String = "Выбери категорию", date: String = "Выбери дату"): String{
+    fun createMeetingFilter (city: String = "Выбери город", category: String = "Выбери категорию", date: String = "Выбери дату"): String{
 
         val stringBuilder = StringBuilder()
         val arrayTempFilter = listOf(city, category, date)
+
+        for ((index, string) in arrayTempFilter.withIndex()){
+
+            stringBuilder.append(string)
+            if (index != arrayTempFilter.size - 1) stringBuilder.append("_")
+
+        }
+
+        return stringBuilder.toString()
+
+    }
+
+    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА АКЦИЙ -----
+
+    fun createStockFilter (city: String = "Выбери город", category: String = "Выбери категорию", startDate: String = "Выбери дату", finishDate: String = "Выбери дату"): String{
+
+        val stringBuilder = StringBuilder()
+        val arrayTempFilter = listOf(city, category, startDate, finishDate)
 
         for ((index, string) in arrayTempFilter.withIndex()){
 

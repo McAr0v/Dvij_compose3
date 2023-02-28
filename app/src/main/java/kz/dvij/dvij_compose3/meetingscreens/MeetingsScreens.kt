@@ -94,7 +94,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
-        val filter = filterFunctions.createFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
+        val filter = filterFunctions.createMeetingFilter(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value)
 
         val removeQuery = filterFunctions.splitFilter(filter)
 

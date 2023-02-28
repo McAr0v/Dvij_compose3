@@ -178,7 +178,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         val typeFilter = filterFunctions.getTypeOfFilter(listOf(cityForFilter.value, meetingCategoryForFilter.value, meetingStartDateForFilter.value))
 
         // Создаем фильтр из пришедших выбранных пользователем данных
-        var filter = filterFunctions.createFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
+        var filter = filterFunctions.createMeetingFilter(city = cityForFilter.value, category = meetingCategoryForFilter.value, date = meetingStartDateForFilter.value)
 
 
         // Время в миллисекундах СЕГОДНЯ
@@ -244,7 +244,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Получается, что фильтр будет постоянно меняться и подстраиваться к каждому мероприятию, которое попадает
                                     // В период
 
-                                    filterFunctions.createFilter(
+                                    filterFunctions.createMeetingFilter(
                                         city = cityForFilter.value, // город, который выбрал для фильтра пользователь
                                         category = meetingCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
                                         meeting.data!! // дата из БД, чтобы фильтр совпал с фильтром из БД и это мероприятие подошло
@@ -253,7 +253,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                 } else {
 
                                     // если не попадает в диапазон, делаем фильтр как выбрал пользователь и мероприятие не попало в список
-                                    filterFunctions.createFilter(
+                                    filterFunctions.createMeetingFilter(
                                         city = cityForFilter.value, // город, который выбрал для фильтра пользователь
                                         category = meetingCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
                                         date = meetingStartDateForFilter.value // минимальная дата
@@ -568,14 +568,14 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         // ---- СОЗДАЕМ ФИЛЬТРЫ ДЛЯ ВЫГРУЗКИ В БД ------
 
         val filledFilter = FilterMeetingClass(
-            cityCategoryDate = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            cityCategory = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty"),
-            cityDate = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            city = filterFunctions.createFilter(city = filledMeeting.city ?: "Empty"),
-            categoryDate = filterFunctions.createFilter(category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
-            category = filterFunctions.createFilter(category = filledMeeting.category ?: "Empty"),
-            date = filterFunctions.createFilter(date = filledMeeting.data ?: "Empty"),
-            noFilter = filterFunctions.createFilter()
+            cityCategoryDate = filterFunctions.createMeetingFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            cityCategory = filterFunctions.createMeetingFilter(city = filledMeeting.city ?: "Empty", category = filledMeeting.category ?: "Empty"),
+            cityDate = filterFunctions.createMeetingFilter(city = filledMeeting.city ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            city = filterFunctions.createMeetingFilter(city = filledMeeting.city ?: "Empty"),
+            categoryDate = filterFunctions.createMeetingFilter(category = filledMeeting.category ?: "Empty", date = filledMeeting.data ?: "Empty"),
+            category = filterFunctions.createMeetingFilter(category = filledMeeting.category ?: "Empty"),
+            date = filterFunctions.createMeetingFilter(date = filledMeeting.data ?: "Empty"),
+            noFilter = filterFunctions.createMeetingFilter()
         )
 
         meetingDatabase // записываем в базу данных
