@@ -75,8 +75,8 @@ class PlacesScreens (val act: MainActivity) {
         }
 
         // обращаемся к базе данных и записываем в список заведений заведения
-        //databaseManager.readPlaceDataFromDb(placeList)
-        databaseManager.readPlaceSortedDataFromDb(placeList)
+        databaseManager.readPlaceDataFromDb(placeList)
+        //databaseManager.readPlaceSortedDataFromDb(placeList)
 
         // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 
@@ -109,7 +109,12 @@ class PlacesScreens (val act: MainActivity) {
                     items(placeList.value){ item ->
 
                         // сам шаблон карточки
-                        act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+                        //act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+                        act.placesCard.PlaceCardOnlyKey(
+                            navController = navController,
+                            placeKey = item.placeKey!!,
+                            placeKeyFromAct = placeKey
+                        )
                     }
                 }
             } else if (placeList.value == listOf(default)){

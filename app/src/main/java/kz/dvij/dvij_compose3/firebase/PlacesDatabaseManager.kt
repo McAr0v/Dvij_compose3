@@ -106,15 +106,15 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ЗАВЕДЕНИЙ С БАЗЫ ДАННЫХ --------
 
-    fun readPlaceSortedDataFromDb(placeList: MutableState<List<PlacesAdsClass>>){
+    fun readPlaceSortedDataFromDb(placeList: MutableState<List<PlacesCardClass>>){
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val placeFinishArray = arrayListOf<List<String>>()
+                val placeFinishArray = arrayListOf<PlacesCardClass>()
 
-                val placeArray = ArrayList<PlacesAdsClass>() // создаем пустой список заведений
+                val placeArray = ArrayList<PlacesCardClass>() // создаем пустой список заведений
 
                 for (item in snapshot.children){
 
@@ -155,18 +155,36 @@ class PlacesDatabaseManager (val act: MainActivity) {
                             stockCount = stockCounters.toString()
                         }
 
-                        val list = listOf<String>(place.placeKey, place.city!!, place.category!!, placeFav.toString(), placeViewCount.toString(), meetingCount.toString(), stockCount.toString())
+                        val filledFinishPlace = PlacesCardClass(
+                            logo = place.logo,
+                            placeName = place.placeName,
+                            placeDescription = place.placeDescription,
+                            phone = place.phone,
+                            whatsapp = place.whatsapp,
+                            telegram = place.telegram,
+                            instagram = place.instagram,
+                            category = place.category,
+                            city = place.city,
+                            address = place.address,
+                            placeKey = place.placeKey,
+                            owner = place.owner,
+                            openTime = place.openTime,
+                            closeTime = place.closeTime,
+                            //meetingCounter = meetingCount,
+                            //stockCounter = stockCount,
+                            favCounter = placeFav.toString(),
+                            viewCounter = placeViewCount.toString()
 
-                        placeFinishArray.add(list)
+                        )
 
-                        placeArray.add(place)
+                        placeFinishArray.add(filledFinishPlace)
 
                     }
 
                 }
 
                 if (placeArray.isEmpty()){
-                    placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
+                    //placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
                 } else {
                     placeList.value = placeArray // если добавились заведения в список, то этот новый список и передаем
                     Log.d("MyLog", "$placeFinishArray")

@@ -559,4 +559,321 @@ class PlacesCard (val act: MainActivity) {
             }
         }
     }
+
+    @Composable
+    fun PlaceCardOnlyKey (navController: NavController, placeKey: String, placeKeyFromAct: MutableState<String>) {
+
+        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+        val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
+        val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
+
+        // Считываем с базы данных - добавлено ли это заведение в избранное?
+
+        act.placesDatabaseManager.favIconPlace(placeKey){
+            // Если колбак тру, то окрашиваем иконку в нужный цвет
+            if (it){
+                iconFavColor.value = PrimaryColor
+            } else {
+                // Если колбак фалс, то в обычный цвет
+                iconFavColor.value = Grey10
+            }
+        }
+
+        // Считываем количество мероприятий у этого заведения
+
+        act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeKey){ meetingsCounter ->
+            meetingCounter.value = meetingsCounter.toString()
+        }
+
+        // Считываем количество акций у этого заведения
+
+        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeKey) { stockCounters ->
+            stockCounter.value = stockCounters.toString()
+        }
+
+        // Переменная, которая содержит в себе информацию о заведении
+        val placeInfo = remember {
+            mutableStateOf(PlacesAdsClass())
+        }
+
+        // Переменная счетчика людей, добавивших в избранное заведение
+        val favCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Переменная счетчика просмотра заведения
+        val viewCounter = remember {
+            mutableStateOf(0)
+        }
+
+        // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
+
+        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, placeKey){
+
+            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
+            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+                .clickable {
+
+                    // При клике на карточку - передаем на Main Activity placeKey. Ключ берем из дата класса заведения
+
+                    placeKeyFromAct.value = placeKey
+
+                    // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
+
+                    act.placesDatabaseManager.viewCounterPlace(placeKey) { result ->
+
+                        // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
+                        if (result) {
+
+                            navController.navigate(PLACE_VIEW)
+                        }
+                    }
+                }
+            ,
+            shape = RoundedCornerShape(15.dp),
+            elevation = CardDefaults.cardElevation(5.dp),
+            colors = CardDefaults.cardColors(Grey100)
+        ) {
+
+            Box(modifier = Modifier.fillMaxWidth()){
+
+                if (placeInfo.value.logo != null){
+
+                    AsyncImage(
+                        model = placeInfo.value.logo, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
+                        contentDescription = "Логотип заведения", // описание изображения для слабовидящих
+                        modifier = Modifier
+                            .height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
+                        //alignment = Alignment.Center
+                    )
+
+                } else {
+
+                    Image(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(260.dp),
+                        painter = painterResource(id = R.drawable.rest_logo2),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center
+                    )
+
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // ------- КНОПКА КАТЕГОРИИ -----------
+
+                    if (placeInfo.value.category != null) {
+
+                        Button(
+                            onClick = { Toast.makeText(act, "Сделать фунцию", Toast.LENGTH_SHORT).show()},
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                            shape = RoundedCornerShape(50)
+                        ) {
+
+                            androidx.compose.material.Text(
+                                text = placeInfo.value.category!!,
+                                style = Typography.labelSmall,
+                                color = Grey40
+                            )
+
+                        }
+
+                    }
+
+                    // ----------- Счетчик избранных ----------
+
+                    Button(
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                        shape = RoundedCornerShape(50)
+                    ) {
+
+                        androidx.compose.material.Text(
+                            text = favCounter.value.toString(),
+                            style = Typography.labelSmall,
+                            color = Grey40
+                        )
+
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        // ----- Иконка избранное ------
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_bookmark),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp),
+                            tint = iconFavColor.value
+                        )
+
+                    }
+
+                }
+
+                // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 245.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+
+                    // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomEnd = 15.dp, bottomStart = 15.dp),
+                        elevation = CardDefaults.cardElevation(5.dp),
+                        colors = CardDefaults.cardColors(Grey100)
+                    ) {
+
+                        Column(modifier = Modifier.padding(20.dp)) {
+
+                            // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
+
+                            if (placeInfo.value.placeName != null) {
+
+                                Text(
+                                    text = placeInfo.value.placeName!!,
+                                    style = Typography.titleLarge,
+                                    color = Grey10
+                                )
+
+                            }
+
+
+                            // ----- ГОРОД -----
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            if (placeInfo.value.city != null){
+
+                                Text(
+                                    text = placeInfo.value.city!!,
+                                    style = Typography.bodyMedium,
+                                    color = Grey40
+                                )
+
+                            }
+
+
+                            // ---- АДРЕС -----
+
+                            if (placeInfo.value.address != null){
+
+                                Text(
+                                    text = placeInfo.value.address!!,
+                                    style = Typography.bodyMedium,
+                                    color = Grey40
+                                )
+
+                            }
+
+
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // ----- ВРЕМЯ РАБОТЫ ------
+
+                            if (placeInfo.value.openTime != null && placeInfo.value.closeTime != null) {
+
+                                IconText(icon = R.drawable.ic_time, inputText = "${placeInfo.value.openTime} - ${placeInfo.value.closeTime}")
+
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Button(
+                                    onClick = {},
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+
+                                    // ----- Иконка мероприятий ------
+
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_celebration),
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = Grey40
+                                    )
+
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                    // ----------- Счетчик мероприятий ----------
+
+                                    androidx.compose.material.Text(
+                                        text = when (meetingCounter.value) {
+                                            "1" -> "${meetingCounter.value} мероприятие"
+                                            "2","3","4" -> "${meetingCounter.value} мероприятия"
+                                            else -> "${meetingCounter.value} мероприятий"
+                                        },
+                                        style = Typography.labelSmall,
+                                        color = Grey40
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Button(
+                                    onClick = {},
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+
+                                    // ----- Иконка акций ------
+
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_fire),
+                                        contentDescription = "",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = Grey40
+                                    )
+
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    // ----------- Счетчик акций ----------
+
+                                    androidx.compose.material.Text(
+                                        text = when (stockCounter.value) {
+                                            "1" -> "${stockCounter.value} акция"
+                                            "2","3","4" -> "${stockCounter.value} акции"
+                                            else -> "${stockCounter.value} акций"
+                                        },
+                                        style = Typography.labelSmall,
+                                        color = Grey40
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -595,7 +595,37 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                             if (filterIsPublish.isSuccessful){
 
-                                callback (true)
+                                // Если фильтер опубликовался и в нашем мероприятии есть заведение, то
+                                if (filledMeeting.placeKey != null && filledMeeting.placeKey != "null" && filledMeeting.placeKey != ""){
+
+                                    // НУЖНА ФУНКЦИЯ ПРОВЕРКА И УДАЛЕНИЕ КЛЮЧА ИЗ ЗАВЕДЕНИЯ
+                                    // ВДРУГ Я ИЗМЕНИЛ ЗАВЕДЕНИЕ, ИЛИ ИЗМЕНИЛ НА ВВОД АДРЕСА ВРУЧНУЮ
+                                    // ИЛИ НАОБОРОТ, БЫЛО ВРУЧНУЮ А ТЕПЕРЬ ЗАВЕДЕНИЕ
+
+                                    // Добавляем в папку заведения ключ нашего мероприятия
+                                    activity.placesDatabaseManager.placeDatabase
+                                        .child(filledMeeting.placeKey) //папка с ключем заведения
+                                        .child("AddedMeetings") // папка, куда добавляются мероприятия этого заведения
+                                        .child(filledMeeting.key!!) // создаем подпапку со значением ключа
+                                        .setValue(filledMeeting.key) // записываем ключ мероприятия
+                                        .addOnCompleteListener { addedToPlace ->
+
+                                            // Если добавилось, то тру
+                                            if (addedToPlace.isSuccessful) {
+
+                                                callback (true)
+
+                                            } else {
+                                                // если нет то фолс
+                                                callback (false)
+
+                                            }
+                                        }
+
+                                } else {
+                                    // если не заведение, а просто введен адрес вручную, то просто возвращаем результат как тру
+                                    callback (true)
+                                }
 
                             } else {
                                 // если не опубликован фильтр, то возвращаем фалс
