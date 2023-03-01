@@ -238,6 +238,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                 //Если заведение считалось, указываем ключ выбранного заведения в отдельную переменную
                 placeKey = chosenPlace.value.placeKey
+
             }
 
             // --- Закрываем формы для ввода заведения вручную
@@ -263,6 +264,8 @@ class CreateMeeting(private val act: MainActivity) {
             openFieldPlace.value = true
 
         }
+
+
 
 
         // --------- САМ КОНТЕНТ СТРАНИЦЫ -----------------
@@ -739,6 +742,24 @@ class CreateMeeting(private val act: MainActivity) {
                 Button(
 
                     onClick = {
+
+                        // ЕСЛИ В ЗАКОЛНЕННОМ МЕРОПРИЯТИИ ЕСТЬ КЛЮЧ ЗАВЕДЕНИЯ И В ЗАПОЛНЕННОМ МЕРОПРИЯТИИ ЕСТЬ КЛЮЧ МЕРОПРИЯТИЯ, ТО:
+                        // ps - не сработает, если будет создание
+
+                        if (filledMeeting.placeKey != null && filledMeeting.placeKey != "null" && filledMeeting.placeKey != ""){
+
+                            if (filledMeeting.key != null && filledMeeting.key != "null" && filledMeeting.key != ""){
+
+                                meetingDatabaseManager.deleteMeetingFromPlace(filledMeeting.key, filledMeeting.placeKey){ deleted ->
+
+                                    if (deleted) {
+
+                                        Log.d ("MyLog", "Ключ был успешно удален")
+
+                                    }
+                                }
+                            }
+                        }
 
                         val currentTime = System.currentTimeMillis()/1000 //calendar.timeInMillis // инициализируем календарь //LocalTime.now().toNanoOfDay()
 

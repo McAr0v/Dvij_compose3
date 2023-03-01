@@ -11,6 +11,7 @@ import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.filters.FilterMeetingClass
+import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
 import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
 
@@ -29,6 +30,9 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     )
 
     private val filterFunctions = FilterFunctions(activity)
+
+    private val photoHelper = PhotoHelper(activity)
+
 
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ МЕРОПРИЯТИИ ВОЗВРАЩАЮЩАЯ СПИСОК СЧЕТЧИКИ МЕРОПРИЯТИЯ --------
 
@@ -280,7 +284,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -304,7 +308,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -325,7 +329,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -346,7 +350,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -367,7 +371,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -388,7 +392,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -409,7 +413,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -430,7 +434,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
                                         // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
+                                        deleteMeeting(meeting.key!!, meeting.image1!!, meeting.placeKey!!){
                                             if(it){
                                                 Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
                                             }
@@ -561,6 +565,56 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     }
 
 
+    // ---- ФУНКЦИЯ ДОБАВЛЕНИЯ МЕРОПРИЯТИЯ К МЕСТУ ------
+
+    private fun addMeetingToPlace (meetingKey: String, placeKey: String, callback: (result: Boolean) -> Unit){
+
+        activity.placesDatabaseManager.placeDatabase
+            .child(placeKey) //папка с ключем заведения
+            .child("AddedMeetings") // папка, куда добавляются мероприятия этого заведения
+            .child(meetingKey) // создаем подпапку со значением ключа
+            .setValue(meetingKey) // записываем ключ мероприятия
+            .addOnCompleteListener{ addedToPlace ->
+
+                // Если добавилось, то тру
+                if (addedToPlace.isSuccessful) {
+
+                    callback (true)
+
+                } else {
+                    // если нет то фолс
+                    callback (false)
+
+                }
+
+            }
+
+    }
+
+    fun deleteMeetingFromPlace (meetingKey: String, placeKey: String, callback: (result: Boolean) -> Unit){
+
+        activity.placesDatabaseManager.placeDatabase // обращаемся к БД
+            .child(placeKey) // заходим в папку с уникальным ключем заведения
+            .child("AddedMeetings") // заходим в папку мероприятий этого заведения
+            .child(meetingKey) // заходим в папку с названием как наш ключ
+            .removeValue() // удаляем значение
+            .addOnCompleteListener{ deleted ->
+
+                if (deleted.isSuccessful){
+
+                    callback (true)
+
+                } else {
+
+                    callback (false)
+
+                }
+            }
+    }
+
+
+
+
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ МЕРОПРИЯТИЯ --------
 
     fun publishMeeting(filledMeeting: MeetingsAdsClass, callback: (result: Boolean)-> Unit){
@@ -603,24 +657,21 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // ИЛИ НАОБОРОТ, БЫЛО ВРУЧНУЮ А ТЕПЕРЬ ЗАВЕДЕНИЕ
 
                                     // Добавляем в папку заведения ключ нашего мероприятия
-                                    activity.placesDatabaseManager.placeDatabase
-                                        .child(filledMeeting.placeKey) //папка с ключем заведения
-                                        .child("AddedMeetings") // папка, куда добавляются мероприятия этого заведения
-                                        .child(filledMeeting.key!!) // создаем подпапку со значением ключа
-                                        .setValue(filledMeeting.key) // записываем ключ мероприятия
-                                        .addOnCompleteListener { addedToPlace ->
 
-                                            // Если добавилось, то тру
-                                            if (addedToPlace.isSuccessful) {
+                                    addMeetingToPlace(filledMeeting.key!!, filledMeeting.placeKey){ addedToPlace ->
 
-                                                callback (true)
+                                        // Если добавилось, то тру
+                                        if (addedToPlace) {
 
-                                            } else {
-                                                // если нет то фолс
-                                                callback (false)
+                                            callback (true)
 
-                                            }
+                                        } else {
+                                            // если нет то фолс
+                                            callback (false)
+
                                         }
+
+                                    }
 
                                 } else {
                                     // если не заведение, а просто введен адрес вручную, то просто возвращаем результат как тру
@@ -663,11 +714,11 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ----------
 
-    fun deleteMeeting(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){
+    fun deleteMeeting(meetingKey: String, placeKey: String = "", imageUrl: String, callback: (result: Boolean)-> Unit){
 
         // ---- СНАЧАЛА УДАЛЯЕМ КАРТИНКУ ------
 
-        activity.photoHelper.deleteMeetingImage(imageUrl){ resultDeletingImage ->
+        photoHelper.deleteMeetingImage(imageUrl){ resultDeletingImage ->
 
             // ЕСЛИ УДАЛЕНА ->
 
@@ -675,19 +726,43 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
                 Log.d ("MyLog", "Картинка мероприятия была успешно автоматически удалена")
 
-                // если ключ пользователя не будет нал, то выполнится функция удаления уже мероприятия
+                meetingDatabase // обращаемся к БД
+                    .child(meetingKey) // заходим в папку с уникальным ключем мероприятия
+                    .removeValue() // удаляем значение
+                    .addOnCompleteListener{
 
-                activity.mAuth.uid?.let {
-                    meetingDatabase // обращаемся к БД
-                        .child(key) // заходим в папку с уникальным ключем мероприятия
-                        .removeValue() // удаляем значение
-                }?.addOnCompleteListener {
-                    // слушаем выполнение. Если успешно сделано, то...
-                    if (it.isSuccessful){
-                        // возвращаем колбак ТРУ
-                        callback (true)
+                        // слушаем выполнение. Если успешно сделано, то...
+                        if (it.isSuccessful){
+
+                            if (placeKey != "") {
+
+                                deleteMeetingFromPlace(meetingKey, placeKey){ deleted ->
+
+                                    if (deleted) {
+
+                                        // возвращаем колбак ТРУ
+                                        callback (true)
+
+                                    } else {
+
+                                        // возвращаем колбак FALSE
+                                        callback (false)
+                                        Log.d ("MyLog", "Не удалился ключ с заведения")
+
+                                    }
+
+                                }
+
+                            } else {
+
+                                // возвращаем колбак ТРУ
+                                callback (true)
+
+                            }
+
+
+                        }
                     }
-                }
             }
         }
     }

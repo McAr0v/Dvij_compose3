@@ -149,10 +149,12 @@ class MeetingViewScreen(val act: MainActivity) {
 
                     meetingInfo.value.key?.let { key ->
                         meetingInfo.value.image1?.let { url ->
-                            act.meetingDatabaseManager.deleteMeeting(key, url){
+                            meetingInfo.value.placeKey?.let {
+                                act.meetingDatabaseManager.deleteMeeting(key, url, it){
 
-                                navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
 
+                                }
                             }
                         }
                     }

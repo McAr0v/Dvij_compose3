@@ -8,7 +8,9 @@ import android.os.SystemClock
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.ktx.FirebaseStorageKtxRegistrar
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 import kz.dvij.dvij_compose3.MainActivity
@@ -23,9 +25,13 @@ class PhotoHelper (val act: MainActivity) {
 
     // ----- STORAGE МЕРОПРИЯТИЙ -----------
 
+    val met = Firebase.storage
+
     private val storageMeetings = Firebase
         .storage("gs://dvij-compose3-1cf6a.appspot.com") // Указываем путь на наш Storage
         .getReference("Meetings") // инициализируем папку, в которую будет сохраняться картинка мероприятия
+
+
 
     // делаем дополнительные подпапки для более удобного поиска изображений
 
