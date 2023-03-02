@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.stockscreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import kz.dvij.dvij_compose3.elements.PlacesCard
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -132,16 +134,28 @@ class StockViewScreen (val act: MainActivity) {
 
                 ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                    stockInfo.value.keyStock?.let { key->
-                        stockInfo.value.image?.let { image ->
-                            act.stockDatabaseManager.deleteStock(key, imageUrl = image){
+                    if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
 
+                        act.stockDatabaseManager.deleteStockWithPlaceNote(
+                            stockKey = stockInfo.value.keyStock!!,
+                            imageUrl = stockInfo.value.image!!,
+                            placeKey = stockInfo.value.keyPlace!!
+                        ) {
+
+                            if (it) {
+
+                                Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
                                 navController.navigate(STOCK_ROOT) {popUpTo(0)}
 
-                            }
-                        }
-                    }
+                            } else {
 
+                                Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                            }
+
+                        }
+
+                    }
                 }
             }
 

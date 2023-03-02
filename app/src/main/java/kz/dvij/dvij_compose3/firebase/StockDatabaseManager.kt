@@ -10,8 +10,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.filters.FilterFunctions
-import kz.dvij.dvij_compose3.filters.FilterMeetingClass
 import kz.dvij.dvij_compose3.filters.FilterStockClass
+import kz.dvij.dvij_compose3.navigation.STOCK_ROOT
 import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
 import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
 
@@ -75,7 +75,27 @@ class StockDatabaseManager (val act: MainActivity) {
 
                             if (filterIsPublish.isSuccessful){
 
-                                callback (true)
+                                if (filledStock.keyPlace != null && filledStock.keyPlace != "null" && filledStock.keyPlace != ""){
+
+                                    addStockToPlace(filledStock.keyStock!!, filledStock.keyPlace){ addedToPlace ->
+
+                                        // Если добавилось, то тру
+                                        if (addedToPlace) {
+
+                                            callback (true)
+
+                                        } else {
+                                            // если нет то фолс
+                                            callback (false)
+
+                                        }
+
+                                    }
+
+                                } else {
+                                    // если не заведение, а просто введен адрес вручную, то просто возвращаем результат как тру
+                                    callback (true)
+                                }
 
                             } else {
                                 // если не опубликован фильтр, то возвращаем фалс
@@ -229,13 +249,29 @@ class StockDatabaseManager (val act: MainActivity) {
 
                                 if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                    deleteStock(stock.keyStock!!, stock.image!!){
-                                        if(it){
-                                            Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
-                                        }
-                                    }
-                                } else {
+                                    if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
 
+                                        act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                            stockKey = stock.keyStock,
+                                            imageUrl = stock.image,
+                                            placeKey = stock.keyPlace
+                                        ) {
+
+                                            if (it) {
+
+                                                Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                            } else {
+
+                                                Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                } else {
                                         stockArray.add(stock)
                                     }
                                 }
@@ -244,10 +280,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategoryStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -259,10 +311,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategoryFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -274,10 +342,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityStartFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -289,10 +373,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategory == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -304,10 +404,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -319,10 +435,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -334,10 +466,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.city == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -349,10 +497,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryStartFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -364,10 +528,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -379,10 +559,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -394,10 +590,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.startFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -409,10 +621,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.category == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -424,10 +652,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.finish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -439,10 +683,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.start == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -454,10 +714,26 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.noFilter == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        deleteStock(stock.keyStock!!, stock.image!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Акция была успешно автоматически удалена вместе с картинкой")
+                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+
+                                            act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                                stockKey = stock.keyStock,
+                                                imageUrl = stock.image,
+                                                placeKey = stock.keyPlace
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                                }
+
                                             }
+
                                         }
                                     } else {
 
@@ -483,6 +759,93 @@ class StockDatabaseManager (val act: MainActivity) {
         )
     }
 
+    // ---- ФУНКЦИЯ ДОБАВЛЕНИЯ АКЦИИ К МЕСТУ ------
+
+    private fun addStockToPlace (stockKey: String, placeKey: String, callback: (result: Boolean) -> Unit){
+
+        act.placesDatabaseManager.placeDatabase
+            .child(placeKey) //папка с ключем заведения
+            .child("AddedStocks") // папка, куда добавляются акции этого заведения
+            .child(stockKey) // создаем подпапку со значением ключа
+            .setValue(stockKey) // записываем ключ акции
+            .addOnCompleteListener{ addedToPlace ->
+
+                // Если добавилось, то тру
+                if (addedToPlace.isSuccessful) {
+
+                    callback (true)
+
+                } else {
+                    // если нет то фолс
+                    callback (false)
+
+                }
+
+            }
+
+    }
+
+    // ---- ФУНКЦИЯ УДАЛЕНИЯ АКЦИИ У МЕСТА ------
+
+    fun deleteStockFromPlace (stockKey: String, placeKey: String, callback: (result: Boolean) -> Unit){
+
+        act.placesDatabaseManager.placeDatabase // обращаемся к БД
+            .child(placeKey) // заходим в папку с уникальным ключем заведения
+            .child("AddedStocks") // заходим в папку мероприятий этого заведения
+            .child(stockKey) // заходим в папку с названием как наш ключ
+            .removeValue() // удаляем значение
+            .addOnCompleteListener{ deleted ->
+
+                if (deleted.isSuccessful){
+
+                    callback (true)
+
+                } else {
+
+                    callback (false)
+
+                }
+            }
+    }
+
+    fun deleteStockWithPlaceNote (stockKey: String, imageUrl: String, placeKey: String, callback: (result: Boolean)-> Unit) {
+
+        // Сначала удаляем акцию и картинку
+        deleteStock(stockKey, imageUrl){ deletedStock ->
+
+            // Если удалилось
+            if (deletedStock) {
+
+                // если есть заведение
+                if (placeKey != "") {
+
+                    // Удаляем ключ из заведения
+                    deleteStockFromPlace(stockKey, placeKey){ deleteFromPlace ->
+
+                        // если ключ удалился, возвращаем тру
+                        if (deleteFromPlace){
+
+                            callback (true)
+
+                        } else {
+                            // Если нет - фалс
+                            callback (false)
+                        }
+                    }
+
+                } else {
+
+                    // Если заведения нет, но акция удалилась, то просто возвращаем тру
+                    callback(true)
+                }
+
+            } else {
+                // Если акция не удалилось, возвращаем фалс
+                callback (false)
+
+            }
+        }
+    }
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 

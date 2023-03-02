@@ -11,7 +11,6 @@ import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.filters.FilterMeetingClass
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
 import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
@@ -866,7 +865,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ----------
 
-    fun deleteMeeting(meetingKey: String, imageUrl: String, callback: (result: Boolean)-> Unit){
+    private fun deleteMeeting(meetingKey: String, imageUrl: String, callback: (result: Boolean)-> Unit){
 
         // ---- СНАЧАЛА УДАЛЯЕМ КАРТИНКУ ------
 

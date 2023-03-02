@@ -556,6 +556,24 @@ class CreateStock (val act: MainActivity) {
 
                 onClick = {
 
+                    // ЕСЛИ В ЗАКОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ ЗАВЕДЕНИЯ И В ЗАПОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ АКЦИИ, ТО:
+                    // ps - не сработает, если будет создание
+
+                    if (filledStock.keyPlace != null && filledStock.keyPlace != "null" && filledStock.keyPlace != ""){
+
+                        if (filledStock.keyStock != null && filledStock.keyStock != "null" && filledStock.keyStock != ""){
+
+                            stockDatabaseManager.deleteStockFromPlace(filledStock.keyStock, filledStock.keyPlace){ deleted ->
+
+                                if (deleted) {
+
+                                    Log.d ("MyLog", "Ключ был успешно удален")
+
+                                }
+                            }
+                        }
+                    }
+
                     val currentTime = System.currentTimeMillis()/1000 // инициализируем календарь //LocalTime.now().toNanoOfDay()
 
                     // действие на нажатие
