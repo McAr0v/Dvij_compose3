@@ -11,6 +11,7 @@ import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.filters.FilterMeetingClass
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.photohelper.PhotoHelper
 import kz.dvij.dvij_compose3.pickers.convertMillisecondsToDate
 import kz.dvij.dvij_compose3.pickers.getTodayInMilliseconds
@@ -283,10 +284,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -294,8 +309,6 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         meetingArray.add(meeting)
 
                                     }
-
-
                                 }
 
                             }
@@ -307,10 +320,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -328,10 +355,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -349,10 +390,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -370,10 +425,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -391,10 +460,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -412,10 +495,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -433,10 +530,24 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        // ---- УДАЛЯЕМ ЭТО МЕРОПРИЯТИЕ ВМЕСТЕ С КАРТИНКОЙ ---
-                                        deleteMeeting(meeting.key!!, meeting.image1!!){
-                                            if(it){
-                                                Log.d ("MyLog", "Мероприятие было успешно автоматически удалено вместе с картинкой")
+                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+
+                                            deleteMeetingWithPlaceNote(
+                                                meetingKey = meeting.key,
+                                                placeKey = meeting.placeKey,
+                                                imageUrl = meeting.image1
+                                            ) {
+
+                                                if (it) {
+
+                                                    Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+
+
+                                                } else {
+
+                                                    Log.d ("MyLog", "Почемуто не удалилось")
+
+                                                }
                                             }
                                         }
                                     } else {
@@ -591,6 +702,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     }
 
+    // ---- ФУНКЦИЯ УДАЛЕНИЯ МЕРОПРИЯТИЯ У МЕСТА ------
+
     fun deleteMeetingFromPlace (meetingKey: String, placeKey: String, callback: (result: Boolean) -> Unit){
 
         activity.placesDatabaseManager.placeDatabase // обращаемся к БД
@@ -708,6 +821,45 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
             if (it.isSuccessful){
                 // возвращаем колбак ТРУ
                 callback (true)
+            }
+        }
+    }
+
+    fun deleteMeetingWithPlaceNote (meetingKey: String, imageUrl: String, placeKey: String, callback: (result: Boolean)-> Unit) {
+
+        // Сначала удаляем мероприятие и картинку
+        deleteMeeting(meetingKey, imageUrl){ deletedMeeting ->
+
+            // Если удалилось
+            if (deletedMeeting) {
+
+                // если есть заведение
+                if (placeKey != "") {
+
+                    // Удаляем ключ из заведения
+                    deleteMeetingFromPlace(meetingKey, placeKey){ deleteFromPlace ->
+
+                        // если ключ удалился, возвращаем тру
+                        if (deleteFromPlace){
+
+                            callback (true)
+
+                        } else {
+                            // Если нет - фалс
+                            callback (false)
+                        }
+                    }
+
+                } else {
+
+                    // Если заведения нет, но мероприятие удалилось, то просто возвращаем тру
+                    callback(true)
+                }
+
+            } else {
+                // Если мероприятие не удалилось, возвращаем фалс
+                callback (false)
+
             }
         }
     }

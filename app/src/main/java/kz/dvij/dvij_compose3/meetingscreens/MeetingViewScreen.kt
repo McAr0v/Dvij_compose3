@@ -1,6 +1,7 @@
 package kz.dvij.dvij_compose3.meetingscreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -147,28 +148,22 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                    meetingInfo.value.key?.let { key ->
-                        meetingInfo.value.image1?.let { url ->
-                            act.meetingDatabaseManager.deleteMeeting(key, url){
+                    if (meetingInfo.value.key != null && meetingInfo.value.placeKey != null && meetingInfo.value.image1 != null){
 
-                                if (meetingInfo.value.placeKey != ""){
+                        act.meetingDatabaseManager.deleteMeetingWithPlaceNote(
+                            meetingKey = meetingInfo.value.key!!,
+                            placeKey = meetingInfo.value.placeKey!!,
+                            imageUrl = meetingInfo.value.image1!!
+                        ) {
 
-                                    act.meetingDatabaseManager.deleteMeetingFromPlace(key,
-                                        meetingInfo.value.placeKey!!
-                                    ){
+                            if (it) {
 
-                                        if (it){
+                                Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+                                navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
 
-                                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+                            } else {
 
-                                        }
-
-                                }
-                                } else {
-
-                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
-                                }
-
+                                Log.d ("MyLog", "Почемуто не удалилось")
 
                             }
                         }
