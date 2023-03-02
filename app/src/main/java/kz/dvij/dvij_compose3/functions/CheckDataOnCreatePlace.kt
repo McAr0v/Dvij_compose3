@@ -9,13 +9,28 @@ fun checkDataOnCreatePlace (
     image1: Uri?,
     headline: String,
     phone: String,
-    openTime: String,
-    closeTime: String,
     description: String,
     category: String,
     city: String,
     address: String,
-    imageUriFromDb: String
+    imageUriFromDb: String,
+    mondayOT: String,
+    mondayCT: String,
+    tuesdayOT: String,
+    tuesdayCT: String,
+    wednesdayOT: String,
+    wednesdayCT: String,
+    thursdayOT: String,
+    thursdayCT: String,
+    fridayOT: String,
+    fridayCT: String,
+    saturdayOT: String,
+    saturdayCT: String,
+    sundayOT: String,
+    sundayCT: String,
+
+
+
 ): Int{
 
     // Результат в числах, так как возвращает id сообщения для вывода тоста
@@ -28,7 +43,13 @@ fun checkDataOnCreatePlace (
 
     }
 
-    if (image1 == null || headline == "" || phone == "+77" || closeTime == "" || openTime == "" || description == "" || category == "Выбери категорию" || city == "Выбери город" || address == "" ) {
+    if (mondayOT == "" || mondayCT == "" || tuesdayOT == "" || tuesdayCT == "" || wednesdayOT == "" || wednesdayCT == "" || thursdayOT == "" || thursdayCT == "" || fridayOT == "" || fridayCT == "" || saturdayOT == "" || saturdayCT == "" || sundayOT == "" || sundayCT == ""){
+
+        result = R.string.cp_no_time
+
+    }
+
+    if (image1 == null || headline == "" || phone == "+77" || description == "" || category == "Выбери категорию" || city == "Выбери город" || address == "" ) {
 
         if (headline == "") {
             result = R.string.cp_no_place_name
@@ -38,13 +59,6 @@ fun checkDataOnCreatePlace (
             result = R.string.cm_no_phone
         }
 
-        if (closeTime == "") {
-            result = R.string.cp_no_finish_time
-        }
-
-        if (openTime == "") {
-            result = R.string.cp_no_start_time
-        }
         if (description == "") {
             result = R.string.cm_no_description
         }

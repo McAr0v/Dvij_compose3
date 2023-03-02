@@ -4,6 +4,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 
 class FilterFunctions(val act: MainActivity) {
@@ -26,12 +27,31 @@ class FilterFunctions(val act: MainActivity) {
 
     }
 
+
     // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА АКЦИЙ -----
 
     fun createStockFilter (city: String = "Выбери город", category: String = "Выбери категорию", startDate: String = "Выбери дату", finishDate: String = "Выбери дату"): String{
 
         val stringBuilder = StringBuilder()
         val arrayTempFilter = listOf(city, category, startDate, finishDate)
+
+        for ((index, string) in arrayTempFilter.withIndex()){
+
+            stringBuilder.append(string)
+            if (index != arrayTempFilter.size - 1) stringBuilder.append("_")
+
+        }
+
+        return stringBuilder.toString()
+
+    }
+
+    // ------ ФУНКЦИЯ СОЗДАНИЯ СТРОКИ ФИЛЬТРА Заведения -----
+
+    fun createPlaceFilter (city: String = "Выбери город", category: String = "Выбери категорию"): String{
+
+        val stringBuilder = StringBuilder()
+        val arrayTempFilter = listOf(city, category)
 
         for ((index, string) in arrayTempFilter.withIndex()){
 
@@ -199,21 +219,23 @@ class FilterFunctions(val act: MainActivity) {
 
     // ---- ФУНКЦИЯ СОРТИРОВКИ СПИСКА Заведений В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ТИПА -----
 
-    /*fun sortedPlaceList (placesList: List<PlacesAdsClass>, query: String): List<PlacesAdsClass>{
+    fun sortedPlaceList (placesList: List<PlacesCardClass>, query: String): List<PlacesCardClass>{
 
         return when (query) {
 
             // вместо it.createTime вставить функцию считывания информации о количестве добавивших в избранное
-            "Сначала новые" -> placesList.sortedBy { it.createTime }.asReversed() // по дате создания
-            "Сначала старые" -> placesList.sortedBy { it.createTime } // по дате создания
-            "По дате начала акции: По возрастанию" -> placesList.sortedBy { it.startDateNumber } // по дате проведения
-            "По дате начала акции: По убыванию" -> placesList.sortedBy { it.startDateNumber }.asReversed() // по дате проведения
-            "По дате завершения акции: По возрастанию" -> placesList.sortedBy { it.finishDateNumber } // по дате проведения
-            "По дате завершения акции: По убыванию" -> placesList.sortedBy { it.finishDateNumber }.asReversed() // по дате проведения
-            else -> placesList.sortedBy { it.createTime }.asReversed() // по умолчанию - сначала новые
+            "Сначала новые" -> placesList.sortedBy { it.createPlaceTime }.asReversed() // по дате создания
+            "Сначала старые" -> placesList.sortedBy { it.createPlaceTime } // по дате создания
+            "По популярности: По возрастанию" -> placesList.sortedBy { it.favCounter } // по дате проведения
+            "По популярности: По убыванию" -> placesList.sortedBy { it.favCounter }.asReversed() // по дате проведения
+            "По количеству мероприятий: По возрастанию" -> placesList.sortedBy { it.meetingCounter } // по дате проведения
+            "По количеству мероприятий: По убыванию" -> placesList.sortedBy { it.meetingCounter }.asReversed() // по дате проведения
+            "По количеству акций: По возрастанию" -> placesList.sortedBy { it.stockCounter } // по дате проведения
+            "По количеству акций: По убыванию" -> placesList.sortedBy { it.stockCounter }.asReversed() // по дате проведения
+            else -> placesList.sortedBy { it.createPlaceTime }.asReversed() // по умолчанию - сначала новые
         }
 
-    }*/
+    }
 
     // ----- Функция определения типа фильтра для корректной фильтрации МЕРОПРИЯТИЙ-------
 
@@ -252,6 +274,36 @@ class FilterFunctions(val act: MainActivity) {
         } else if (date != "Выбери дату"){
 
             result = "date"
+
+        } else {
+
+            result = "noFilter"
+
+        }
+
+        return result
+    }
+
+    // ----- Функция определения типа фильтра для корректной фильтрации МЕРОПРИЯТИЙ-------
+
+    fun getTypeOfPlaceFilter(inputList: List<String>): String{
+
+        var result = ""
+
+        val city = inputList[0]
+        val category = inputList[1]
+
+        if (city != "Выбери город" && category != "Выбери категорию"){
+
+            result = "cityCategory"
+
+        } else if (city != "Выбери город"){
+
+            result = "city"
+
+        } else if (category != "Выбери категорию"){
+
+            result = "category"
 
         } else {
 

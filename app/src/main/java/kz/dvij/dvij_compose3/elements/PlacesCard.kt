@@ -1,6 +1,9 @@
 package kz.dvij.dvij_compose3.elements
 
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,14 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class PlacesCard (val act: MainActivity) {
 
@@ -478,11 +487,11 @@ class PlacesCard (val act: MainActivity) {
 
                             // ----- ВРЕМЯ РАБОТЫ ------
 
-                            if (placeItem.openTime != null && placeItem.closeTime != null) {
+                            /*if (placeItem.openTime != null && placeItem.closeTime != null) {
 
                                 IconText(icon = R.drawable.ic_time, inputText = "${placeItem.openTime} - ${placeItem.closeTime}")
 
-                            }
+                            }*/
 
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -560,36 +569,54 @@ class PlacesCard (val act: MainActivity) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlaceCardOnlyKey (navController: NavController, placeKey: String, placeKeyFromAct: MutableState<String>) {
+    fun PlaceCardForNewClass (navController: NavController, placeItem: PlacesCardClass, placeKeyFromAct: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
         val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
         val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
 
+        val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
+
+        val splitDate = getNowTime.split(", ")
+
+        val nowDay = splitDate[1]
+        val nowTime = splitDate[2]
+
+        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDay(nowDay, placeItem)
+
+        val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
+
+
         // Считываем с базы данных - добавлено ли это заведение в избранное?
 
-        act.placesDatabaseManager.favIconPlace(placeKey){
-            // Если колбак тру, то окрашиваем иконку в нужный цвет
-            if (it){
-                iconFavColor.value = PrimaryColor
-            } else {
-                // Если колбак фалс, то в обычный цвет
-                iconFavColor.value = Grey10
+        placeItem.placeKey?.let {key ->
+            act.placesDatabaseManager.favIconPlace(key){ result ->
+                // Если колбак тру, то окрашиваем иконку в нужный цвет
+                if (result){
+                    iconFavColor.value = PrimaryColor
+                } else {
+                    // Если колбак фалс, то в обычный цвет
+                    iconFavColor.value = Grey10
+                }
             }
         }
 
+
+
         // Считываем количество мероприятий у этого заведения
 
-        act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeKey){ meetingsCounter ->
+        /*act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeKey){ meetingsCounter ->
             meetingCounter.value = meetingsCounter.toString()
-        }
+        }*/
 
         // Считываем количество акций у этого заведения
 
-        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeKey) { stockCounters ->
+        /*act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeKey) { stockCounters ->
             stockCounter.value = stockCounters.toString()
-        }
+        }*/
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
@@ -608,11 +635,13 @@ class PlacesCard (val act: MainActivity) {
 
         // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
 
-        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, placeKey){
+        placeItem.placeKey?.let { placeKey->
+            act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, placeKey){
 
-            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
-            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+                favCounter.value = it[0] // данные из списка - количество добавивших в избранное
+                viewCounter.value = it[1] // данные из списка - количество просмотров заведения
 
+            }
         }
 
         Card(
@@ -623,11 +652,11 @@ class PlacesCard (val act: MainActivity) {
 
                     // При клике на карточку - передаем на Main Activity placeKey. Ключ берем из дата класса заведения
 
-                    placeKeyFromAct.value = placeKey
+                    placeKeyFromAct.value = placeInfo.value.placeKey!!
 
                     // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
 
-                    act.placesDatabaseManager.viewCounterPlace(placeKey) { result ->
+                    act.placesDatabaseManager.viewCounterPlace(placeItem.placeKey!!) { result ->
 
                         // если колбак тру, то счетчик успешно сработал, значит переходим на страницу заведения
                         if (result) {
@@ -644,10 +673,10 @@ class PlacesCard (val act: MainActivity) {
 
             Box(modifier = Modifier.fillMaxWidth()){
 
-                if (placeInfo.value.logo != null){
+                if (placeItem.logo != null){
 
                     AsyncImage(
-                        model = placeInfo.value.logo, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
+                        model = placeItem.logo, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО ЗАВЕДЕНИЯ ИЗ БД
                         contentDescription = "Логотип заведения", // описание изображения для слабовидящих
                         modifier = Modifier
                             .height(260.dp), // заполнить картинкой весь контейнер
@@ -679,7 +708,7 @@ class PlacesCard (val act: MainActivity) {
 
                     // ------- КНОПКА КАТЕГОРИИ -----------
 
-                    if (placeInfo.value.category != null) {
+                    if (placeItem.category != null) {
 
                         Button(
                             onClick = { Toast.makeText(act, "Сделать фунцию", Toast.LENGTH_SHORT).show()},
@@ -688,7 +717,7 @@ class PlacesCard (val act: MainActivity) {
                         ) {
 
                             androidx.compose.material.Text(
-                                text = placeInfo.value.category!!,
+                                text = placeItem.category,
                                 style = Typography.labelSmall,
                                 color = Grey40
                             )
@@ -750,10 +779,10 @@ class PlacesCard (val act: MainActivity) {
 
                             // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
 
-                            if (placeInfo.value.placeName != null) {
+                            if (placeItem.placeName != null) {
 
                                 Text(
-                                    text = placeInfo.value.placeName!!,
+                                    text = placeItem.placeName,
                                     style = Typography.titleLarge,
                                     color = Grey10
                                 )
@@ -765,10 +794,10 @@ class PlacesCard (val act: MainActivity) {
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            if (placeInfo.value.city != null){
+                            if (placeItem.city != null){
 
                                 Text(
-                                    text = placeInfo.value.city!!,
+                                    text = placeItem.city,
                                     style = Typography.bodyMedium,
                                     color = Grey40
                                 )
@@ -778,10 +807,10 @@ class PlacesCard (val act: MainActivity) {
 
                             // ---- АДРЕС -----
 
-                            if (placeInfo.value.address != null){
+                            if (placeItem.address != null){
 
                                 Text(
-                                    text = placeInfo.value.address!!,
+                                    text = placeItem.address,
                                     style = Typography.bodyMedium,
                                     color = Grey40
                                 )
@@ -794,9 +823,9 @@ class PlacesCard (val act: MainActivity) {
 
                             // ----- ВРЕМЯ РАБОТЫ ------
 
-                            if (placeInfo.value.openTime != null && placeInfo.value.closeTime != null) {
+                            if (placeTimeOnToday[0] != "" && placeTimeOnToday[1] != "") {
 
-                                IconText(icon = R.drawable.ic_time, inputText = "${placeInfo.value.openTime} - ${placeInfo.value.closeTime}")
+                                IconText(icon = R.drawable.ic_time, inputText = "${nowDay.capitalize()} - ${placeTimeOnToday[0]} - ${placeTimeOnToday[1]}")
 
                             }
 
@@ -827,10 +856,10 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик мероприятий ----------
 
                                     androidx.compose.material.Text(
-                                        text = when (meetingCounter.value) {
-                                            "1" -> "${meetingCounter.value} мероприятие"
-                                            "2","3","4" -> "${meetingCounter.value} мероприятия"
-                                            else -> "${meetingCounter.value} мероприятий"
+                                        text = when (placeItem.meetingCounter) {
+                                            "1" -> "${placeItem.meetingCounter} мероприятие"
+                                            "2","3","4" -> "${placeItem.meetingCounter} мероприятия"
+                                            else -> "${placeItem.meetingCounter} мероприятий"
                                         },
                                         style = Typography.labelSmall,
                                         color = Grey40
@@ -859,16 +888,66 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик акций ----------
 
                                     androidx.compose.material.Text(
-                                        text = when (stockCounter.value) {
-                                            "1" -> "${stockCounter.value} акция"
-                                            "2","3","4" -> "${stockCounter.value} акции"
-                                            else -> "${stockCounter.value} акций"
+                                        text = when (placeItem.stockCounter) {
+                                            "1" -> "${placeItem.stockCounter} акция"
+                                            "2","3","4" -> "${placeItem.stockCounter} акции"
+                                            else -> "${placeItem.stockCounter} акций"
                                         },
                                         style = Typography.labelSmall,
                                         color = Grey40
                                     )
                                 }
+
                             }
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Button(
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
+                                shape = RoundedCornerShape(50)
+                            ) {
+
+                                // ----- Иконка акций ------
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_visibility),
+                                    contentDescription = "",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Grey40
+                                )
+
+                                Spacer(modifier = Modifier.width(5.dp))
+
+                                // ----------- Счетчик акций ----------
+
+                                androidx.compose.material.Text(
+                                    text = when (placeItem.viewCounter) {
+                                        "1" -> "${placeItem.viewCounter} просмотр"
+                                        "2","3","4" -> "${placeItem.viewCounter} просмотра"
+                                        else -> "${placeItem.viewCounter} просмотров"
+                                    },
+                                    style = Typography.labelSmall,
+                                    color = Grey40
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Button(
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(backgroundColor = if (nowIsOpen) {
+                                    SuccessColor} else {Grey90}),
+                                shape = RoundedCornerShape(50)
+                            ) {
+
+                                androidx.compose.material.Text(
+                                    text = if (nowIsOpen) {"Сейчас открыто"} else {"Закрыто"},
+                                    style = Typography.labelSmall,
+                                    color = Grey40
+                                )
+                            }
+
                         }
                     }
                 }

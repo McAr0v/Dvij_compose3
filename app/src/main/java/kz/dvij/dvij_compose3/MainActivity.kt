@@ -197,8 +197,20 @@ class MainActivity : ComponentActivity() {
                     city = "",
                     address = "",
                     owner = "",
-                    openTime = "",
-                    closeTime = ""
+                    mondayOpenTime = "",
+                    mondayCloseTime = "",
+                    tuesdayOpenTime = "",
+                    tuesdayCloseTime = "",
+                    wednesdayOpenTime = "",
+                    wednesdayCloseTime = "",
+                    thursdayOpenTime = "",
+                    thursdayCloseTime = "",
+                    fridayOpenTime = "",
+                    fridayCloseTime = "",
+                    saturdayOpenTime = "",
+                    saturdayCloseTime = "",
+                    sundayOpenTime = "",
+                    sundayCloseTime = ""
 
                 )
                 )
@@ -250,6 +262,12 @@ class MainActivity : ComponentActivity() {
             val stockStartDateForFilter = remember { mutableStateOf("Выбери дату") }
             val stockFinishDateForFilter = remember { mutableStateOf("Выбери дату") }
             val stockSortingForFilter = remember { mutableStateOf("По умолчанию") }
+
+            // Переменные для запоминания фильтра в Заведениях
+
+            val placeCategoryForFilter = remember { mutableStateOf("Выбери категорию") }
+            val placeIsOpenForFilter = remember { mutableStateOf(false) }
+            val placeSortingForFilter = remember { mutableStateOf("По умолчанию") }
 
 
             if (meetingFinishDateForFilter.value == "Выбери дату" && meetingStartDateForFilter.value != "Выбери дату" ){
@@ -483,7 +501,7 @@ class MainActivity : ComponentActivity() {
 
                         // ---- СТРАНИЦЫ ЗАВЕДЕНИЙ ----
 
-                        composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey)}
+                        composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey, cityForFilter = cityName, placeSortingForFilter = placeSortingForFilter, placeCategoryForFilter = placeCategoryForFilter, placeIsOpenForFilter = placeIsOpenForFilter)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value ,createOrEdit = "0")}
                         composable(EDIT_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value, filledPlace = placeInfo.value, createOrEdit = EDIT_PLACES_SCREEN)}
                         composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey, placeInfo)}

@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -42,13 +44,35 @@ class PlacesScreens (val act: MainActivity) {
         placeDescription = "Default"
     )
 
+    val defaultForCard = PlacesCardClass (
+        placeDescription = "Default"
+    )
+
+    private val filterDialog = FilterDialog(act)
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlacesScreen(navController: NavController, placeKey: MutableState<String>) {
+    fun PlacesScreen(
+        navController: NavController,
+        placeKey: MutableState<String>,
+        cityForFilter: MutableState<String>,
+        placeCategoryForFilter: MutableState<String>,
+        placeIsOpenForFilter: MutableState<Boolean>,
+        placeSortingForFilter: MutableState<String>
+    ) {
 
         Column {
 
-            TabMenu(bottomPage = PLACES_ROOT, navController, activity = act, placesKey = placeKey)
+            TabMenu(
+                bottomPage = PLACES_ROOT,
+                navController,
+                activity = act,
+                placesKey = placeKey,
+                cityForFilter = cityForFilter,
+                placeCategoryForFilter = placeCategoryForFilter,
+                placeIsOpenForFilter = placeIsOpenForFilter,
+                placeSortingForFilter = placeSortingForFilter
+            )
 
         }
     }
@@ -58,106 +82,157 @@ class PlacesScreens (val act: MainActivity) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlacesTapeScreen(navController: NavController, placeKey: MutableState<String>) {
-
-        val date = Date()
-
-        Log.d("MyLog", "$date")
-
-        val timestamp = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
-            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
-
-        Log.d("MyLog", timestamp)
+    fun PlacesTapeScreen(
+        navController: NavController,
+        placeKey: MutableState<String>,
+        cityForFilter: MutableState<String>,
+        placeCategoryForFilter: MutableState<String>,
+        placeIsOpenForFilter: MutableState<Boolean>,
+        placeSortingForFilter: MutableState<String>
+    ) {
 
         // инициализируем список заведений
         val placeList = remember {
-            mutableStateOf(listOf<PlacesAdsClass>())
+            mutableStateOf(listOf<PlacesCardClass>())
         }
 
+        val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
+
+        if (openFilterDialog.value){
+
+            filterDialog.FilterPlaceChooseDialog(
+                cityForFilter = cityForFilter,
+                placeCategoryForFilter = placeCategoryForFilter,
+                placeSortingForFilter = placeSortingForFilter,
+                placeIsOpenForFilter = placeIsOpenForFilter
+            ) {
+                openFilterDialog.value = false
+            }
+
+        }
+
+        val filter = act.filterFunctions.createPlaceFilter(cityForFilter.value, placeCategoryForFilter.value)
+
+        val removeQuery = act.filterFunctions.splitFilter(filter)
+
+        val typeFilter = act.filterFunctions.getTypeOfPlaceFilter(removeQuery)
+
+
+
         // обращаемся к базе данных и записываем в список заведений заведения
-        databaseManager.readPlaceDataFromDb(placeList)
-        //databaseManager.readPlaceSortedDataFromDb(placeList)
+        //databaseManager.readPlaceDataFromDb(placeList)
+        databaseManager.readPlaceSortedDataFromDb(
+            placeList,
+            cityForFilter = cityForFilter,
+            placeCategoryForFilter = placeCategoryForFilter,
+            placeIsOpenForFilter = placeIsOpenForFilter,
+            placeSortingForFilter = placeSortingForFilter
+        )
 
         // -------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 
-        Column (
-            modifier = Modifier
-                .background(Grey95)
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Surface(modifier = Modifier.fillMaxSize()) {
 
-            // ---- ЕСЛИ ЗАГРУЗИЛИСЬ Заведения С БД --------
 
-            if (placeList.value.isNotEmpty() && placeList.value != listOf(default)){
+            Column (
+                modifier = Modifier
+                    .background(Grey95)
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
-                // ---- ЛЕНИВАЯ КОЛОНКА --------
+                // ---- ЕСЛИ ЗАГРУЗИЛИСЬ Заведения С БД --------
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Grey95),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ){
+                if (placeList.value.isNotEmpty() && placeList.value != listOf(defaultForCard)){
 
-                    // для каждого элемента из списка указываем шаблон для отображения
+                    // ---- ЛЕНИВАЯ КОЛОНКА --------
 
-                    items(placeList.value){ item ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Grey95),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ){
 
-                        // сам шаблон карточки
-                        //act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
-                        act.placesCard.PlaceCardOnlyKey(
-                            navController = navController,
-                            placeKey = item.placeKey!!,
-                            placeKeyFromAct = placeKey
-                        )
+                        // для каждого элемента из списка указываем шаблон для отображения
+
+                        items(placeList.value){ item ->
+
+                            if (placeList.value.isNotEmpty() && placeList.value != listOf(defaultForCard)){
+                                // сам шаблон карточки
+                                act.placesCard.PlaceCardForNewClass(
+                                    navController = navController,
+                                    placeKeyFromAct = placeKey,
+                                    placeItem = item
+                                )
+
+                            }
+
+
+                            //act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
+
+                        }
                     }
-                }
-            } else if (placeList.value == listOf(default)){
+                } else if (placeList.value == listOf(defaultForCard)){
 
-                // ----- ЕСЛИ НЕТ ЗАВЕДЕНИЙ -------
-
-                Text(
-                    text = stringResource(id = R.string.empty_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10
-                )
-
-            } else {
-
-                // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    // крутилка индикатор
-
-                    CircularProgressIndicator(
-                        color = PrimaryColor,
-                        strokeWidth = 3.dp,
-                        modifier = Modifier.size(40.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    // текст рядом с крутилкой
+                    // ----- ЕСЛИ НЕТ ЗАВЕДЕНИЙ -------
 
                     Text(
-                        text = stringResource(id = R.string.ss_loading),
+                        text = stringResource(id = R.string.empty_meeting),
                         style = Typography.bodyMedium,
                         color = Grey10
                     )
 
+                } else {
+
+                    // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        // крутилка индикатор
+
+                        CircularProgressIndicator(
+                            color = PrimaryColor,
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(40.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        // текст рядом с крутилкой
+
+                        Text(
+                            text = stringResource(id = R.string.ss_loading),
+                            style = Typography.bodyMedium,
+                            color = Grey10
+                        )
+
+                    }
                 }
             }
+
+
+            // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
+
+            FloatingPlaceFilterButton(
+                city = cityForFilter.value,
+                category = placeCategoryForFilter.value,
+                typeOfFilter = typeFilter
+            ) {
+                openFilterDialog.value = true
+            }
+
         }
+
+
     }
 
 

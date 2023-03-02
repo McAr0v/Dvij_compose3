@@ -13,6 +13,20 @@ data class PlacesAdsClass(
     val address: String? = null,
     val placeKey: String? = null,
     val owner: String? = null,
-    val openTime: String? = null,
-    val closeTime: String? = null,
+    val mondayOpenTime: String? = null,
+    val mondayCloseTime: String? = null,
+    val tuesdayOpenTime: String? = null,
+    val tuesdayCloseTime: String? = null,
+    val wednesdayOpenTime: String? = null,
+    val wednesdayCloseTime: String? = null,
+    val thursdayOpenTime: String? = null,
+    val thursdayCloseTime: String? = null,
+    val fridayOpenTime: String? = null,
+    val fridayCloseTime: String? = null,
+    val saturdayOpenTime: String? = null,
+    val saturdayCloseTime: String? = null,
+    val sundayOpenTime: String? = null,
+    val sundayCloseTime: String? = null,
+    val createPlaceTime: String? = null
+
 )

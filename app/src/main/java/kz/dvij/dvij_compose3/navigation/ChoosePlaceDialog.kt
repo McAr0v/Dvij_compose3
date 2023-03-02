@@ -103,8 +103,20 @@ class ChoosePlaceDialog (val act: MainActivity) {
                             address=null,
                             placeKey=null,
                             owner=null,
-                            openTime=null,
-                            closeTime=null
+                            mondayOpenTime = null,
+                            mondayCloseTime = null,
+                            tuesdayOpenTime = null,
+                            tuesdayCloseTime = null,
+                            wednesdayOpenTime = null,
+                            wednesdayCloseTime = null,
+                            thursdayOpenTime = null,
+                            thursdayCloseTime = null,
+                            fridayOpenTime = null,
+                            fridayCloseTime = null,
+                            saturdayOpenTime = null,
+                            saturdayCloseTime = null,
+                            sundayOpenTime = null,
+                            sundayCloseTime = null
                 )
                     )) {
 

@@ -675,8 +675,20 @@ class CreateStock (val act: MainActivity) {
                                                     city = "",
                                                     address = "",
                                                     owner = "",
-                                                    openTime = "",
-                                                    closeTime = ""
+                                                    mondayOpenTime = "",
+                                                    mondayCloseTime = "",
+                                                    tuesdayOpenTime = "",
+                                                    tuesdayCloseTime = "",
+                                                    wednesdayOpenTime = "",
+                                                    wednesdayCloseTime = "",
+                                                    thursdayOpenTime = "",
+                                                    thursdayCloseTime = "",
+                                                    fridayOpenTime = "",
+                                                    fridayCloseTime = "",
+                                                    saturdayOpenTime = "",
+                                                    saturdayCloseTime = "",
+                                                    sundayOpenTime = "",
+                                                    sundayCloseTime = ""
 
                                                 )
 
@@ -809,8 +821,20 @@ class CreateStock (val act: MainActivity) {
                                                         city = "",
                                                         address = "",
                                                         owner = "",
-                                                        openTime = "",
-                                                        closeTime = ""
+                                                        mondayOpenTime = "",
+                                                        mondayCloseTime = "",
+                                                        tuesdayOpenTime = "",
+                                                        tuesdayCloseTime = "",
+                                                        wednesdayOpenTime = "",
+                                                        wednesdayCloseTime = "",
+                                                        thursdayOpenTime = "",
+                                                        thursdayCloseTime = "",
+                                                        fridayOpenTime = "",
+                                                        fridayCloseTime = "",
+                                                        saturdayOpenTime = "",
+                                                        saturdayCloseTime = "",
+                                                        sundayOpenTime = "",
+                                                        sundayCloseTime = ""
 
                                                     )
 

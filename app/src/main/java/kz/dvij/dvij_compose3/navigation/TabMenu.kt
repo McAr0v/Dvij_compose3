@@ -46,7 +46,10 @@ fun TabMenu (
     stockCategoryForFilter: MutableState<String>? = null,
     stockStartDateForFilter: MutableState<String>? = null,
     stockFinishDateForFilter: MutableState<String>? = null,
-    stockSortingForFilter: MutableState<String>? = null
+    stockSortingForFilter: MutableState<String>? = null,
+    placeCategoryForFilter: MutableState<String>? = null,
+    placeIsOpenForFilter: MutableState<Boolean>? = null,
+    placeSortingForFilter: MutableState<String>? = null
 ){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
@@ -136,7 +139,14 @@ fun TabMenu (
                 PLACES_ROOT -> {
                     // в завимисости от того, какой индекс страницы
                     when (page) {
-                        0 -> placesKey?.let { activity.placesScreens.PlacesTapeScreen(navController = navController, placeKey = it) } // заведения Лента
+                        0 -> placesKey?.let { activity.placesScreens.PlacesTapeScreen(
+                            navController = navController,
+                            placeKey = it,
+                            cityForFilter = cityForFilter!!,
+                            placeSortingForFilter = placeSortingForFilter!!,
+                            placeCategoryForFilter = placeCategoryForFilter!!,
+                            placeIsOpenForFilter = placeIsOpenForFilter!!
+                        ) } // заведения Лента
                         1 -> placesKey?.let { activity.placesScreens.PlacesFavScreen(navController = navController, placeKey = it) } // заведения Избранные
                         else -> placesKey?.let { activity.placesScreens.PlacesMyScreen(navController = navController, placeKey = it) } // заведения Мои
                     }

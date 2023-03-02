@@ -1,7 +1,9 @@
 package kz.dvij.dvij_compose3.placescreens
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +32,7 @@ import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.ConfirmDialog
 import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
+import kz.dvij.dvij_compose3.elements.IconText
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
@@ -37,9 +40,13 @@ import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class PlaceViewScreen (val act: MainActivity) {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotConstructor")
     @Composable
     fun PlaceViewScreen (
@@ -49,6 +56,18 @@ class PlaceViewScreen (val act: MainActivity) {
         stockKey: MutableState<String>, // КЛЮЧ АКЦИЙ для перехода на клик по карточке Акции
         filledPlaceInfoFromAct: MutableState<PlacesAdsClass> // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
     ){
+
+        val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
+
+        val splitDate = getNowTime.split(", ")
+
+        val nowDay = splitDate[1]
+        val nowTime = splitDate[2]
+
+
+
+        //val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
@@ -96,9 +115,15 @@ class PlaceViewScreen (val act: MainActivity) {
 
         val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
 
+        val placeTimeOnToday = remember {
+            mutableStateOf(listOf<String>())
+        }
+
         // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
 
         act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, key){
+
+            placeTimeOnToday.value = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay,placeInfo.value)
 
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1] // данные из списка - количество просмотров заведения
@@ -136,15 +161,19 @@ class PlaceViewScreen (val act: MainActivity) {
             ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
                 placeInfo.value.placeKey?.let {
-                    act.placesDatabaseManager.deletePlace(it){
+                    placeInfo.value.logo?.let { it1 ->
+                        act.placesDatabaseManager.deletePlace(it, it1){
 
-                        navController.navigate(PLACES_ROOT) {popUpTo(0)}
+                            navController.navigate(PLACES_ROOT) {popUpTo(0)}
 
+                        }
                     }
                 }
 
             }
         }
+
+
 
 
         // ---------- КОНТЕНТ СТРАНИЦЫ --------------
@@ -501,19 +530,15 @@ class PlaceViewScreen (val act: MainActivity) {
                                 .weight(0.5f)
                         ) {
 
-                            if (placeInfo.value.openTime != null && placeInfo.value.closeTime != null) {
+                            // сделать РЕЖИМ РАБОТЫ
+
+                            if (placeTimeOnToday.value != listOf<String>()){
+
                                 HeadlineAndDesc(
-                                    headline = if (placeInfo.value.closeTime == "") {
-                                        placeInfo.value.openTime!!
-                                    } else {
-                                        "${placeInfo.value.openTime} - ${placeInfo.value.closeTime}"
-                                    },
-                                    desc = if (placeInfo.value.closeTime == "") {
-                                        "Открываемся в"
-                                    } else {
-                                        "Режим работы"
-                                    } //
+                                    headline = "${placeTimeOnToday.value[0]} - ${placeTimeOnToday.value[1]}",
+                                    desc = nowDay //
                                 )
+
                             }
                         }
                     }
@@ -761,7 +786,10 @@ class PlaceViewScreen (val act: MainActivity) {
                 // ------- РЕКЛАМНЫЙ БАННЕР -------
 
                 Image(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp).height(200.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                        .height(200.dp),
                     painter = painterResource(id = R.drawable.korn_concert),
                     contentDescription = "",
                     contentScale = ContentScale.Crop

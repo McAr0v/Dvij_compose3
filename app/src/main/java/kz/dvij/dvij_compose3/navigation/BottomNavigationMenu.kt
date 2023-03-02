@@ -223,6 +223,90 @@ fun FloatingMeetingFilterButton(
     }
 }
 
+// ----- ЛЕТАЮЩАЯ КНОПКА ФИЛЬТРА ЗАВЕДЕНИЙ -----------
+
+@Composable
+fun FloatingPlaceFilterButton(
+    city: String = "Выбери город",
+    category: String = "Выбери категорию",
+    typeOfFilter: String,
+    onClick: () -> Unit
+){
+
+    val counter = when (typeOfFilter){
+
+        "cityCategory" -> {
+            " (2)"
+        }
+
+        "city" -> {
+            " (1)"
+        }
+
+        "category" -> {
+            " (1)"
+        }
+
+        "noFilter" -> {
+            ""
+        }
+
+        else -> {""}
+    }
+
+    val containerColor = remember {
+        mutableStateOf(SuccessColor)
+    }
+
+    if (city != "Выбери город" || category != "Выбери категорию") {
+        containerColor.value = SuccessColor
+    } else {
+        containerColor.value = Grey90
+    }
+
+    // помещаем кнопку в BOX
+    Box(
+        modifier = Modifier
+            .fillMaxSize() // занять полный размер
+            .fillMaxWidth() // занять всю ширину
+            .fillMaxHeight() // занять всю высоту
+    ) {
+
+        // --- САМА КНОПКА -------
+
+        FloatingActionButton(
+
+            onClick = { // действие на нажатие
+                onClick()
+            },
+            shape = CircleShape, // форма кнопки
+            contentColor = Grey00, // цвет содержимого кнопки
+            containerColor = containerColor.value, // цвет фона кнопки
+            modifier = Modifier
+                .padding(16.dp) // отступы
+                .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
+        ) {
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.padding(15.dp)
+            ){
+
+                Text(text = "Фильтр$counter", color = Grey00)
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter), // сама иконка
+                    contentDescription = "Кнопка фильтра" // описание для слабовидящих
+                )
+
+            }
+        }
+    }
+}
+
 // ----- ЛЕТАЮЩАЯ КНОПКА ФИЛЬТРА МЕРОПРИЯТИЙ -----------
 
 @Composable

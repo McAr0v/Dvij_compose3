@@ -196,6 +196,7 @@
     <string name="cp_no_finish_time">Во сколько закрывается заведение?</string>
     <string name="cp_no_start_time">Во сколько открывается заведение?</string>
     <string name="cp_no_address">Какой адрес у заведения?</string>
+    <string name="cp_no_time">Заполни весь режим работы</string>
 
     <!-- Создание акции -->
     <string name="cs_no_image">Нет картинки. Без нее никак не опубликовать акцию :(</string>

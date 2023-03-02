@@ -1,6 +1,8 @@
 package kz.dvij.dvij_compose3.firebase
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -9,6 +11,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.filters.FilterMeetingClass
+import kz.dvij.dvij_compose3.filters.FilterPlacesClass
+import java.time.MonthDay
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class PlacesDatabaseManager (val act: MainActivity) {
 
@@ -24,11 +32,22 @@ class PlacesDatabaseManager (val act: MainActivity) {
         placeDescription = "Default"
     )
 
+    val defaultForCard = PlacesCardClass (
+        placeDescription = "Default"
+    )
+
     private val meetingDatabaseManager = MeetingDatabaseManager(act)
 
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ ЗАВЕДЕНИЯ --------
 
     fun publishPlace(filledPLace: PlacesAdsClass, callback: (result: Boolean)-> Unit){
+
+        val filledFilter = FilterPlacesClass(
+            cityCategory = act.filterFunctions.createPlaceFilter(city = filledPLace.city!!, category = filledPLace.category!!),
+            city = act.filterFunctions.createPlaceFilter(city = filledPLace.city),
+            category = act.filterFunctions.createPlaceFilter(category = filledPLace.category),
+            noFilter = act.filterFunctions.createPlaceFilter()
+        )
 
         placeDatabase // записываем в базу данных
             .child(filledPLace.placeKey ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ ЗАВЕДЕНИЯ
@@ -38,9 +57,17 @@ class PlacesDatabaseManager (val act: MainActivity) {
             .setValue(filledPLace).addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    // если заведение опубликовано, возвращаем колбак тру
-                    callback (true)
 
+                    // если заведение опубликовано, запускаем публикацию фильтра
+                    placeDatabase
+                        .child(filledPLace.placeKey ?: "empty") // создаем путь с УНИКАЛЬНЫМ КЛЮЧОМ заведения
+                        .child("filterInfo") // помещаем данные в папку filterInfo
+                        .setValue(filledFilter).addOnCompleteListener{
+
+                            // если заведение и фильтр опубликованы, возвращаем колбак тру
+                            callback (true)
+
+                        }
                 } else {
                     // если не опубликовано, то возвращаем фалс
                     callback (false)
@@ -50,9 +77,35 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ Заведения----------
 
-    fun deletePlace(key: String, callback: (result: Boolean)-> Unit){
+    fun deletePlace(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){
 
         // если ключ пользователя не будет нал, то выполнится функция
+
+        act.photoHelper.deletePlaceImage(imageUrl = imageUrl){
+
+            if (it) {
+
+                placeDatabase.child(key).removeValue().addOnCompleteListener{deleteP ->
+
+                    if (deleteP.isSuccessful) {
+
+                        callback (true)
+
+                    } else {
+
+                        callback (false)
+
+                    }
+                }
+
+            } else {
+
+                callback (false)
+
+            }
+        }
+
+
 
         act.mAuth.uid?.let {
             placeDatabase // обращаемся к БД
@@ -106,13 +159,34 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ЗАВЕДЕНИЙ С БАЗЫ ДАННЫХ --------
 
-    fun readPlaceSortedDataFromDb(placeList: MutableState<List<PlacesCardClass>>){
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun readPlaceSortedDataFromDb(
+        placeList: MutableState<List<PlacesCardClass>>,
+        cityForFilter: MutableState<String>,
+        placeCategoryForFilter: MutableState<String>,
+        placeIsOpenForFilter: MutableState<Boolean>,
+        placeSortingForFilter: MutableState<String>
+    ){
+
+        // Определяем тип фильтра
+        val typeFilter = act.filterFunctions.getTypeOfPlaceFilter(listOf(cityForFilter.value, placeCategoryForFilter.value))
+
+        // Создаем фильтр из пришедших выбранных пользователем данных
+        var filter = act.filterFunctions.createPlaceFilter(city = cityForFilter.value, category = placeCategoryForFilter.value)
+
+        val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
+
+        val splitDate = getNowTime.split(", ")
+
+        val nowDay = splitDate[1]
+        val nowTime = splitDate[2]
+
+
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
-
-                val placeFinishArray = arrayListOf<PlacesCardClass>()
 
                 val placeArray = ArrayList<PlacesCardClass>() // создаем пустой список заведений
 
@@ -126,34 +200,34 @@ class PlacesDatabaseManager (val act: MainActivity) {
                         .child("placeData") // добираесся до следующей папки внутри УКПользователя - папка с данными о заведении
                         .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведений
 
+                    // Читаем фильтр из заведения
+                    val getFilter = item
+                        .child("filterInfo").getValue(FilterPlacesClass::class.java)
+
+
+
                     // считываем данные для счетчика - количество добавивших в избранное
                     val placeFav = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество мероприятий, ссылающихся на это заведение
+                    val placeMeetingsCounter = item.child("AddedMeetings").childrenCount
+
+                    // считываем данные для счетчика - количество акций, ссылающихся на это заведение
+                    val placeStockCounter = item.child("AddedStocks").childrenCount
 
                     // считываем данные для счетчика - количество просмотров объявления
                     val placeViewCount = item
                         .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
-                    if (place != null){
+
+
+                    if (place != null && getFilter != null){
+
+                        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay, place)
+
+                        val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
 
                         // Считываем количество мероприятий у этого заведения
-
-                        // СДЕЛАТЬ ТАК ЖЕ КАК И В PLACEFAV - СДЕЛАТЬ ДОБАВЛЕНИЕ КЛЮЧА В ОТДЕЛЬНУЮ ПАПКУ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ И АКЦИИ И СООТВЕТСТВЕННО УДАЛЕНИЕ КЛЮЧА ПРИ УДАЛЕНИИ
-
-                        var meetingCount = "0"
-
-                        meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(place.placeKey!!){ meetingsCounter ->
-                           meetingCount = meetingsCounter.toString()
-                        }
-
-                        // Считываем количество акций у этого заведения
-
-                        // СДЕЛАТЬ ТАК ЖЕ КАК И В PLACEFAV - СДЕЛАТЬ ДОБАВЛЕНИЕ КЛЮЧА В ОТДЕЛЬНУЮ ПАПКУ ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ И АКЦИИ И СООТВЕТСТВЕННО УДАЛЕНИЕ КЛЮЧА ПРИ УДАЛЕНИИ
-
-                        var stockCount = "0"
-
-                        act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = place.placeKey) { stockCounters ->
-                            stockCount = stockCounters.toString()
-                        }
 
                         val filledFinishPlace = PlacesCardClass(
                             logo = place.logo,
@@ -168,26 +242,141 @@ class PlacesDatabaseManager (val act: MainActivity) {
                             address = place.address,
                             placeKey = place.placeKey,
                             owner = place.owner,
-                            openTime = place.openTime,
-                            closeTime = place.closeTime,
-                            //meetingCounter = meetingCount,
-                            //stockCounter = stockCount,
+                            meetingCounter = placeMeetingsCounter.toString(),
+                            stockCounter = placeStockCounter.toString(),
                             favCounter = placeFav.toString(),
-                            viewCounter = placeViewCount.toString()
+                            viewCounter = placeViewCount.toString(),
+                            mondayOpenTime = place.mondayOpenTime,
+                            mondayCloseTime = place.mondayCloseTime,
+                            tuesdayOpenTime = place.tuesdayOpenTime,
+                            tuesdayCloseTime = place.tuesdayCloseTime,
+                            wednesdayOpenTime = place.wednesdayOpenTime,
+                            wednesdayCloseTime = place.wednesdayCloseTime,
+                            thursdayOpenTime = place.thursdayOpenTime,
+                            thursdayCloseTime = place.thursdayCloseTime,
+                            fridayOpenTime = place.fridayOpenTime,
+                            fridayCloseTime = place.fridayCloseTime,
+                            saturdayOpenTime = place.saturdayOpenTime,
+                            saturdayCloseTime = place.saturdayCloseTime,
+                            sundayOpenTime = place.sundayOpenTime,
+                            sundayCloseTime = place.sundayCloseTime
 
                         )
 
-                        placeFinishArray.add(filledFinishPlace)
+                        when (typeFilter) {
 
+                            "cityCategory" -> {
+
+                                // Если полученный фильтр равен фильтру выбранному пользователем
+
+                                if (getFilter.cityCategory == filter) {
+
+                                    // если нажата кнопка "Сейчас открыто"
+                                    if (placeIsOpenForFilter.value){
+
+                                        // проверяем, открыто ли сейчас заведение
+                                        if (nowIsOpen) {
+
+                                            // Если открыто, добавляем в список
+                                            placeArray.add(filledFinishPlace)
+
+                                        }
+
+                                    } else {
+
+                                        // Если не выбрана опция только открытые, то просто добавляем в список,
+                                        placeArray.add(filledFinishPlace)
+
+                                    }
+                                }
+                            }
+                            "city" -> {
+
+                                // Если полученный фильтр равен фильтру выбранному пользователем
+
+                                if (getFilter.city == filter) {
+
+                                    // если нажата кнопка "Сейчас открыто"
+                                    if (placeIsOpenForFilter.value){
+
+                                        // проверяем, открыто ли сейчас заведение
+                                        if (nowIsOpen) {
+
+                                            // Если открыто, добавляем в список
+                                            placeArray.add(filledFinishPlace)
+
+                                        }
+
+                                    } else {
+
+                                        // Если не выбрана опция только открытые, то просто добавляем в список,
+                                        placeArray.add(filledFinishPlace)
+
+                                    }
+                                }
+
+                            }
+                            "category" -> {
+
+                                // Если полученный фильтр равен фильтру выбранному пользователем
+
+                                if (getFilter.category == filter) {
+
+                                    // если нажата кнопка "Сейчас открыто"
+                                    if (placeIsOpenForFilter.value){
+
+                                        // проверяем, открыто ли сейчас заведение
+                                        if (nowIsOpen) {
+
+                                            // Если открыто, добавляем в список
+                                            placeArray.add(filledFinishPlace)
+
+                                        }
+
+                                    } else {
+
+                                        // Если не выбрана опция только открытые, то просто добавляем в список,
+                                        placeArray.add(filledFinishPlace)
+
+                                    }
+                                }
+
+                            }
+                            "noFilter" -> {
+
+                                // Если полученный фильтр равен фильтру выбранному пользователем
+
+                                if (getFilter.noFilter == filter) {
+
+                                    // если нажата кнопка "Сейчас открыто"
+                                    if (placeIsOpenForFilter.value){
+
+                                        // проверяем, открыто ли сейчас заведение
+                                        if (nowIsOpen) {
+
+                                            // Если открыто, добавляем в список
+                                            placeArray.add(filledFinishPlace)
+
+                                        }
+
+                                    } else {
+
+                                        // Если не выбрана опция только открытые, то просто добавляем в список,
+                                        placeArray.add(filledFinishPlace)
+
+                                    }
+                                }
+                            }
+                        }
                     }
-
                 }
 
                 if (placeArray.isEmpty()){
-                    //placeList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
+                    placeList.value = listOf(defaultForCard) // если в список-черновик ничего не добавилось, то добавляем заведение по умолчанию
                 } else {
-                    placeList.value = placeArray // если добавились заведения в список, то этот новый список и передаем
-                    Log.d("MyLog", "$placeFinishArray")
+                    val sortedList = act.filterFunctions.sortedPlaceList(placesList = placeArray, placeSortingForFilter.value)
+                    placeList.value = sortedList // если добавились заведения в список, то этот новый список и передаем
+
                 }
             }
 
@@ -237,6 +426,71 @@ class PlacesDatabaseManager (val act: MainActivity) {
                 callback (true)
             }
         }
+    }
+
+    fun returnWrightTimeOnCurrentDay (day: String, placeInfo: PlacesCardClass): List<String>{
+
+        return when (day) {
+
+            "понедельник" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!)
+            "вторник" -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!)
+            "среда" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!)
+            "четверг" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!)
+            "пятница" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!)
+            "суббота" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!)
+            else -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!)
+
+        }
+
+    }
+
+    fun returnWrightTimeOnCurrentDayInStandartClass (day: String, placeInfo: PlacesAdsClass): List<String>{
+
+        return when (day) {
+
+            "понедельник" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!)
+            "вторник" -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!)
+            "среда" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!)
+            "четверг" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!)
+            "пятница" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!)
+            "суббота" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!)
+            else -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!)
+
+        }
+
+    }
+
+    fun nowIsOpenPlace (nowTime: String, startTime: String, finishTime: String):Boolean{
+
+        var result = false
+
+        val nowInNumber = getTimeNumber(nowTime).toInt()
+
+        val startInNumber = getTimeNumber(startTime).toInt()
+        val finishInNUmber = getTimeNumber(finishTime).toInt()
+
+        result = if (startInNumber>finishInNUmber){
+
+            // если заведение работает за полночь, то финишное время будет меньше начального
+            val currentFinishTime = finishInNUmber + 2400
+
+            nowInNumber in (startInNumber + 1) until currentFinishTime // startInNumber<nowInNumber && nowInNumber<currentFinishTime
+
+        } else {
+
+            nowInNumber in (startInNumber + 1) until finishInNUmber // startInNumber < nowInNumber && nowInNumber < finishInNUmber
+
+        }
+
+        return result
+    }
+
+    private fun getTimeNumber (date: String): String {
+
+        val split = date.split(":")
+
+        return "${split[0]}${split[1]}"
+
     }
 
     // ---- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ - ЗАВЕДЕНИЕ В ИЗБРАННОМ УЖЕ ИЛИ НЕТ

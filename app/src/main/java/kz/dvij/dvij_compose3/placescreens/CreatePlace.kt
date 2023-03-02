@@ -73,8 +73,21 @@ class CreatePlace (val act: MainActivity) {
             city = "",
             address = "",
             owner = "",
-            openTime = "",
-            closeTime = ""
+            mondayOpenTime = "",
+            mondayCloseTime = "",
+            tuesdayOpenTime = "",
+            tuesdayCloseTime = "",
+            wednesdayOpenTime = "",
+            wednesdayCloseTime = "",
+            thursdayOpenTime = "",
+            thursdayCloseTime = "",
+            fridayOpenTime = "",
+            fridayCloseTime = "",
+            saturdayOpenTime = "",
+            saturdayCloseTime = "",
+            sundayOpenTime = "",
+            sundayCloseTime = "",
+            createPlaceTime = ""
         ),
 
         // Тип страницы - редактирование или создание
@@ -382,13 +395,13 @@ class CreatePlace (val act: MainActivity) {
             }
 
 
-            // ---- НАЧАЛО РАБОЧЕГО ДНЯ -----
+            // ---- ПОНЕДЕЛЬНИК ------
 
-            SpacerTextWithLine(headline = "Начало рабочего дня") // подпись перед формой
+            SpacerTextWithLine(headline = "Понедельник начало") // подпись перед формой
 
-            val openTimeResult = if (filledPlace.openTime != "" && filledPlace.openTime != null && createOrEdit != "0"){
+            val mondayOpenTimeResult = if (filledPlace.mondayOpenTime != "" && filledPlace.mondayOpenTime != null && createOrEdit != "0"){
 
-                timePicker(filledPlace.openTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                timePicker(filledPlace.mondayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
             } else {
 
@@ -396,14 +409,11 @@ class CreatePlace (val act: MainActivity) {
 
             }
 
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
 
-            // ---- КОНЕЦ РАБОЧЕГО ДНЯ -----
+            val mondayCloseTimeResult = if (filledPlace.mondayCloseTime != "" && filledPlace.mondayCloseTime != null && createOrEdit != "0"){
 
-            SpacerTextWithLine(headline = "Конец рабочего дня") // подпись перед формой
-
-            val closeTimeResult = if (filledPlace.closeTime != "" && filledPlace.closeTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.closeTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                timePicker(filledPlace.mondayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
             } else {
 
@@ -411,6 +421,161 @@ class CreatePlace (val act: MainActivity) {
 
             }
 
+            // ---- Вторник ------
+
+            SpacerTextWithLine(headline = "Вторник начало") // подпись перед формой
+
+            val tuesdayOpenTimeResult = if (filledPlace.tuesdayOpenTime != "" && filledPlace.tuesdayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.tuesdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val tuesdayCloseTimeResult = if (filledPlace.tuesdayCloseTime != "" && filledPlace.tuesdayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.tuesdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
+            // ---- Среда ------
+
+            SpacerTextWithLine(headline = "Среда начало") // подпись перед формой
+
+            val wednesdayOpenTimeResult = if (filledPlace.wednesdayOpenTime != "" && filledPlace.wednesdayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.wednesdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val wednesdayCloseTimeResult = if (filledPlace.wednesdayCloseTime != "" && filledPlace.wednesdayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.wednesdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
+            // ---- Четверг ------
+
+            SpacerTextWithLine(headline = "Четверг начало") // подпись перед формой
+
+            val thursdayOpenTimeResult = if (filledPlace.thursdayOpenTime != "" && filledPlace.thursdayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.thursdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val thursdayCloseTimeResult = if (filledPlace.thursdayCloseTime != "" && filledPlace.thursdayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.thursdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
+            // ---- Пятница ------
+
+            SpacerTextWithLine(headline = "Пятница начало") // подпись перед формой
+
+            val fridayOpenTimeResult = if (filledPlace.fridayOpenTime != "" && filledPlace.fridayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.fridayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val fridayCloseTimeResult = if (filledPlace.fridayCloseTime != "" && filledPlace.fridayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.fridayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
+            // ---- Суббота ------
+
+            SpacerTextWithLine(headline = "Суббота начало") // подпись перед формой
+
+            val saturdayOpenTimeResult = if (filledPlace.saturdayOpenTime != "" && filledPlace.saturdayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.saturdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val saturdayCloseTimeResult = if (filledPlace.saturdayCloseTime != "" && filledPlace.saturdayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.saturdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
+
+            // ---- Воскресенье ------
+
+            SpacerTextWithLine(headline = "Воскресенье начало") // подпись перед формой
+
+            val sundayOpenTimeResult = if (filledPlace.sundayOpenTime != "" && filledPlace.sundayOpenTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.sundayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            }
+
+            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+
+            val sundayCloseTimeResult = if (filledPlace.sundayCloseTime != "" && filledPlace.sundayCloseTime != null && createOrEdit != "0"){
+
+                timePicker(filledPlace.sundayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+
+            } else {
+
+                timePicker()
+
+            }
 
             // ---- ОПИСАНИЕ --------
 
@@ -440,6 +605,8 @@ class CreatePlace (val act: MainActivity) {
 
                 onClick = {
 
+                    val currentTime = System.currentTimeMillis()/1000
+
                     // действие на нажатие
 
                     // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
@@ -448,13 +615,25 @@ class CreatePlace (val act: MainActivity) {
                         image1 = image1,
                         headline = headline,
                         phone = phone,
-                        openTime = openTimeResult,
-                        closeTime = closeTimeResult,
                         description = description,
                         category = category,
                         city = city,
                         address = address,
-                        imageUriFromDb = filledPlace.logo ?: ""
+                        imageUriFromDb = filledPlace.logo ?: "",
+                        mondayOT = mondayOpenTimeResult,
+                        mondayCT = mondayCloseTimeResult,
+                        tuesdayOT = tuesdayOpenTimeResult,
+                        tuesdayCT = tuesdayCloseTimeResult,
+                        wednesdayOT = wednesdayOpenTimeResult,
+                        wednesdayCT = wednesdayCloseTimeResult,
+                        thursdayOT = thursdayOpenTimeResult,
+                        thursdayCT = thursdayCloseTimeResult,
+                        fridayOT = fridayOpenTimeResult,
+                        fridayCT = fridayCloseTimeResult,
+                        saturdayOT = saturdayOpenTimeResult,
+                        saturdayCT = saturdayCloseTimeResult,
+                        sundayOT = sundayOpenTimeResult,
+                        sundayCT = sundayCloseTimeResult
                     )
 
                     if (checkData != 0) {
@@ -501,8 +680,21 @@ class CreatePlace (val act: MainActivity) {
                                         address = address,
                                         placeKey = filledPlace.placeKey,
                                         owner = filledPlace.owner,
-                                        openTime = openTimeResult,
-                                        closeTime = closeTimeResult
+                                        mondayOpenTime = mondayOpenTimeResult,
+                                        mondayCloseTime = mondayCloseTimeResult,
+                                        tuesdayOpenTime = tuesdayOpenTimeResult,
+                                        tuesdayCloseTime = tuesdayCloseTimeResult,
+                                        wednesdayOpenTime = wednesdayOpenTimeResult,
+                                        wednesdayCloseTime = wednesdayCloseTimeResult,
+                                        thursdayOpenTime = thursdayOpenTimeResult,
+                                        thursdayCloseTime = thursdayCloseTimeResult,
+                                        fridayOpenTime = fridayOpenTimeResult,
+                                        fridayCloseTime = fridayCloseTimeResult,
+                                        saturdayOpenTime = saturdayOpenTimeResult,
+                                        saturdayCloseTime = saturdayCloseTimeResult,
+                                        sundayOpenTime = sundayOpenTimeResult,
+                                        sundayCloseTime = sundayCloseTimeResult,
+                                        createPlaceTime = filledPlace.createPlaceTime
 
                                     )
 
@@ -577,8 +769,21 @@ class CreatePlace (val act: MainActivity) {
                                                 address = address,
                                                 placeKey = placesDatabaseManager.placeDatabase.push().key,
                                                 owner = auth.uid,
-                                                openTime = openTimeResult,
-                                                closeTime = closeTimeResult
+                                                mondayOpenTime = mondayOpenTimeResult,
+                                                mondayCloseTime = mondayCloseTimeResult,
+                                                tuesdayOpenTime = tuesdayOpenTimeResult,
+                                                tuesdayCloseTime = tuesdayCloseTimeResult,
+                                                wednesdayOpenTime = wednesdayOpenTimeResult,
+                                                wednesdayCloseTime = wednesdayCloseTimeResult,
+                                                thursdayOpenTime = thursdayOpenTimeResult,
+                                                thursdayCloseTime = thursdayCloseTimeResult,
+                                                fridayOpenTime = fridayOpenTimeResult,
+                                                fridayCloseTime = fridayCloseTimeResult,
+                                                saturdayOpenTime = saturdayOpenTimeResult,
+                                                saturdayCloseTime = saturdayCloseTimeResult,
+                                                sundayOpenTime = sundayOpenTimeResult,
+                                                sundayCloseTime = sundayCloseTimeResult,
+                                                createPlaceTime = currentTime.toString()
 
                                             )
 
@@ -600,8 +805,21 @@ class CreatePlace (val act: MainActivity) {
                                                 address = address,
                                                 placeKey = filledPlace.placeKey,
                                                 owner = filledPlace.owner,
-                                                openTime = openTimeResult,
-                                                closeTime = closeTimeResult
+                                                mondayOpenTime = mondayOpenTimeResult,
+                                                mondayCloseTime = mondayCloseTimeResult,
+                                                tuesdayOpenTime = tuesdayOpenTimeResult,
+                                                tuesdayCloseTime = tuesdayCloseTimeResult,
+                                                wednesdayOpenTime = wednesdayOpenTimeResult,
+                                                wednesdayCloseTime = wednesdayCloseTimeResult,
+                                                thursdayOpenTime = thursdayOpenTimeResult,
+                                                thursdayCloseTime = thursdayCloseTimeResult,
+                                                fridayOpenTime = fridayOpenTimeResult,
+                                                fridayCloseTime = fridayCloseTimeResult,
+                                                saturdayOpenTime = saturdayOpenTimeResult,
+                                                saturdayCloseTime = saturdayCloseTimeResult,
+                                                sundayOpenTime = sundayOpenTimeResult,
+                                                sundayCloseTime = sundayCloseTimeResult,
+                                                createPlaceTime = filledPlace.createPlaceTime
 
                                             )
 
