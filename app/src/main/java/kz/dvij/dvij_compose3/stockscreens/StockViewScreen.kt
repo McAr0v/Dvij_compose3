@@ -26,9 +26,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.elements.ConfirmDialog
-import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
-import kz.dvij.dvij_compose3.elements.PlacesCard
+import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
@@ -39,6 +37,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 class StockViewScreen (val act: MainActivity) {
 
     private val placeCard = PlacesCard (act)
+    private val ownerCard = OwnerCard(act)
 
     @SuppressLint("NotConstructor")
     @Composable
@@ -521,6 +520,20 @@ class StockViewScreen (val act: MainActivity) {
                             color = Grey10
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                }
+
+                SpacerTextWithLine(headline = "Организитор")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // КАРТОЧКА СОЗДАТЕЛЯ
+
+                if (stockInfo.value.keyCreator != null && stockInfo.value.keyCreator != "null" && stockInfo.value.keyCreator != ""){
+
+                    ownerCard.OwnerCardView(userKey = stockInfo.value.keyCreator!!)
 
                     Spacer(modifier = Modifier.height(20.dp))
 

@@ -2,10 +2,7 @@ package kz.dvij.dvij_compose3.filters
 
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesCardClass
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.*
 
 class FilterFunctions(val act: MainActivity) {
 
@@ -187,7 +184,7 @@ class FilterFunctions(val act: MainActivity) {
 
     // ---- ФУНКЦИЯ СОРТИРОВКИ СПИСКА МЕРОПРИЯТИЙ В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ТИПА -----
 
-    fun sortedMeetingList (meetingsList: List<MeetingsAdsClass>, query: String): List<MeetingsAdsClass>{
+    fun sortedMeetingList (meetingsList: List<MeetingsCardClass>, query: String): List<MeetingsCardClass>{
 
         return when (query) {
 
@@ -195,6 +192,8 @@ class FilterFunctions(val act: MainActivity) {
             "Сначала старые" -> meetingsList.sortedBy { it.createdTime } // по дате создания
             "Дата: По возрастанию" -> meetingsList.sortedBy { it.dateInNumber } // по дате проведения
             "Дата: По убыванию" -> meetingsList.sortedBy { it.dateInNumber }.asReversed() // по дате проведения
+            "По популярности: По возрастанию" -> meetingsList.sortedBy { it.counterInFav } // по дате проведения
+            "По популярности: По убыванию" -> meetingsList.sortedBy { it.counterInFav }.asReversed() // по дате проведения
             else -> meetingsList.sortedBy { it.createdTime }.asReversed() // по умолчанию - сначала новые
         }
 
@@ -202,7 +201,7 @@ class FilterFunctions(val act: MainActivity) {
 
     // ---- ФУНКЦИЯ СОРТИРОВКИ СПИСКА АКЦИЙ В ЗАВИСИМОСТИ ОТ ВЫБРАННОГО ТИПА -----
 
-    fun sortedStockList (stockList: List<StockAdsClass>, query: String): List<StockAdsClass>{
+    fun sortedStockList (stockList: List<StockCardClass>, query: String): List<StockCardClass>{
 
         return when (query) {
 
@@ -212,6 +211,8 @@ class FilterFunctions(val act: MainActivity) {
             "По дате начала акции: По убыванию" -> stockList.sortedBy { it.startDateNumber }.asReversed() // по дате проведения
             "По дате завершения акции: По возрастанию" -> stockList.sortedBy { it.finishDateNumber } // по дате проведения
             "По дате завершения акции: По убыванию" -> stockList.sortedBy { it.finishDateNumber }.asReversed() // по дате проведения
+            "По популярности: По возрастанию" -> stockList.sortedBy { it.counterInFav } // по добавившим в избраное
+            "По популярности: По убыванию" -> stockList.sortedBy { it.counterInFav }.asReversed() // по добавившим в избранное
             else -> stockList.sortedBy { it.createTime }.asReversed() // по умолчанию - сначала новые
         }
 

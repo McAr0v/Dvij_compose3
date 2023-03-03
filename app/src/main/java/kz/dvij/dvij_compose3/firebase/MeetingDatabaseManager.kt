@@ -29,6 +29,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         description = "Default"
     )
 
+    val defaultCardMeeting = MeetingsCardClass (
+        description = "Default"
+    )
+
     private val filterFunctions = FilterFunctions(activity)
 
     private val photoHelper = PhotoHelper(activity)
@@ -170,7 +174,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ С ФИЛЬТРОМ --------
 
     fun readFilteredMeetingDataFromDb(
-        meetingsList: MutableState<List<MeetingsAdsClass>>,
+        meetingsList: MutableState<List<MeetingsCardClass>>,
         cityForFilter: MutableState<String>,
         meetingCategoryForFilter: MutableState<String>,
         meetingStartDateForFilter: MutableState<String>,
@@ -198,7 +202,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+                val meetingArray = ArrayList<MeetingsCardClass>() // создаем пустой список мероприятий
 
                 for (item in snapshot.children) {
 
@@ -214,11 +218,41 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     val getFilter = item
                         .child("filterInfo").getValue(FilterMeetingClass::class.java)
 
+                    // Читаем количество добавивших в избранное
+                    val getFavCounter = item
+                        .child("AddedToFavorites").childrenCount
 
                     if (meeting != null && getFilter != null) {
 
+                        val finishCardMeeting = MeetingsCardClass(
+
+                            key = meeting.key,
+                            category = meeting.category,
+                            headline = meeting.headline,
+                            description = meeting.description,
+                            price = meeting.price,
+                            phone = meeting.phone,
+                            whatsapp = meeting.whatsapp,
+                            data = meeting.data,
+                            startTime = meeting.startTime,
+                            finishTime = meeting.finishTime,
+                            image1 = meeting.image1,
+                            image2 = meeting.image2,
+                            image3 = meeting.image3,
+                            city = meeting.city,
+                            instagram = meeting.instagram,
+                            telegram = meeting.telegram,
+                            placeKey = meeting.placeKey,
+                            headlinePlaceInput = meeting.headlinePlaceInput,
+                            addressPlaceInput = meeting.addressPlaceInput,
+                            ownerKey = meeting.ownerKey,
+                            dateInNumber = meeting.dateInNumber,
+                            createdTime = meeting.createdTime,
+                            counterInFav = getFavCounter.toString()
+                        )
+
                         // читаем число даты для сортировки ГодМесяцДень
-                        val meetingDataNumber = meeting.dateInNumber!!.toInt()
+                        val meetingDataNumber = finishCardMeeting.dateInNumber!!.toInt()
 
                         // ---- ЕСЛИ ДАТЫ НАЧАЛА И КОНЦА ПЕРИОДА ЕСТЬ, ТО
 
@@ -235,7 +269,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             // ПРОВЕРЯЕМ - ПОПАДАЕТ ЛИ НАШЕ МЕРОПРИЯТИЕ В ДИАПАЗОН ДАТ ИЗ ФИЛЬТРА
 
                             filterFunctions.checkMeetingDatePeriod(
-                                meetingDate = meeting.dateInNumber, // дата мероприятия из БД в правильном формате
+                                meetingDate = finishCardMeeting.dateInNumber, // дата мероприятия из БД в правильном формате
                                 startFilterDay = startDayNumber, // Начало периода в правильном формате
                                 finishFilterDay = finishDayNumber // конец периода в правильном формате
                             ) { inPeriod ->
@@ -251,7 +285,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     filterFunctions.createMeetingFilter(
                                         city = cityForFilter.value, // город, который выбрал для фильтра пользователь
                                         category = meetingCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
-                                        meeting.data!! // дата из БД, чтобы фильтр совпал с фильтром из БД и это мероприятие подошло
+                                        finishCardMeeting.data!! // дата из БД, чтобы фильтр совпал с фильтром из БД и это мероприятие подошло
                                     )
 
                                 } else {
@@ -283,12 +317,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -305,7 +339,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -319,12 +353,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -341,7 +375,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -354,12 +388,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -376,7 +410,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -389,12 +423,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -411,7 +445,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -424,12 +458,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -446,7 +480,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -459,12 +493,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -481,7 +515,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -494,12 +528,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -516,7 +550,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -529,12 +563,12 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     // Если число из мероприятия меньше чем число СЕГОДНЯ
                                     if (meetingDataNumber < todayInRightFormat.toInt()) {
 
-                                        if (meeting.key != null && meeting.placeKey != null && meeting.image1 != null){
+                                        if (finishCardMeeting.key != null && finishCardMeeting.placeKey != null && finishCardMeeting.image1 != null){
 
                                             deleteMeetingWithPlaceNote(
-                                                meetingKey = meeting.key,
-                                                placeKey = meeting.placeKey,
-                                                imageUrl = meeting.image1
+                                                meetingKey = finishCardMeeting.key,
+                                                placeKey = finishCardMeeting.placeKey,
+                                                imageUrl = finishCardMeeting.image1
                                             ) {
 
                                                 if (it) {
@@ -551,7 +585,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                         }
                                     } else {
 
-                                        meetingArray.add(meeting)
+                                        meetingArray.add(finishCardMeeting)
 
                                     }
                                 }
@@ -561,7 +595,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                 }
 
                 if (meetingArray.isEmpty()) {
-                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                    meetingsList.value = listOf(defaultCardMeeting) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
                 } else {
 
                     // ---- Сортируем список в зависимости от выбранной настройки ----
@@ -583,14 +617,14 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ МЕРОПРИЯТИЙ --------
 
-    fun readMeetingMyDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
+    fun readMeetingMyDataFromDb(meetingsList: MutableState<List<MeetingsCardClass>>){
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>()
+                val meetingArray = ArrayList<MeetingsCardClass>()
 
                 for (item in snapshot.children){
 
@@ -603,12 +637,46 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             .child("meetingData") // папка с данными о мероприятии
                             .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                        if (meeting != null) {meetingArray.add(meeting)} //  если мероприятие не нал, то добавляем в список-черновик
+                        // Читаем количество добавивших в избранное
+                        val getFavCounter = item
+                            .child("AddedToFavorites").childrenCount
+
+                        if (meeting != null) {
+
+                            val finishCardMeeting = MeetingsCardClass(
+
+                                key = meeting.key,
+                                category = meeting.category,
+                                headline = meeting.headline,
+                                description = meeting.description,
+                                price = meeting.price,
+                                phone = meeting.phone,
+                                whatsapp = meeting.whatsapp,
+                                data = meeting.data,
+                                startTime = meeting.startTime,
+                                finishTime = meeting.finishTime,
+                                image1 = meeting.image1,
+                                image2 = meeting.image2,
+                                image3 = meeting.image3,
+                                city = meeting.city,
+                                instagram = meeting.instagram,
+                                telegram = meeting.telegram,
+                                placeKey = meeting.placeKey,
+                                headlinePlaceInput = meeting.headlinePlaceInput,
+                                addressPlaceInput = meeting.addressPlaceInput,
+                                ownerKey = meeting.ownerKey,
+                                dateInNumber = meeting.dateInNumber,
+                                createdTime = meeting.createdTime,
+                                counterInFav = getFavCounter.toString()
+                            )
+
+                            meetingArray.add(finishCardMeeting)
+                        } //  если мероприятие не нал, то добавляем в список-черновик
                     }
                 }
 
                 if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
+                    meetingsList.value = listOf(defaultCardMeeting) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
                     meetingsList.value = meetingArray.asReversed() // если список не пустой, то возвращаем мои мероприятия с БД
                 }
@@ -622,14 +690,14 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ МЕРОПРИЯТИЙ --------
 
-    fun readMeetingFavDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>){
+    fun readMeetingFavDataFromDb(meetingsList: MutableState<List<MeetingsCardClass>>){
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>()
+                val meetingArray = ArrayList<MeetingsCardClass>()
 
                 for (item in snapshot.children){
 
@@ -655,15 +723,46 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             // если ключи совпали, проверяем мероприятие на нал
                             if (meeting != null) {
 
+                                // Читаем количество добавивших в избранное
+                                val getFavCounter = item
+                                    .child("AddedToFavorites").childrenCount
+
+                                val finishCardMeeting = MeetingsCardClass(
+
+                                    key = meeting.key,
+                                    category = meeting.category,
+                                    headline = meeting.headline,
+                                    description = meeting.description,
+                                    price = meeting.price,
+                                    phone = meeting.phone,
+                                    whatsapp = meeting.whatsapp,
+                                    data = meeting.data,
+                                    startTime = meeting.startTime,
+                                    finishTime = meeting.finishTime,
+                                    image1 = meeting.image1,
+                                    image2 = meeting.image2,
+                                    image3 = meeting.image3,
+                                    city = meeting.city,
+                                    instagram = meeting.instagram,
+                                    telegram = meeting.telegram,
+                                    placeKey = meeting.placeKey,
+                                    headlinePlaceInput = meeting.headlinePlaceInput,
+                                    addressPlaceInput = meeting.addressPlaceInput,
+                                    ownerKey = meeting.ownerKey,
+                                    dateInNumber = meeting.dateInNumber,
+                                    createdTime = meeting.createdTime,
+                                    counterInFav = getFavCounter.toString()
+                                )
+
                                 //  если мероприятие не нал, то добавляем в список-черновик
-                                meetingArray.add(meeting)
+                                meetingArray.add(finishCardMeeting)
                             }
                         }
                     }
                 }
 
                 if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default) // если в списке ничего нет, то добавляем мероприятие по умолчанию
+                    meetingsList.value = listOf(defaultCardMeeting) // если в списке ничего нет, то добавляем мероприятие по умолчанию
                 } else {
                     meetingsList.value = meetingArray.asReversed() // если список не пустой, то возвращаем избранные мероприятия с БД
                 }
@@ -1036,13 +1135,13 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ МЕРОПРИЯТИЙ КОНКРЕТНОГО ЗАВЕДЕНИЯ С БАЗЫ ДАННЫХ --------
 
-    fun readMeetingInPlaceDataFromDb(meetingsList: MutableState<List<MeetingsAdsClass>>, placeKey: String){
+    fun readMeetingInPlaceDataFromDb(meetingsList: MutableState<List<MeetingsCardClass>>, placeKey: String){
 
         meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val meetingArray = ArrayList<MeetingsAdsClass>() // создаем пустой список мероприятий
+                val meetingArray = ArrayList<MeetingsCardClass>() // создаем пустой список мероприятий
 
                 for (item in snapshot.children){
 
@@ -1052,12 +1151,47 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         .child("meetingData") // папка с данными о мероприятии
                         .getValue(MeetingsAdsClass::class.java) // забираем данные из БД в виде нашего класса МЕРОПРИЯТИЯ
 
-                    if (meeting != null && meeting.placeKey == placeKey) {meetingArray.add(meeting)} // если мероприятие не пустое и ключ заведения совпадает с ключем заведения в мероприятии, добавляем в список
+                    if (meeting != null && meeting.placeKey == placeKey) {
+
+                        // Читаем количество добавивших в избранное
+                        val getFavCounter = item
+                            .child("AddedToFavorites").childrenCount
+
+                        val finishCardMeeting = MeetingsCardClass(
+
+                            key = meeting.key,
+                            category = meeting.category,
+                            headline = meeting.headline,
+                            description = meeting.description,
+                            price = meeting.price,
+                            phone = meeting.phone,
+                            whatsapp = meeting.whatsapp,
+                            data = meeting.data,
+                            startTime = meeting.startTime,
+                            finishTime = meeting.finishTime,
+                            image1 = meeting.image1,
+                            image2 = meeting.image2,
+                            image3 = meeting.image3,
+                            city = meeting.city,
+                            instagram = meeting.instagram,
+                            telegram = meeting.telegram,
+                            placeKey = meeting.placeKey,
+                            headlinePlaceInput = meeting.headlinePlaceInput,
+                            addressPlaceInput = meeting.addressPlaceInput,
+                            ownerKey = meeting.ownerKey,
+                            dateInNumber = meeting.dateInNumber,
+                            createdTime = meeting.createdTime,
+                            counterInFav = getFavCounter.toString()
+                        )
+
+                        meetingArray.add(finishCardMeeting)
+
+                    } // если мероприятие не пустое и ключ заведения совпадает с ключем заведения в мероприятии, добавляем в список
 
                 }
 
                 if (meetingArray.isEmpty()){
-                    meetingsList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
+                    meetingsList.value = listOf(defaultCardMeeting) // если в список-черновик ничего не добавилось, то добавляем мероприятие по умолчанию
                 } else {
                     meetingsList.value = meetingArray // если добавились мероприятия в список, то этот новый список и передаем
                 }

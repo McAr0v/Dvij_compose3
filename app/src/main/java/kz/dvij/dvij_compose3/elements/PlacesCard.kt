@@ -923,6 +923,7 @@ class PlacesCard (val act: MainActivity) {
 
                                 androidx.compose.material.Text(
                                     text = when (placeItem.viewCounter) {
+                                        "null"-> "0 просмотров"
                                         "1" -> "${placeItem.viewCounter} просмотр"
                                         "2","3","4" -> "${placeItem.viewCounter} просмотра"
                                         else -> "${placeItem.viewCounter} просмотров"

@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.StockCardClass
 import kz.dvij.dvij_compose3.navigation.STOCK_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -33,7 +34,7 @@ class StockCard (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun StockCard (navController: NavController, stockItem: StockAdsClass, stockKey: MutableState<String>) {
+    fun StockCard (navController: NavController, stockItem: StockCardClass, stockKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
 

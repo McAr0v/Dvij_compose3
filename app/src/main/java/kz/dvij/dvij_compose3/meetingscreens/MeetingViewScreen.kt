@@ -27,10 +27,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
-import kz.dvij.dvij_compose3.elements.ConfirmDialog
-import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
-import kz.dvij.dvij_compose3.elements.PlacesCard
-import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
+import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
@@ -42,6 +39,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
     val placesDatabaseManager = PlacesDatabaseManager(act)
     private val placeCard = PlacesCard(act)
+    private val ownerCard = OwnerCard(act)
 
     @SuppressLint("NotConstructor")
     @Composable
@@ -518,7 +516,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                SpacerTextWithLine(headline = stringResource(id = R.string.meeting_call_org))
+                SpacerTextWithLine(headline = "Забронировать посещение")
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -615,6 +613,21 @@ class MeetingViewScreen(val act: MainActivity) {
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
+
+                SpacerTextWithLine(headline = "Организитор")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // КАРТОЧКА СОЗДАТЕЛЯ
+
+                if (meetingInfo.value.ownerKey != null && meetingInfo.value.ownerKey != "null" && meetingInfo.value.ownerKey != ""){
+
+                    ownerCard.OwnerCardView(userKey = meetingInfo.value.ownerKey!!)
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                }
+
 
                 // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 

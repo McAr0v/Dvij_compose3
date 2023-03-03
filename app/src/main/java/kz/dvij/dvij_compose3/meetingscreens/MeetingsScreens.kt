@@ -22,6 +22,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.util.*
@@ -34,6 +35,10 @@ class MeetingsScreens (val act: MainActivity) {
 
     // создаем мероприятие по умолчанию
     private val default = MeetingsAdsClass (
+        description = "Default"
+    )
+
+    private val defaultCardMeeting = MeetingsCardClass (
         description = "Default"
     )
 
@@ -88,7 +93,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         // инициализируем список мероприятий
         val meetingsList = remember {
-            mutableStateOf(listOf<MeetingsAdsClass>())
+            mutableStateOf(listOf<MeetingsCardClass>())
         }
 
 
@@ -142,7 +147,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                 // ---- ЕСЛИ ЗАГРУЗИЛИСЬ МЕРОПРИЯТИЯ С БД --------
 
-                if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
+                if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(defaultCardMeeting)){
 
                     // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -158,7 +163,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                         items(meetingsList.value){ item ->
 
-                            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(default)){
+                            if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(defaultCardMeeting)){
                                 // сам шаблон карточки мероприятия
                                 act.meetingsCard.MeetingCard(
                                     navController = navController,
@@ -170,7 +175,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                         }
                     }
-                } else if (meetingsList.value == listOf(default)){
+                } else if (meetingsList.value == listOf(defaultCardMeeting)){
 
                     // ----- ЕСЛИ НЕТ МЕРОПРИЯТИЙ -------
 
@@ -235,7 +240,7 @@ class MeetingsScreens (val act: MainActivity) {
         // инициализируем пустой список мероприятий
 
         val myMeetingsList = remember {
-            mutableStateOf(listOf<MeetingsAdsClass>())
+            mutableStateOf(listOf<MeetingsCardClass>())
         }
 
         // считываем с БД мои мероприятия
@@ -260,7 +265,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                 // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ МЕРОПРИЯТИЯ ---------
 
-                if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(default)){
+                if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(defaultCardMeeting)){
 
                     // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -276,7 +281,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                         items(myMeetingsList.value ){ item ->
 
-                            if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(default)){
+                            if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(defaultCardMeeting)){
 
                                 act.meetingsCard.MeetingCard(
                                     navController = navController,
@@ -288,7 +293,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                         }
                     }
-                } else if (myMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+                } else if (myMeetingsList.value == listOf(defaultCardMeeting) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
                     // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
@@ -405,7 +410,7 @@ class MeetingsScreens (val act: MainActivity) {
         // Инициализируем список мероприятий
 
         val favMeetingsList = remember {
-            mutableStateOf(listOf<MeetingsAdsClass>())
+            mutableStateOf(listOf<MeetingsCardClass>())
         }
 
         // Считываем с базы данных избранные мероприятия
@@ -427,7 +432,7 @@ class MeetingsScreens (val act: MainActivity) {
 
             // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
 
-            if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(default)){
+            if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(defaultCardMeeting) && act.mAuth.currentUser != null){
 
                 LazyColumn(
                     modifier = Modifier
@@ -437,7 +442,7 @@ class MeetingsScreens (val act: MainActivity) {
                     verticalArrangement = Arrangement.Top
                 ){
 
-                    if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(default)){
+                    if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(defaultCardMeeting)){
 
                         // Шаблон для каждого мероприятия
 
@@ -451,7 +456,7 @@ class MeetingsScreens (val act: MainActivity) {
 
                     }
                 }
-            } else if (favMeetingsList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+            } else if (favMeetingsList.value == listOf(defaultCardMeeting) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
                 // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 

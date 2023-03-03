@@ -30,13 +30,8 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
-import kz.dvij.dvij_compose3.elements.ConfirmDialog
-import kz.dvij.dvij_compose3.elements.HeadlineAndDesc
-import kz.dvij.dvij_compose3.elements.IconText
-import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.elements.*
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
 import kz.dvij.dvij_compose3.navigation.PLACES_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -45,6 +40,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class PlaceViewScreen (val act: MainActivity) {
+
+    private val ownerCard = OwnerCard(act)
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotConstructor")
@@ -96,20 +93,20 @@ class PlaceViewScreen (val act: MainActivity) {
 
         // инициализируем список мероприятий этого заведения
         val meetingsList = remember {
-            mutableStateOf(listOf<MeetingsAdsClass>())
+            mutableStateOf(listOf<MeetingsCardClass>())
         }
 
         // инициализируем список акций
         val stockList = remember {
-            mutableStateOf(listOf<StockAdsClass>())
+            mutableStateOf(listOf<StockCardClass>())
         }
 
-        val defaultMeeting = MeetingsAdsClass (
+        val defaultMeeting = MeetingsCardClass (
             description = "Default"
         )
 
         // создаем акцию по умолчанию
-        val defaultStock = StockAdsClass (
+        val defaultStock = StockCardClass (
             description = "Default"
         )
 
@@ -666,7 +663,19 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    SpacerTextWithLine(headline = "Создатель")
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // КАРТОЧКА СОЗДАТЕЛЯ
+
+                    if (placeInfo.value.owner != null && placeInfo.value.owner != "null" && placeInfo.value.owner != ""){
+
+                        ownerCard.OwnerCardView(userKey = placeInfo.value.owner!!)
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                    }
 
 
 

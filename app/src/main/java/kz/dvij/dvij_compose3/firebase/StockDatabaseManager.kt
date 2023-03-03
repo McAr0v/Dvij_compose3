@@ -31,6 +31,10 @@ class StockDatabaseManager (val act: MainActivity) {
         description = "Default"
     )
 
+    val defaultStockCard = StockCardClass (
+        description = "Default"
+    )
+
     // ------ ФУНКЦИЯ ПУБЛИКАЦИИ АКЦИЙ --------
 
     fun publishStock(filledStock: StockAdsClass, callback: (result: Boolean)-> Unit){
@@ -140,7 +144,7 @@ class StockDatabaseManager (val act: MainActivity) {
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ ФИЛЬТРОВАННЫХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 
     fun readFilteredStockDataFromDb(
-        stockList: MutableState<List<StockAdsClass>>,
+        stockList: MutableState<List<StockCardClass>>,
         cityForFilter: MutableState<String>,
         stockCategoryForFilter: MutableState<String>,
         stockStartDateForFilter: MutableState<String>,
@@ -167,7 +171,7 @@ class StockDatabaseManager (val act: MainActivity) {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val stockArray = ArrayList<StockAdsClass>() // создаем пустой список акций
+                val stockArray = ArrayList<StockCardClass>() // создаем пустой список акций
 
                 for (item in snapshot.children){
 
@@ -179,16 +183,42 @@ class StockDatabaseManager (val act: MainActivity) {
                         .child("stockData") // добираесся до следующей папки внутри УКПользователя - папка с данными об акции
                         .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
 
-                    // Читаем фильтр из мероприятия
+                    // Читаем фильтр из акции
                     val getFilter = item
                         .child("filterInfo").getValue(FilterStockClass::class.java)
 
 
                     if (stock != null && getFilter != null){
 
+                        // Читаем счетчик добавивших в избранное
+                        val getFavCounter = item
+                            .child("AddedToFavorites").childrenCount
+
+
+                        val finishFilledStock = StockCardClass(
+
+                            image = stock.image,
+                            headline = stock.headline,
+                            description = stock.description,
+                            category = stock.category,
+                            keyStock = stock.keyStock,
+                            keyPlace = stock.keyPlace,
+                            keyCreator = stock.keyCreator,
+                            city = stock.city,
+                            startDate = stock.startDate,
+                            finishDate = stock.finishDate,
+                            inputHeadlinePlace = stock.inputHeadlinePlace,
+                            inputAddressPlace = stock.inputAddressPlace,
+                            createTime = stock.createTime,
+                            startDateNumber = stock.startDateNumber,
+                            finishDateNumber = stock.finishDateNumber,
+                            counterInFav = getFavCounter.toString()
+
+                        )
+
                         // читаем числа даты для сортировки ГодМесяцДень
-                        val startDataNumber = stock.startDateNumber!!
-                        val finishDataNumber = stock.finishDateNumber!!
+                        val startDataNumber = finishFilledStock.startDateNumber!!
+                        val finishDataNumber = finishFilledStock.finishDateNumber!!
 
                         // ---- ЕСЛИ ДАТЫ НАЧАЛА И КОНЦА ПЕРИОДА ЕСТЬ, ТО
 
@@ -222,8 +252,8 @@ class StockDatabaseManager (val act: MainActivity) {
                                     filterFunctions.createStockFilter(
                                         city = cityForFilter.value, // город, который выбрал для фильтра пользователь
                                         category = stockCategoryForFilter.value, // категория, которую выбрал пользователь для фильтра
-                                        startDate = stock.startDate!!, // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
-                                        finishDate = stock.finishDate!! // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                        startDate = finishFilledStock.startDate!!, // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
+                                        finishDate = finishFilledStock.finishDate!! // дата из БД, чтобы фильтр совпал с фильтром из БД и акция подошла
                                     )
 
                                 } else {
@@ -249,12 +279,12 @@ class StockDatabaseManager (val act: MainActivity) {
 
                                 if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                    if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                    if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                         act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                            stockKey = stock.keyStock,
-                                            imageUrl = stock.image,
-                                            placeKey = stock.keyPlace
+                                            stockKey = finishFilledStock.keyStock,
+                                            imageUrl = finishFilledStock.image,
+                                            placeKey = finishFilledStock.keyPlace
                                         ) {
 
                                             if (it) {
@@ -272,7 +302,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                     }
 
                                 } else {
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -280,12 +310,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategoryStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -303,7 +333,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -311,12 +341,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategoryFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -334,7 +364,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -342,12 +372,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityStartFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -365,7 +395,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -373,12 +403,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityCategory == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -396,7 +426,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -404,12 +434,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -427,7 +457,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -435,12 +465,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.cityStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -458,7 +488,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -466,12 +496,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.city == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -489,7 +519,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -497,12 +527,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryStartFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -520,7 +550,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -528,12 +558,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryStart == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -551,7 +581,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -559,12 +589,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.categoryFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -582,7 +612,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -590,12 +620,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.startFinish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -613,7 +643,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -621,12 +651,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.category == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -644,7 +674,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -652,12 +682,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.finish == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -675,7 +705,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -683,12 +713,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.start == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -706,7 +736,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -714,12 +744,12 @@ class StockDatabaseManager (val act: MainActivity) {
                                 if (getFilter.noFilter == filter) {
                                     if (finishDataNumber.toInt() < todayInRightFormat.toInt()) {
 
-                                        if (stock.keyStock != null && stock.keyPlace != null && stock.image != null) {
+                                        if (finishFilledStock.keyStock != null && finishFilledStock.keyPlace != null && finishFilledStock.image != null) {
 
                                             act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                                stockKey = stock.keyStock,
-                                                imageUrl = stock.image,
-                                                placeKey = stock.keyPlace
+                                                stockKey = finishFilledStock.keyStock,
+                                                imageUrl = finishFilledStock.image,
+                                                placeKey = finishFilledStock.keyPlace
                                             ) {
 
                                                 if (it) {
@@ -737,7 +767,7 @@ class StockDatabaseManager (val act: MainActivity) {
                                         }
                                     } else {
 
-                                        stockArray.add(stock)
+                                        stockArray.add(finishFilledStock)
                                     }
                                 }
                             }
@@ -746,7 +776,7 @@ class StockDatabaseManager (val act: MainActivity) {
                 }
 
                 if (stockArray.isEmpty()){
-                    stockList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
+                    stockList.value = listOf(defaultStockCard) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
                 } else {
                     val sortedList = filterFunctions.sortedStockList(stockArray, stockSortingForFilter.value)
                     stockList.value = sortedList // если добавились акции в список, то этот новый список и передаем
@@ -1050,14 +1080,14 @@ class StockDatabaseManager (val act: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ АКЦИЙ --------
 
-    fun readStockMyDataFromDb(stockList: MutableState<List<StockAdsClass>>){
+    fun readStockMyDataFromDb(stockList: MutableState<List<StockCardClass>>){
 
         stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val stockArray = ArrayList<StockAdsClass>()
+                val stockArray = ArrayList<StockCardClass>()
 
                 for (item in snapshot.children){
 
@@ -1070,12 +1100,42 @@ class StockDatabaseManager (val act: MainActivity) {
                             .child("stockData") // добираемся до следующей папки внутри УКПользователя - папка с данными об акции
                             .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акции
 
-                        if (stock != null) {stockArray.add(stock)} //  если акция не нал, то добавляем в список-черновик
+                        if (stock != null) {
+
+                            // Читаем счетчик добавивших в избранное
+                            val getFavCounter = item
+                                .child("AddedToFavorites").childrenCount
+
+
+                            val finishFilledStock = StockCardClass(
+
+                                image = stock.image,
+                                headline = stock.headline,
+                                description = stock.description,
+                                category = stock.category,
+                                keyStock = stock.keyStock,
+                                keyPlace = stock.keyPlace,
+                                keyCreator = stock.keyCreator,
+                                city = stock.city,
+                                startDate = stock.startDate,
+                                finishDate = stock.finishDate,
+                                inputHeadlinePlace = stock.inputHeadlinePlace,
+                                inputAddressPlace = stock.inputAddressPlace,
+                                createTime = stock.createTime,
+                                startDateNumber = stock.startDateNumber,
+                                finishDateNumber = stock.finishDateNumber,
+                                counterInFav = getFavCounter.toString()
+
+                            )
+
+
+                            stockArray.add(finishFilledStock)
+                        } //  если акция не нал, то добавляем в список-черновик
                     }
                 }
 
                 if (stockArray.isEmpty()){
-                    stockList.value = listOf(default) // если в списке ничего нет, то добавляем акцию по умолчанию
+                    stockList.value = listOf(defaultStockCard) // если в списке ничего нет, то добавляем акцию по умолчанию
                 } else {
                     stockList.value = stockArray // если список не пустой, то возвращаем мои акции с БД
                 }
@@ -1089,14 +1149,14 @@ class StockDatabaseManager (val act: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ АКЦИЙ --------
 
-    fun readStockFavDataFromDb(stockList: MutableState<List<StockAdsClass>>){
+    fun readStockFavDataFromDb(stockList: MutableState<List<StockCardClass>>){
 
         stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val stockArray = ArrayList<StockAdsClass>()
+                val stockArray = ArrayList<StockCardClass>()
 
                 for (item in snapshot.children){
 
@@ -1122,15 +1182,41 @@ class StockDatabaseManager (val act: MainActivity) {
                             // если ключи совпали, проверяем акцию на нал
                             if (stock != null) {
 
+                                // Читаем счетчик добавивших в избранное
+                                val getFavCounter = item
+                                    .child("AddedToFavorites").childrenCount
+
+
+                                val finishFilledStock = StockCardClass(
+
+                                    image = stock.image,
+                                    headline = stock.headline,
+                                    description = stock.description,
+                                    category = stock.category,
+                                    keyStock = stock.keyStock,
+                                    keyPlace = stock.keyPlace,
+                                    keyCreator = stock.keyCreator,
+                                    city = stock.city,
+                                    startDate = stock.startDate,
+                                    finishDate = stock.finishDate,
+                                    inputHeadlinePlace = stock.inputHeadlinePlace,
+                                    inputAddressPlace = stock.inputAddressPlace,
+                                    createTime = stock.createTime,
+                                    startDateNumber = stock.startDateNumber,
+                                    finishDateNumber = stock.finishDateNumber,
+                                    counterInFav = getFavCounter.toString()
+
+                                )
+
                                 //  если акция не нал, то добавляем в список-черновик
-                                stockArray.add(stock)
+                                stockArray.add(finishFilledStock)
                             }
                         }
                     }
                 }
 
                 if (stockArray.isEmpty()){
-                    stockList.value = listOf(default) // если в списке ничего нет, то добавляем акцию по умолчанию
+                    stockList.value = listOf(defaultStockCard) // если в списке ничего нет, то добавляем акцию по умолчанию
                 } else {
                     stockList.value = stockArray // если список не пустой, то возвращаем избранные акции с БД
                 }
@@ -1218,13 +1304,13 @@ class StockDatabaseManager (val act: MainActivity) {
 
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ АКЦИЙ С БАЗЫ ДАННЫХ --------
 
-    fun readStockInPlaceFromDb(stockList: MutableState<List<StockAdsClass>>, placeKey: String){
+    fun readStockInPlaceFromDb(stockList: MutableState<List<StockCardClass>>, placeKey: String){
 
         stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val stockArray = ArrayList<StockAdsClass>() // создаем пустой список акций
+                val stockArray = ArrayList<StockCardClass>() // создаем пустой список акций
 
                 for (item in snapshot.children){
 
@@ -1236,12 +1322,42 @@ class StockDatabaseManager (val act: MainActivity) {
                         .child("stockData") // добираесся до следующей папки внутри УКПользователя - папка с данными об акции
                         .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
 
-                    if (stock != null && stock.keyPlace == placeKey) {stockArray.add(stock)} // если акция не пустая, добавляем в список
+                    if (stock != null && stock.keyPlace == placeKey) {
+
+                        // Читаем счетчик добавивших в избранное
+                        val getFavCounter = item
+                            .child("AddedToFavorites").childrenCount
+
+
+                        val finishFilledStock = StockCardClass(
+
+                            image = stock.image,
+                            headline = stock.headline,
+                            description = stock.description,
+                            category = stock.category,
+                            keyStock = stock.keyStock,
+                            keyPlace = stock.keyPlace,
+                            keyCreator = stock.keyCreator,
+                            city = stock.city,
+                            startDate = stock.startDate,
+                            finishDate = stock.finishDate,
+                            inputHeadlinePlace = stock.inputHeadlinePlace,
+                            inputAddressPlace = stock.inputAddressPlace,
+                            createTime = stock.createTime,
+                            startDateNumber = stock.startDateNumber,
+                            finishDateNumber = stock.finishDateNumber,
+                            counterInFav = getFavCounter.toString()
+
+                        )
+
+                        stockArray.add(finishFilledStock)
+
+                    } // если акция не пустая, добавляем в список
 
                 }
 
                 if (stockArray.isEmpty()){
-                    stockList.value = listOf(default) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
+                    stockList.value = listOf(defaultStockCard) // если в список-черновик ничего не добавилось, то добавляем акцию по умолчанию
                 } else {
                     stockList.value = stockArray // если добавились акции в список, то этот новый список и передаем
                 }

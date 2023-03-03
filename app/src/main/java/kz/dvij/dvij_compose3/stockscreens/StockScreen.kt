@@ -27,6 +27,7 @@ import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.StockCardClass
 import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -42,6 +43,10 @@ class StockScreen(val act: MainActivity) {
 
     // создаем акцию по умолчанию
     private val default = StockAdsClass (
+        description = "Default"
+    )
+
+    private val defaultStockCard = StockCardClass(
         description = "Default"
     )
 
@@ -92,7 +97,7 @@ class StockScreen(val act: MainActivity) {
 
         // инициализируем список акций
         val stockList = remember {
-            mutableStateOf(listOf<StockAdsClass>())
+            mutableStateOf(listOf<StockCardClass>())
         }
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
@@ -146,7 +151,7 @@ class StockScreen(val act: MainActivity) {
 
                 // ---- ЕСЛИ ЗАГРУЗИЛИСЬ АКЦИИ С БД --------
 
-                if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+                if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStockCard)){
 
                     // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -159,7 +164,7 @@ class StockScreen(val act: MainActivity) {
                     ){
 
                         // для каждого элемента из списка указываем шаблон для отображения
-                        if (stockList.value.isNotEmpty() && stockList.value != listOf(default)){
+                        if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStockCard)){
 
                             items(stockList.value){ item ->
 
@@ -170,7 +175,7 @@ class StockScreen(val act: MainActivity) {
                         }
 
                     }
-                } else if (stockList.value == listOf(default)){
+                } else if (stockList.value == listOf(defaultStockCard)){
 
                     // ----- ЕСЛИ НЕТ АКЦИЙ -------
 
@@ -233,7 +238,7 @@ class StockScreen(val act: MainActivity) {
         // инициализируем пустой список акций
 
             val myStockList = remember {
-                mutableStateOf(listOf<StockAdsClass>())
+                mutableStateOf(listOf<StockCardClass>())
             }
 
             // считываем с БД мои акции
@@ -258,7 +263,7 @@ class StockScreen(val act: MainActivity) {
 
                     // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ АКЦИИ ---------
 
-                    if (myStockList.value.isNotEmpty() && myStockList.value != listOf(default)){
+                    if (myStockList.value.isNotEmpty() && myStockList.value != listOf(defaultStockCard)){
 
                         // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -273,10 +278,17 @@ class StockScreen(val act: MainActivity) {
                             // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
 
                             items(myStockList.value){ item ->
-                                act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+
+                                if (myStockList.value.isNotEmpty() && myStockList.value != listOf(defaultStockCard)){
+
+                                    act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+
+                                }
+
+
                             }
                         }
-                    } else if (myStockList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+                    } else if (myStockList.value == listOf(defaultStockCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
                         // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
@@ -387,7 +399,7 @@ class StockScreen(val act: MainActivity) {
         // Инициализируем список акций
 
         val favStockList = remember {
-            mutableStateOf(listOf<StockAdsClass>())
+            mutableStateOf(listOf<StockCardClass>())
         }
 
         // Считываем с базы данных избранные акции
@@ -409,7 +421,7 @@ class StockScreen(val act: MainActivity) {
 
             // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
 
-            if (favStockList.value.isNotEmpty() && favStockList.value != listOf(default)){
+            if (favStockList.value.isNotEmpty() && favStockList.value != listOf(defaultStockCard)){
 
                 LazyColumn(
                     modifier = Modifier
@@ -422,10 +434,15 @@ class StockScreen(val act: MainActivity) {
                     // Шаблон для каждой акции
 
                     items(favStockList.value){ item ->
-                       stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                        if (favStockList.value.isNotEmpty() && favStockList.value != listOf(defaultStockCard)){
+
+                            stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+
+                        }
+
                     }
                 }
-            } else if (favStockList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+            } else if (favStockList.value == listOf(defaultStockCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
                 // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
