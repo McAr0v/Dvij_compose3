@@ -89,7 +89,7 @@ class ChooseCityNavigation (val act: MainActivity) {
 
         Column( // ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КОЛОКНКУ
             modifier = Modifier
-                .background(Grey100) // цвет фона
+                .background(Grey_OnBackground) // цвет фона
                 .fillMaxWidth() // занимаем всю ширину
                 .padding(20.dp) // отступы
         ) {
@@ -103,7 +103,7 @@ class ChooseCityNavigation (val act: MainActivity) {
 
             androidx.compose.material.Text( // ЗАГОЛОВОК ГОРОД
                 text = stringResource(id = R.string.city), // текст заголовка
-                color = Grey40, // цвет заголовка
+                color = Grey_Text, // цвет заголовка
                 style = Typography.labelMedium // стиль заголовка
             )
 
@@ -142,7 +142,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 // -------------  Иконка возле текста ------------------
 
                 androidx.compose.material3.Icon(
-                    tint = Grey40, // цвет иконки
+                    tint = WhiteDvij, // цвет иконки
                     painter = painterResource(id = R.drawable.ic_baseline_places), // задаем иконку
                     contentDescription = stringResource(id = R.string.cd_location) // описание для слабовидящих
                 )
@@ -156,23 +156,21 @@ class ChooseCityNavigation (val act: MainActivity) {
 
                     androidx.compose.material.Text(
                         text = cityName.value, // из chosenCity достаем название города
-                        style = Typography.labelLarge, // Стиль текста
+                        style = Typography.bodyMedium, // Стиль текста
                         modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
-                        color = Grey40 // цвет текста
+                        color = WhiteDvij // цвет текста
                     )
 
                 } else {
 
                     androidx.compose.material.Text(
                         text = "Выбери город", // из chosenCity достаем название города
-                        style = Typography.labelLarge, // Стиль текста
+                        style = Typography.bodyMedium, // Стиль текста
                         modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
-                        color = Grey40 // цвет текста
+                        color = Grey_Text // цвет текста
                     )
 
                 }
-
-
 
                 // разделитель между текстом и иконкой
                 Spacer(modifier = Modifier.width(15.dp))
@@ -180,9 +178,9 @@ class ChooseCityNavigation (val act: MainActivity) {
                 // ------------- ИКОНКА РЕДАКТИРОВАТЬ -------------------
 
                 androidx.compose.material3.Icon(
-                    tint = Grey40, // цвет иконки
-                    painter = painterResource(id = R.drawable.ic_edit), // задаем иконку
-                    contentDescription = stringResource(id = R.string.to_change_location) // описание для слабовидящих
+                    tint = WhiteDvij, // цвет иконки
+                    painter = painterResource(id = R.drawable.ic_right), // задаем иконку
+                    contentDescription = stringResource(id = R.string.cd_location) // описание для слабовидящих
                 )
             }
         }

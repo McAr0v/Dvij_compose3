@@ -38,7 +38,7 @@ fun BottomNavigationMenu (navController: NavController) {
 
     BottomNavigation (
         // Здесь обычная настройка, как у текста, Column и тд. Я передал только цвет фона
-        backgroundColor = Grey100
+        backgroundColor = Grey_OnBackground
             ) {
 
         // определяем текущий маршрут как состояние, он не может быть статичным.
@@ -74,14 +74,14 @@ fun BottomNavigationMenu (navController: NavController) {
                 icon = {
                     // сама иконка
                     Icon(painter = painterResource(id = item.icon),
-                        tint = if (item.navRoute == currentRoute){PrimaryColor} else {Grey10}, // условие цвета, без него будет просто статично окрашена
+                        tint = if (item.navRoute == currentRoute){YellowDvij} else {WhiteDvij}, // условие цвета, без него будет просто статично окрашена
                         contentDescription = stringResource(id = item.title), // описание иконки для слабовидящих. Сделаем здесь текст заголовка итема
                         modifier = Modifier
                             .size(24.dp) // размер иконки
                             .padding(bottom = 2.dp)) // отступ от текста под иконкой
                        },
-                selectedContentColor = PrimaryColor, // цвет выбранного элемента
-                unselectedContentColor = Grey10 // цвет невыбранного элемента
+                selectedContentColor = YellowDvij, // цвет выбранного элемента
+                unselectedContentColor = WhiteDvij // цвет невыбранного элемента
 
             )
         }

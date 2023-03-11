@@ -5,6 +5,17 @@ import androidx.compose.ui.graphics.Color
 
 // Primary Colors - цвета из дизайн-файла Figma
 
+
+val YellowDvij = Color(0xFFFED32C)
+val Grey_OnBackground = Color(0xFF1A1E23)
+val Grey_Background = Color(0xFF202329)
+val Grey_ForCards = Color(0xFF2B3138)
+val Grey_Text = Color(0xFF6E7177)
+val WhiteDvij = Color(0xFFFCFDFE)
+val AttentionRed = Color(0xFFFA5C47)
+
+
+
 val PrimaryColor = Color(0xFFFF7D92)
 
 val Primary100 = Color(0xFF32191D)

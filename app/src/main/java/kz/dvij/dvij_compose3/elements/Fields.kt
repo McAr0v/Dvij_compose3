@@ -45,7 +45,7 @@ fun fieldEmailComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) } // Значение цвета фокуса по умолчанию
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ EMAIL -----------------
@@ -56,14 +56,14 @@ fun fieldEmailComponent (
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value!!.lowercase(), // значение text // lowerCase() - делает все буквы строчными
@@ -79,38 +79,39 @@ fun fieldEmailComponent (
             if (!newText.contains("@")) {
 
                 isTextError.value = true // объявляем состояние ошибки
-                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                focusColor.value = AttentionRed // красим границы формы в цвет ошибки
                 errorMassage.value = act.resources.getString(R.string.em_dog) // передаем текст ошибки
 
             } else if (!newText.contains(".")){ // если не содежрит .
 
                 isTextError.value = true // объявляем состояние ошибки
-                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                focusColor.value = AttentionRed  // красим границы формы в цвет ошибки
                 errorMassage.value = act.resources.getString(R.string.em_dot) // передаем текст ошибки
 
             } else if (newText.contains(" ")){ // если содержит пробел
 
                 isTextError.value = true // объявляем состояние ошибки
-                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                focusColor.value = AttentionRed  // красим границы формы в цвет ошибки
                 errorMassage.value = act.resources.getString(R.string.em_space) // передаем текст ошибки
 
             } else { // когда все нормально
 
                 isTextError.value = false // объявляем, что ошибки нет
-                focusColor.value = SuccessColor // цвет фокуса переводим в нормальный
+                focusColor.value = YellowDvij // цвет фокуса переводим в нормальный
             }
 
         },
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -125,7 +126,7 @@ fun fieldEmailComponent (
                 Icon(
                     painter = painterResource(R.drawable.ic_error), // иконка ошибки
                     contentDescription = stringResource(R.string.cd_error_icon), // описание для слабовидящих
-                    tint = AttentionColor, // цвет иконки
+                    tint = AttentionRed, // цвет иконки
                     modifier = Modifier.size(20.dp) // размер иконки
                 )
             } else if (!isTextError.value && text.value != "") {
@@ -138,7 +139,7 @@ fun fieldEmailComponent (
             }
         },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
 
@@ -164,7 +165,7 @@ fun fieldEmailComponent (
 
             Text(
                 text = stringResource(id = R.string.email_example), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -175,7 +176,7 @@ fun fieldEmailComponent (
             Icon(
                 painter = painterResource(id = R.drawable.ic_email), // сама иконка
                 contentDescription = stringResource(id = R.string.cd_email_icon), // описание для слабовидящих
-                tint = Grey60, // цвет иконки
+                tint = Grey_Text, // цвет иконки
                 modifier = Modifier.size(20.dp) // размер иконки
             )
         },
@@ -194,7 +195,7 @@ fun fieldEmailComponent (
     if (isTextError.value) {
         Text(
             text = errorMassage.value, // текст ошибки
-            color = AttentionColor, // цвет текста ошибки
+            color = AttentionRed, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
     }
@@ -222,7 +223,7 @@ fun fieldPasswordComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
     // создаем переменную для скрытия или отображения пароля
 
@@ -238,14 +239,14 @@ fun fieldPasswordComponent (
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value, // значение text
@@ -261,27 +262,27 @@ fun fieldPasswordComponent (
             if (newText.length < 6) {
 
                 isTextError.value = true // объявляем состояние ошибки
-                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                focusColor.value = AttentionRed // красим границы формы в цвет ошибки
                 errorMassage.value = act.resources.getString(R.string.exception_password_need_more_letters) // передаем текст ошибки
 
             } else { // когда все нормально
 
                 isTextError.value = false // объявляем, что ошибки нет
-                focusColor.value = SuccessColor // цвет фокуса переводим в нормальный
+                focusColor.value = YellowDvij // цвет фокуса переводим в нормальный
             }
 
         },
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
-
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
         ),
 
         // иконка справа от текста
@@ -305,13 +306,13 @@ fun fieldPasswordComponent (
                             R.string.cd_hide_password // открыт, но иконка о том, чтобы закрыть видимость
                         }
                     ),
-                    tint = Grey00, // цвет иконки
+                    tint = Grey_Text, // цвет иконки
                     modifier = Modifier.size(20.dp) // размер иконки
                 )
             }
         },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -333,7 +334,7 @@ fun fieldPasswordComponent (
             // подсказка для пользователей
             Text(
                 text = stringResource(id = R.string.enter_password), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -342,7 +343,7 @@ fun fieldPasswordComponent (
             Icon(
                 painter = painterResource(id = R.drawable.ic_key), // сама иконка
                 contentDescription = stringResource(id = R.string.cd_password_icon), // описание для слабовидящих
-                tint = Grey60, // цвет иконки
+                tint = Grey_Text, // цвет иконки
                 modifier = Modifier.size(20.dp) // размер иконки
             )
         },
@@ -359,7 +360,7 @@ fun fieldPasswordComponent (
     if (isTextError.value) {
         Text(
             text = errorMassage.value, // текст ошибки
-            color = AttentionColor, // цвет текста ошибки
+            color = AttentionRed, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
     }

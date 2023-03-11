@@ -72,11 +72,11 @@ fun TabMenu (
             indicator = { pos ->
                         TabRowDefaults.Indicator(
                             Modifier.pagerTabIndicatorOffset(pagerState, pos),
-                            color = PrimaryColor
+                            color = YellowDvij
                         )
             },
-            contentColor = Grey10, // цвет контента
-            backgroundColor = Grey100 // цвет фона табов
+            contentColor = WhiteDvij, // цвет контента
+            backgroundColor = Grey_OnBackground // цвет фона табов
         ) {
             // начинаем отрабатывать для каждого таба дизайн
             tabItem.forEachIndexed{index, tabItems ->
@@ -86,11 +86,11 @@ fun TabMenu (
                         pagerState.animateScrollToPage(index) // сам переход на страницу index, которую указываем ниже в HorizontalPager
                     }
                               },
-                    selectedContentColor = PrimaryColor, // цвет выбранного таба
-                    unselectedContentColor = Grey30, // цвет не выбранного тада
+                    selectedContentColor = YellowDvij, // цвет выбранного таба
+                    unselectedContentColor = WhiteDvij, // цвет не выбранного тада
                     text = {
                         Text(text = stringResource(id = tabItems.title), // Заголовок берем из табов
-                            style = Typography.labelMedium) // указываем стиль текста
+                            style = Typography.bodySmall) // указываем стиль текста
                     }
 
                 )

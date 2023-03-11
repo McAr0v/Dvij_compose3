@@ -24,7 +24,9 @@ import com.google.firebase.auth.FirebaseUser
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
+import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.dialogs.CitiesList
+import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.SpacerTextWithLine
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.navigation.*
@@ -406,75 +408,60 @@ fun ProfileScreen (
 
         Column(
             modifier = Modifier
-                .background(Grey95)
+                .background(Grey_Background)
                 .fillMaxSize()
                 .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
 
-            // ----- ИЛЛЮСТРАЦИЯ ---------
-
-            Image(
-                //modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.verifi_email),
-                contentDescription = stringResource(id = R.string.cd_illustration)
-            )
-
-
-            Spacer(modifier = Modifier.height(40.dp)) // разделитель
-
-
-            // ------- ТЕКСТ НА СТРАНИЦЕ --------------
+            // -------------  ЗАГОЛОВОК ПРОВЕРЬ ПОЧТУ И АКТИВИРУЙ АККАУНТ ---------------
 
             Text(
-                text = stringResource(id = R.string.email_verify_toast), // имя из базы данных firebase
-                style = Typography.bodyLarge, // стиль текста
-                color = Grey00, // цвет
-                textAlign = TextAlign.Center // выравнивание по центру
+                text = stringResource(id = R.string.verify_email_title), //"Активируй аккаунт"
+                style = Typography.titleLarge, // стиль заголовка
+                color = WhiteDvij, // цвет заголовка
+                textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(40.dp)) // разделитель между текстом и иконкой
 
-            // -------- КНОПКА ПЕРЕХОДА НА СТРАНИЦУ ВХОДА -------------
+            Spacer(modifier = Modifier.height(30.dp)) // разделитель между заголовком и полями для ввода
 
-            Button(
-                onClick = {
-                    // функции на нажатие
 
-                    navController.navigate(LOG_IN_ROOT)
+            // ------ ДОПОЛНИТЕЛЬНОЕ ОПИСАНИЕ ПОД ЗАГОЛОВКОМ ДЛЯ ПОДТВЕРЖДЕНИЯ ПОЧТЫ ---------------
 
-                },
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка занимает всю ширину
-                    .height(50.dp)// высота - 50
-                    .padding(horizontal = 30.dp), // отступы от краев
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
+            Text(
+                text = stringResource(id = R.string.email_verify_toast),
+                style = Typography.bodySmall, // стиль текста
+                color = WhiteDvij, // цвет текста
+                textAlign = TextAlign.Start
+            )
 
-                    // цвета кнопки
-                    backgroundColor = PrimaryColor,
-                    contentColor = Grey100
 
-                )) {
+            Spacer(modifier = Modifier.height(60.dp)) // разделитель между полями
 
-                // Иконка в кнопке
+            // --------- КНОПКА ВХОД -------------
 
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_login), // иконка
-                    contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                    tint = Grey100 // цвет иконки
-                )
 
-                Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
-
-                // Текст кнопки
-
-                Text(
-                    text = stringResource(id = R.string.to_login), // текст кнопки
-                    style = Typography.labelMedium // стиль текста
-                )
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.i_activate_profile)
+            ) {
+                navController.navigate(LOG_IN_ROOT)
             }
+
+
+            Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+
+            // --------- КНОПКА ВЕРНУТЬСЯ НА ГЛАВНУЮ -------------
+
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.go_to_home),
+                typeButton = SECONDARY
+            ) {
+                navController.navigate(MEETINGS_ROOT)
+            }
+
         }
     }
 
@@ -484,14 +471,61 @@ fun ProfileScreen (
 
         Column(
             modifier = Modifier
-                .background(Grey95)
+                .background(Grey_Background)
                 .fillMaxSize()
                 .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
 
-            // ----- ИЛЛЮСТРАЦИЯ ---------
+            // -------------  ЗАГОЛОВОК Создай аккаунт ---------------
+
+            Text(
+                text = stringResource(id = R.string.create_or_sign_in), // Создай аккаунт
+                style = Typography.titleLarge, // стиль заголовка
+                color = WhiteDvij, // цвет заголовка
+                textAlign = TextAlign.Start
+            )
+
+
+            Spacer(modifier = Modifier.height(30.dp)) // разделитель между заголовком и полями для ввода
+
+
+            // ------ ДОПОЛНИТЕЛЬНОЕ ОПИСАНИЕ ПОД ЗАГОЛОВКОМ ДЛЯ ПОДТВЕРЖДЕНИЯ ПОЧТЫ ---------------
+
+            Text(
+                text = stringResource(id = R.string.you_must_create_or_sign_in),
+                style = Typography.bodySmall, // стиль текста
+                color = WhiteDvij, // цвет текста
+                textAlign = TextAlign.Start
+            )
+
+
+            Spacer(modifier = Modifier.height(60.dp)) // разделитель между полями
+
+            // --------- КНОПКА ВХОД -------------
+
+
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.to_login)
+            ) {
+                navController.navigate(LOG_IN_ROOT)
+            }
+
+
+            Spacer(modifier = Modifier.height(20.dp)) // разделитель
+
+
+            // --------- КНОПКА ВЕРНУТЬСЯ НА ГЛАВНУЮ -------------
+
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.to_registration),
+                typeButton = SECONDARY
+            ) {
+                navController.navigate(REG_ROOT)
+            }
+
+            /*// ----- ИЛЛЮСТРАЦИЯ ---------
 
             Image(
                 painter = painterResource(id = R.drawable.need_create_account),
@@ -550,7 +584,7 @@ fun ProfileScreen (
                     text = stringResource(id = R.string.to_registration), // текст кнопки
                     style = Typography.labelMedium // стиль текста
                 )
-            }
+            }*/
         }
     }
 }

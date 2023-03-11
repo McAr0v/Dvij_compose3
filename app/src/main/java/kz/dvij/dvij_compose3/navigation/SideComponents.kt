@@ -24,6 +24,11 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.DARK
+import kz.dvij.dvij_compose3.constants.FOR_CARDS
+import kz.dvij.dvij_compose3.constants.SECONDARY
+import kz.dvij.dvij_compose3.elements.ButtonCustom
+import kz.dvij.dvij_compose3.elements.SocialButtonCustom
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -37,14 +42,14 @@ class SideComponents (private val act: MainActivity) {
         Box( // создаем контейнер для логотипа
             modifier = Modifier
                 .fillMaxWidth() // говорим, чтобы занял всю ширину
-                .background(Grey100) // цвет фона контейнера
+                .background(Grey_OnBackground) // цвет фона контейнера
                 .padding(start = 20.dp, end = 20.dp, top = 30.dp, bottom = 20.dp), // паддинги контейнера
             contentAlignment = Alignment.CenterStart // выравнивание
         ){
             Icon( // помещаем логотип как векторную иконку
                 painter = painterResource(id = R.drawable.dvij_logo), // задаем логотип
                 contentDescription = stringResource(id = R.string.cd_logo), // задаем описание для слабослышаших
-                tint = PrimaryColor // окрашиваем логотип
+                tint = YellowDvij // окрашиваем логотип
             )
         }
     }
@@ -57,7 +62,7 @@ class SideComponents (private val act: MainActivity) {
         Column( // создаем контейнер-стобец
             modifier = Modifier
                 .fillMaxSize() // занять максимальный размер (чтобы внизу тоже заполнял осташееся пространство)
-                .background(Grey100) // цвет фона
+                .background(Grey_OnBackground) // цвет фона
                 .padding(20.dp), // отступы со всех сторон
             verticalArrangement = Arrangement.Top, // выравнивание по вертикали
             horizontalAlignment = Alignment.Start // выравнивание по горизонтали (слева)
@@ -68,7 +73,7 @@ class SideComponents (private val act: MainActivity) {
 
             Text(
                 text = stringResource(id = R.string.subscribe), // текст заголовка
-                color = Grey40, // цвет заголовка
+                color = Grey_Text, // цвет заголовка
                 style = Typography.labelMedium // стиль заголовка
             )
 
@@ -80,73 +85,22 @@ class SideComponents (private val act: MainActivity) {
             ) {
                 val context = LocalContext.current // инициализируем контекст для отображения ТОСТОВ. Когда уберу тосты, можно удалить по идее
 
-                // ИКОНКА ИНСТАГРАМ
-
-                IconButton(
-                    onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
-                        Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
-                    }
-                ) {
-                    Icon( // Сама иконка инстаграма
-                        modifier = Modifier
-                            .clip(CircleShape) // делаем круглый фон
-                            .background(Grey95) // фон иконки
-                            .padding(10.dp) // отступ внутри до иконки
-                            .size(25.dp), // размер иконки
-                        painter = painterResource(id = R.drawable.instagram), // сама иконка
-                        contentDescription = stringResource(id = R.string.subscribe_to_instagram), // описание для слабовидящих
-                        tint = Grey00 // цвет иконки
-                    )
+                SocialButtonCustom(icon = R.drawable.instagram) {
+                    Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
                 }
 
                 Spacer(modifier = Modifier.width(10.dp)) // разделитель между иконками
 
-                // ИКОНКА ТЕЛЕГРАМА
-
-                IconButton(
-                    onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
-                        Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
-                    }
-                ) {
-
-                    // Сама иконка Телеграма
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape) // делаем круглый фон
-                            .background(Grey95) // фон иконки
-                            .padding(10.dp) // отступ внутри до иконки
-                            .size(25.dp), // размер иконки
-                        painter = painterResource(id = R.drawable.telegram), // сама иконка
-                        contentDescription = stringResource(id = R.string.subscribe_to_telegram), // описание для слабовидящих
-                        tint = Grey00 // цвет иконки
-                    )
-
+                SocialButtonCustom(icon = R.drawable.telegram) {
+                    Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
                 }
 
                 Spacer(modifier = Modifier.width(10.dp)) // разделитель между иконками
 
-                // Иконка WHATSAPP
-
-                IconButton(
-                    onClick = { // пока заглушка в виде тоста. Надо будет сюда вставить функцию перехода
-                        Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
-                    }
-                ) {
-
-                    // Сама иконка
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape) // делаем круглый фон
-                            .background(Grey95) // фон иконки
-                            .padding(10.dp) // отступ внутри до иконки
-                            .size(25.dp), // размер иконки
-                        painter = painterResource(id = R.drawable.whatsapp), // сама иконка
-                        contentDescription = stringResource(id = R.string.subscribe_to_whatsapp), // описание для слабовидящих
-                        tint = Grey00 // цвет иконки
-                    )
+                SocialButtonCustom(icon = R.drawable.whatsapp) {
+                    Toast.makeText(context, "Сделать нужную функцию", Toast.LENGTH_LONG).show()
                 }
+
             }
         }
     }
@@ -176,7 +130,7 @@ class SideComponents (private val act: MainActivity) {
             Row( // используем строку
                 modifier = Modifier
                     .fillMaxWidth() // занимаем всю ширину
-                    .background(Grey100) // цвет фона
+                    .background(Grey_OnBackground) // цвет фона
                     .padding(20.dp) // отступы
                     .clickable { // действие на нажатие
 
@@ -197,32 +151,37 @@ class SideComponents (private val act: MainActivity) {
 
                 if (userInfo.value.avatar != ""){
 
+                    // --- Если пользователь поменял аватарку сам --
+
                     AsyncImage(
                         model = userInfo.value.avatar,
                         contentDescription = stringResource(id = R.string.icon_user_image),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(60.dp)
-                            .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
                             .clip(CircleShape))
 
                 } else if (loggedUser.photoUrl != null) {
+
+                    // --- Если пользователь имеет аккаунт гугла но не менял аватарку. Грубо говоря подгрузится изображение из гугл
+
                     AsyncImage(
                         model = loggedUser.photoUrl,
                         contentDescription = stringResource(id = R.string.icon_user_image),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(60.dp)
-                            .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
                             .clip(CircleShape))
                 } else {
+
+                    // --- Если нет аватарки -----
+
                     Image(
                         painter = painterResource(id = R.drawable.no_user_image), // по идее сюда надо будет передавать из гугла, или иметь возможность загружать
                         contentScale = ContentScale.Crop,
                         contentDescription = stringResource(id = R.string.cd_avatar), // описание для слабовидящих
                         modifier = Modifier
                             .size(60.dp) // размер аватарки
-                            .border(BorderStroke(2.dp, PrimaryColor), CircleShape)
                             .clip(CircleShape) // делаем ее круглой
                     )
                 }
@@ -240,14 +199,14 @@ class SideComponents (private val act: MainActivity) {
 
                         Text(
                             text = "${userInfo.value.name} ${userInfo.value.surname}", // сюда нужно передавать имя пользователя из БД
-                            color = Grey40, // цвет имени
-                            style = Typography.titleSmall // стиль текста
+                            color = WhiteDvij, // цвет имени
+                            style = Typography.bodyMedium // стиль текста
                         )
 
                         Text(
                             text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
-                            color = Grey40, // цвет Email
-                            style = Typography.labelSmall // стиль текста
+                            color = Grey_Text, // цвет Email
+                            style = Typography.labelMedium // стиль текста
                         )
                     }
 
@@ -261,7 +220,7 @@ class SideComponents (private val act: MainActivity) {
                     ){
                         Text(
                             text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
-                            color = Grey40, // цвет Email
+                            color = Grey_Text, // цвет Email
                             style = Typography.labelMedium // стиль текста
                         )
                     }
@@ -277,14 +236,14 @@ class SideComponents (private val act: MainActivity) {
 
                         Text(
                             text = loggedUser.displayName!!, // сюда нужно передавать имя пользователя из БД
-                            color = Grey40, // цвет имени
-                            style = Typography.titleSmall // стиль текста
+                            color = WhiteDvij, // цвет имени
+                            style = Typography.bodyMedium // стиль текста
                         )
 
                         Text(
                             text = loggedUser.email!!, // сюда нужно передавать email пользователя из БД
-                            color = Grey40, // цвет Email
-                            style = Typography.labelSmall // стиль текста
+                            color = Grey_Text, // цвет Email
+                            style = Typography.labelMedium // стиль текста
                         )
                     }
 
@@ -296,86 +255,96 @@ class SideComponents (private val act: MainActivity) {
                 // ИКОНКА РЕДАКТИРОВАТЬ
 
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_edit), // сама иконка
-                    contentDescription = stringResource(id = R.string.to_change_location), // описание для слабовидящих
-                    tint = Grey40 // цвет иконки
+                    painter = painterResource(id = R.drawable.ic_right), // сама иконка
+                    contentDescription = stringResource(id = R.string.cd_move_to_profile), // описание для слабовидящих
+                    tint = WhiteDvij // цвет иконки
                 )
             }
 
         } else if (loggedUser != null && !loggedUser.isEmailVerified){
 
             // если пользователь зарегистрировался, но еще не верифицировал email
-            // КОНТЕНТ если не авторизован пользователь
 
-            Row( // используем строку
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth() // занимаем всю ширину
-                    .background(Grey100) // цвет фона
-                    .padding(20.dp) // отступы
-                    .clickable { // действие на нажатие. По идее потом надо вести на страницу авторизации
+                    .fillMaxWidth()
+                    .background(Grey_OnBackground)
+                    .padding(20.dp)
+                    .clickable {
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
                         }
-                        navController.navigate(THANK_YOU_PAGE_ROOT) {popUpTo(0)}
+                        navController.navigate(THANK_YOU_PAGE_ROOT) { popUpTo(0) }
 
                     },
                 verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
 
             ) {
 
-                // ТЕКСТ ГОСТЬ
-
                 Column(
                     modifier = Modifier.weight(1f) // колонка займет всю ширину, которая останется после добавления элементов
                 ) {
 
-                    Text( // текст ГОСТЬ
-                        text = stringResource(id = R.string.verify_email_title), // сам текст
-                        color = Grey40, // цвет текста
-                        style = Typography.titleMedium // стиль текста
+                    Text(
+                        text = stringResource(id = R.string.verify_email_and_sign_in), // сам текст
+                        color = WhiteDvij, // цвет текста
+                        style = Typography.bodyMedium // стиль текста
                     )
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
-                        text = stringResource(id = R.string.verify_email_text), // сам текст
-                        color = Grey40, // цвет текста
-                        style = Typography.labelSmall // стиль текста
+                    Text(
+                        text = stringResource(id = R.string.verify_email_text), // сам текст активируй аккаунт
+                        color = Grey_Text, // цвет текста
+                        style = Typography.labelMedium // стиль текста
                     )
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    // КНОПКА ДЛЯ ПЕРЕХОДА НА СТРАНИЦУ РЕГИСТРАЦИИ
+
+                    ButtonCustom(buttonText = stringResource(id = R.string.i_activate_profile)) {
+                        coroutineScope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+                        navController.navigate(LOG_IN_ROOT)
+                    }
+
+
                 }
             }
 
-        } else { // КОНТЕНТ если не авторизован пользователь
+        } else {
 
-            Row( // используем строку
+            // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ ЗАЛОГИНЕН ------
+
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth() // занимаем всю ширину
-                    .background(Grey100) // цвет фона
-                    .padding(20.dp) // отступы
-                    .clickable { // действие на нажатие. По идее потом надо вести на страницу авторизации
+                    .fillMaxWidth()
+                    .background(Grey_OnBackground)
+                    .padding(20.dp)
+                    .clickable {
                         coroutineScope.launch {
                             scaffoldState.drawerState.close()
                         }
                         navController.navigate(LOG_IN_ROOT)
                     },
-                verticalAlignment = Alignment.CenterVertically // выравнивание по вертикали
+                verticalAlignment = Alignment.CenterVertically
 
             ) {
-
-                // ТЕКСТ ГОСТЬ
 
                 Column(
                     modifier = Modifier.weight(1f) // колонка займет всю ширину, которая останется после добавления элементов
                 ) {
-                    Text( // текст ГОСТЬ
-                        text = stringResource(id = R.string.guest), // сам текст
-                        color = Grey40, // цвет текста
-                        style = Typography.titleMedium // стиль текста
+                    Text(
+                        text = stringResource(id = R.string.guest), // текст ГОСТЬ
+                        color = WhiteDvij, // цвет текста
+                        style = Typography.bodyMedium // стиль текста
                     )
-                    Text( // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
-                        text = stringResource(id = R.string.login_or_register), // сам текст
-                        color = Grey40, // цвет текста
-                        style = Typography.labelSmall // стиль текста
+                    Text(
+                        text = stringResource(id = R.string.login_or_register), // текст ВОЙДИТЕ ИЛИ ЗАРЕГИСТРИРУЙТЕСЬ
+                        color = Grey_Text, // цвет текста
+                        style = Typography.labelMedium // стиль текста
                     )
                 }
 
@@ -384,7 +353,7 @@ class SideComponents (private val act: MainActivity) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_login), // сама иконка
                     contentDescription = stringResource(id = R.string.login_or_register), // описание для слабовидящих
-                    tint = Grey40 // цвет иконки
+                    tint = WhiteDvij // цвет иконки
                 )
             }
         }
@@ -412,8 +381,7 @@ class SideComponents (private val act: MainActivity) {
 
         LazyColumn(
             Modifier
-                .background(color = Grey100) // окрашиваем в черный
-                //.fillMaxHeight() // занимаем весь размер
+                .background(color = Grey_OnBackground)
                 .padding(vertical = 10.dp)
         ) {
             // Помещаем все в "ленивую" колонку
@@ -442,7 +410,7 @@ class SideComponents (private val act: MainActivity) {
 
                     // Иконка возле текста
                     Icon(
-                        tint = if (item.navRoute == currentRoute) PrimaryColor else Grey40, // цвет иконки
+                        tint = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij, // цвет иконки
                         painter = painterResource(id = item.icon), // задаем иконку, прописанную в sealed class
                         contentDescription = stringResource(id = item.contentDescription) // описание для слабовидящих - вшито тоже в sealed class
                     )
@@ -453,9 +421,9 @@ class SideComponents (private val act: MainActivity) {
                     // Сам текст "Кнопки"
                     Text(
                         text = stringResource(id = item.title), // берем заголовок
-                        style = Typography.labelLarge, // Стиль текста
+                        style = Typography.bodyMedium, // Стиль текста
                         modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
-                        color = if (item.navRoute == currentRoute) PrimaryColor else Grey40 // цвет текста
+                        color = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij // цвет текста
                     )
                 }
             }

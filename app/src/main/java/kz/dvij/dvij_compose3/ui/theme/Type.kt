@@ -26,11 +26,94 @@ val sfProFont = FontFamily(
 
 val Typography = Typography(
 
-    // ОБЫЧНЫЙ ТЕКСТ
+
+
+    // Подпись МАЛЕНЬКАЯ
+
+    labelSmall = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp,
+        lineHeight = 12.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    // Подпись СРЕДНЯЯ
+
+    labelMedium = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
 
     // Обычный текст БОЛЬШОЙ
 
     bodyLarge = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    // Обычный текст СРЕДНИЙ
+
+    bodyMedium = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    // Обычный текст МАЛЕНЬКИЙ
+
+    bodySmall = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
+    ),
+
+    // Заголовок БОЛЬШОЙ
+
+    titleLarge = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp
+    ),
+
+    // Заголовок СРЕДНИЙ
+
+    titleMedium = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 23.sp,
+        letterSpacing = 0.sp
+    ),
+
+    // Заголовок МАЛЕНЬКИЙ
+
+    titleSmall = TextStyle(
+        fontFamily = sfProFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        lineHeight = 23.sp,
+        letterSpacing = 0.sp
+    ),
+
+
+    // ОБЫЧНЫЙ ТЕКСТ
+
+    // Обычный текст БОЛЬШОЙ
+
+    /*bodyLarge = TextStyle(
         fontFamily = sfProFont,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
@@ -56,7 +139,7 @@ val Typography = Typography(
         fontSize = 11.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
-    ),
+    ),*/
 
     displaySmall = TextStyle(
         fontFamily = sfProFont,
@@ -70,7 +153,7 @@ val Typography = Typography(
 
     // Заголовок БОЛЬШОЙ
 
-    titleLarge = TextStyle(
+    /*titleLarge = TextStyle(
         fontFamily = sfProFont,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
@@ -96,7 +179,7 @@ val Typography = Typography(
         fontSize = 18.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.sp
-    ),
+    ),*/
 
     // ПОДПИСИ
 
@@ -112,23 +195,23 @@ val Typography = Typography(
 
     // Подпись СРЕДНЯЯ
 
-    labelMedium = TextStyle(
+    /*labelMedium = TextStyle(
         fontFamily = sfProFont,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
-    ),
+    ),*/
 
     // Подпись МАЛЕНЬКАЯ
 
-    labelSmall = TextStyle(
+    /*labelSmall = TextStyle(
         fontFamily = sfProFont,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
-    ),
+    ),*/
 
 )
 

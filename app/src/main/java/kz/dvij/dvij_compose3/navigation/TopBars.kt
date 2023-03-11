@@ -12,9 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.ui.theme.Grey10
-import kz.dvij.dvij_compose3.ui.theme.Grey100
-import kz.dvij.dvij_compose3.ui.theme.Typography
+import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН ВЕРХНЕЙ ПАНЕЛИ
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -30,15 +28,15 @@ fun TopBarInApp(
         title = {
             Text(
                 text = topBarName, // Передаем полученный заголовок панели
-                color = Grey10, // цвет заголовка
+                color = WhiteDvij, // цвет заголовка
                 style = Typography.titleMedium, // Стиль текста заголовка
                 maxLines = 1, // максимальное количество строк
                 overflow = TextOverflow.Ellipsis // если не влазит текст в контейнер, обрезается точками
 
             )
         },
-        backgroundColor = Grey100, // цвет панели
-        contentColor = Grey10, // цвет контента
+        backgroundColor = Grey_OnBackground, // цвет панели
+        contentColor = WhiteDvij, // цвет контента
 
         // сама навигационная иконка
         navigationIcon = {
@@ -62,8 +60,8 @@ fun TopBarWithBackButton(navController: NavController, text: Int){
     TopAppBar(
         modifier = Modifier
             .fillMaxWidth(), // на всю ширину
-        backgroundColor = Grey100, // цвет фона
-        contentColor = Grey10 // цвет контента
+        backgroundColor = Grey_OnBackground, // цвет фона
+        contentColor = WhiteDvij // цвет контента
     ) {
 
         // ----- КНОПКА НАЗАД -------
@@ -74,7 +72,7 @@ fun TopBarWithBackButton(navController: NavController, text: Int){
             Icon(
                 painter = painterResource(id = R.drawable.ic_back), // иконка
                 contentDescription = stringResource(id = R.string.cd_go_back), // описание для слабовидящих
-                tint = Grey10, // цвет
+                tint = WhiteDvij, // цвет
                 modifier = Modifier.size(20.dp) // размер иконки
             )
         }
@@ -86,7 +84,7 @@ fun TopBarWithBackButton(navController: NavController, text: Int){
         androidx.compose.material.Text(
             text = stringResource(id = text), // сам текст
             style = Typography.titleMedium, // стиль текста
-            color = Grey10 // цвет
+            color = WhiteDvij // цвет
         )
     }
 }
