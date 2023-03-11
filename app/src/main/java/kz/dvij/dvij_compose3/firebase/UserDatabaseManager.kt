@@ -39,6 +39,97 @@ class UserDatabaseManager (val act: MainActivity) {
             }
     }
 
+    // ---- ФУНКЦИЯ СЧИТЫВАНИЯ КОЛИЧЕСТВА ЗАВЕДЕНИЙ, АКЦИЙ, МЕРОПРИТИЙ ----
+
+    fun readMeetingCountersCreatedUser (userKey: String, counter: MutableState<Int>){
+
+        counter.value = 0
+
+        act.meetingDatabaseManager.meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+
+
+                    val meeting = item
+                        .child("info")
+                        .children.iterator().next()
+                        .child("meetingData")
+                        .getValue(MeetingsAdsClass::class.java)
+
+
+                    if (meeting != null && meeting.ownerKey == userKey) {
+
+                       counter.value ++
+
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
+    }
+
+    fun readPlaceCountersCreatedUser (userKey: String, counter: MutableState<Int>){
+
+        counter.value = 0
+
+        act.placesDatabaseManager.placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    val place = item
+                        .child("info")
+                        .children.iterator().next()
+                        .child("placeData")
+                        .getValue(PlacesAdsClass::class.java)
+
+
+                    if (place != null && place.owner == userKey) {
+
+                        counter.value ++
+
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
+    }
+
+    fun readStockCountersCreatedUser (userKey: String, counter: MutableState<Int>){
+
+        counter.value = 0
+
+        act.stockDatabaseManager.stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    val stock = item
+                        .child("info")
+                        .children.iterator().next()
+                        .child("stockData")
+                        .getValue(StockAdsClass::class.java)
+
+
+                    if (stock != null && stock.keyCreator == userKey) {
+
+                        counter.value ++
+
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
+    }
+
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О ПОЛЬЗОВАТЕЛЕ --------
 
     fun readOneUserFromDataBase(userInfo: MutableState<UserInfoClass>, key: String, callback: (result: Boolean) -> Unit){
