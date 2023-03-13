@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.elements
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +39,9 @@ import kz.dvij.dvij_compose3.constants.FOR_CARDS
 import kz.dvij.dvij_compose3.constants.PRIMARY
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
+import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
 import kz.dvij.dvij_compose3.navigation.STOCK_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -49,14 +53,23 @@ class MeetingsCard(val act: MainActivity) {
         navController: NavController,
         meetingItem: MeetingsCardClass,
         meetingKey: MutableState<String>,
-        isAd: Boolean = false
+        isAd: Boolean = false,
+        filledMeeting: MutableState<MeetingsAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ) {
 
         val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100)) // Переменная полупрозрачного градиента
 
         val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
 
-        val favCounter = remember{ mutableStateOf (0) }
+        val favCounter = remember{ mutableStateOf (meetingItem.counterInFav?.toInt() ?: 0) }
+        val viewCounter = remember{ mutableStateOf (meetingItem.counterView) }
+        val placeInfo = remember{ mutableStateOf (PlacesAdsClass()) }
+
+        val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
+
+
+
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
@@ -135,25 +148,93 @@ class MeetingsCard(val act: MainActivity) {
 
                     // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
 
-                    if (meetingItem.counterView != null) {
+
 
                         Bubble(
-                            buttonText = meetingItem.counterView,
+                            buttonText = if (viewCounter.value != null && viewCounter.value != "null" ) {
+                                viewCounter.value.toString()
+                            } else {"0"},//meetingItem.counterView,
                             leftIcon = R.drawable.ic_visibility,
                             typeButton = FOR_CARDS
-                        ) {}
+                        ) {
+                            Toast.makeText(act,act.getString(R.string.meeting_view_counter),Toast.LENGTH_SHORT).show()
+                        }
 
-                    }
+
 
 
                     if (meetingItem.counterInFav != null){
 
                         Bubble(
-                            buttonText = meetingItem.counterInFav,
+                            buttonText = favCounter.value.toString(),
                             rightIcon = R.drawable.ic_fav,
                             typeButton = FOR_CARDS,
                             rightIconColor = iconFavColor.value
-                        ) {}
+                        ) {
+
+                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это мероприятие -----
+                            // Если не авторизован, условие else
+
+                            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                act.meetingDatabaseManager.favIconMeeting(meetingItem.key) {
+
+                                    // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                    if (it) {
+
+                                        // Убираем из избранных
+                                        act.meetingDatabaseManager.removeFavouriteMeeting(meetingItem.key) { result ->
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (result) {
+
+                                                //favCounterBackground.value = Grey_ForCardsFav
+
+                                                act.meetingDatabaseManager.readFavCounter(meetingItem.key){ counter ->
+                                                    favCounter.value = counter
+                                                }
+                                                iconFavColor.value = WhiteDvij
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(act,act.getString(R.string.delete_from_fav),Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+
+                                    } else {
+
+                                        // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                        act.meetingDatabaseManager.addFavouriteMeeting(meetingItem.key) { inFav ->
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (inFav) {
+
+                                                act.meetingDatabaseManager.readFavCounter(meetingItem.key){ counter ->
+                                                    favCounter.value = counter
+                                                }
+
+                                                iconFavColor.value = YellowDvij
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(act,act.getString(R.string.add_to_fav),Toast.LENGTH_SHORT).show()
+
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } else {
+
+                                // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                Toast
+                                    .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                        }
 
                     }
 
@@ -309,7 +390,51 @@ class MeetingsCard(val act: MainActivity) {
                                 text = stringResource(id = R.string.edit),
                                 style = Typography.bodySmall,
                                 color = YellowDvij,
-                                modifier = Modifier.clickable {  }
+                                modifier = Modifier.clickable {
+
+                                    filledMeeting.value = MeetingsAdsClass(
+                                        key = meetingItem.key,
+                                        category = meetingItem.category,
+                                        headline = meetingItem.headline,
+                                        description = meetingItem.description,
+                                        price = meetingItem.price,
+                                        phone = meetingItem.phone,
+                                        whatsapp = meetingItem.whatsapp,
+                                        data = meetingItem.data,
+                                        startTime = meetingItem.startTime,
+                                        finishTime = meetingItem.finishTime,
+                                        image1 = meetingItem.image1,
+                                        city = meetingItem.city,
+                                        instagram = meetingItem.instagram,
+                                        telegram = meetingItem.telegram,
+                                        placeKey = meetingItem.placeKey,
+                                        headlinePlaceInput = meetingItem.headlinePlaceInput,
+                                        addressPlaceInput = meetingItem.addressPlaceInput,
+                                        ownerKey = meetingItem.ownerKey,
+                                        dateInNumber = meetingItem.dateInNumber,
+                                        createdTime = meetingItem.createdTime
+                                    )
+
+                                    if (meetingItem.placeKey == null || meetingItem.placeKey == ""){
+
+                                        filledPlace.value = PlacesAdsClass(
+                                            placeName = meetingItem.headlinePlaceInput,
+                                            address = meetingItem.addressPlaceInput
+                                        )
+
+                                        navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                    } else {
+
+                                        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = meetingItem.placeKey) {
+
+                                            navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                        }
+
+                                    }
+
+                                }
                             )
 
                             // ------ КНОПКА УДАЛИТЬ -------
@@ -318,7 +443,7 @@ class MeetingsCard(val act: MainActivity) {
                                 text = stringResource(id = R.string.delete),
                                 style = Typography.bodySmall,
                                 color = AttentionRed,
-                                modifier = Modifier.clickable { }
+                                modifier = Modifier.clickable { openConfirmChoose.value = true }
                             )
 
                         }
@@ -326,6 +451,32 @@ class MeetingsCard(val act: MainActivity) {
                     }
 
 
+                    if (openConfirmChoose.value) {
+
+                        ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
+
+                            if (meetingItem.placeKey != null && meetingItem.image1 != null){
+
+                                act.meetingDatabaseManager.deleteMeetingWithPlaceNote(
+                                    meetingKey = meetingItem.key,
+                                    placeKey = meetingItem.placeKey,
+                                    imageUrl = meetingItem.image1
+                                ) {
+
+                                    if (it) {
+
+                                        Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
+                                        navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+
+                                    } else {
+
+                                        Log.d ("MyLog", "Почемуто не удалилось")
+
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                 }
             }

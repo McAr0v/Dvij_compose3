@@ -171,6 +171,99 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
         )
     }
 
+    fun readFavCounter (meetingKey: String, callback: (result: Int) -> Unit) {
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // считываем данные мероприятия
+
+                    val meeting = item
+                        .child("info")
+                        .children.iterator().next()
+                        .child("meetingData")
+                        .getValue(MeetingsAdsClass::class.java)
+
+                    // считываем список добавивших в избранное пользователей
+
+                    // Читаем количество добавивших в избранное
+                    val getFavCounter = item
+                        .child("AddedToFavorites").childrenCount
+
+                    // проверка мероприятия на Null
+
+                    if (meeting != null) {
+
+                        // если ключ мероприятия равен переданному ключу
+                        if (meeting.key == meetingKey) {
+
+                            callback (getFavCounter.toInt())
+                        }
+                    }
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+
+        }
+        )
+    }
+
+    fun readViewCounter (meetingKey: String, callback: (result: Int) -> Unit) {
+
+        meetingDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // считываем данные мероприятия
+
+                    val meeting = item
+                        .child("info")
+                        .children.iterator().next()
+                        .child("meetingData")
+                        .getValue(MeetingsAdsClass::class.java)
+
+                    // считываем список добавивших в избранное пользователей
+
+                    // Читаем количество добавивших в избранное
+                    val getViewCounter = item
+                        .child("viewCounter")
+                        .child("viewCounter").getValue(Int::class.java)
+
+                    // проверка мероприятия на Null
+
+                    if (meeting != null) {
+
+                        // если ключ мероприятия равен переданному ключу
+                        if (meeting.key == meetingKey) {
+
+                            if (getViewCounter != null){
+                                callback (getViewCounter)
+                            } else {
+                                callback (0)
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            // в функцию onCancelled пока ничего не добавляем
+            override fun onCancelled(error: DatabaseError) {}
+
+        }
+        )
+    }
+
+
+
+
     // ------ ФУНКЦИЯ СЧИТЫВАНИЯ ВСЕХ МЕРОПРИЯТИЙ С БАЗЫ ДАННЫХ С ФИЛЬТРОМ --------
 
     fun readFilteredMeetingDataFromDb(
@@ -1173,6 +1266,11 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         val getFavCounter = item
                             .child("AddedToFavorites").childrenCount
 
+                        // Читаем количество добавивших в избранное
+                        val getViewCounter = item
+                            .child("viewCounter")
+                            .child("viewCounter").getValue(Int::class.java)
+
                         val finishCardMeeting = MeetingsCardClass(
 
                             key = meeting.key,
@@ -1197,7 +1295,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             ownerKey = meeting.ownerKey,
                             dateInNumber = meeting.dateInNumber,
                             createdTime = meeting.createdTime,
-                            counterInFav = getFavCounter.toString()
+                            counterInFav = getFavCounter.toString(),
+                            counterView = getViewCounter.toString()
                         )
 
                         meetingArray.add(finishCardMeeting)

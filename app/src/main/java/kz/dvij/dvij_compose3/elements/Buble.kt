@@ -71,7 +71,8 @@ fun Bubble (
             Icon(
                 painter = painterResource(id = leftIcon), // иконка
                 contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                tint = leftIconColor
+                tint = leftIconColor,
+                modifier = Modifier.size(20.dp)
             )
 
             Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
@@ -95,7 +96,8 @@ fun Bubble (
             Icon(
                 painter = painterResource(id = rightIcon), // иконка
                 contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                tint = rightIconColor
+                tint = rightIconColor,
+                modifier = Modifier.size(20.dp)
             )
         }
     }

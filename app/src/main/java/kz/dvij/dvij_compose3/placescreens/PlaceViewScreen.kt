@@ -51,7 +51,8 @@ class PlaceViewScreen (val act: MainActivity) {
         navController: NavController,
         meetingKey: MutableState<String>, // КЛЮЧ МЕРОПРИЯТИЯ ДЛЯ ПЕРЕХОДА НА КЛИК ПО КАРТОЧКЕ МЕРОПРИЯТИЯ
         stockKey: MutableState<String>, // КЛЮЧ АКЦИЙ для перехода на клик по карточке Акции
-        filledPlaceInfoFromAct: MutableState<PlacesAdsClass> // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+        filledPlaceInfoFromAct: MutableState<PlacesAdsClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+        filledMeetingInfoFromAct: MutableState<MeetingsAdsClass> // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
     ){
 
         val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
@@ -727,7 +728,9 @@ class PlaceViewScreen (val act: MainActivity) {
                         act.meetingsCard.MeetingCard(
                             navController = navController,
                             meetingItem = item,
-                            meetingKey = meetingKey
+                            meetingKey = meetingKey,
+                            filledMeeting = filledMeetingInfoFromAct,
+                            filledPlace = filledPlaceInfoFromAct
                         )
                     }
                 }

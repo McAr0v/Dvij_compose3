@@ -112,8 +112,8 @@ fun FloatingButton(
                 onClick()
             },
             shape = CircleShape, // форма кнопки
-            contentColor = Grey00, // цвет содержимого кнопки
-            containerColor = SuccessColor, // цвет фона кнопки
+            contentColor = Grey_OnBackground, // цвет содержимого кнопки
+            containerColor = YellowDvij, // цвет фона кнопки
             modifier = Modifier
                 .padding(16.dp) // отступы
                 .align(alignment = Alignment.BottomEnd) // выравнивание кнопки в боке
@@ -171,13 +171,19 @@ fun FloatingMeetingFilterButton(
     }
 
     val containerColor = remember {
-        mutableStateOf(SuccessColor)
+        mutableStateOf(YellowDvij)
+    }
+
+    val contentColor = remember {
+        mutableStateOf(Grey_OnBackground)
     }
 
     if (city != "Выбери город" || category != "Выбери категорию" || date != "Выбери дату") {
-        containerColor.value = SuccessColor
+        containerColor.value = YellowDvij
+        contentColor.value = Grey_OnBackground
     } else {
-        containerColor.value = Grey90
+        containerColor.value = Grey_ForCards
+        contentColor.value = WhiteDvij
     }
 
     // помещаем кнопку в BOX
@@ -196,7 +202,7 @@ fun FloatingMeetingFilterButton(
                 onClick()
             },
             shape = CircleShape, // форма кнопки
-            contentColor = Grey00, // цвет содержимого кнопки
+            contentColor = contentColor.value, // цвет содержимого кнопки
             containerColor = containerColor.value, // цвет фона кнопки
             modifier = Modifier
                 .padding(16.dp) // отступы
@@ -209,7 +215,7 @@ fun FloatingMeetingFilterButton(
                 modifier = Modifier.padding(15.dp)
             ){
 
-                Text(text = "Фильтр$counter", color = Grey00)
+                Text(text = "Фильтр$counter", color = contentColor.value)
 
                 Spacer(modifier = Modifier.width(10.dp))
 

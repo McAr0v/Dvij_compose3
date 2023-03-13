@@ -23,6 +23,8 @@ import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.util.*
@@ -54,6 +56,8 @@ class MeetingsScreens (val act: MainActivity) {
         meetingStartDateForFilter: MutableState<String>,
         meetingFinishDateForFilter: MutableState<String>,
         meetingSortingForFilter: MutableState<String>,
+        filledMeeting: MutableState<MeetingsAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ) {
         Column {
 
@@ -68,7 +72,9 @@ class MeetingsScreens (val act: MainActivity) {
                 meetingCategoryForFilter = meetingCategoryForFilter,
                 meetingStartDateForFilter = meetingStartDateForFilter,
                 meetingFinishDateForFilter = meetingFinishDateForFilter,
-                meetingSortingForFilter = meetingSortingForFilter
+                meetingSortingForFilter = meetingSortingForFilter,
+                filledMeeting = filledMeeting,
+                filledPlace = filledPlace
             )
 
         }
@@ -87,6 +93,8 @@ class MeetingsScreens (val act: MainActivity) {
         meetingStartDateForFilter: MutableState<String>,
         meetingFinishDateForFilter: MutableState<String>,
         meetingSortingForFilter: MutableState<String>,
+        filledMeeting: MutableState<MeetingsAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ){
 
         // ----- СПИСКИ -----
@@ -137,7 +145,7 @@ class MeetingsScreens (val act: MainActivity) {
 
             Column (
                 modifier = Modifier
-                    .background(Grey95)
+                    .background(Grey_Background)
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
                     .fillMaxHeight(),
@@ -154,7 +162,7 @@ class MeetingsScreens (val act: MainActivity) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Grey95),
+                            .background(Grey_Background),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ){
@@ -168,7 +176,9 @@ class MeetingsScreens (val act: MainActivity) {
                                 act.meetingsCard.MeetingCard(
                                     navController = navController,
                                     meetingItem = item,
-                                    meetingKey = meetingKey
+                                    meetingKey = meetingKey,
+                                    filledMeeting = filledMeeting,
+                                    filledPlace = filledPlace
                                 )
 
                             }
@@ -181,8 +191,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
 
                 } else {
@@ -195,22 +205,18 @@ class MeetingsScreens (val act: MainActivity) {
                         horizontalArrangement = Arrangement.Center
                     ) {
 
-                        // крутилка индикатор
-
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
 
                         Spacer(modifier = Modifier.width(20.dp))
 
-                        // текст рядом с крутилкой
-
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -235,7 +241,12 @@ class MeetingsScreens (val act: MainActivity) {
     // --- СТРАНИЦА МОИХ МЕРОПРИЯТИЙ -----
 
     @Composable
-    fun MeetingsMyScreen (navController: NavController, meetingKey: MutableState<String>){
+    fun MeetingsMyScreen (
+        navController: NavController,
+        meetingKey: MutableState<String>,
+        filledMeeting: MutableState<MeetingsAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
+    ){
 
         // инициализируем пустой список мероприятий
 
@@ -255,7 +266,7 @@ class MeetingsScreens (val act: MainActivity) {
 
             Column (
                 modifier = Modifier
-                    .background(Grey95)
+                    .background(Grey_Background)
                     .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
@@ -272,7 +283,7 @@ class MeetingsScreens (val act: MainActivity) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Grey95),
+                            .background(Grey_Background),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ){
@@ -286,7 +297,9 @@ class MeetingsScreens (val act: MainActivity) {
                                 act.meetingsCard.MeetingCard(
                                     navController = navController,
                                     meetingItem = item,
-                                    meetingKey = meetingKey
+                                    meetingKey = meetingKey,
+                                    filledMeeting = filledMeeting,
+                                    filledPlace = filledPlace
                                 )
 
                             }
@@ -299,8 +312,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
 
                 } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
@@ -373,7 +386,7 @@ class MeetingsScreens (val act: MainActivity) {
                     ) {
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -382,8 +395,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -405,7 +418,12 @@ class MeetingsScreens (val act: MainActivity) {
     // --------- ЭКРАН ИЗБРАННЫХ МЕРОПРИЯТИЙ -------------
 
     @Composable
-    fun MeetingsFavScreen (navController: NavController, meetingKey: MutableState<String>){
+    fun MeetingsFavScreen (
+        navController: NavController,
+        meetingKey: MutableState<String>,
+        filledMeeting: MutableState<MeetingsAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
+    ){
 
         // Инициализируем список мероприятий
 
@@ -422,7 +440,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         Column (
             modifier = Modifier
-                .background(Grey95)
+                .background(Grey_Background)
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
@@ -437,7 +455,7 @@ class MeetingsScreens (val act: MainActivity) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Grey95),
+                        .background(Grey_Background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ){
@@ -450,7 +468,9 @@ class MeetingsScreens (val act: MainActivity) {
                             act.meetingsCard.MeetingCard(
                                 navController = navController,
                                 meetingItem = item,
-                                meetingKey = meetingKey
+                                meetingKey = meetingKey,
+                                filledMeeting = filledMeeting,
+                                filledPlace = filledPlace
                             )
                         }
 
@@ -462,8 +482,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                 Text(
                     text = stringResource(id = R.string.empty_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10
+                    style = Typography.bodySmall,
+                    color = WhiteDvij
                 )
 
             } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
@@ -536,7 +556,7 @@ class MeetingsScreens (val act: MainActivity) {
                 ) {
 
                     CircularProgressIndicator(
-                        color = PrimaryColor,
+                        color = YellowDvij,
                         strokeWidth = 3.dp,
                         modifier = Modifier.size(40.dp)
                     )
@@ -545,8 +565,8 @@ class MeetingsScreens (val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.ss_loading),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
                 }
             }

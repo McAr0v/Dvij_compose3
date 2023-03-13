@@ -494,7 +494,7 @@ class MainActivity : ComponentActivity() {
 
                         // --- СТРАНИЦЫ МЕРОПРИЯТИЙ -----
 
-                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingStartDateForFilter = meetingStartDateForFilter, meetingFinishDateForFilter = meetingFinishDateForFilter, meetingSortingForFilter = meetingSortingForFilter)}
+                        composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingStartDateForFilter = meetingStartDateForFilter, meetingFinishDateForFilter = meetingFinishDateForFilter, meetingSortingForFilter = meetingSortingForFilter, filledMeeting = meetingInfo, filledPlace = placeInfo)}
                         composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
@@ -504,7 +504,7 @@ class MainActivity : ComponentActivity() {
                         composable(PLACES_ROOT) { placesScreens.PlacesScreen(navController, placeKey = placeKey, cityForFilter = cityName, placeSortingForFilter = placeSortingForFilter, placeCategoryForFilter = placeCategoryForFilter, placeIsOpenForFilter = placeIsOpenForFilter)}
                         composable(CREATE_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value ,createOrEdit = "0")}
                         composable(EDIT_PLACES_SCREEN) { createPlace.CreatePlaceScreen(navController = navController, citiesList = citiesList, filledUserInfo = userInfo.value, filledPlace = placeInfo.value, createOrEdit = EDIT_PLACES_SCREEN)}
-                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey, placeInfo)}
+                        composable(PLACE_VIEW) {placeViewScreen.PlaceViewScreen(key = placeKey.value, navController = navController, meetingKey, stockKey, placeInfo, meetingInfo)}
 
                         // ----- СТРАНИЦЫ АКЦИЙ ------
 

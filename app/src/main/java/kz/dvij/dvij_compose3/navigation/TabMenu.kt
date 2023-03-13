@@ -20,6 +20,8 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
+import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -49,7 +51,9 @@ fun TabMenu (
     stockSortingForFilter: MutableState<String>? = null,
     placeCategoryForFilter: MutableState<String>? = null,
     placeIsOpenForFilter: MutableState<Boolean>? = null,
-    placeSortingForFilter: MutableState<String>? = null
+    placeSortingForFilter: MutableState<String>? = null,
+    filledMeeting: MutableState<MeetingsAdsClass>? = null,
+    filledPlace: MutableState<PlacesAdsClass>? = null
 ){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
@@ -120,17 +124,25 @@ fun TabMenu (
                                 meetingCategoryForFilter = meetingCategoryForFilter!!,
                                 meetingStartDateForFilter = meetingStartDateForFilter!!,
                                 meetingFinishDateForFilter = meetingFinishDateForFilter!!,
-                                meetingSortingForFilter = meetingSortingForFilter!!
+                                meetingSortingForFilter = meetingSortingForFilter!!,
+                                filledMeeting = filledMeeting!!,
+                                filledPlace = filledPlace!!
                             )
                         } // мероприятия Лента
                         1 -> meetingKey?.let {
-                            activity.meetingsScreens.MeetingsFavScreen(navController,
-                                it
+                            activity.meetingsScreens.MeetingsFavScreen(
+                                navController,
+                                it,
+                                filledMeeting = filledMeeting!!,
+                                filledPlace = filledPlace!!
                             )
                         } // мероприятия Избранные
                         else -> meetingKey?.let {
-                            activity.meetingsScreens.MeetingsMyScreen(navController,
-                                it
+                            activity.meetingsScreens.MeetingsMyScreen(
+                                navController,
+                                it,
+                                filledMeeting = filledMeeting!!,
+                                filledPlace = filledPlace!!
                             )
                         } // мероприятия Мои
                 }

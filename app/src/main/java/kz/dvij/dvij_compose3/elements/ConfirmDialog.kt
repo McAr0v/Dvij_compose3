@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.ui.theme.*
 
 @Composable
@@ -33,12 +34,12 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
             modifier = Modifier
                 .border(
                     2.dp, // толщина границы
-                    color = Grey80, // цвет границы
-                    shape = RoundedCornerShape(20.dp) // скругление углов
+                    color = YellowDvij, // цвет границы
+                    shape = RoundedCornerShape(15.dp) // скругление углов
                 )
                 .background(
-                    Grey95, // цвет фона
-                    shape = RoundedCornerShape(20.dp) // скругление углов
+                    Grey_Background, // цвет фона
+                    shape = RoundedCornerShape(15.dp) // скругление углов
                 )
                 .padding(20.dp) // отступы
                 .fillMaxWidth() // занять всю ширину
@@ -60,7 +61,7 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
                 Text(
                     text = "Действительно хочешь удалить?", // текст заголовка
                     style = Typography.titleMedium, // стиль заголовка
-                    color = Grey10, // цвет заголовка
+                    color = WhiteDvij, // цвет заголовка
                     modifier = Modifier.weight(1f)
                 ) // занять всю оставшуюся ширину
 
@@ -71,14 +72,26 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close), // сама иконка
                     contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                    tint = Grey10, // цвет иконки
+                    tint = WhiteDvij, // цвет иконки
                     modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                 )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ---- КНОПКИ -------
+            ButtonCustom(buttonText = "Нет, отмена") {
+                onDismiss()
+            }
+
+
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            ButtonCustom(buttonText = "Да, удалить", typeButton = SECONDARY) {
+                onClick()
+            }
+
+            /*// ---- КНОПКИ -------
 
             Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -100,7 +113,7 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
                     Text(text = "Нет, отмена")
 
                 }
-            }
+            }*/
         }
     }
 }
