@@ -39,7 +39,7 @@ fun ButtonCustom (
             .height(60.dp) // высота
             .border( // настройки самих границ
                 2.dp, // толщина границы
-                color = YellowDvij, // цвет - для этого выше мы создавали переменные с цветом
+                color = if (typeButton != "Attention") YellowDvij else AttentionRed, // цвет - для этого выше мы создавали переменные с цветом
                 shape = RoundedCornerShape(30) // скругление границ
             ),
         shape = RoundedCornerShape(30), // скругление углов

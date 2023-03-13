@@ -3,9 +3,13 @@ package kz.dvij.dvij_compose3.elements
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
@@ -19,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,35 +33,305 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.DARK
+import kz.dvij.dvij_compose3.constants.FOR_CARDS
+import kz.dvij.dvij_compose3.constants.PRIMARY
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
 import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
+import kz.dvij.dvij_compose3.navigation.STOCK_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class MeetingsCard(val act: MainActivity) {
 
     @Composable
-    fun MeetingCard (navController: NavController, meetingItem: MeetingsCardClass, meetingKey: MutableState<String>) {
+    fun MeetingCard (
+        navController: NavController,
+        meetingItem: MeetingsCardClass,
+        meetingKey: MutableState<String>,
+        isAd: Boolean = false
+    ) {
 
         val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100)) // Переменная полупрозрачного градиента
 
-        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+        val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
+
+        val favCounter = remember{ mutableStateOf (0) }
 
         // Считываем с базы данных - добавлено ли это мероприятие в избранное?
 
         act.meetingDatabaseManager.favIconMeeting(meetingItem.key!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
-                iconFavColor.value = PrimaryColor
+                favCounter.value = meetingItem.counterInFav!!.toInt()
+                iconFavColor.value = YellowDvij
             } else {
                 // Если колбак фалс, то в обычный цвет
-                iconFavColor.value = Grey10
+                favCounter.value = meetingItem.counterInFav!!.toInt()
+                iconFavColor.value = WhiteDvij
             }
         }
 
         // ------ САМ КОНТЕНТ КАРТОЧКИ ----------
 
+
         Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+                .border(
+                    width = if (isAd) 2.dp else 0.dp,
+                    color = if (isAd) YellowDvij else Grey_Background,
+                    shape = if (isAd) RoundedCornerShape(15.dp) else RoundedCornerShape(0.dp)
+                )
+                .clickable {
+
+                    // При клике на карточку - передаем на Main Activity meetingKey. Ключ берем из дата класса мероприятия
+
+                    meetingKey.value = meetingItem.key
+
+                    // так же при нажатии регистрируем счетчик просмотров - добавляем 1 просмотр
+
+                    act.meetingDatabaseManager.viewCounterMeeting(meetingItem.key) {
+
+                        // если колбак тру, то счетчик успешно сработал, значит переходим на страницу мероприятия
+                        if (it) {
+                            navController.navigate(MEETING_VIEW)
+                        }
+                    }
+                },
+            shape = RoundedCornerShape(15.dp),
+            elevation = CardDefaults.cardElevation(5.dp),
+            colors = CardDefaults.cardColors(Grey100)
+        ) {
+
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                ){
+
+                if (meetingItem.image1 !=null){
+                    AsyncImage(
+                        model = meetingItem.image1, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
+                        contentDescription = stringResource(id = R.string.cd_meeting_image), // описание изображения для слабовидящих
+                        modifier = Modifier.height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.korn_concert), // картинка карточки. Потом сюда надо подставлять картинку с базы данных
+                        modifier = Modifier.height(260.dp), // заполнить картинкой весь контейнер
+                        contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
+                        contentDescription = stringResource(id = R.string.cd_meeting_image) // описание изображения для слабовидящих
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
+
+                    if (meetingItem.counterView != null) {
+
+                        Bubble(
+                            buttonText = meetingItem.counterView,
+                            leftIcon = R.drawable.ic_visibility,
+                            typeButton = FOR_CARDS
+                        ) {}
+
+                    }
+
+
+                    if (meetingItem.counterInFav != null){
+
+                        Bubble(
+                            buttonText = meetingItem.counterInFav,
+                            rightIcon = R.drawable.ic_fav,
+                            typeButton = FOR_CARDS,
+                            rightIconColor = iconFavColor.value
+                        ) {}
+
+                    }
+
+
+                }
+
+                // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+
+                    // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 0.dp, bottomEnd = 0.dp, bottomStart = 0.dp),
+                        elevation = CardDefaults.cardElevation(5.dp),
+                        colors = CardDefaults.cardColors(Grey_ForCards)
+                    ) {
+
+                        Column(modifier = Modifier.padding(20.dp)) {
+
+                            Row {
+                                Text(
+                                    text = "#Мероприятие",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Text(
+                                    text = "#${meetingItem.category}",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+                            }
+
+                            if (isAd){
+
+                                Spacer(modifier = Modifier.height(5.dp))
+
+                                Text(
+                                    text = "#Рекламный пост",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                            // ----- НАЗВАНИЕ АКЦИИ --------
+
+                            if (meetingItem.headline != null) {
+
+                                Text(
+                                    text = meetingItem.headline,
+                                    style = Typography.titleMedium,
+                                    color = WhiteDvij
+                                )
+
+                            }
+
+                            // ----- ГОРОД --------
+
+                            if (meetingItem.city != null){
+
+                                Spacer(modifier = Modifier.height(5.dp))
+
+                                Text(
+                                    text = meetingItem.city,
+                                    style = Typography.labelMedium,
+                                    color = Grey_Text
+                                )
+
+                            }
+
+                            Spacer(modifier = Modifier.height(15.dp))
+
+                            Row {
+
+                                if (meetingItem.data != null){
+
+                                    Bubble(buttonText = meetingItem.data, typeButton = DARK) {}
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                }
+
+                                if (meetingItem.startTime != null && meetingItem.finishTime != null) {
+
+                                    Bubble(buttonText = "${meetingItem.startTime} - ${meetingItem.finishTime}", typeButton = DARK) {}
+
+                                } else if (meetingItem.startTime != null) {
+
+                                    Bubble(buttonText = meetingItem.startTime, typeButton = DARK) {}
+
+                                } else {
+
+                                    Bubble(buttonText = "Время не указано", typeButton = DARK) {}
+
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(15.dp))
+
+
+                            if (meetingItem.description != null){
+
+                                Text(
+                                    text = meetingItem.description,
+                                    style = Typography.bodySmall,
+                                    color = WhiteDvij
+                                )
+
+                            }
+
+                            Spacer(modifier = Modifier.height(15.dp))
+
+                            if (meetingItem.price != null){
+
+                                Bubble(
+                                    buttonText = if(meetingItem.price == ""){
+                                        stringResource(id = R.string.free_price)
+                                    } else {
+                                        "${meetingItem.price} тенге"
+                                },
+                                    typeButton = PRIMARY) {}
+
+                            }
+                        }
+                    }
+
+                    if (meetingItem.ownerKey == act.mAuth.uid){
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Grey_OnBackground).padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+
+                            // ----- КНОПКА РЕДАКТИРОВАТЬ ------
+
+                            androidx.compose.material.Text(
+                                text = stringResource(id = R.string.edit),
+                                style = Typography.bodySmall,
+                                color = YellowDvij,
+                                modifier = Modifier.clickable {  }
+                            )
+
+                            // ------ КНОПКА УДАЛИТЬ -------
+
+                            androidx.compose.material.Text(
+                                text = stringResource(id = R.string.delete),
+                                style = Typography.bodySmall,
+                                color = AttentionRed,
+                                modifier = Modifier.clickable { }
+                            )
+
+                        }
+
+                    }
+
+
+
+                }
+            }
+        }
+
+        /*Card(
             modifier = Modifier
                 .fillMaxWidth() // растягиваем карточку на всю ширину экрана
                 .padding(vertical = 10.dp) // отступ от краев экрана
@@ -163,17 +439,25 @@ class MeetingsCard(val act: MainActivity) {
                                             if (it) {
 
                                                 // Убираем из избранных
-                                                act.meetingDatabaseManager.removeFavouriteMeeting(meetingItem.key) { result ->
+                                                act.meetingDatabaseManager.removeFavouriteMeeting(
+                                                    meetingItem.key
+                                                ) { result ->
 
                                                     // Если пришел колбак, что успешно
 
                                                     if (result) {
 
-                                                        iconFavColor.value = Grey00 // При нажатии окрашиваем кнопку в темно-серый
+                                                        iconFavColor.value =
+                                                            Grey00 // При нажатии окрашиваем кнопку в темно-серый
 
                                                         // Выводим ТОСТ
-                                                        Toast.makeText(act,act.getString(R.string.delete_from_fav),
-                                                            Toast.LENGTH_SHORT).show()
+                                                        Toast
+                                                            .makeText(
+                                                                act,
+                                                                act.getString(R.string.delete_from_fav),
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
                                                     }
                                                 }
 
@@ -181,17 +465,25 @@ class MeetingsCard(val act: MainActivity) {
 
                                                 // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                                act.meetingDatabaseManager.addFavouriteMeeting(meetingItem.key) { inFav ->
+                                                act.meetingDatabaseManager.addFavouriteMeeting(
+                                                    meetingItem.key
+                                                ) { inFav ->
 
                                                     // Если пришел колбак, что успешно
 
                                                     if (inFav) {
 
-                                                        iconFavColor.value = PrimaryColor // Окрашиваем кнопку в главный цвет
+                                                        iconFavColor.value =
+                                                            PrimaryColor // Окрашиваем кнопку в главный цвет
 
                                                         // Выводим ТОСТ
-                                                        Toast.makeText(act,act.getString(R.string.add_to_fav),
-                                                            Toast.LENGTH_SHORT).show()
+                                                        Toast
+                                                            .makeText(
+                                                                act,
+                                                                act.getString(R.string.add_to_fav),
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
 
                                                     }
                                                 }
@@ -203,7 +495,11 @@ class MeetingsCard(val act: MainActivity) {
                                         // Если пользователь не авторизован, то ему выводим ТОСТ
 
                                         Toast
-                                            .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
+                                            .makeText(
+                                                act,
+                                                act.getString(R.string.need_reg_meeting_to_fav),
+                                                Toast.LENGTH_SHORT
+                                            )
                                             .show()
                                     }
                                 }, // размер иконки
@@ -266,6 +562,6 @@ class MeetingsCard(val act: MainActivity) {
                     }
                 }
             }
-        }
+        }*/
     }
 }

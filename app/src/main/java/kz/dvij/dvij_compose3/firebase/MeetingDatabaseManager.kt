@@ -222,6 +222,11 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                     val getFavCounter = item
                         .child("AddedToFavorites").childrenCount
 
+                    // Читаем количество добавивших в избранное
+                    val getViewCounter = item
+                        .child("viewCounter")
+                        .child("viewCounter").getValue(Int::class.java)
+
                     if (meeting != null && getFilter != null) {
 
                         val finishCardMeeting = MeetingsCardClass(
@@ -248,7 +253,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             ownerKey = meeting.ownerKey,
                             dateInNumber = meeting.dateInNumber,
                             createdTime = meeting.createdTime,
-                            counterInFav = getFavCounter.toString()
+                            counterInFav = getFavCounter.toString(),
+                            counterView = getViewCounter.toString()
                         )
 
                         // читаем число даты для сортировки ГодМесяцДень
@@ -641,6 +647,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         val getFavCounter = item
                             .child("AddedToFavorites").childrenCount
 
+                        val getViewCounter = item
+                            .child("viewCounter")
+                            .child("viewCounter").getValue(Int::class.java)
+
                         if (meeting != null) {
 
                             val finishCardMeeting = MeetingsCardClass(
@@ -667,7 +677,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                 ownerKey = meeting.ownerKey,
                                 dateInNumber = meeting.dateInNumber,
                                 createdTime = meeting.createdTime,
-                                counterInFav = getFavCounter.toString()
+                                counterInFav = getFavCounter.toString(),
+                                counterView = getViewCounter.toString()
                             )
 
                             meetingArray.add(finishCardMeeting)
@@ -717,6 +728,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             .child(auth.uid!!) // ищем папку с ключом пользователя
                             .getValue(String::class.java) // забираем данные из БД если они есть
 
+                        val getViewCounter = item
+                            .child("viewCounter")
+                            .child("viewCounter").getValue(Int::class.java)
+
                         // сравниваем ключи мероприятия
 
                         if (meetingFav == auth.uid) {
@@ -751,7 +766,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                                     ownerKey = meeting.ownerKey,
                                     dateInNumber = meeting.dateInNumber,
                                     createdTime = meeting.createdTime,
-                                    counterInFav = getFavCounter.toString()
+                                    counterInFav = getFavCounter.toString(),
+                                    counterView = getViewCounter.toString()
                                 )
 
                                 //  если мероприятие не нал, то добавляем в список-черновик

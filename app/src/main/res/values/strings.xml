@@ -5,16 +5,16 @@
 
     <!-- Нижнее меню -->
 
-    <string name="profile">Профиль</string>
-    <string name="meetings">Мероприятия</string>
-    <string name="places">Места</string>
-    <string name="stock">Акции</string>
+    <string name="profile">Профиль</string> <!-- Подтвержденная строчка -->
+    <string name="meetings">Мероприятия</string> <!-- Подтвержденная строчка -->
+    <string name="places">Места</string> <!-- Подтвержденная строчка -->
+    <string name="stock">Акции</string> <!-- Подтвержденная строчка -->
 
     <!-- Табы -->
 
-    <string name="tab_my">Мои</string>
-    <string name="tab_tape">Лента</string>
-    <string name="tab_fav">Избранные</string>
+    <string name="tab_my">Мои</string> <!-- Подтвержденная строчка -->
+    <string name="tab_tape">Лента</string> <!-- Подтвержденная строчка -->
+    <string name="tab_fav">Избранные</string> <!-- Подтвержденная строчка -->
 
     <!-- Боковое меню -->
 
@@ -46,26 +46,26 @@
     <string name="cd_go_back">Иконка "Вернуться назад"</string> <!-- Подтвержденная строчка -->
     <string name="cd_side_menu">Открыть боковое меню</string> <!-- Подтвержденная строчка -->
     <string name="cd_avatar">Аватарка пользователя</string> <!-- Подтвержденная строчка -->
-
-
-
-
+    <string name="cd_phone_icon">Иконка поля ввода телефона</string> <!-- Подтвержденная строчка -->
+    <string name="cd_money">Иконка валюты</string> <!-- Подтвержденная строчка -->
+    <string name="cd_social_icon">Кнопка социальной сети</string> <!-- Подтвержденная строчка -->
+    <string name="cd_chosen_image">Выбранное изображение</string> <!-- Подтвержденная строчка -->
 
 
 
 
 
     <string name="cd_illustration">Иллюстрация</string>
-    <string name="cd_phone_icon">Иконка поля ввода телефона</string>
+
     <string name="cd_create">Кнопка "Создать"</string>
     <string name="cd_meeting_image">Изображение мероприятия</string>
 
     <string name="cd_publish_button">Кнопка "Опубликовать"</string>
-    <string name="cd_social_icon">Кнопка социальной сети</string>
+
     <string name="cd_fav_icon">Иконка "Избранное"</string>
     <string name="cd_add_image">Иконка "Добавить картинку"</string>
     <string name="cd_add_to_fav">Иконка "Добавить в избранное"</string>
-    <string name="cd_chosen_image">Выбранное изображение</string>
+
     <string name="cd_edit_image">Иконка "Редактировать изображение"</string>
     <string name="cd_delete_image">Иконка "Удалить изображение"</string>
     <string name="cd_counter_view_meeting">Иконка "Количество просмотров"</string>
@@ -78,6 +78,12 @@
     <string name="i_change_password">Я сбросил пароль. Войти</string> <!-- Подтвержденная строчка -->
     <string name="i_activate_profile">Я активировал аккаунт. Войти</string> <!-- Подтвержденная строчка -->
     <string name="go_to_home">Вернуться на главную страницу</string> <!-- Подтвержденная строчка -->
+    <string name="choose_image">Выбрать изображение</string> <!-- Подтвержденная строчка -->
+    <string name="edit">Редактировать</string> <!-- Подтвержденная строчка -->
+    <string name="delete">Удалить</string> <!-- Подтвержденная строчка -->
+    <string name="choose_city">Выбери город:</string> <!-- Подтвержденная строчка -->
+    <string name="push_button">Опубликовать</string> <!-- Подтвержденная строчка -->
+    <string name="cansel_button">Отменить</string> <!-- Подтвержденная строчка -->
 
     <string name="to_change">Изменить</string>
 
@@ -87,13 +93,13 @@
     <string name="subscribe_to_instagram">Подписаться на канал в Instagram</string>
 
 
-    <string name="choose_city">Выбери город:</string>
+
     <string name="create_meeting">Создание мероприятия</string>
     <string name="edit_meeting">Редактирование мероприятия</string>
     <string name="create_place">Создание места</string>
     <string name="create_stock">Создание акции</string>
-    <string name="push_button">Опубликовать</string>
-    <string name="cansel_button">Отменить</string>
+
+
     <string name="delete_from_fav">Удалено из избранных</string>
     <string name="add_to_fav">Добавлено в избранные</string>
 
@@ -150,12 +156,17 @@
 
     <!-- Страница профиля -->
     <string name="icon_user_image">Изображение аватарки пользователя</string> <!-- Подтвержденная строчка -->
-
+    <string name="avatar">Аватар</string> <!-- Подтвержденная строчка -->
+    <string name="name">Имя</string> <!-- Подтвержденная строчка -->
+    <string name="surname">Фамилия</string> <!-- Подтвержденная строчка -->
+    <string name="email">Email</string> <!-- Подтвержденная строчка -->
+    <string name="phone">Телефон</string> <!-- Подтвержденная строчка -->
+    <string name="sign_out_button">Выйти из аккаунта</string> <!-- Подтвержденная строчка -->
 
 
     <string name="sign_out_success">Ты успешно вышел из аккаунта.</string>
     <string name="sign_in_google_success">Ты успешно вошел через Google-аккаунт</string>
-    <string name="sign_out_button">Выйти из аккаунта</string>
+
 
     <string name="need_registration_toast">Страница аккаунта станет доступна после того, как ты зарегистрируешься</string>
 
@@ -189,10 +200,13 @@
     <string name="cat_concerts">Концерты</string>
 
     <!-- МЕРОПРИЯТИЯ -->
-    <string name="input_headline">Введите заголовок (max 40 символов)</string>
-    <string name="input_username">Введите имя пользователя</string>
-    <string name="input_description">Введите описание</string>
-    <string name="input_price">Введите стоимость билета</string>
+    <string name="input_headline">Напиши заголовок (max 40 символов)</string> <!-- Подтвержденная строчка -->
+    <string name="input_description">Напиши описание</string> <!-- Подтвержденная строчка -->
+    <string name="input_price">Напиши стоимость билета</string> <!-- Подтвержденная строчка -->
+    <string name="input_username">Введи имя пользователя</string> <!-- Подтвержденная строчка -->
+
+
+
     <string name="free_price">Вход бесплатный</string>
     <string name="about_meeting">О мероприятии</string>
     <string name="empty_meeting">Пусто</string>
@@ -206,10 +220,13 @@
     <string name="piker_time">Выбери время</string>
 
     <!-- SYSTEM STRINGS -->
-    <string name="ss_loading">Идет загрузка</string>
+    <string name="ss_loading">Идет загрузка</string>  <!-- Подтвержденная строчка -->
+
     <string name="ss_tenge">тенге</string>
 
     <!-- Создание мероприятия -->
+    <string name="cm_without_dog">Вводить имя пользователя нужно без @</string> <!-- Подтвержденная строчка -->
+
     <string name="cm_image">Картинка мероприятия*</string>
     <string name="cm_headline">Заголовок*</string>
     <string name="cm_category">Категория*</string>
@@ -224,7 +241,7 @@
     <string name="cm_description">Описание*</string>
     <string name="cm_no_image">Нет картинки. Без нее никак не опубликовать мероприятие :(</string>
     <string name="cm_no_headline">Нет заголовка. Заполни - а то не понятно, о чем твое мероприятие</string>
-    <string name="cm_without_dog">Вводить имя пользователя нужно без @</string>
+
     <string name="cm_no_phone">Не введен телефон для звоноков. Как связаться-то с тобой?</string>
     <string name="cm_no_date">В какой день начало?</string>
     <string name="cm_no_start_time">Во сколько начало?</string>
@@ -233,7 +250,7 @@
     <string name="cm_no_city">Выбери город</string>
     <string name="cm_success">Твое мероприятие успешно опубликовано! Сейчас его все увидят!</string>
     <string name="cm_start_in">Начинаем в</string>
-    <string name="cm_choose_image">Выбери картинку</string>
+
     <string name="cm_choose_place">Выбери заведение или введи название и адрес места</string>
 
     <!-- Создание заведения -->
@@ -251,9 +268,9 @@
     <string name="cs_no_finish_day">В какой день заканчивается акция?</string>
 
     <!-- Social Media -->
-    <string name="social_instagram">Instagram</string>
-    <string name="social_telegram">Telegram</string>
-    <string name="social_whatsapp">Whatsapp</string>
+    <string name="social_instagram">Instagram</string> <!-- Подтвержденная строчка -->
+    <string name="social_telegram">Telegram</string> <!-- Подтвержденная строчка -->
+    <string name="social_whatsapp">Whatsapp</string> <!-- Подтвержденная строчка -->
 
     <!-- Месяцы -->
     <string name="january">января</string>

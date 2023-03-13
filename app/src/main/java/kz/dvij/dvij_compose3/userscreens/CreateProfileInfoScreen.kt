@@ -1,15 +1,13 @@
 package kz.dvij.dvij_compose3.userscreens
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,7 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toFile
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -28,6 +27,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.ATTENTION
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.UserDatabaseManager
@@ -36,11 +36,7 @@ import kz.dvij.dvij_compose3.navigation.CREATE_USER_INFO_SCREEN
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.PROFILE_ROOT
 import kz.dvij.dvij_compose3.photohelper.chooseImageDesign
-import kz.dvij.dvij_compose3.ui.theme.Grey100
-import kz.dvij.dvij_compose3.ui.theme.Grey95
-import kz.dvij.dvij_compose3.ui.theme.SuccessColor
-import kz.dvij.dvij_compose3.ui.theme.Typography
-import java.io.File
+import kz.dvij.dvij_compose3.ui.theme.*
 
 class CreateProfileInfoScreen (val act: MainActivity) {
 
@@ -101,7 +97,7 @@ class CreateProfileInfoScreen (val act: MainActivity) {
         Column(
             modifier = Modifier
                 .fillMaxSize() // занять весь размер экрана
-                .background(Grey95) // цвет фона
+                .background(Grey_Background) // цвет фона
                 .verticalScroll(rememberScrollState()) // говорим, что колонка скролится вверх и вниз
                 .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp) // паддинги
             ,
@@ -111,7 +107,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ---- АВАТАР ------
 
-            SpacerTextWithLine(headline = "Аватар") // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.avatar),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val avatar = if (filledUserInfo.avatar != null && filledUserInfo.avatar != "" && createOrEdit != "0"){
 
@@ -128,7 +129,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ---- ИМЯ ------
 
-            SpacerTextWithLine(headline = "Имя")
+            Text(
+                text = stringResource(id = R.string.name),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val name = if (filledUserInfo.name != null && filledUserInfo.name != "" && createOrEdit != "0" ){
 
@@ -143,7 +149,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ---- ФАМИЛИЯ -------
 
-            SpacerTextWithLine(headline = "Фамилия")
+            Text(
+                text = stringResource(id = R.string.surname),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val surname = if (filledUserInfo.surname != null && filledUserInfo.surname != "" && createOrEdit != "0" ){
 
@@ -158,7 +169,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ---- EMAIL ---------
 
-            SpacerTextWithLine(headline = "Email")
+            Text(
+                text = stringResource(id = R.string.email),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val email = if (filledUserInfo.email != null && filledUserInfo.email != "" && createOrEdit != "0" ) {
 
@@ -173,7 +189,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ----- ТЕЛЕФОН --------
 
-            SpacerTextWithLine(headline = "Телефон")
+            Text(
+                text = stringResource(id = R.string.phone),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val phone = if (phoneNumberFromDb != null && phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != ""){
 
@@ -190,7 +211,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // --- ФОРМА WHATSAPP ----
 
-            SpacerTextWithLine(headline = "Whatsapp")
+            Text(
+                text = stringResource(id = R.string.social_whatsapp),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val whatsapp = if (phoneNumberFromDb != null && phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != ""){
 
@@ -215,7 +241,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ------ ИНСТАГРАМ -------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.social_instagram),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val instagram = if (filledUserInfo.instagram != null && filledUserInfo.instagram != "" && createOrEdit != "0" ){
 
@@ -230,7 +261,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ------ ТЕЛЕГРАМ -------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.social_telegram),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val telegram = if (filledUserInfo.telegram != null && filledUserInfo.telegram != "" && createOrEdit != "0" ) {
 
@@ -246,7 +282,12 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
             // ---- ГОРОД ------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.city),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
 
             // Если при редактировании в пользователе есть город
@@ -287,20 +328,31 @@ class CreateProfileInfoScreen (val act: MainActivity) {
             Spacer(modifier = Modifier.height(20.dp))
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
+            
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.push_button),
+                leftIcon = R.drawable.ic_send
+            ) {
 
-            Button(
 
-                onClick = {
 
-                    // если все права есть и все обязательные поля заполнены
+                // запускаем корутину
 
-                    openLoading.value = true // открываем диалог загрузки
+                GlobalScope.launch(Dispatchers.IO){
 
-                    // запускаем корутину
+                    if (avatar != null){
 
-                    GlobalScope.launch(Dispatchers.IO){
+                        if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                        if (avatar != null){
+                            // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
+
+                            ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
+
+                        } else {
+
+                            // если все права есть и все обязательные поля заполнены
+
+                            openLoading.value = true // открываем диалог загрузки
 
                             // запускаем сжатие изображения
                             val compressedImage = act.photoHelper.compressImage(act, avatar)
@@ -369,98 +421,88 @@ class CreateProfileInfoScreen (val act: MainActivity) {
                                     }
                                 }
                             }
+                        }
 
-                        } else {
+                    } else {
 
-                            // Запускаем корутину и публикуем данные пользователя
+                        // если все права есть и все обязательные поля заполнены
 
-                            GlobalScope.launch(Dispatchers.Main) {
+                        openLoading.value = true // открываем диалог загрузки
 
-                                // заполняем
+                        // Запускаем корутину и публикуем данные пользователя
 
-                                val filledUser = UserInfoClass(
-                                    avatar = filledUserInfo.avatar,
-                                    name = name,
-                                    surname = surname,
-                                    email = email,
-                                    phoneNumber = phone,
-                                    whatsapp = whatsapp,
-                                    instagram = instagram,
-                                    telegram = telegram,
-                                    userKey = auth.uid,
-                                    city = city
-                                )
+                        GlobalScope.launch(Dispatchers.Main) {
 
-                                // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+                            // заполняем
 
-                                if (auth.uid != null) {
+                            val filledUser = UserInfoClass(
+                                avatar = filledUserInfo.avatar,
+                                name = name,
+                                surname = surname,
+                                email = email,
+                                phoneNumber = phone,
+                                whatsapp = whatsapp,
+                                instagram = instagram,
+                                telegram = telegram,
+                                userKey = auth.uid,
+                                city = city
+                            )
 
-                                    // Если зарегистрирован, то запускаем функцию публикации мероприятия
+                            // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
-                                    userDatabaseManager.publishUser(filledUser = filledUser){ result ->
+                            if (auth.uid != null) {
 
-                                        // в качестве колбака придет булин. Если опубликовано, то:
+                                // Если зарегистрирован, то запускаем функцию публикации мероприятия
 
-                                        if (result){
+                                userDatabaseManager.publishUser(filledUser = filledUser){ result ->
 
-                                            act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
+                                    // в качестве колбака придет булин. Если опубликовано, то:
 
-                                            navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
+                                    if (result){
 
-                                            // показываем ТОСТ
-                                            Toast.makeText(
-                                                act,
-                                                "Данные пользователя успешно отредактированы",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                        act.chooseCityNavigation.chosenCity = CitiesList("Выбери город", "default_city")
 
-                                        } else {
+                                        navController.navigate(PROFILE_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 
-                                            // если произошла ошибка и мероприятие не опубликовалось то:
+                                        // показываем ТОСТ
+                                        Toast.makeText(
+                                            act,
+                                            "Данные пользователя успешно отредактированы",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
 
-                                            // Показываем тост
-                                            Toast.makeText(
-                                                act,
-                                                act.resources.getString(R.string.error_text),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                    } else {
 
-                                        }
+                                        // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                        // Показываем тост
+                                        Toast.makeText(
+                                            act,
+                                            act.resources.getString(R.string.error_text),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
                                     }
                                 }
                             }
                         }
                     }
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка на всю ширину
-                    .height(50.dp),// высота - 50
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = SuccessColor, // цвет кнопки
-                    contentColor = Grey100 // цвет контента на кнопке
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.push_button),
-                    style = Typography.labelMedium
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_publish),
-                    contentDescription = stringResource(id = R.string.cd_publish_button),
-                    modifier = Modifier.size(20.dp)
-                )
+                }
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // ------ КНОПКА ОТМЕНИТЬ -----------
 
-
+            ButtonCustom(
+                buttonText = stringResource(id = R.string.cansel_button),
+                leftIcon = R.drawable.ic_close,
+                typeButton = ATTENTION
+            ) {
+                navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+            }
         }
+
 
         // --- ЭКРАН ИДЕТ ЗАГРУЗКА ----
 

@@ -9,8 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -18,11 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // --- ФУНКЦИЯ ВЫБОРА КАРТИНКИ В СОЗДАНИИ МЕРОПРИЯТИЯ / ЗАВЕДЕНИЯ / АКЦИЙ  --------
@@ -42,141 +40,128 @@ fun chooseImageDesign (inputImageUrl: String? = ""): Uri? {
         selectImage.value = it // собственно результат it помещаем в переменную изображения выше
     }
 
-    // ------- ПОМЕЩАЕМ ВСЕ СОДЕРЖИМОЕ В КАРТОЧКУ -------
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth() // занять всю ширину
-            .height(220.dp), // высота 220
-        shape = RoundedCornerShape(15.dp), // скругление углов
-        backgroundColor = Grey100 // цвет фона
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(
+            color = Grey_ForCards,
+            shape = RoundedCornerShape(15.dp)
+        )
     ) {
-
-        // ---- ЕСЛИ ИЗОБРАЖЕНИЕ ЕЩЕ НЕ ВЫБРАНО -------
+        
+        // ---- ЕСЛИ ИЗОБРАЖЕНИЕ НЕ ВЫБРАНО -------
 
         if (selectImage.value == null && imageUrl.value == "") {
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth() // занять всю ширину
-                    .fillMaxHeight(), // занять всю высоту
-                horizontalAlignment = Alignment.CenterHorizontally, // выравнивание по горизонтали по центру
-                verticalArrangement = Arrangement.Center // выравнивание по вертикали по центру
-            ) {
-
-                // ------- ИКОНКА И НАДПИСЬ ДОБАВИТЬ ИЗОБРАЖЕНИЕ ---------
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth() // занять всю ширину
-                        .clickable {
-
-                            // запускаем на нажатие функции выбора картинки
-                            galleryLauncher.launch("image/*")
-
-                        },
-                    verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали по центру
-                    horizontalArrangement = Arrangement.Center // выравнивание по горизонтали по центру
+                    .height(220.dp)
+                    .padding(horizontal = 50.dp), // высота 220
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    // ------ ИКОНКА ДОБАВИТЬ --------
+                // КНОПКА ВЫБРАТЬ ИЗОБРАЖЕНИЕ
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = stringResource(id = R.string.cd_add_image),
-                        tint = Grey10
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    // -------- ТЕКСТ ВЫБЕРИ ИЗОБРАЖЕНИЕ -----------
-
-                    Text(
-                        text = stringResource(id = R.string.cm_choose_image),
-                        color = Grey10,
-                        style = Typography.bodyMedium
-                    )
+                ButtonCustom(
+                    buttonText = stringResource(id = R.string.choose_image),
+                    leftIcon = R.drawable.ic_add
+                ) {
+                    // запускаем на нажатие функции выбора картинки
+                    galleryLauncher.launch("image/*")
                 }
             }
-
         } else {
 
-            // -------- ЕСЛИ ИЗОБРАЖЕНИЕ ВЫБРАНО ------------
-
-            Image(
-                modifier = Modifier
-                    .background(
-                        shape = RoundedCornerShape(20.dp), // скругление углов
-                        color = Grey95 // цвет фона
-                    )
-                    .fillMaxWidth() // занять всю ширину
-                    .fillMaxHeight(), // занять всю высоту
-
-                painter = (
-                        if (selectImage.value != null) {
-
-                            // изображение-ЗАГЛУШКА
-                            rememberAsyncImagePainter(model = selectImage.value)
-
-                        } else {
-
-                            // ВЫБРАННОЕ ИЗОБРАЖЕНИЕ
-                            rememberAsyncImagePainter(model = imageUrl.value)
-
-                        }
-                        ),
-                contentDescription = stringResource(id = R.string.cd_chosen_image), // Описание для слабовидящих
-
-                contentScale = ContentScale.Crop, // Поместить изображение
-                alignment = Alignment.Center // выравнивание по центру
-            )
-
-            // --- РЕДАКТИРОВАТЬ ИЛИ УДАЛИТЬ ИЗОБРАЖЕНИЕ --------
-
+            // -------- ЕСЛИ УЖЕ ЕСТЬ ИЗОБРАЖЕНИЕ ----
             Column(
                 modifier = Modifier
-                    .fillMaxSize() // занять весь размер
-                    .padding(5.dp), // отступ
-                horizontalAlignment = Alignment.End, // выравнивание по горизонтали справа
-                verticalArrangement = Arrangement.SpaceBetween // выравнивание по вертикали - раскидать элементы сверху и снизу
+                    .fillMaxWidth()
+                    .background(
+                        Grey_OnBackground,
+                        shape = RoundedCornerShape(15.dp)
+                    ),
+
             ) {
 
-                // ---- ИКОНКА РЕДАКТИРОВАТЬ -------
+                // -------- ЕСЛИ ИЗОБРАЖЕНИЕ ВЫБРАНО, ПОМЕЩАЕМ В КАРТОЧКУ ------------
 
-                IconButton(
-
-                    onClick = { galleryLauncher.launch("image/*") },
+                Card(
                     modifier = Modifier
-                        .background(
-                            WarningColor,
-                            shape = RoundedCornerShape(50)
-                        )
+                        .fillMaxWidth() // занять всю ширину
+                        .height(220.dp), // высота 220
+                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomStart = 0.dp, bottomEnd = 0.dp), // скругление углов
+                    backgroundColor = Grey_ForCards // цвет фона
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_edit),
-                        contentDescription = stringResource(id = R.string.cd_edit_image),
-                        tint = Grey95
+
+                    // -------- САМО ИЗОБРАЖЕНИЕ -------- 
+
+                    Image(
+                        modifier = Modifier
+                            .background(
+                                shape = RoundedCornerShape(
+                                    topStart = 15.dp,
+                                    topEnd = 15.dp,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = 0.dp
+                                ), // скругление углов
+                                color = Grey_ForCards // цвет фона
+                            )
+                            .fillMaxWidth() // занять всю ширину
+                            .fillMaxHeight(), // занять всю высоту
+
+                        painter = (
+                                if (selectImage.value != null) {
+
+                                    // изображение-ЗАГЛУШКА
+                                    rememberAsyncImagePainter(model = selectImage.value)
+
+                                } else {
+
+                                    // ВЫБРАННОЕ ИЗОБРАЖЕНИЕ
+                                    rememberAsyncImagePainter(model = imageUrl.value)
+
+                                }
+                                ),
+                        contentDescription = stringResource(id = R.string.cd_chosen_image), // Описание для слабовидящих
+
+                        contentScale = ContentScale.Crop, // Поместить изображение
+                        alignment = Alignment.Center // выравнивание по центру
                     )
                 }
 
-                // --- ИКОНКА УДАЛИТЬ -----------
 
-                IconButton(
-                    onClick = {
-                        selectImage.value = null
-                        imageUrl.value = ""
-                              },
-                    modifier = Modifier
-                        .background(
-                            AttentionColor,
-                            shape = RoundedCornerShape(50)
-                        )
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 20.dp,
+                        vertical = 20.dp
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = stringResource(id = R.string.cd_delete_image),
-                        tint = Grey95
+
+                    // ----- КНОПКА РЕДАКТИРОВАТЬ ------
+
+                    Text(
+                        text = stringResource(id = R.string.edit),
+                        style = Typography.labelMedium,
+                        color = YellowDvij,
+                        modifier = Modifier.clickable { galleryLauncher.launch("image/*") }
                     )
+
+                    // ------ КНОПКА УДАЛИТЬ -------
+
+                    Text(
+                        text = stringResource(id = R.string.delete),
+                        style = Typography.labelMedium,
+                        color = AttentionRed,
+                        modifier = Modifier.clickable {
+                            selectImage.value = null
+                            imageUrl.value = ""
+                        }
+                    )
+
                 }
             }
         }

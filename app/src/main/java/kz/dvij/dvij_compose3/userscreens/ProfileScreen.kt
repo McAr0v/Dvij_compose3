@@ -46,10 +46,6 @@ fun ProfileScreen (
     userInfo: MutableState<UserInfoClass>
 ) {
 
-    val meetingCounter = remember { mutableStateOf(0) }
-    val placeCounter = remember { mutableStateOf(0) }
-    val stockCounter = remember { mutableStateOf(0) }
-
     // ------ Считываем данные о пользователе -----
 
     if (activity.mAuth.uid != null){
@@ -59,16 +55,6 @@ fun ProfileScreen (
         }
 
     }
-
-    // ------ ЧИТАЕМ СЧЕТЧИКИ -------
-
-    if (activity.mAuth.uid != null){
-        activity.userDatabaseManager.readMeetingCountersCreatedUser(activity.mAuth.uid!!, meetingCounter)
-        activity.userDatabaseManager.readPlaceCountersCreatedUser(activity.mAuth.uid!!, placeCounter)
-        activity.userDatabaseManager.readStockCountersCreatedUser(activity.mAuth.uid!!, stockCounter)
-    }
-
-
 
     val accountHelper = AccountHelper(activity)
 
@@ -241,42 +227,6 @@ fun ProfileScreen (
                             Spacer(modifier = Modifier.height(20.dp))
 
 
-                            Row {
-
-                                if (meetingCounter.value != 0) {
-
-                                    NumberAndDesc(
-                                        number = meetingCounter.value.toString(),
-                                        desc = returnMeetingWord(meetingCounter.value)
-                                    )
-
-                                    Spacer(modifier = Modifier.width(20.dp))
-
-                                }
-
-                                if (placeCounter.value != 0) {
-                                    NumberAndDesc(
-                                        number = placeCounter.value.toString(),
-                                        desc = returnPlaceWord(placeCounter.value)
-                                    )
-
-                                    Spacer(modifier = Modifier.width(20.dp))
-
-                                }
-
-
-                                if (stockCounter.value != 0) {
-
-                                    NumberAndDesc(
-                                        number = stockCounter.value.toString(),
-                                        desc = returnStockWord(stockCounter.value)
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-
                             // --- ТЕЛЕФОН -----
 
                             TextAndDesc(
@@ -373,7 +323,7 @@ fun ProfileScreen (
                             // ---- КНОПКА ВЫЙТИ ИЗ АККАУНТА -----
 
                             ButtonCustom(
-                                buttonText = "Выйти из аккаунта",
+                                buttonText = stringResource(id = R.string.sign_out_button),
                                 typeButton = SECONDARY,
                                 rightIcon = R.drawable.ic_logout
                             ) {

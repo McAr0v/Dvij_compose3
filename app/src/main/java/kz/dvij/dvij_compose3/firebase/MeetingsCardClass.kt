@@ -24,6 +24,7 @@ data class MeetingsCardClass(
     val ownerKey: String? = null,
     val dateInNumber: String? = null,
     val createdTime: String? = null,
-    val counterInFav: String? = null
+    val counterInFav: String? = null,
+    val counterView: String? = null
 
 )

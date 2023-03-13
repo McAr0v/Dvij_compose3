@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.FOR_CARDS
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -206,12 +207,12 @@ class ChooseCityNavigation (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_Background, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -232,7 +233,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                     Text(
                         text = stringResource(id = R.string.choose_city), // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)) // занять всю оставшуюся ширину
 
                     Spacer(modifier = Modifier.height(20.dp)) // разделител
@@ -242,7 +243,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
@@ -257,8 +258,8 @@ class ChooseCityNavigation (val act: MainActivity) {
                     modifier = Modifier
                         .fillMaxWidth() // занять ширину
                         .background(
-                            Grey100, // цвет фона
-                            shape = RoundedCornerShape(10.dp) // скругление углов
+                            Grey_OnBackground, // цвет фона
+                            shape = RoundedCornerShape(15.dp) // скругление углов
                         )
                         .padding(20.dp), // отступ
                 verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка
@@ -284,8 +285,8 @@ class ChooseCityNavigation (val act: MainActivity) {
                         ) {
                             Text(
                                 text = city.cityName!!, // само название города
-                                color = Grey40, // цвет текста
-                                style = Typography.bodyMedium // стиль текста
+                                color = WhiteDvij, // цвет текста
+                                style = Typography.bodySmall // стиль текста
                             )
                         }
                     }
@@ -310,9 +311,9 @@ class ChooseCityNavigation (val act: MainActivity) {
                 } else {
                     2.dp
                 }, color = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
-                    Grey95
+                    YellowDvij
                 } else {
-                    Grey60
+                    Grey_ForCards
 
                 }
             ),
@@ -321,15 +322,15 @@ class ChooseCityNavigation (val act: MainActivity) {
 
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
-                    PrimaryColor
+                    YellowDvij
 
                 } else {
-                    Grey95
+                    Grey_ForCards
                 },
                 contentColor = if (cityName.value != "" && cityName.value != "null" && cityName.value != "Выбери город") {
-                    Grey100
+                    Grey_OnBackground
                 } else {
-                    Grey60
+                    WhiteDvij
                 },
             ),
             shape = RoundedCornerShape(50) // скругленные углы кнопки
@@ -343,9 +344,9 @@ class ChooseCityNavigation (val act: MainActivity) {
                     text = cityName.value, // текст кнопки
                     style = Typography.labelMedium, // стиль текста
                     color = if (cityName.value == "Выбери город") {
-                        Grey60
+                        WhiteDvij
                     } else {
-                        Grey100
+                        Grey_OnBackground
                     }
                 )
 

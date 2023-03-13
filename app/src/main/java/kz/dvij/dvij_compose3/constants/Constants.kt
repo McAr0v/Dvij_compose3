@@ -8,6 +8,7 @@ const val WHATSAPP_URL = "https://api.whatsapp.com/send?phone="
 const val PHONE_URL = "tel:"
 const val PRIMARY = "Primary"
 const val SECONDARY = "Secondary"
+const val ATTENTION = "Attention"
 const val DARK = "Dark"
 const val FOR_CARDS = "For Cards"
 

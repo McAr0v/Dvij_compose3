@@ -393,7 +393,7 @@ fun fieldHeadlineComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
 
 
@@ -406,14 +406,14 @@ fun fieldHeadlineComponent (
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value ?: "Empty", // значение поля
@@ -428,13 +428,14 @@ fun fieldHeadlineComponent (
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -442,11 +443,11 @@ fun fieldHeadlineComponent (
         trailingIcon = {
             Text(
                 text = counter.toString(),
-            style = Typography.bodySmall,
-            color = Grey60)
+            style = Typography.labelMedium,
+            color = Grey_Text)
         },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -466,7 +467,7 @@ fun fieldHeadlineComponent (
             // подсказка для пользователей
             Text(
                 text = stringResource(id = R.string.input_headline), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -501,7 +502,7 @@ fun fieldDescriptionComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
@@ -512,14 +513,14 @@ fun fieldDescriptionComponent (
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(30.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value, // значение поля
@@ -535,13 +536,14 @@ fun fieldDescriptionComponent (
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -549,11 +551,11 @@ fun fieldDescriptionComponent (
         trailingIcon = {
             Text(
                 text = counter,
-                style = Typography.bodySmall,
-                color = Grey60)
+                style = Typography.labelMedium,
+                color = Grey_Text)
         },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -573,7 +575,7 @@ fun fieldDescriptionComponent (
             // подсказка для пользователей
             Text(
                 text = stringResource(id = R.string.input_description), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -618,14 +620,14 @@ fun fieldPhoneComponent(
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         singleLine = true, // говорим, что в поле только 1 строка
@@ -637,17 +639,18 @@ fun fieldPhoneComponent(
             }
         ),
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -657,12 +660,15 @@ fun fieldPhoneComponent(
             Icon(
                 painter = icon,
                 contentDescription = stringResource(id = R.string.cd_phone_icon),
-                tint = Grey60,
+                tint = Grey_Text,
                 modifier = Modifier.size(20.dp) // размер иконки
             )
         },
         placeholder = {
-            Text(text = mask)
+            Text(
+                text = mask,
+                style = Typography.bodySmall
+            )
         }
 
     )
@@ -693,7 +699,7 @@ fun fieldPriceComponent (
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
 
     // -------- ТЕКСТОВОЕ ПОЛЕ -----------------
@@ -705,14 +711,14 @@ fun fieldPriceComponent (
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value, // значение введенного текста
@@ -728,13 +734,14 @@ fun fieldPriceComponent (
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -742,13 +749,13 @@ fun fieldPriceComponent (
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_tenge),
-                contentDescription = stringResource(id = R.string.cd_phone_icon),
-                tint = Grey60,
+                contentDescription = stringResource(id = R.string.cd_money),
+                tint = Grey_Text,
                 modifier = Modifier.size(15.dp) // размер иконки
             )
                       },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -768,7 +775,7 @@ fun fieldPriceComponent (
             // подсказка для пользователей
             Text(
                 text = stringResource(id = R.string.input_price), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -802,7 +809,7 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
 
 
@@ -815,14 +822,14 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value ?: "", // значение поля
@@ -834,26 +841,27 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
             if (newText.contains("@")) {
 
                 isTextError.value = true // объявляем состояние ошибки
-                focusColor.value = AttentionColor // красим границы формы в цвет ошибки
+                focusColor.value = AttentionRed // красим границы формы в цвет ошибки
                 errorMassage.value = act.resources.getString(R.string.cm_without_dog) // передаем текст ошибки
 
             } else { // когда все нормально
 
                 isTextError.value = false // объявляем, что ошибки нет
-                focusColor.value = SuccessColor // цвет фокуса переводим в нормальный
+                focusColor.value = YellowDvij // цвет фокуса переводим в нормальный
             }
 
         },
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
@@ -861,12 +869,12 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
             Icon(
                 painter = painterResource(id = icon), // сама иконка
                 contentDescription = stringResource(id = R.string.cd_social_icon), // описание для слабовидящих
-                tint = Grey60, // цвет иконки
+                tint = Grey_Text, // цвет иконки
                 modifier = Modifier.size(20.dp) // размер иконки
             )
         },
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -886,7 +894,7 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
             // подсказка для пользователей
             Text(
                 text = stringResource(id = R.string.input_username), // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 
@@ -898,7 +906,7 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
     if (isTextError.value) {
         Text(
             text = errorMassage.value, // текст ошибки
-            color = AttentionColor, // цвет текста ошибки
+            color = AttentionRed, // цвет текста ошибки
             style = Typography.bodySmall, // стиль текста
             modifier = Modifier.padding(top = 5.dp)) // отступы
     }
@@ -922,7 +930,7 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
     // создаем переменные, в которые будет записываться цвет. Они нужны, чтобы поля
     // при фокусе на них окрашивались в нужные цвета
 
-    val focusColor = remember { mutableStateOf(Grey60) }
+    val focusColor = remember { mutableStateOf(Grey_Text) }
 
 
 
@@ -935,14 +943,14 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
             .fillMaxWidth()
             .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
                 if (focus.isFocused) focusColor.value =
-                    PrimaryColor // если есть, то в переменные с цветами передать цвет брендовый
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
                 else focusColor.value =
-                    Grey60 // если нет, то в переменные с цветами передать серый
+                    Grey_Text // если нет, то в переменные с цветами передать серый
             }
             .border( // настройки самих границ
                 2.dp, // толщина границы
                 color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
-                shape = RoundedCornerShape(50.dp) // скругление границ
+                shape = RoundedCornerShape(15.dp) // скругление границ
             ),
 
         value = text.value!!, // значение поля
@@ -956,17 +964,18 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
 
         colors = TextFieldDefaults.outlinedTextFieldColors(
             // цвета
-            textColor = Grey40,
-            //backgroundColor = Grey95,
-            placeholderColor = Grey60,
-            focusedBorderColor = Grey95,
-            unfocusedBorderColor = Grey95,
-            cursorColor = Grey00,
-            errorBorderColor = Grey95
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
 
         ),
 
-        textStyle = Typography.bodyLarge, // стиль текста
+        textStyle = Typography.bodySmall, // стиль текста
 
         keyboardOptions = KeyboardOptions(
             // опции клавиатуры, которая появляется при вводе
@@ -986,7 +995,7 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
             // подсказка для пользователей
             Text(
                 text = placeHolder, // значение подсказки
-                style = Typography.bodyLarge // стиль текста в холдере
+                style = Typography.bodySmall // стиль текста в холдере
             )
         },
 

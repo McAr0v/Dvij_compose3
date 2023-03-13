@@ -8,10 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kz.dvij.dvij_compose3.ui.theme.Grey10
-import kz.dvij.dvij_compose3.ui.theme.Grey100_95
-import kz.dvij.dvij_compose3.ui.theme.PrimaryColor
-import kz.dvij.dvij_compose3.ui.theme.Typography
+import kz.dvij.dvij_compose3.ui.theme.*
 
 // --------- ЭКРАН "ИДЕТ ЗАГРУЗКА" ----------
 
@@ -29,7 +26,7 @@ fun LoadingScreen (messageText: String) {
         // ---- ЦИРКУЛЛИРУЮЩИЙ ИНДИКАТОР ------
 
         CircularProgressIndicator(
-            color = PrimaryColor, // цвет крутилки
+            color = YellowDvij, // цвет крутилки
             strokeWidth = 3.dp, // толщина крутилки
             modifier = Modifier.size(40.dp) // размер крутилки
         )
@@ -38,8 +35,8 @@ fun LoadingScreen (messageText: String) {
 
         Text(
             text = messageText, // текст рядом с крутилкой
-            style = Typography.bodyMedium, // стиль текста
-            color = Grey10 // цвет
+            style = Typography.bodySmall, // стиль текста
+            color = WhiteDvij // цвет
         )
     }
 }
