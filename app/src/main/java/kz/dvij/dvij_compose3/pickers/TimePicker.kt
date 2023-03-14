@@ -97,9 +97,9 @@ fun timePicker(inputTime: String = ""): String {
                 },
 
                 color = if (mClock.value == "") {
-                    Grey60
+                    Grey_ForCards
                 } else {
-                    Grey95
+                    YellowDvij
                 }
             ),
 
@@ -107,14 +107,14 @@ fun timePicker(inputTime: String = ""): String {
 
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = if (mClock.value == "") {
-                    Grey95
+                    Grey_ForCards
                 } else {
-                    PrimaryColor
+                    YellowDvij
                 },
                 contentColor = if (mClock.value == "") {
-                    Grey60
+                    WhiteDvij
                 } else {
-                    Grey100
+                    Grey_OnBackground
                 },
             ),
 

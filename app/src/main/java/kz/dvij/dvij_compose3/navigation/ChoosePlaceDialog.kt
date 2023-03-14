@@ -204,9 +204,9 @@ class ChoosePlaceDialog (val act: MainActivity) {
                 } else {
                     0.dp
                 }, color = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
-                    Grey60
+                    Grey_ForCards
                 } else {
-                    Grey95
+                    YellowDvij
                 }
             ),
 
@@ -214,14 +214,14 @@ class ChoosePlaceDialog (val act: MainActivity) {
 
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
-                    Grey95
+                    Grey_ForCards
                 } else {
-                    PrimaryColor
+                    YellowDvij
                 },
                 contentColor = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
-                    Grey60
+                    WhiteDvij
                 } else {
-                    Grey100
+                    Grey_OnBackground
                 },
             ),
             shape = RoundedCornerShape(50) // скругленные углы кнопки
@@ -233,9 +233,9 @@ class ChoosePlaceDialog (val act: MainActivity) {
                 text = chosenOutPlace.value.placeName!!, // текст кнопки
                 style = Typography.labelMedium, // стиль текста
                 color = if (chosenOutPlace.value.placeName == "Выбери заведение" || chosenOutPlace.value.placeKey == "null") {
-                    Grey60
+                    WhiteDvij
                 } else {
-                    Grey100
+                    Grey_OnBackground
                 }
             )
 

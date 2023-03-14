@@ -2,6 +2,7 @@ package kz.dvij.dvij_compose3.elements
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
+import kz.dvij.dvij_compose3.navigation.PLACE_VIEW
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class OwnerCard (val act: MainActivity) {
@@ -47,184 +49,159 @@ class OwnerCard (val act: MainActivity) {
 
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Grey100, shape = RoundedCornerShape(10.dp)).padding(10.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            
-            AsyncImage(
-                model = userInfo.value.avatar, 
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(100.dp).clip(CircleShape),
-            )
 
-            Spacer(
-                modifier = Modifier
-                    .width(20.dp)
-            )
-            
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // ----- РАЗДЕЛ СВЯЗАТЬСЯ С ОРГАНИЗАТОРОМ -----
+            // ----- ЛОГОТИП ЗАВЕДЕНИЯ ---------
 
-                // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
+            if (userInfo.value.avatar != null && userInfo.value.avatar != ""){
 
-                if (userInfo.value.name != null && userInfo.value.name != "null" && userInfo.value.name != "") {
+                AsyncImage(
+                    model = userInfo.value.avatar,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                )
 
-                    if (userInfo.value.surname != null && userInfo.value.surname != "null" && userInfo.value.surname != "") {
+                Spacer(modifier = Modifier.width(20.dp))
 
-                        Text(
-                            text = "${userInfo.value.name!!} ${userInfo.value.surname!!}",
-                            style = Typography.titleLarge,
-                            color = Grey10
-                        )
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+                ) {
 
-                    } else {
+                    // ----- ИМЯ И ФАМИЛИЯ --------
 
-                        Text(
-                            text = userInfo.value.name!!,
-                            style = Typography.titleLarge,
-                            color = Grey10
-                        )
+                    if (userInfo.value.name != null && userInfo.value.name != "null" && userInfo.value.name != "") {
+
+                        if (userInfo.value.surname != null && userInfo.value.surname != "null" && userInfo.value.surname != "") {
+
+                            Text(
+                                text = "${userInfo.value.name!!} ${userInfo.value.surname!!}",
+                                style = Typography.bodyMedium,
+                                color = WhiteDvij
+                            )
+
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                        } else {
+
+                            Text(
+                                text = userInfo.value.name!!,
+                                style = Typography.bodyMedium,
+                                color = WhiteDvij
+                            )
+
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                        }
+
 
                     }
 
+                    // --------- АДРЕС -------------
 
-                }
-
-                // ------- ГОРОД ------------
-
-                if (userInfo.value.city != null && userInfo.value.city != "null" && userInfo.value.city != "") {
-
-                    Text(
-                        text = userInfo.value.city!!,
-                        style = Typography.bodyMedium,
-                        color = Grey40
+                    androidx.compose.material3.Text(
+                        text = "Создатель мероприятия",
+                        style = Typography.labelMedium,
+                        color = Grey_Text
                     )
-                }
 
-                Spacer(
-                    modifier = Modifier
-                        .height(10.dp)
-                )
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                Row(modifier = Modifier.fillMaxSize()) {
 
-                    // ----- КНОПКА ПОЗВОНИТЬ --------
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
 
-                    if (userInfo.value.phoneNumber != null && userInfo.value.phoneNumber != "7" && userInfo.value.phoneNumber != "+77" && userInfo.value.phoneNumber != "" && userInfo.value.phoneNumber != "null") {
 
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.makeACall(userInfo.value.phoneNumber!!) }, // функция набора номера
-                            modifier = Modifier.background(
-                                Grey90,
-                                shape = RoundedCornerShape(50)
-                            )
-                        ) {
+                        // ----- КНОПКА ПОЗВОНИТЬ --------
+
+                        if (userInfo.value.phoneNumber != null && userInfo.value.phoneNumber != "7" && userInfo.value.phoneNumber != "+77" && userInfo.value.phoneNumber != "" && userInfo.value.phoneNumber != "null") {
 
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_phone),
                                 contentDescription = "",
-                                tint = Grey10
+                                tint = YellowDvij,
+                                modifier = Modifier.clickable {
+                                    act.callAndWhatsapp.makeACall(userInfo.value.phoneNumber!!)
+                                }.size(30.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .width(20.dp)
                             )
 
                         }
 
-                        Spacer(
-                            modifier = Modifier
-                                .width(10.dp)
-                        )
+                        // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
 
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
-
-                    if (userInfo.value.whatsapp != null && userInfo.value.whatsapp != "7" && userInfo.value.whatsapp != "+77" && userInfo.value.whatsapp != "" && userInfo.value.whatsapp != "null") {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.writeInWhatsapp(userInfo.value.whatsapp!!) }, // Функция перехода в ватсапп
-                            modifier = Modifier.background(
-                                Grey90,
-                                shape = RoundedCornerShape(50)
-                            )
-                        ) {
+                        if (userInfo.value.whatsapp != null && userInfo.value.whatsapp != "7" && userInfo.value.whatsapp != "+77" && userInfo.value.whatsapp != "" && userInfo.value.whatsapp != "null") {
 
                             Icon(
                                 painter = painterResource(id = R.drawable.whatsapp),
                                 contentDescription = stringResource(id = R.string.social_whatsapp),
-                                tint = Grey10
+                                tint = YellowDvij,
+                                modifier = Modifier.clickable {act.callAndWhatsapp.writeInWhatsapp(userInfo.value.whatsapp!!)}.size(30.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .width(20.dp)
                             )
 
                         }
 
-                        Spacer(
-                            modifier = Modifier
-                                .width(10.dp)
-                        )
+                        // ---- КНОПКА НАПИСАТЬ В ИНСТАГРАМ -----------
 
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ИНСТАГРАМ -----------
-
-                    if (userInfo.value.instagram != null && userInfo.value.instagram != "" && userInfo.value.instagram != "null") {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(userInfo.value.instagram!!, INSTAGRAM_URL) }, // Функция перейти на инстаграм
-                            modifier = Modifier.background(
-                                Grey90,
-                                shape = RoundedCornerShape(50)
-                            )
-                        ) {
+                        if (userInfo.value.instagram != null && userInfo.value.instagram != "" && userInfo.value.instagram != "null") {
 
                             Icon(
                                 painter = painterResource(id = R.drawable.instagram),
                                 contentDescription = stringResource(id = R.string.social_instagram),
-                                tint = Grey10
+                                tint = YellowDvij,
+                                modifier = Modifier.clickable {act.callAndWhatsapp.goToInstagramOrTelegram(userInfo.value.instagram!!, INSTAGRAM_URL)}.size(30.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .width(20.dp)
                             )
 
                         }
 
-                        Spacer(
-                            modifier = Modifier
-                                .width(10.dp)
-                        )
+                        // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
 
-                    }
-
-                    // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
-
-                    if (userInfo.value.telegram != null && userInfo.value.telegram != "" && userInfo.value.telegram != "null") {
-
-                        IconButton(
-                            onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(userInfo.value.telegram!!, TELEGRAM_URL) }, // Функция написать в телеграм
-                            modifier = Modifier.background(
-                                Grey90,
-                                shape = RoundedCornerShape(50)
-                            )
-                        ) {
+                        if (userInfo.value.telegram != null && userInfo.value.telegram != "" && userInfo.value.telegram != "null") {
 
                             Icon(
                                 painter = painterResource(id = R.drawable.telegram),
                                 contentDescription = stringResource(id = R.string.social_telegram),
-                                tint = Grey10
+                                tint = YellowDvij,
+                                modifier = Modifier
+                                    .clickable {act.callAndWhatsapp.goToInstagramOrTelegram(userInfo.value.telegram!!, TELEGRAM_URL)}
+                                    .size(30.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .width(20.dp)
                             )
 
                         }
-
-                        Spacer(
-                            modifier = Modifier
-                                .width(10.dp)
-                        )
-
                     }
                 }
             }
-            
         }
-
-
     }
-
-
 }

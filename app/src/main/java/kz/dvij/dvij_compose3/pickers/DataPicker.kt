@@ -110,23 +110,23 @@ fun dataPicker(act: MainActivity, inputDate: String = "", chosenDate: MutableSta
             },
             // цвет границы
             color = if (mDate.value == "") {
-                Grey60
+                Grey_ForCards
             } else {
-                Grey95
+                YellowDvij
             }
         ),
 
         // цвета кнопки
         colors = ButtonDefaults.buttonColors(
             backgroundColor = if (mDate.value == "") {
-                Grey95
+                Grey_ForCards
             } else {
-                PrimaryColor
+                YellowDvij
             },
             contentColor = if (mDate.value == "") {
-                Grey60
+                WhiteDvij
             } else {
-                Grey100
+                Grey_OnBackground
             },
         ),
         shape = RoundedCornerShape(50) // скругление углов

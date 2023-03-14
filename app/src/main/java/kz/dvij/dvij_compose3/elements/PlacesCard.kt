@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Card
@@ -14,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
@@ -64,10 +67,9 @@ class PlacesCard (val act: MainActivity) {
             stockCounter.value = stockCounters.toString()
         }
 
-        Card(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                //.padding(10.dp)
                 .clickable {
 
                     // При клике на карточку - передаем на Main Activity placeKey. Ключ берем из дата класса заведения
@@ -86,165 +88,129 @@ class PlacesCard (val act: MainActivity) {
                             }
                         }
                     }
-
                 },
-            shape = RoundedCornerShape(15.dp),
-            elevation = CardDefaults.cardElevation(5.dp),
-            colors = CardDefaults.cardColors(Grey100)
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
 
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(170.dp)){
+            // ----- ЛОГОТИП ЗАВЕДЕНИЯ ---------
 
-                // ----- ЛОГОТИП ЗАВЕДЕНИЯ ---------
+            if (placeItem.logo != null && placeItem.logo != ""){
 
-                if (placeItem.logo != null && placeItem.logo != ""){
+                AsyncImage(
+                    model = placeItem.logo,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                )
 
-                    AsyncImage(
-                        model = placeItem.logo,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .width(170.dp)
-                            .height(170.dp),
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+                Spacer(modifier = Modifier.width(20.dp))
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(top = 0.dp, end = 0.dp, start = 110.dp, bottom = 0.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
+                        .weight(1f),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
                 ) {
 
-                    // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+                    // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomEnd = 15.dp, bottomStart = 15.dp),
-                        elevation = CardDefaults.cardElevation(5.dp),
-                        colors = CardDefaults.cardColors(Grey100)
+                    if (placeItem.placeName != null && placeItem.placeName != ""){
+
+                        Text(
+                            text = placeItem.placeName,
+                            style = Typography.bodyMedium,
+                            color = WhiteDvij
+                        )
+
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                    }
+
+                    // --------- АДРЕС -------------
+
+                    if (placeItem.address != null && placeItem.address != ""){
+
+                        Text(
+                            text = placeItem.address,
+                            style = Typography.labelMedium,
+                            color = Grey_Text
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                    }
+
+                    // ------ МЕРОПРИЯТИЯ --------
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
                     ) {
 
-                        Column(modifier = Modifier.padding(20.dp)) {
+                        Row (verticalAlignment = Alignment.CenterVertically) {
 
-                            // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
+                            // ----- Иконка мероприятий ------
 
-                            if (placeItem.placeName != null && placeItem.placeName != ""){
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_celebration),
+                                contentDescription = "",
+                                //modifier = Modifier.size(15.dp),
+                                tint = YellowDvij
+                            )
 
-                                Text(
-                                    text = placeItem.placeName,
-                                    style = Typography.titleSmall,
-                                    color = Grey10
-                                )
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                            // ----------- Счетчик мероприятий ----------
 
-                            }
+                            androidx.compose.material.Text(
+                                text = meetingCounter.value,
+                                style = Typography.labelMedium,
+                                color = WhiteDvij
+                            )
 
-                            // ------- ГОРОД ---------
+                        }
 
-                            if (placeItem.city != null && placeItem.city != ""){
+                        Spacer(modifier = Modifier.width(20.dp))
 
-                                Text(
-                                    text = placeItem.city,
-                                    style = Typography.bodyMedium,
-                                    color = Grey40
-                                )
+                        Row (verticalAlignment = Alignment.CenterVertically) {
 
-                            }
+                            // ----- Иконка акций ------
 
-                            // --------- АДРЕС -------------
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_fire),
+                                contentDescription = "",
+                                //modifier = Modifier.size(15.dp),
+                                tint = YellowDvij
+                            )
 
-                            if (placeItem.address != null && placeItem.address != ""){
+                            Spacer(modifier = Modifier.width(5.dp))
 
-                                Text(
-                                    text = placeItem.address,
-                                    style = Typography.bodyMedium,
-                                    color = Grey40
-                                )
+                            // ----------- Счетчик акций ----------
 
-                            }
+                            androidx.compose.material.Text(
+                                text = stockCounter.value,
+                                style = Typography.labelMedium,
+                                color = WhiteDvij
+                            )
 
-                            Spacer(modifier = Modifier.height(10.dp))
-
-
-                            // ------ МЕРОПРИЯТИЯ --------
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                Button(
-                                    onClick = {},
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                                    shape = RoundedCornerShape(50)
-                                ) {
-
-                                    // ----- Иконка мероприятий ------
-
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_celebration),
-                                        contentDescription = "",
-                                        modifier = Modifier.size(15.dp),
-                                        tint = Grey40
-                                    )
-
-                                    Spacer(modifier = Modifier.width(10.dp))
-
-                                    // ----------- Счетчик мероприятий ----------
-
-                                    androidx.compose.material.Text(
-                                        text = meetingCounter.value,
-                                        style = Typography.labelSmall,
-                                        color = Grey40
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(10.dp))
-
-
-                                // -------- АКЦИИ ---------
-
-                                Button(
-                                    onClick = {},
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                                    shape = RoundedCornerShape(50)
-                                ) {
-
-                                    // ----- Иконка акций ------
-
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_fire),
-                                        contentDescription = "",
-                                        modifier = Modifier.size(15.dp),
-                                        tint = Grey40
-                                    )
-
-                                    Spacer(modifier = Modifier.width(5.dp))
-
-                                    // ----------- Счетчик акций ----------
-
-                                    androidx.compose.material.Text(
-                                        text = stockCounter.value,
-                                        style = Typography.labelSmall,
-                                        color = Grey40
-                                    )
-                                }
-                            }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // ИКОНКА РЕДАКТИРОВАТЬ
+
+                androidx.compose.material3.Icon(
+                    painter = painterResource(id = R.drawable.ic_right), // сама иконка
+                    contentDescription = stringResource(id = R.string.cd_move_to_profile), // описание для слабовидящих
+                    tint = WhiteDvij // цвет иконки
+                )
             }
         }
     }
