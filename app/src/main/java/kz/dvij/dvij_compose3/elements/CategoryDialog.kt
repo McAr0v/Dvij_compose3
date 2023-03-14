@@ -189,9 +189,9 @@ class CategoryDialog (val act: MainActivity) {
                 } else {
                     2.dp
                 }, color = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
-                    Grey95
+                    YellowDvij
                 } else {
-                    Grey60
+                    Grey_ForCards
                 }
             ),
 
@@ -199,15 +199,15 @@ class CategoryDialog (val act: MainActivity) {
 
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
-                    PrimaryColor
+                    YellowDvij
                 } else {
-                    Grey95
+                    Grey_ForCards
 
                 },
                 contentColor = if (categoryName.value != "" && categoryName.value != "null" && categoryName.value != "Выбери категорию" && categoryName.value != "По умолчанию") {
-                    Grey100
+                    Grey_OnBackground
                 } else {
-                    Grey60
+                    WhiteDvij
 
                 },
             ),
@@ -222,9 +222,9 @@ class CategoryDialog (val act: MainActivity) {
                     text = categoryName.value, // текст кнопки
                     style = Typography.labelMedium, // стиль текста
                     color = if (categoryName.value == "Выбери категорию" || categoryName.value == "По умолчанию") {
-                        Grey60
+                        WhiteDvij
                     } else {
-                        Grey100
+                        Grey_OnBackground
                     }
                 )
 
@@ -235,7 +235,7 @@ class CategoryDialog (val act: MainActivity) {
                     Text(
                         text = "Выбери категорию", // текст кнопки
                         style = Typography.labelMedium, // стиль текста
-                        color = Grey60
+                        color = WhiteDvij
                     )
 
                 } else {
@@ -243,7 +243,7 @@ class CategoryDialog (val act: MainActivity) {
                     Text(
                         text = "По умолчанию", // текст кнопки
                         style = Typography.labelMedium, // стиль текста
-                        color = Grey60
+                        color = WhiteDvij
                     )
 
                 }
@@ -272,12 +272,12 @@ class CategoryDialog (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_Background, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -299,7 +299,7 @@ class CategoryDialog (val act: MainActivity) {
                     Text(
                         text = stringResource(id = R.string.cat_default), // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)
                     ) // занять всю оставшуюся ширину
 
@@ -310,7 +310,7 @@ class CategoryDialog (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
@@ -324,8 +324,8 @@ class CategoryDialog (val act: MainActivity) {
                     modifier = Modifier
                         .fillMaxWidth() // занять ширину
                         .background(
-                            Grey100, // цвет фона
-                            shape = RoundedCornerShape(10.dp) // скругление углов
+                            Grey_OnBackground, // цвет фона
+                            shape = RoundedCornerShape(15.dp) // скругление углов
                         )
                         .padding(20.dp), // отступ
                     verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами
@@ -348,8 +348,8 @@ class CategoryDialog (val act: MainActivity) {
 
                                 Text(
                                     text = category.categoryName!!, // само название категории
-                                    color = Grey00, // цвет текста
-                                    style = Typography.bodyMedium // стиль текста
+                                    color = WhiteDvij, // цвет текста
+                                    style = Typography.bodySmall // стиль текста
                                 )
 
                         }

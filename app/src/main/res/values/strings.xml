@@ -195,7 +195,8 @@
     <string name="title_activity_google">googleActivity</string>
 
     <!-- Категории -->
-    <string name="cat_default">Выберите категорию</string>
+    <string name="cat_default">Выбери категорию</string> <!-- Подтвержденная строчка -->
+
     <string name="cat_hobie">Хобби</string>
     <string name="cat_concerts">Концерты</string>
 
@@ -204,19 +205,20 @@
     <string name="input_description">Напиши описание</string> <!-- Подтвержденная строчка -->
     <string name="input_price">Напиши стоимость билета</string> <!-- Подтвержденная строчка -->
     <string name="input_username">Введи имя пользователя</string> <!-- Подтвержденная строчка -->
+    <string name="empty_meeting">Пусто</string> <!-- Подтвержденная строчка -->
+    <string name="free_price">Вход бесплатный</string> <!-- Подтвержденная строчка -->
 
 
 
-    <string name="free_price">Вход бесплатный</string>
     <string name="about_meeting">О мероприятии</string>
-    <string name="empty_meeting">Пусто</string>
+
     <string name="need_reg_meeting">Чтобы добавить мероприятие в этот раздел, тебе нужно авторизоваться в системе</string>
     <string name="need_reg_meeting_to_fav">Чтобы добавить мероприятие в ИЗБРАННОЕ, тебе нужно авторизоваться в системе</string>
     <string name="meeting_view_counter">Количество просмотров мероприятия</string>
     <string name="meeting_call_org">Связаться с организатором</string>
 
     <!-- PICKERS -->
-    <string name="piker_date">Выбери дату</string>
+    <string name="piker_date">Выбери дату</string> <!-- Подтвержденная строчка -->
     <string name="piker_time">Выбери время</string>
 
     <!-- SYSTEM STRINGS -->
@@ -226,8 +228,9 @@
 
     <!-- Создание мероприятия -->
     <string name="cm_without_dog">Вводить имя пользователя нужно без @</string> <!-- Подтвержденная строчка -->
+    <string name="cm_image">Картинка мероприятия*</string> <!-- Подтвержденная строчка -->
 
-    <string name="cm_image">Картинка мероприятия*</string>
+
     <string name="cm_headline">Заголовок*</string>
     <string name="cm_category">Категория*</string>
     <string name="cm_phone">Телефон для звонков*</string>

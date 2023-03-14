@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.filters.FilterFunctions
@@ -94,12 +95,12 @@ class FilterDialog (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_Background, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -121,7 +122,7 @@ class FilterDialog (val act: MainActivity) {
                     Text(
                         text = "Фильтр", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)
                     ) // занять всю оставшуюся ширину
 
@@ -132,23 +133,28 @@ class FilterDialog (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
 
                 Column(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 20.dp),
+                    .padding(bottom = 10.dp),
                 ) {
 
 
                     // ----- ГОРОД ------
 
-                    SpacerTextWithLine(headline = "Город")
+                    Text(
+                        text = "Город",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -162,18 +168,21 @@ class FilterDialog (val act: MainActivity) {
 
                             IconButton(onClick = { cityForFilter.value = "Выбери город" }) {
 
-                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = WhiteDvij)
 
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
 
                     // ----- КАТЕГОРИЯ --------
 
-                    SpacerTextWithLine(headline = "Категория")
+                    Text(
+                        text = "Категория",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -188,21 +197,20 @@ class FilterDialog (val act: MainActivity) {
 
                             IconButton(onClick = { meetingCategoryForFilter.value = "Выбери категорию" }) {
 
-                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = WhiteDvij)
 
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
                     // ------- ПЕРИОД ДАТ ----------
 
-                    SpacerTextWithLine(headline = "Период")
-
-                    Text(text = "Начало периода", color = Grey40)
-
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Начало периода поиска",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -218,19 +226,20 @@ class FilterDialog (val act: MainActivity) {
 
                             IconButton(onClick = { meetingStartDateForFilter.value = "Выбери дату" }) {
 
-                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = WhiteDvij)
 
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
                     // --------- КОНЕЧНАЯ ДАТА -------
 
-                    Text(text = "Конец периода:", color = Grey40)
-
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Конец периода поиска",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -244,7 +253,7 @@ class FilterDialog (val act: MainActivity) {
 
                             IconButton(onClick = { meetingFinishDateForFilter.value = "Выбери дату" }) {
 
-                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+                                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = WhiteDvij)
 
                             }
                         }
@@ -255,7 +264,12 @@ class FilterDialog (val act: MainActivity) {
 
                 // ------- СОРТИРОВКА --------------
 
-                SpacerTextWithLine(headline = "Сортировка")
+                Text(
+                    text = "Сортировка",
+                    style = Typography.bodySmall,
+                    color = WhiteDvij,
+                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                )
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -269,42 +283,32 @@ class FilterDialog (val act: MainActivity) {
 
                         IconButton(onClick = { meetingSortingForFilter.value = "По умолчанию" }) {
 
-                            Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = Grey00)
+                            Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = "", tint = WhiteDvij)
 
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(30.dp))
+                
+
 
 
                 // ---- КНОПКИ ПРИНЯТЬ И СБРОСИТЬ
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                ButtonCustom(buttonText = "Применить фильтр") {onDismiss()}
 
-                    Button(onClick = { onDismiss() }) {
-                        Text(text = "Применить", color = Grey00)
-                    }
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                ButtonCustom(buttonText = "Сбросить фильтр", typeButton = SECONDARY) {
+                    val query = filterFunctions.createMeetingFilter()
 
-                    Button(
-                        onClick = {
+                    val removeQuery = filterFunctions.splitFilter(query)
 
-                            val query = filterFunctions.createMeetingFilter()
-
-                            val removeQuery = filterFunctions.splitFilter(query)
-
-                            meetingCategoryForFilter.value = removeQuery[1]
-                            meetingStartDateForFilter.value = removeQuery[2]
-                            meetingFinishDateForFilter.value = removeQuery[2]
-                            cityForFilter.value = removeQuery[0]
-
-                        }
-                    ) {
-                        Text(text = "Сбросить фильтр", color = Grey00)
-                    }
-
+                    meetingCategoryForFilter.value = removeQuery[1]
+                    meetingStartDateForFilter.value = removeQuery[2]
+                    meetingFinishDateForFilter.value = removeQuery[2]
+                    cityForFilter.value = removeQuery[0]
                 }
 
 

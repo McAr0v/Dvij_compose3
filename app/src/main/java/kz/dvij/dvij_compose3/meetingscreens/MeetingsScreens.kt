@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
@@ -320,59 +321,25 @@ class MeetingsScreens (val act: MainActivity) {
 
                     // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                    Image(
-                        painter = painterResource(
-                            id = R.drawable.sign_in_illustration
-                        ),
-                        contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                        modifier = Modifier.size(200.dp)
-                    )
-
-
-                    Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                    Text(
-                        modifier = Modifier.padding(20.dp),
-                        text = stringResource(id = R.string.need_reg_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // ------------------- КНОПКА ВОЙТИ ---------------------------------
-
-                    Button(
-
-                        onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                        modifier = Modifier
-                            .fillMaxWidth() // кнопка на всю ширину
-                            .height(50.dp) // высота - 50
-                            .padding(horizontal = 20.dp),
-                        shape = RoundedCornerShape(50), // скругление углов
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = PrimaryColor, // цвет кнопки
-                            contentColor = Grey100 // цвет контента на кнопке
-                        )
-                    )
-                    {
-
-                        // СОДЕРЖИМОЕ КНОПКИ
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_login), // иконка
-                            contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                            tint = Grey100 // цвет иконки
-                        )
-
-                        Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
                         Text(
-                            text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                            style = Typography.labelMedium // стиль текста
+                            text = stringResource(id = R.string.need_reg_meeting),
+                            style = Typography.bodySmall,
+                            color = WhiteDvij,
+                            textAlign = TextAlign.Center
                         )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                        ButtonCustom(
+                            buttonText = stringResource(id = R.string.to_login)
+                        ) {
+                            navController.navigate(LOG_IN_ROOT)
+                        }
+
                     }
 
                 } else {
@@ -490,59 +457,25 @@ class MeetingsScreens (val act: MainActivity) {
 
                 // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.sign_in_illustration
-                    ),
-                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                    modifier = Modifier.size(200.dp)
-                )
-
-
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = stringResource(id = R.string.need_reg_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // ------------------- КНОПКА ВОЙТИ ---------------------------------
-
-                Button(
-
-                    onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка на всю ширину
-                        .height(50.dp) // высота - 50
-                        .padding(horizontal = 20.dp),
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = PrimaryColor, // цвет кнопки
-                        contentColor = Grey100 // цвет контента на кнопке
-                    )
-                )
-                {
-
-                    // СОДЕРЖИМОЕ КНОПКИ
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_login), // иконка
-                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                        tint = Grey100 // цвет иконки
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
                     Text(
-                        text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                        style = Typography.labelMedium // стиль текста
+                        text = stringResource(id = R.string.need_reg_meeting),
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        textAlign = TextAlign.Center
                     )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                    ButtonCustom(
+                        buttonText = stringResource(id = R.string.to_login)
+                    ) {
+                        navController.navigate(LOG_IN_ROOT)
+                    }
+
                 }
 
             } else {

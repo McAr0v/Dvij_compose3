@@ -355,7 +355,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 Text(
                     text = "Выбери город", // текст кнопки
                     style = Typography.labelMedium, // стиль текста
-                    color = Grey60
+                    color = WhiteDvij
                 )
 
             }

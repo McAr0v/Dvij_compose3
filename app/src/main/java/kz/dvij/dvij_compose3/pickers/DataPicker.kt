@@ -234,23 +234,23 @@ fun dataPickerWithRemember(act: MainActivity, chosenDay: MutableState<String>, i
             },
             // цвет границы
             color = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
-                Grey60
+                Grey_ForCards
             } else {
-                Grey95
+                YellowDvij
             }
         ),
 
         // цвета кнопки
         colors = ButtonDefaults.buttonColors(
             backgroundColor = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
-                Grey95
+                Grey_ForCards
             } else {
-                PrimaryColor
+                YellowDvij
             },
             contentColor = if (chosenDay.value == "" || chosenDay.value == "Выбери дату") {
-                Grey60
+                WhiteDvij
             } else {
-                Grey100
+                Grey_OnBackground
             },
         ),
         shape = RoundedCornerShape(50) // скругление углов
