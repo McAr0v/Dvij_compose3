@@ -187,17 +187,17 @@ class StockDatabaseManager (val act: MainActivity) {
                     val getFilter = item
                         .child("filterInfo").getValue(FilterStockClass::class.java)
 
-                    val stockCount = item
-                        .child("viewCounter")
-                        .child("viewCounter")
-                        .getValue(Int::class.java)
-
 
                     if (stock != null && getFilter != null){
 
                         // Читаем счетчик добавивших в избранное
                         val getFavCounter = item
                             .child("AddedToFavorites").childrenCount
+
+                        val stockCount = item
+                            .child("viewCounter")
+                            .child("viewCounter")
+                            .getValue(Int::class.java)
 
 
                         val finishFilledStock = StockCardClass(
@@ -1270,6 +1270,36 @@ class StockDatabaseManager (val act: MainActivity) {
                             // Возвращаем калбак в виде списка счетчиков
                             callback (listOf(stockFav.toInt(), stockViewCount.toInt()))
                         }
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    fun readFavCounter(key: String, callback: (result: Int)-> Unit){
+
+        stockDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val stock = item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА акции
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("stockData") // добираесся до следующей папки внутри - папка с данными о акции
+                        .getValue(StockAdsClass::class.java) // забираем данные из БД в виде нашего класса акции
+
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val stockFav = item.child("AddedToFavorites").childrenCount
+
+                    // если мероприятие не нал и ключ акции совпадает с ключем из БД, то...
+                    if (stock != null && stock.keyStock == key) {
+
+                        callback (stockFav.toInt())
                     }
                 }
             }

@@ -31,6 +31,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.ATTENTION
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
@@ -135,6 +136,9 @@ class CreateStock (val act: MainActivity) {
         // КАТЕГОРИЯ АКЦИИ, ПЕРЕДАВАЕМАЯ В БД ПРИ СОЗДАНИИ МЕРОПРИЯТИЯ
         var category by rememberSaveable { mutableStateOf("Выбери категорию") }
 
+        var startDay = ""
+        var finishDay = ""
+
 
         // --- ПЕРЕМЕННЫЕ ДИАЛОГОВ ---
 
@@ -215,7 +219,7 @@ class CreateStock (val act: MainActivity) {
         Column(
             modifier = Modifier
                 .fillMaxSize() // занять весь размер экрана
-                .background(Grey95) // цвет фона
+                .background(Grey_Background) // цвет фона
                 .verticalScroll(rememberScrollState()) // говорим, что колонка скролится вверх и вниз
                 .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp) // паддинги
             ,
@@ -225,7 +229,12 @@ class CreateStock (val act: MainActivity) {
 
             // ----- КАРТИНКА -----
 
-            SpacerTextWithLine(headline = "Фото акции") // подпись перед формой
+            Text(
+                text = "Фото акции",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val image1 = if (filledStock.image != null && filledStock.image != "" && createOrEdit != "0"){
                 // Если при редактировании есть картинка, подгружаем картинку
@@ -238,7 +247,12 @@ class CreateStock (val act: MainActivity) {
 
             // ----- ЗАГОЛОВОК -----
 
-            SpacerTextWithLine(headline = "Заголовок акции") // подпись перед формой
+            Text(
+                text = "Заголовок",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val headline = if (filledStock.headline != null && filledStock.headline != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
@@ -248,10 +262,33 @@ class CreateStock (val act: MainActivity) {
                 fieldHeadlineComponent() // форма заголовка
             }
 
+            // --- ОПИСАНИЕ -----
+            Text(
+                text = stringResource(id = R.string.cm_description),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
+
+            val description = if (filledStock.description != null && filledStock.description != "null" && filledStock.description != ""){
+
+                fieldDescriptionComponent(description = filledStock.description) // ФОРМА ОПИСАНИЯ Акции
+
+            } else {
+
+                fieldDescriptionComponent() // ФОРМА ОПИСАНИЯ Акции
+
+            }
+
 
             // ----- КАТЕГОРИЯ -----
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.cm_category),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             category = if (filledStock.category != null && filledStock.category != "Выбери категорию" && filledStock.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
@@ -282,171 +319,14 @@ class CreateStock (val act: MainActivity) {
                 }
             }
 
-
-
-            // ----- ЗАВЕДЕНИЕ -----
-
-            SpacerTextWithLine(headline = "Заведение*") // подпись перед формой
-
-            // --- КНОПКИ ВЫБОРА - ВЫБРАТЬ ЗАВЕДЕНИЕ ИЗ СПИСКА ИЛИ ВВВЕСТИ ВРУЧНУЮ ------
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
-
-                placeInfo = choosePlaceDialog.placeSelectButton (chosenOutPlace = chosenPlace) {
-
-                    // ДЕЙСТВИЯ НА НАЖАТИЕ НА КНОПКУ
-
-                    openPlaceDialog.value = true // открываем диалог выбора заведения
-                    openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
-
-                }.toString()
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                // --- КНОПКА ВКЛЮЧЕНИЯ ВВОДА АДРЕСА ВРУЧНУЮ --------
-
-                Button(
-                    onClick = {
-
-                        // Если открыт диалог ввода заведения вручную
-                        if (openFieldPlace.value){
-                            openFieldPlace.value = false // закрываем диалог
-                        } else {
-
-                            // Если закрыт
-                            openFieldPlace.value = true // Открываем)
-
-                            // если выбираем ввести вручную, а уже выбрано заведение из списка
-                            // то сбрасываем выбранное заведение из списка
-                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
-                        }
-                    },
-
-                    // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
-
-                    border = BorderStroke(
-                        width = if (!openFieldPlace.value) {
-                            2.dp
-                        } else {
-                            0.dp
-                        }, color = if (!openFieldPlace.value) {
-                            Grey60
-                        } else {
-                            Grey95
-                        }
-                    ),
-
-                    // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
-
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (!openFieldPlace.value) {
-                            Grey95
-                        } else {
-                            PrimaryColor
-                        },
-                        contentColor = if (!openFieldPlace.value) {
-                            Grey60
-                        } else {
-                            Grey100
-                        },
-                    ),
-                    shape = RoundedCornerShape(50) // скругленные углы кнопки
-                ) {
-
-                    Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
-
-                    androidx.compose.material3.Text(
-                        text = "Ввести адрес вручную", // текст кнопки
-                        style = Typography.labelMedium, // стиль текста
-                        color = if (!openFieldPlace.value) {
-                            Grey60
-                        } else {
-                            Grey100
-                        }
-                    )
-                }
-            }
-
-            // --- КОНТЕНТ, ЕСЛИ МЫ ВЫБРАЛИ ВВЕСТИ АДРЕС И НАЗВАНИЕ ЗАВЕДЕНИЯ ВРУЧНУЮ ----
-
-            if (openFieldPlace.value){
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // --- ПОДЛОЖКА ПОД ФОРМЫ -----
-
-                Column(
-
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Grey90, shape = RoundedCornerShape(15.dp))
-                        .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 20.dp)
-
-                ) {
-                    SpacerTextWithLine(headline = "Название места проведения")
-
-                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ ЗАГОЛОВОК ЗАВЕДЕНИЯ
-
-                    finishHeadlinePlace = if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
-
-                        // Передаем заголовок в текстовое поле
-                        fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
-
-                    } else {
-                        // Если не пришел - показываем пустое поле
-                        fieldTextComponent("Введите название места")
-                    }
-
-                    SpacerTextWithLine(headline = "Адрес места проведения")
-
-                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ АДРЕС ЗАВЕДЕНИЯ
-
-                    finishAddressPlace = if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
-
-                        // Передаем адрес в текстовое поле
-                        fieldTextComponent("Введите адрес места", addressPlace.value)
-
-                    } else {
-                        // Если не пришел - показываем пустое поле
-                        fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
-
-                    }
-                }
-            }
-
-
-            // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
-
-            if (openPlaceDialog.value) {
-
-                choosePlaceDialog.PlaceChooseDialog(placesList = placesList, chosenOutPlace = chosenPlace, ifChoose = changeTypePlace) {
-                    // Функции при закрытии диалога
-                    openFieldPlace.value = false // Закрываем отображение полей ввода вручную
-                    openPlaceDialog.value = false // Закрываем сам вспылвающий диалог выбора заведений
-                }
-            }
-
-            // --- ЕСЛИ ИЗ БД ПРИШЛИ ЗАГОЛОВОК И АДРЕС ЗАВЕДЕНИЯ,
-            // НО ПОЛЬЗОВАТЕЛЬ ВЫБРАЛ ЗАВЕДЕНИЕ ИЗ СПИСКА
-
-            if (changeTypePlace.value){
-                finishHeadlinePlace = ""
-                finishAddressPlace = ""
-                headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
-                addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
-                !changeTypePlace.value // Говорим, что мы сбросили значения, теперь в них ничего нет
-            }
-
-
             // ----- ГОРОД -----
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.city_with_star),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             // Если при редактировании в мероприятии есть город
 
@@ -496,54 +376,244 @@ class CreateStock (val act: MainActivity) {
 
 
 
+            // ----- ЗАВЕДЕНИЕ -----
 
-            // ----- ДАТА НАЧАЛА АКЦИИ ---
+            Text(
+                text = "Место проведения*",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
-            SpacerTextWithLine(headline = "Дата начала акции") // подпись перед формой
+            // --- КНОПКИ ВЫБОРА - ВЫБРАТЬ ЗАВЕДЕНИЕ ИЗ СПИСКА ИЛИ ВВВЕСТИ ВРУЧНУЮ ------
 
-            var startDay = if (filledStock.startDate != null && filledStock.startDate != "null" && filledStock.startDate != ""){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-                dataPicker(act = act, inputDate = filledStock.startDate) // выбор даты начала
+                // ---- КНОПКА ВЫБОРА ЗАВЕДЕНИЯ ИЗ ДИАЛОГА --------
 
-            } else {
+                placeInfo = choosePlaceDialog.placeSelectButton (chosenOutPlace = chosenPlace) {
 
-                dataPicker(act = act) // выбор даты начала
+                    // ДЕЙСТВИЯ НА НАЖАТИЕ НА КНОПКУ
+
+                    openPlaceDialog.value = true // открываем диалог выбора заведения
+                    openFieldPlace.value = false // Сбрасываем отображение форм адреса и названия заведения ВРУЧНУЮ, а так же цвета кнопки выбора вручную
+
+                }.toString()
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                // --- КНОПКА ВКЛЮЧЕНИЯ ВВОДА АДРЕСА ВРУЧНУЮ --------
+
+                Button(
+                    onClick = {
+
+                        // Если открыт диалог ввода заведения вручную
+                        if (openFieldPlace.value){
+                            openFieldPlace.value = false // закрываем диалог
+                        } else {
+
+                            // Если закрыт
+                            openFieldPlace.value = true // Открываем)
+
+                            // если выбираем ввести вручную, а уже выбрано заведение из списка
+                            // то сбрасываем выбранное заведение из списка
+                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
+                        }
+                    },
+
+                    // ----- ГРАНИЦА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    border = BorderStroke(
+                        width = if (!openFieldPlace.value) {
+                            2.dp
+                        } else {
+                            0.dp
+                        }, color = if (!openFieldPlace.value) {
+                            Grey_ForCards
+                        } else {
+                            YellowDvij
+                        }
+                    ),
+
+                    // ----- ЦВЕТА В ЗАВИСИМОСТИ ОТ СОСТОЯНИЯ КАТЕГОРИИ ------
+
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (!openFieldPlace.value) {
+                            Grey_ForCards
+                        } else {
+                            YellowDvij
+                        },
+                        contentColor = if (!openFieldPlace.value) {
+                            WhiteDvij
+                        } else {
+                            Grey_OnBackground
+                        },
+                    ),
+                    shape = RoundedCornerShape(50) // скругленные углы кнопки
+                ) {
+
+                    Spacer(modifier = Modifier.height(30.dp)) // ЧТОБЫ КНОПКА БЫЛА ПОБОЛЬШЕ
+
+                    androidx.compose.material3.Text(
+                        text = "Ввести адрес", // текст кнопки
+                        style = Typography.labelMedium, // стиль текста
+                        color = if (!openFieldPlace.value) {
+                            WhiteDvij
+                        } else {
+                            Grey_OnBackground
+                        }
+                    )
+                }
+            }
+
+            // --- КОНТЕНТ, ЕСЛИ МЫ ВЫБРАЛИ ВВЕСТИ АДРЕС И НАЗВАНИЕ ЗАВЕДЕНИЯ ВРУЧНУЮ ----
+
+            if (openFieldPlace.value){
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // --- ПОДЛОЖКА ПОД ФОРМЫ -----
+
+                Column(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Grey_OnBackground, shape = RoundedCornerShape(15.dp))
+                        .padding(top = 0.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+
+                ) {
+                    Text(
+                        text = "Название места проведения",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
+
+                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ ЗАГОЛОВОК ЗАВЕДЕНИЯ
+
+                    finishHeadlinePlace = if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
+
+                        // Передаем заголовок в текстовое поле
+                        fieldTextComponent("Введи название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+
+                    } else {
+                        // Если не пришел - показываем пустое поле
+                        fieldTextComponent("Введи название места")
+                    }
+
+                    Text(
+                        text = "Адрес места",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
+
+                    // ЕСЛИ ИЗ МЕРОПРИЯТИЯ ПРИШЕЛ ВВЕДЕННЫЙ АДРЕС ЗАВЕДЕНИЯ
+
+                    finishAddressPlace = if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
+
+                        // Передаем адрес в текстовое поле
+                        fieldTextComponent("Введи адрес места", addressPlace.value)
+
+                    } else {
+                        // Если не пришел - показываем пустое поле
+                        fieldTextComponent("Введи адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+
+                    }
+                }
+            }
+
+
+            // --- САМ ДИАЛОГ ВЫБОРА Заведения -----
+
+            if (openPlaceDialog.value) {
+
+                choosePlaceDialog.PlaceChooseDialog(placesList = placesList, chosenOutPlace = chosenPlace, ifChoose = changeTypePlace) {
+                    // Функции при закрытии диалога
+                    openFieldPlace.value = false // Закрываем отображение полей ввода вручную
+                    openPlaceDialog.value = false // Закрываем сам вспылвающий диалог выбора заведений
+                }
+            }
+
+            // --- ЕСЛИ ИЗ БД ПРИШЛИ ЗАГОЛОВОК И АДРЕС ЗАВЕДЕНИЯ,
+            // НО ПОЛЬЗОВАТЕЛЬ ВЫБРАЛ ЗАВЕДЕНИЕ ИЗ СПИСКА
+
+            if (changeTypePlace.value){
+                finishHeadlinePlace = ""
+                finishAddressPlace = ""
+                headlinePlace.value = "" // Сбрасываем значения заголовка, введенного вручную
+                addressPlace.value = "" // Сбрасываем значения адреса, введенного вручную
+                !changeTypePlace.value // Говорим, что мы сбросили значения, теперь в них ничего нет
+            }
+
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ){
+
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.weight(0.5f)
+                ) {
+
+                    // ----- ДАТА НАЧАЛА АКЦИИ ---
+
+                    Text(
+                        text = "Начало акции",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
+
+                    startDay = if (filledStock.startDate != null && filledStock.startDate != "null" && filledStock.startDate != ""){
+
+                        dataPicker(act = act, inputDate = filledStock.startDate) // выбор даты начала
+
+                    } else {
+
+                        dataPicker(act = act) // выбор даты начала
+
+                    }
+
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.weight(0.5f)
+                ){
+
+                    // ----- ДАТА ЗАВЕРШЕНИЯ АКЦИИ ---
+
+                    Text(
+                        text = "Конец акции",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
+
+                    finishDay = if (filledStock.finishDate != null && filledStock.finishDate != "null" && filledStock.finishDate != "") {
+
+                        dataPicker(act = act, inputDate = filledStock.finishDate) // выбор даты завершения
+
+                    } else {
+
+                        dataPicker(act = act) // выбор даты завершения
+
+                    }
+
+                }
 
             }
 
 
-            // ----- ДАТА ЗАВЕРШЕНИЯ АКЦИИ ---
-
-            SpacerTextWithLine(headline = "Дата завершения акции") // подпись перед формой
-
-            var finishDay = if (filledStock.finishDate != null && filledStock.finishDate != "null" && filledStock.finishDate != "") {
-
-                dataPicker(act = act, inputDate = filledStock.finishDate) // выбор даты завершения
-
-            } else {
-
-                dataPicker(act = act) // выбор даты завершения
-
-            }
-
-
-
-            // --- ОПИСАНИЕ -----
-
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
-
-            val description = if (filledStock.description != null && filledStock.description != "null" && filledStock.description != ""){
-
-                fieldDescriptionComponent(description = filledStock.description) // ФОРМА ОПИСАНИЯ Акции
-
-            } else {
-
-                fieldDescriptionComponent() // ФОРМА ОПИСАНИЯ Акции
-
-            }
-
-
-            Spacer(modifier = Modifier.height(30.dp)) // РАЗДЕЛИТЕЛЬ
+            Spacer(modifier = Modifier.height(40.dp)) // РАЗДЕЛИТЕЛЬ
 
 
 
@@ -551,96 +621,240 @@ class CreateStock (val act: MainActivity) {
 
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
+            
+            ButtonCustom(buttonText = "Опубликовать") {
 
-            Button(
+                // ЕСЛИ В ЗАКОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ ЗАВЕДЕНИЯ И В ЗАПОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ АКЦИИ, ТО:
+                // ps - не сработает, если будет создание
 
-                onClick = {
+                if (filledStock.keyPlace != null && filledStock.keyPlace != "null" && filledStock.keyPlace != ""){
 
-                    // ЕСЛИ В ЗАКОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ ЗАВЕДЕНИЯ И В ЗАПОЛНЕННОЙ АКЦИИ ЕСТЬ КЛЮЧ АКЦИИ, ТО:
-                    // ps - не сработает, если будет создание
+                    if (filledStock.keyStock != null && filledStock.keyStock != "null" && filledStock.keyStock != ""){
 
-                    if (filledStock.keyPlace != null && filledStock.keyPlace != "null" && filledStock.keyPlace != ""){
+                        stockDatabaseManager.deleteStockFromPlace(filledStock.keyStock, filledStock.keyPlace){ deleted ->
 
-                        if (filledStock.keyStock != null && filledStock.keyStock != "null" && filledStock.keyStock != ""){
+                            if (deleted) {
 
-                            stockDatabaseManager.deleteStockFromPlace(filledStock.keyStock, filledStock.keyPlace){ deleted ->
+                                Log.d ("MyLog", "Ключ был успешно удален")
 
-                                if (deleted) {
-
-                                    Log.d ("MyLog", "Ключ был успешно удален")
-
-                                }
                             }
                         }
                     }
+                }
 
-                    val currentTime = System.currentTimeMillis()/1000 // инициализируем календарь //LocalTime.now().toNanoOfDay()
+                val currentTime = System.currentTimeMillis()/1000 // инициализируем календарь //LocalTime.now().toNanoOfDay()
 
-                    // действие на нажатие
+                // действие на нажатие
 
-                    // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
+                // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
 
-                    Log.d ("MyLog", "${filledStock.image}")
+                Log.d ("MyLog", "${filledStock.image}")
 
-                    val checkData = checkDataOnCreateStock(
-                        image1 = image1,
-                        headline = headline,
-                        startDay = startDay,
-                        finishDay = finishDay,
-                        description = description,
-                        category = category,
-                        city = city,
-                        placeKey = chosenPlace.value.placeKey,
-                        inputAddressPlace = finishAddressPlace,
-                        inputHeadlinePlace = finishHeadlinePlace,
-                        imageUriFromDb = filledStock.image ?: "Empty"
-                    )
+                val checkData = checkDataOnCreateStock(
+                    image1 = image1,
+                    headline = headline,
+                    startDay = startDay,
+                    finishDay = finishDay,
+                    description = description,
+                    category = category,
+                    city = city,
+                    placeKey = chosenPlace.value.placeKey,
+                    inputAddressPlace = finishAddressPlace,
+                    inputHeadlinePlace = finishHeadlinePlace,
+                    imageUriFromDb = filledStock.image ?: "Empty"
+                )
 
-                    if (checkData != 0) {
+                if (checkData != 0) {
 
-                        // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
+                    // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
 
-                        Toast.makeText(act, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(act, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
 
-                    } else if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                } else if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                        // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
+                    // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
 
-                        ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
+                    ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
 
-                    } else {
+                } else {
 
-                        // если все права есть и все обязательные поля заполнены
+                    // если все права есть и все обязательные поля заполнены
 
-                        openLoading.value = true // открываем диалог загрузки
+                    openLoading.value = true // открываем диалог загрузки
 
-                        // запускаем корутину
+                    // запускаем корутину
 
-                        GlobalScope.launch(Dispatchers.IO){
+                    GlobalScope.launch(Dispatchers.IO){
 
-                            if (image1 == null && createOrEdit != "0"){
+                        if (image1 == null && createOrEdit != "0"){
+
+                            GlobalScope.launch(Dispatchers.Main) {
+
+                                val filledStockForDb = StockAdsClass (
+
+                                    image = filledStock.image,
+                                    headline = headline,
+                                    description = description,
+                                    category = category,
+                                    keyStock = filledStock.keyStock,
+                                    keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                    keyCreator = filledStock.keyCreator ?: "Empty",
+                                    city = city,
+                                    startDate = startDay,
+                                    finishDate = finishDay,
+                                    inputHeadlinePlace = finishHeadlinePlace,
+                                    inputAddressPlace = finishAddressPlace,
+                                    createTime = filledStock.createTime,
+                                    startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                    finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
+
+                                )
+
+                                if (auth.uid != null) {
+
+                                    // Если зарегистрирован, то запускаем функцию публикации акции
+
+                                    stockDatabaseManager.publishStock(filledStock = filledStockForDb) { result ->
+
+                                        // в качестве колбака придет булин. Если опубликована акция то:
+
+                                        if (result) {
+
+                                            startDay = ""
+                                            finishDay = ""
+                                            city = "Выбери город"
+                                            category = "Выбери категорию"
+                                            finishAddressPlace = ""
+                                            finishHeadlinePlace = ""
+                                            chosenStockCategoryCreate.value = "Выбери категорию"
+                                            chosenCityCreateWithoutUser.value = "Выбери город"
+
+                                            chosenPlace.value = PlacesAdsClass(
+
+                                                logo = "",
+                                                placeKey = "",
+                                                placeName = "Выбери заведение",
+                                                placeDescription = "",
+                                                phone = "",
+                                                whatsapp = "",
+                                                telegram = "",
+                                                instagram = "",
+                                                category = "",
+                                                city = "",
+                                                address = "",
+                                                owner = "",
+                                                mondayOpenTime = "",
+                                                mondayCloseTime = "",
+                                                tuesdayOpenTime = "",
+                                                tuesdayCloseTime = "",
+                                                wednesdayOpenTime = "",
+                                                wednesdayCloseTime = "",
+                                                thursdayOpenTime = "",
+                                                thursdayCloseTime = "",
+                                                fridayOpenTime = "",
+                                                fridayCloseTime = "",
+                                                saturdayOpenTime = "",
+                                                saturdayCloseTime = "",
+                                                sundayOpenTime = "",
+                                                sundayCloseTime = ""
+
+                                            )
+
+                                            navController.navigate(STOCK_ROOT) {popUpTo(0)} // переходим на страницу акций
+
+                                            // показываем ТОСТ
+                                            Toast.makeText(
+                                                act,
+                                                "Твоя акция успешно опубликована",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        } else {
+
+                                            // если произошла ошибка и акция не опубликовалась то:
+
+                                            // Показываем тост
+                                            Toast.makeText(
+                                                act,
+                                                act.resources.getString(R.string.error_text),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        } else {
+
+                            // запускаем сжатие изображения
+                            val compressedImage = act.photoHelper.compressImage(act, image1!!)
+
+                            // после сжатия запускаем функцию загрузки сжатого фота в Storage
+
+                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
+
+
+                                Log.d("MyLog", it)
+                                // В качестве колбака придет ссылка на изображение в Storage
+
+                                // Запускаем корутину и публикуем акцию
 
                                 GlobalScope.launch(Dispatchers.Main) {
 
-                                    val filledStockForDb = StockAdsClass (
+                                    // заполняем акцию
 
-                                        image = filledStock.image,
-                                        headline = headline,
-                                        description = description,
-                                        category = category,
-                                        keyStock = filledStock.keyStock,
-                                        keyPlace = chosenPlace.value.placeKey ?: "Empty",
-                                        keyCreator = filledStock.keyCreator ?: "Empty",
-                                        city = city,
-                                        startDate = startDay,
-                                        finishDate = finishDay,
-                                        inputHeadlinePlace = finishHeadlinePlace,
-                                        inputAddressPlace = finishAddressPlace,
-                                        createTime = filledStock.createTime,
-                                        startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
-                                        finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
+                                    val filledStockForDb = if (createOrEdit != "0"){
 
-                                    )
+                                        StockAdsClass (
+
+                                            image = it,
+                                            headline = headline,
+                                            description = description,
+                                            category = category,
+                                            keyStock = filledStock.keyStock,
+                                            keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                            keyCreator = filledStock.keyCreator,
+                                            city = city,
+                                            startDate = startDay,
+                                            finishDate = finishDay,
+                                            inputHeadlinePlace = finishHeadlinePlace,
+                                            inputAddressPlace = finishAddressPlace,
+                                            createTime = filledStock.createTime,
+                                            startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                            finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
+
+                                        )
+
+                                    } else {
+
+                                        StockAdsClass (
+
+                                            image = it,
+                                            headline = headline,
+                                            description = description,
+                                            category = category,
+                                            keyStock = stockDatabaseManager.stockDatabase.push().key,
+                                            keyPlace = chosenPlace.value.placeKey ?: "Empty",
+                                            keyCreator = auth.uid,
+                                            city = city,
+                                            startDate = startDay,
+                                            finishDate = finishDay,
+                                            inputHeadlinePlace = finishHeadlinePlace,
+                                            inputAddressPlace = finishAddressPlace,
+                                            createTime = currentTime.toString(),
+                                            startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
+                                            finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
+
+                                        )
+
+                                    }
+
+
+                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
                                     if (auth.uid != null) {
 
@@ -715,194 +929,19 @@ class CreateStock (val act: MainActivity) {
                                             }
 
                                         }
-
-                                    }
-
-                                }
-
-                            } else {
-
-                                // запускаем сжатие изображения
-                                val compressedImage = act.photoHelper.compressImage(act, image1!!)
-
-                                // после сжатия запускаем функцию загрузки сжатого фота в Storage
-
-                                act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
-
-
-                                    Log.d("MyLog", it)
-                                    // В качестве колбака придет ссылка на изображение в Storage
-
-                                    // Запускаем корутину и публикуем акцию
-
-                                    GlobalScope.launch(Dispatchers.Main) {
-
-                                        // заполняем акцию
-
-                                        val filledStockForDb = if (createOrEdit != "0"){
-
-                                            StockAdsClass (
-
-                                                image = it,
-                                                headline = headline,
-                                                description = description,
-                                                category = category,
-                                                keyStock = filledStock.keyStock,
-                                                keyPlace = chosenPlace.value.placeKey ?: "Empty",
-                                                keyCreator = filledStock.keyCreator,
-                                                city = city,
-                                                startDate = startDay,
-                                                finishDate = finishDay,
-                                                inputHeadlinePlace = finishHeadlinePlace,
-                                                inputAddressPlace = finishAddressPlace,
-                                                createTime = filledStock.createTime,
-                                                startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
-                                                finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
-
-                                            )
-
-                                        } else {
-
-                                            StockAdsClass (
-
-                                                image = it,
-                                                headline = headline,
-                                                description = description,
-                                                category = category,
-                                                keyStock = stockDatabaseManager.stockDatabase.push().key,
-                                                keyPlace = chosenPlace.value.placeKey ?: "Empty",
-                                                keyCreator = auth.uid,
-                                                city = city,
-                                                startDate = startDay,
-                                                finishDate = finishDay,
-                                                inputHeadlinePlace = finishHeadlinePlace,
-                                                inputAddressPlace = finishAddressPlace,
-                                                createTime = currentTime.toString(),
-                                                startDateNumber = filterFunctions.getSplitDataFromDb(startDay),
-                                                finishDateNumber = filterFunctions.getSplitDataFromDb(finishDay)
-
-                                            )
-
-                                        }
-
-
-                                        // Делаем дополнительную проверку - пользователь зарегистрирован или нет
-
-                                        if (auth.uid != null) {
-
-                                            // Если зарегистрирован, то запускаем функцию публикации акции
-
-                                            stockDatabaseManager.publishStock(filledStock = filledStockForDb) { result ->
-
-                                                // в качестве колбака придет булин. Если опубликована акция то:
-
-                                                if (result) {
-
-                                                    startDay = ""
-                                                    finishDay = ""
-                                                    city = "Выбери город"
-                                                    category = "Выбери категорию"
-                                                    finishAddressPlace = ""
-                                                    finishHeadlinePlace = ""
-                                                    chosenStockCategoryCreate.value = "Выбери категорию"
-                                                    chosenCityCreateWithoutUser.value = "Выбери город"
-
-                                                    chosenPlace.value = PlacesAdsClass(
-
-                                                        logo = "",
-                                                        placeKey = "",
-                                                        placeName = "Выбери заведение",
-                                                        placeDescription = "",
-                                                        phone = "",
-                                                        whatsapp = "",
-                                                        telegram = "",
-                                                        instagram = "",
-                                                        category = "",
-                                                        city = "",
-                                                        address = "",
-                                                        owner = "",
-                                                        mondayOpenTime = "",
-                                                        mondayCloseTime = "",
-                                                        tuesdayOpenTime = "",
-                                                        tuesdayCloseTime = "",
-                                                        wednesdayOpenTime = "",
-                                                        wednesdayCloseTime = "",
-                                                        thursdayOpenTime = "",
-                                                        thursdayCloseTime = "",
-                                                        fridayOpenTime = "",
-                                                        fridayCloseTime = "",
-                                                        saturdayOpenTime = "",
-                                                        saturdayCloseTime = "",
-                                                        sundayOpenTime = "",
-                                                        sundayCloseTime = ""
-
-                                                    )
-
-                                                    navController.navigate(STOCK_ROOT) {popUpTo(0)} // переходим на страницу акций
-
-                                                    // показываем ТОСТ
-                                                    Toast.makeText(
-                                                        act,
-                                                        "Твоя акция успешно опубликована",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                } else {
-
-                                                    // если произошла ошибка и акция не опубликовалась то:
-
-                                                    // Показываем тост
-                                                    Toast.makeText(
-                                                        act,
-                                                        act.resources.getString(R.string.error_text),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                }
-
-                                            }
-                                        }
                                     }
                                 }
                             }
                         }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка на всю ширину
-                    .height(50.dp),// высота - 50
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = SuccessColor, // цвет кнопки
-                    contentColor = Grey100 // цвет контента на кнопке
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.push_button),
-                    style = Typography.labelMedium
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_publish),
-                    contentDescription = stringResource(id = R.string.cd_publish_button),
-                    modifier = Modifier.size(20.dp)
-                )
+                }
+                
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            TextButton(
-                onClick = { Toast.makeText(act, "СДЕЛАТЬ ДИАЛОГ - ДЕЙСТВИТЕЛЬНО ХОТИТЕ ВЫЙТИ?", Toast.LENGTH_SHORT).show() },
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(id = R.string.cansel_button),
-                    style = Typography.labelMedium,
-                    color = Grey40
-                )
+            ButtonCustom(buttonText = stringResource(id = R.string.cansel_button), typeButton = ATTENTION, leftIcon = R.drawable.ic_close) {
+                Toast.makeText(act, "СДЕЛАТЬ ДИАЛОГ - ДЕЙСТВИТЕЛЬНО ХОТИТЕ ВЫЙТИ?", Toast.LENGTH_SHORT).show()
             }
         }
 

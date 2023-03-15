@@ -35,9 +35,7 @@ import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.firebase.StockCardClass
-import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
-import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
-import kz.dvij.dvij_compose3.navigation.STOCK_VIEW
+import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class StockCard (val act: MainActivity) {
@@ -49,8 +47,8 @@ class StockCard (val act: MainActivity) {
         stockItem: StockCardClass,
         stockKey: MutableState<String>,
         isAd: Boolean = false,
-        //filledStock: MutableState<StockAdsClass>,
-        //filledPlace: MutableState<PlacesAdsClass>
+        filledStock: MutableState<StockAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ) {
 
         val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
@@ -72,9 +70,14 @@ class StockCard (val act: MainActivity) {
             mutableStateOf(stockItem.counterInFav?.toInt() ?: 0)
         }
 
+        /*// Переменная счетчика просмотра акции
+        val viewCounter = remember {
+            mutableStateOf(0)
+        }*/
+
         // Переменная счетчика просмотра акции
         val viewCounter = remember {
-            mutableStateOf(stockItem.counterView?.toInt() ?: 0)
+            mutableStateOf(stockItem.counterView)
         }
 
         val stockInfo = remember {
@@ -88,7 +91,7 @@ class StockCard (val act: MainActivity) {
         act.stockDatabaseManager.readOneStockFromDataBase(stockInfo, stockItem.keyStock){
 
             favCounter.value = it[0] // данные из списка - количество добавивших в избранное
-            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+            viewCounter.value = it[1].toString() // данные из списка - количество просмотров заведения
 
         }
 
@@ -162,7 +165,9 @@ class StockCard (val act: MainActivity) {
                     // ------- КНОПКА КАТЕГОРИИ -----------
 
                     Bubble(
-                        buttonText = viewCounter.value.toString(),
+                        buttonText = if (viewCounter.value != null && viewCounter.value != "null" ) {
+                            viewCounter.value.toString()
+                        } else {"0"},
                         leftIcon = R.drawable.ic_visibility,
                         typeButton = FOR_CARDS
                     ) {
@@ -181,7 +186,85 @@ class StockCard (val act: MainActivity) {
                             typeButton = FOR_CARDS,
                             rightIconColor = iconFavColor.value
                         ) {
-                            Toast.makeText(act,"Функция добавления в избранное",Toast.LENGTH_SHORT).show()
+                            // --- Если клиент авторизован, проверяем, добавлена ли уже в избранное эта акция -----
+                            // Если не авторизован, условие else
+
+                            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                act.stockDatabaseManager.favIconStock(stockItem.keyStock) {
+
+                                    // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                    if (it) {
+
+                                        // Убираем из избранных
+
+                                        act.stockDatabaseManager.removeFavouriteStock(stockItem.keyStock) { remove ->
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (remove) {
+
+                                                act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
+
+                                                    favCounter.value = favCount
+
+                                                }
+
+                                                iconFavColor.value =
+                                                    WhiteDvij // При нажатии окрашиваем текст и иконку в белый
+
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(
+                                                    act, act.getString(R.string.delete_from_fav),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+
+                                    } else {
+
+                                        // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                        act.stockDatabaseManager.addFavouriteStock(stockItem.keyStock) { addToFav ->
+
+                                            // Если пришел колбак, что успешно
+
+                                            if (addToFav) {
+
+                                                act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
+
+                                                    favCounter.value = favCount
+
+                                                }
+
+                                                iconFavColor.value =
+                                                    YellowDvij // При нажатии окрашиваем текст и иконку в черный
+
+
+                                                // Выводим ТОСТ
+                                                Toast.makeText(
+                                                    act, act.getString(R.string.add_to_fav),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } else {
+
+                                // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                Toast
+                                    .makeText(
+                                        act,
+                                        "Чтобы добавить акцию в избранные, тебе нужно авторизоваться",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
                         }
                     }
                 }
@@ -311,48 +394,42 @@ class StockCard (val act: MainActivity) {
                                 color = YellowDvij,
                                 modifier = Modifier.clickable {
 
-                                    /*filledMeeting.value = MeetingsAdsClass(
-                                        key = meetingItem.key,
-                                        category = meetingItem.category,
-                                        headline = meetingItem.headline,
-                                        description = meetingItem.description,
-                                        price = meetingItem.price,
-                                        phone = meetingItem.phone,
-                                        whatsapp = meetingItem.whatsapp,
-                                        data = meetingItem.data,
-                                        startTime = meetingItem.startTime,
-                                        finishTime = meetingItem.finishTime,
-                                        image1 = meetingItem.image1,
-                                        city = meetingItem.city,
-                                        instagram = meetingItem.instagram,
-                                        telegram = meetingItem.telegram,
-                                        placeKey = meetingItem.placeKey,
-                                        headlinePlaceInput = meetingItem.headlinePlaceInput,
-                                        addressPlaceInput = meetingItem.addressPlaceInput,
-                                        ownerKey = meetingItem.ownerKey,
-                                        dateInNumber = meetingItem.dateInNumber,
-                                        createdTime = meetingItem.createdTime
+                                    filledStock.value = StockAdsClass(
+                                        image = stockInfo.value.image,
+                                        headline = stockInfo.value.headline,
+                                        description = stockInfo.value.description,
+                                        category = stockInfo.value.category,
+                                        keyStock = stockInfo.value.keyStock,
+                                        keyPlace = stockInfo.value.keyPlace,
+                                        keyCreator = stockInfo.value.keyCreator,
+                                        city = stockInfo.value.city,
+                                        startDate = stockInfo.value.startDate,
+                                        finishDate = stockInfo.value.finishDate,
+                                        inputHeadlinePlace = stockInfo.value.inputHeadlinePlace,
+                                        inputAddressPlace = stockInfo.value.inputAddressPlace,
+                                        createTime = stockInfo.value.createTime,
+                                        startDateNumber = stockInfo.value.startDateNumber,
+                                        finishDateNumber = stockInfo.value.finishDateNumber
                                     )
 
-                                    if (meetingItem.placeKey == null || meetingItem.placeKey == ""){
+                                    if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
 
                                         filledPlace.value = PlacesAdsClass(
-                                            placeName = meetingItem.headlinePlaceInput,
-                                            address = meetingItem.addressPlaceInput
+                                            placeName = stockItem.inputHeadlinePlace,
+                                            address = stockItem.inputAddressPlace
                                         )
 
-                                        navController.navigate(EDIT_MEETINGS_SCREEN)
+                                        navController.navigate(EDIT_STOCK_SCREEN)
 
                                     } else {
 
-                                        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = meetingItem.placeKey) {
+                                        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = stockItem.keyPlace) {
 
-                                            navController.navigate(EDIT_MEETINGS_SCREEN)
+                                            navController.navigate(EDIT_STOCK_SCREEN)
 
                                         }
 
-                                    }*/
-
+                                    }
                                 }
                             )
 
@@ -373,29 +450,30 @@ class StockCard (val act: MainActivity) {
 
                         ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                            /*if (meetingItem.placeKey != null && meetingItem.image1 != null){
+                            if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
 
-                                act.meetingDatabaseManager.deleteMeetingWithPlaceNote(
-                                    meetingKey = meetingItem.key,
-                                    placeKey = meetingItem.placeKey,
-                                    imageUrl = meetingItem.image1
+                                act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                    stockKey = stockInfo.value.keyStock!!,
+                                    imageUrl = stockInfo.value.image!!,
+                                    placeKey = stockInfo.value.keyPlace!!
                                 ) {
 
                                     if (it) {
 
-                                        Log.d ("MyLog", "Удалилась и картинка и само мероприятие и запись у заведения")
-                                        navController.navigate(MEETINGS_ROOT) {popUpTo(0)}
+                                        Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+                                        navController.navigate(STOCK_ROOT) {popUpTo(0)}
 
                                     } else {
 
-                                        Log.d ("MyLog", "Почемуто не удалилось")
+                                        Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
 
                                     }
+
                                 }
-                            }*/
+
+                            }
                         }
                     }
-
                 }
             }
         }

@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -23,12 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.filters.FilterFunctions
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
-import kz.dvij.dvij_compose3.firebase.StockCardClass
-import kz.dvij.dvij_compose3.firebase.StockDatabaseManager
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -61,7 +61,9 @@ class StockScreen(val act: MainActivity) {
         stockCategoryForFilter: MutableState<String>,
         stockStartDateForFilter: MutableState<String>,
         stockFinishDateForFilter: MutableState<String>,
-        stockSortingForFilter: MutableState<String>
+        stockSortingForFilter: MutableState<String>,
+        filledStockInfoFromAct: MutableState<StockAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ) {
 
         Column {
@@ -75,7 +77,9 @@ class StockScreen(val act: MainActivity) {
                 stockCategoryForFilter = stockCategoryForFilter,
                 stockSortingForFilter = stockSortingForFilter,
                 stockStartDateForFilter = stockStartDateForFilter,
-                stockFinishDateForFilter = stockFinishDateForFilter
+                stockFinishDateForFilter = stockFinishDateForFilter,
+                filledPlace = filledPlace,
+                filledStock = filledStockInfoFromAct
             )
         }
 
@@ -92,7 +96,9 @@ class StockScreen(val act: MainActivity) {
         stockCategoryForFilter: MutableState<String>,
         stockStartDateForFilter: MutableState<String>,
         stockFinishDateForFilter: MutableState<String>,
-        stockSortingForFilter: MutableState<String>
+        stockSortingForFilter: MutableState<String>,
+        filledStockInfoFromAct: MutableState<StockAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
     ) {
 
         // инициализируем список акций
@@ -141,7 +147,7 @@ class StockScreen(val act: MainActivity) {
 
             Column (
                 modifier = Modifier
-                    .background(Grey95)
+                    .background(Grey_Background)
                     .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
@@ -158,7 +164,7 @@ class StockScreen(val act: MainActivity) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Grey95),
+                            .background(Grey_Background),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ){
@@ -169,7 +175,13 @@ class StockScreen(val act: MainActivity) {
                             items(stockList.value){ item ->
 
                                 // сам шаблон карточки
-                                act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                                act.stockCard.StockCard(
+                                    navController = navController,
+                                    stockItem = item,
+                                    stockKey = stockKey,
+                                    filledPlace = filledPlace,
+                                    filledStock = filledStockInfoFromAct
+                                )
                             }
 
                         }
@@ -181,8 +193,8 @@ class StockScreen(val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
 
                 } else {
@@ -198,7 +210,7 @@ class StockScreen(val act: MainActivity) {
                         // крутилка индикатор
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -209,8 +221,8 @@ class StockScreen(val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -233,7 +245,12 @@ class StockScreen(val act: MainActivity) {
     }
 
     @Composable
-    fun StockMyScreen(navController: NavController, stockKey: MutableState<String>) {
+    fun StockMyScreen(
+        navController: NavController,
+        stockKey: MutableState<String>,
+        filledStockInfoFromAct: MutableState<StockAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
+    ) {
 
         // инициализируем пустой список акций
 
@@ -253,7 +270,7 @@ class StockScreen(val act: MainActivity) {
 
                 Column (
                     modifier = Modifier
-                        .background(Grey95)
+                        .background(Grey_Background)
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth()
                         .fillMaxHeight(),
@@ -270,7 +287,7 @@ class StockScreen(val act: MainActivity) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Grey95),
+                                .background(Grey_Background),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Top
                         ){
@@ -281,7 +298,13 @@ class StockScreen(val act: MainActivity) {
 
                                 if (myStockList.value.isNotEmpty() && myStockList.value != listOf(defaultStockCard)){
 
-                                    act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                                    act.stockCard.StockCard(
+                                        navController = navController,
+                                        stockItem = item,
+                                        stockKey = stockKey,
+                                        filledPlace = filledPlace,
+                                        filledStock = filledStockInfoFromAct
+                                    )
 
                                 }
 
@@ -294,67 +317,33 @@ class StockScreen(val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.empty_meeting),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
                         // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                        Image(
-                            painter = painterResource(
-                                id = R.drawable.sign_in_illustration
-                            ),
-                            contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                            modifier = Modifier.size(200.dp)
-                        )
-
-
-                        Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                        Text(
-                            modifier = Modifier.padding(20.dp),
-                            text = "Чтобы создать свою акцию, тебе нужно авторизоваться",
-                            style = Typography.bodyMedium,
-                            color = Grey10,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // ------------------- КНОПКА ВОЙТИ ---------------------------------
-
-                        Button(
-
-                            onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                            modifier = Modifier
-                                .fillMaxWidth() // кнопка на всю ширину
-                                .height(50.dp) // высота - 50
-                                .padding(horizontal = 20.dp),
-                            shape = RoundedCornerShape(50), // скругление углов
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = PrimaryColor, // цвет кнопки
-                                contentColor = Grey100 // цвет контента на кнопке
-                            )
-                        )
-                        {
-
-                            // СОДЕРЖИМОЕ КНОПКИ
-
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_login), // иконка
-                                contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                                tint = Grey100 // цвет иконки
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
                             Text(
-                                text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                                style = Typography.labelMedium // стиль текста
+                                text = "Чтобы создать свою акцию, тебе нужно авторизоваться",
+                                style = Typography.bodySmall,
+                                color = WhiteDvij,
+                                textAlign = TextAlign.Center
                             )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                            ButtonCustom(
+                                buttonText = stringResource(id = R.string.to_login)
+                            ) {
+                                navController.navigate(LOG_IN_ROOT)
+                            }
+
                         }
 
                     } else {
@@ -368,7 +357,7 @@ class StockScreen(val act: MainActivity) {
                         ) {
 
                             CircularProgressIndicator(
-                                color = PrimaryColor,
+                                color = YellowDvij,
                                 strokeWidth = 3.dp,
                                 modifier = Modifier.size(40.dp)
                             )
@@ -377,8 +366,8 @@ class StockScreen(val act: MainActivity) {
 
                             Text(
                                 text = stringResource(id = R.string.ss_loading),
-                                style = Typography.bodyMedium,
-                                color = Grey10
+                                style = Typography.bodySmall,
+                                color = WhiteDvij
                             )
 
                         }
@@ -394,7 +383,12 @@ class StockScreen(val act: MainActivity) {
     }
 
     @Composable
-    fun StockFavScreen(navController: NavController, stockKey: MutableState<String>) {
+    fun StockFavScreen(
+        navController: NavController,
+        stockKey: MutableState<String>,
+        filledStockInfoFromAct: MutableState<StockAdsClass>,
+        filledPlace: MutableState<PlacesAdsClass>
+    ) {
 
         // Инициализируем список акций
 
@@ -411,7 +405,7 @@ class StockScreen(val act: MainActivity) {
 
         Column (
             modifier = Modifier
-                .background(Grey95)
+                .background(Grey_Background)
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
@@ -426,7 +420,7 @@ class StockScreen(val act: MainActivity) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Grey95),
+                        .background(Grey_Background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ){
@@ -436,7 +430,13 @@ class StockScreen(val act: MainActivity) {
                     items(favStockList.value){ item ->
                         if (favStockList.value.isNotEmpty() && favStockList.value != listOf(defaultStockCard)){
 
-                            stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                            stockCard.StockCard(
+                                navController = navController,
+                                stockItem = item,
+                                stockKey = stockKey,
+                                filledPlace = filledPlace,
+                                filledStock = filledStockInfoFromAct
+                            )
 
                         }
 
@@ -448,67 +448,33 @@ class StockScreen(val act: MainActivity) {
 
                 Text(
                     text = stringResource(id = R.string.empty_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10
+                    style = Typography.bodySmall,
+                    color = WhiteDvij
                 )
 
             } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
                 // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.sign_in_illustration
-                    ),
-                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                    modifier = Modifier.size(200.dp)
-                )
-
-
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "Чтобы добавить акцию в этот раздел, тебе нужно авторизоваться",
-                    style = Typography.bodyMedium,
-                    color = Grey10,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // ------------------- КНОПКА ВОЙТИ ---------------------------------
-
-                Button(
-
-                    onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка на всю ширину
-                        .height(50.dp) // высота - 50
-                        .padding(horizontal = 20.dp),
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = PrimaryColor, // цвет кнопки
-                        contentColor = Grey100 // цвет контента на кнопке
-                    )
-                )
-                {
-
-                    // СОДЕРЖИМОЕ КНОПКИ
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_login), // иконка
-                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                        tint = Grey100 // цвет иконки
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
                     Text(
-                        text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                        style = Typography.labelMedium // стиль текста
+                        text = "Чтобы добавить акцию в этот раздел, тебе нужно авторизоваться",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        textAlign = TextAlign.Center
                     )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // ------------------- КНОПКА ВОЙТИ ---------------------------------
+
+                    ButtonCustom(
+                        buttonText = stringResource(id = R.string.to_login)
+                    ) {
+                        navController.navigate(LOG_IN_ROOT)
+                    }
+
                 }
 
             } else {
@@ -522,7 +488,7 @@ class StockScreen(val act: MainActivity) {
                 ) {
 
                     CircularProgressIndicator(
-                        color = PrimaryColor,
+                        color = YellowDvij,
                         strokeWidth = 3.dp,
                         modifier = Modifier.size(40.dp)
                     )
@@ -531,8 +497,8 @@ class StockScreen(val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.ss_loading),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
                 }
             }

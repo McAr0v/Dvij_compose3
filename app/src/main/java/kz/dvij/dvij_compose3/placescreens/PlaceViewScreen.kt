@@ -52,7 +52,8 @@ class PlaceViewScreen (val act: MainActivity) {
         meetingKey: MutableState<String>, // КЛЮЧ МЕРОПРИЯТИЯ ДЛЯ ПЕРЕХОДА НА КЛИК ПО КАРТОЧКЕ МЕРОПРИЯТИЯ
         stockKey: MutableState<String>, // КЛЮЧ АКЦИЙ для перехода на клик по карточке Акции
         filledPlaceInfoFromAct: MutableState<PlacesAdsClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
-        filledMeetingInfoFromAct: MutableState<MeetingsAdsClass> // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+        filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+        filledStockInfoFromAct: MutableState<StockAdsClass>
     ){
 
         val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
@@ -830,7 +831,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                         // сам шаблон карточки акции
-                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey)
+                        act.stockCard.StockCard(navController = navController, stockItem = item, stockKey = stockKey, filledStock = filledStockInfoFromAct, filledPlace = filledPlaceInfoFromAct)
                     }
                 }
 

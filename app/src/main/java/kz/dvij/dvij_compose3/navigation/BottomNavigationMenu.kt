@@ -348,13 +348,19 @@ fun FloatingStockFilterButton(
     }
 
     val containerColor = remember {
-        mutableStateOf(SuccessColor)
+        mutableStateOf(YellowDvij)
+    }
+
+    val contentColor = remember {
+        mutableStateOf(Grey_OnBackground)
     }
 
     if (city != "Выбери город" || category != "Выбери категорию" || startDate != "Выбери дату" || finishDate != "Выбери дату") {
-        containerColor.value = SuccessColor
+        containerColor.value = YellowDvij
+        contentColor.value = Grey_OnBackground
     } else {
-        containerColor.value = Grey90
+        containerColor.value = Grey_ForCards
+        contentColor.value = WhiteDvij
     }
 
     // помещаем кнопку в BOX
@@ -373,7 +379,7 @@ fun FloatingStockFilterButton(
                 onClick()
             },
             shape = CircleShape, // форма кнопки
-            contentColor = Grey00, // цвет содержимого кнопки
+            contentColor = contentColor.value, // цвет содержимого кнопки
             containerColor = containerColor.value, // цвет фона кнопки
             modifier = Modifier
                 .padding(16.dp) // отступы
@@ -386,7 +392,7 @@ fun FloatingStockFilterButton(
                 modifier = Modifier.padding(15.dp)
             ){
 
-                Text(text = "Фильтр$counter", color = Grey00)
+                Text(text = "Фильтр$counter", color = contentColor.value)
 
                 Spacer(modifier = Modifier.width(10.dp))
 

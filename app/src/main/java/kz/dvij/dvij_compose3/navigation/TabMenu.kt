@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -53,7 +54,8 @@ fun TabMenu (
     placeIsOpenForFilter: MutableState<Boolean>? = null,
     placeSortingForFilter: MutableState<String>? = null,
     filledMeeting: MutableState<MeetingsAdsClass>? = null,
-    filledPlace: MutableState<PlacesAdsClass>? = null
+    filledPlace: MutableState<PlacesAdsClass>? = null,
+    filledStock: MutableState<StockAdsClass>? = null
 ){
 
     // bottomPage принимаем для того, чтобы использовать одно меню для отображения на разных страницах
@@ -173,11 +175,23 @@ fun TabMenu (
                             stockCategoryForFilter = stockCategoryForFilter!!,
                             stockStartDateForFilter = stockStartDateForFilter!!,
                             stockFinishDateForFilter = stockFinishDateForFilter!!,
-                            stockSortingForFilter = stockSortingForFilter!!
+                            stockSortingForFilter = stockSortingForFilter!!,
+                            filledStockInfoFromAct = filledStock!!,
+                            filledPlace = filledPlace!!
 
                         ) } // Акции Лента
-                        1 -> stockKey?.let { activity.stockScreen.StockFavScreen(navController = navController, stockKey = it) } // Акции Избранные
-                        else -> stockKey?.let { activity.stockScreen.StockMyScreen(navController = navController, stockKey = it) } // Акции МОИ
+                        1 -> stockKey?.let { activity.stockScreen.StockFavScreen(
+                            navController = navController,
+                            stockKey = it,
+                            filledStockInfoFromAct = filledStock!!,
+                            filledPlace = filledPlace!!
+                        ) } // Акции Избранные
+                        else -> stockKey?.let { activity.stockScreen.StockMyScreen(
+                            navController = navController,
+                            stockKey = it,
+                            filledStockInfoFromAct = filledStock!!,
+                            filledPlace = filledPlace!!
+                        ) } // Акции МОИ
                     }
                 }
             }
