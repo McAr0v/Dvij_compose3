@@ -17,4 +17,5 @@ data class StockCardClass(
     val startDateNumber: String? = null,
     val finishDateNumber: String? = null,
     val counterInFav: String? = null,
+    val counterView: String? = null,
 )

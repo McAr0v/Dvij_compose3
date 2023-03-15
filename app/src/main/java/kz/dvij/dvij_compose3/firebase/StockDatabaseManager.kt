@@ -187,6 +187,11 @@ class StockDatabaseManager (val act: MainActivity) {
                     val getFilter = item
                         .child("filterInfo").getValue(FilterStockClass::class.java)
 
+                    val stockCount = item
+                        .child("viewCounter")
+                        .child("viewCounter")
+                        .getValue(Int::class.java)
+
 
                     if (stock != null && getFilter != null){
 
@@ -212,7 +217,8 @@ class StockDatabaseManager (val act: MainActivity) {
                             createTime = stock.createTime,
                             startDateNumber = stock.startDateNumber,
                             finishDateNumber = stock.finishDateNumber,
-                            counterInFav = getFavCounter.toString()
+                            counterInFav = getFavCounter.toString(),
+                            counterView = stockCount.toString()
 
                         )
 
