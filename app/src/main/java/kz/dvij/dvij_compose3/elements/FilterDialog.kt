@@ -957,12 +957,12 @@ class FilterDialog (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_Background, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -984,7 +984,7 @@ class FilterDialog (val act: MainActivity) {
                     Text(
                         text = "Выбери тип сортировки", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)
                     ) // занять всю оставшуюся ширину
 
@@ -995,7 +995,7 @@ class FilterDialog (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
@@ -1009,8 +1009,8 @@ class FilterDialog (val act: MainActivity) {
                     modifier = Modifier
                         .fillMaxWidth() // занять ширину
                         .background(
-                            Grey100, // цвет фона
-                            shape = RoundedCornerShape(10.dp) // скругление углов
+                            Grey_OnBackground, // цвет фона
+                            shape = RoundedCornerShape(15.dp) // скругление углов
                         )
                         .padding(20.dp), // отступ
                     verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами
@@ -1033,8 +1033,8 @@ class FilterDialog (val act: MainActivity) {
 
                             Text(
                                 text = item, // само название сортировки
-                                color = Grey00, // цвет текста
-                                style = Typography.bodyMedium // стиль текста
+                                color = WhiteDvij, // цвет текста
+                                style = Typography.bodySmall // стиль текста
                             )
 
                         }

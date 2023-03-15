@@ -201,9 +201,9 @@
     <string name="cat_concerts">Концерты</string>
 
     <!-- МЕРОПРИЯТИЯ -->
-    <string name="input_headline">Напиши заголовок (max 40 символов)</string> <!-- Подтвержденная строчка -->
+    <string name="input_headline">Кратко напиши название мероприятия</string> <!-- Подтвержденная строчка -->
     <string name="input_description">Напиши описание</string> <!-- Подтвержденная строчка -->
-    <string name="input_price">Напиши стоимость билета</string> <!-- Подтвержденная строчка -->
+    <string name="input_price">Если бесплатно, оставь поле пустым</string> <!-- Подтвержденная строчка -->
     <string name="input_username">Введи имя пользователя</string> <!-- Подтвержденная строчка -->
     <string name="empty_meeting">Пусто</string> <!-- Подтвержденная строчка -->
     <string name="free_price">Вход бесплатный</string> <!-- Подтвержденная строчка -->

@@ -583,11 +583,11 @@ class CreateMeeting(private val act: MainActivity) {
                     finishHeadlinePlace = if (headlinePlace.value != null && headlinePlace.value != "" && headlinePlace.value != "null" ) {
 
                         // Передаем заголовок в текстовое поле
-                        fieldTextComponent("Введите название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
+                        fieldTextComponent("Напиши название места", headlinePlace.value) // ТЕКСТОВОЕ ПОЛЕ НАЗВАНИЯ МЕСТА
 
                     } else {
                         // Если не пришел - показываем пустое поле
-                        fieldTextComponent("Введите название места")
+                        fieldTextComponent("Напиши название места")
                     }
 
                     Text(
@@ -602,11 +602,11 @@ class CreateMeeting(private val act: MainActivity) {
                     finishAddressPlace = if (addressPlace.value != null && addressPlace.value != "" && addressPlace.value != "null" ) {
 
                         // Передаем адрес в текстовое поле
-                        fieldTextComponent("Введите адрес места", addressPlace.value)
+                        fieldTextComponent("Напиши адрес места проведения", addressPlace.value)
 
                     } else {
                         // Если не пришел - показываем пустое поле
-                        fieldTextComponent("Введите адрес места") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
+                        fieldTextComponent("Напиши адрес места проведения") // ТЕКСТОВОЕ ПОЛЕ АДРЕСА МЕСТА
 
                     }
                 }
@@ -634,7 +634,7 @@ class CreateMeeting(private val act: MainActivity) {
             }
 
 
-// ---- ДАТА ------
+            // ---- ДАТА ------
 
             Text(
                 text = stringResource(id = R.string.cm_date),
