@@ -432,13 +432,14 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
         return when (day) {
 
-            "понедельник" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!)
-            "вторник" -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!)
-            "среда" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!)
-            "четверг" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!)
-            "пятница" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!)
-            "суббота" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!)
-            else -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!)
+            "понедельник", "Monday" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!)
+            "вторник", "Tuesday"  -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!)
+            "среда", "Wednesday" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!)
+            "четверг", "Thursday" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!)
+            "пятница", "Friday" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!)
+            "суббота", "Saturday" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!)
+            "воскресенье", "Sunday" -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!)
+            else -> listOf("00:00", "00:00")
 
         }
 
@@ -652,6 +653,36 @@ class PlacesDatabaseManager (val act: MainActivity) {
             override fun onCancelled(error: DatabaseError) {}
         }
         )
+    }
+
+    fun readFavCounter(key: String, callback: (result: String)-> Unit){
+
+        placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children){
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val place = item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА акции
+                        .child("info") // Папка инфо
+                        .children.iterator().next() // добираемся до следующей папки - путь УНИКАЛЬНОГО КЛЮЧА ПОЛЬЗОВАТЕЛЯ
+                        .child("placeData") // добираесся до следующей папки внутри - папка с данными о акции
+                        .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса акции
+
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val placeFav = item.child("AddedToFavorites").childrenCount
+
+                    // если мероприятие не нал и ключ акции совпадает с ключем из БД, то...
+                    if (place != null && place.placeKey == key) {
+
+                        callback (placeFav.toString())
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ Заведений --------

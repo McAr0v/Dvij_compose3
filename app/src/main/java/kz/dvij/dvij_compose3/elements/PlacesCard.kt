@@ -26,8 +26,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.ATTENTION
+import kz.dvij.dvij_compose3.constants.DARK
+import kz.dvij.dvij_compose3.constants.FOR_CARDS
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesCardClass
+import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.time.ZoneId
@@ -310,20 +314,7 @@ class PlacesCard (val act: MainActivity) {
                         contentDescription = "Логотип заведения", // описание изображения для слабовидящих
                         modifier = Modifier
                             .height(260.dp), // заполнить картинкой весь контейнер
-                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
-                        //alignment = Alignment.Center
-                    )
-
-                } else {
-
-                    Image(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(260.dp),
-                        painter = painterResource(id = R.drawable.rest_logo2),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
+                        contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
                     )
 
                 }
@@ -537,11 +528,14 @@ class PlacesCard (val act: MainActivity) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlaceCardForNewClass (navController: NavController, placeItem: PlacesCardClass, placeKeyFromAct: MutableState<String>) {
+    fun PlaceCardForNewClass (
+        navController: NavController,
+        placeItem: PlacesCardClass,
+        placeKeyFromAct: MutableState<String>,
+        isAd: Boolean = false
+    ) {
 
-        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
-        val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
-        val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
+        val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
 
         val getNowTime = ZonedDateTime.now(ZoneId.of("Asia/Almaty"))
             .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, EEEE, HH:mm"))
@@ -555,6 +549,8 @@ class PlacesCard (val act: MainActivity) {
 
         val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
 
+        val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
+
 
         // Считываем с базы данных - добавлено ли это заведение в избранное?
 
@@ -562,27 +558,13 @@ class PlacesCard (val act: MainActivity) {
             act.placesDatabaseManager.favIconPlace(key){ result ->
                 // Если колбак тру, то окрашиваем иконку в нужный цвет
                 if (result){
-                    iconFavColor.value = PrimaryColor
+                    iconFavColor.value = YellowDvij
                 } else {
                     // Если колбак фалс, то в обычный цвет
-                    iconFavColor.value = Grey10
+                    iconFavColor.value = WhiteDvij
                 }
             }
         }
-
-
-
-        // Считываем количество мероприятий у этого заведения
-
-        /*act.meetingDatabaseManager.readMeetingCounterInPlaceDataFromDb(placeKey){ meetingsCounter ->
-            meetingCounter.value = meetingsCounter.toString()
-        }*/
-
-        // Считываем количество акций у этого заведения
-
-        /*act.stockDatabaseManager.readStockCounterInPlaceFromDb(placeKey = placeKey) { stockCounters ->
-            stockCounter.value = stockCounters.toString()
-        }*/
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
@@ -591,12 +573,12 @@ class PlacesCard (val act: MainActivity) {
 
         // Переменная счетчика людей, добавивших в избранное заведение
         val favCounter = remember {
-            mutableStateOf(0)
+            mutableStateOf(placeItem.favCounter)
         }
 
         // Переменная счетчика просмотра заведения
         val viewCounter = remember {
-            mutableStateOf(0)
+            mutableStateOf(placeItem.viewCounter)
         }
 
         // Считываем данные про заведение и счетчики добавивших в избранное и количество просмотров заведения
@@ -604,8 +586,8 @@ class PlacesCard (val act: MainActivity) {
         placeItem.placeKey?.let { placeKey->
             act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, placeKey){
 
-                favCounter.value = it[0] // данные из списка - количество добавивших в избранное
-                viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+                favCounter.value = it[0].toString() // данные из списка - количество добавивших в избранное
+                viewCounter.value = it[1].toString() // данные из списка - количество просмотров заведения
 
             }
         }
@@ -634,7 +616,7 @@ class PlacesCard (val act: MainActivity) {
             ,
             shape = RoundedCornerShape(15.dp),
             elevation = CardDefaults.cardElevation(5.dp),
-            colors = CardDefaults.cardColors(Grey100)
+            colors = CardDefaults.cardColors(Grey_Background)
         ) {
 
             Box(modifier = Modifier.fillMaxWidth()){
@@ -646,20 +628,7 @@ class PlacesCard (val act: MainActivity) {
                         contentDescription = "Логотип заведения", // описание изображения для слабовидящих
                         modifier = Modifier
                             .height(260.dp), // заполнить картинкой весь контейнер
-                        contentScale = ContentScale.FillWidth, // обрезать картинку, что не вмещается
-                        //alignment = Alignment.Center
-                    )
-
-                } else {
-
-                    Image(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(260.dp),
-                        painter = painterResource(id = R.drawable.rest_logo2),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
+                        contentScale = ContentScale.Crop, // обрезать картинку, что не вмещается
                     )
 
                 }
@@ -667,57 +636,107 @@ class PlacesCard (val act: MainActivity) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                        .padding(horizontal = 10.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    // ------- КНОПКА КАТЕГОРИИ -----------
-
-                    if (placeItem.category != null) {
-
-                        Button(
-                            onClick = { Toast.makeText(act, "Сделать фунцию", Toast.LENGTH_SHORT).show()},
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                            shape = RoundedCornerShape(50)
-                        ) {
-
-                            androidx.compose.material.Text(
-                                text = placeItem.category,
-                                style = Typography.labelSmall,
-                                color = Grey40
-                            )
-
-                        }
-
-                    }
-
-                    // ----------- Счетчик избранных ----------
-
-                    Button(
-                        onClick = {},
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                        shape = RoundedCornerShape(50)
+                    Bubble(
+                        buttonText = if (viewCounter.value != null && viewCounter.value != "null" ) {
+                            viewCounter.value.toString()
+                        } else {"0"},
+                        leftIcon = R.drawable.ic_visibility,
+                        typeButton = FOR_CARDS
                     ) {
-
-                        androidx.compose.material.Text(
-                            text = favCounter.value.toString(),
-                            style = Typography.labelSmall,
-                            color = Grey40
-                        )
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        // ----- Иконка избранное ------
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_bookmark),
-                            contentDescription = "",
-                            modifier = Modifier.size(20.dp),
-                            tint = iconFavColor.value
-                        )
-
+                        Toast.makeText(act,"Количество просмотров акции",Toast.LENGTH_SHORT).show()
                     }
+
+                    Bubble(
+                        buttonText = if (favCounter.value != null && favCounter.value != "null" ) {
+                            favCounter.value.toString()
+                        } else {"0"},
+                        rightIcon = R.drawable.ic_fav,
+                        typeButton = FOR_CARDS,
+                        rightIconColor = iconFavColor.value
+                    ) {
+                        // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это заведение -----
+                        // Если не авторизован, условие else
+
+                        if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                            act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!) { inFav ->
+
+                                // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                if (inFav) {
+
+                                    // Убираем из избранных
+                                    act.placesDatabaseManager.removeFavouritePlace(placeItem.placeKey) { yes ->
+
+                                        // Если пришел колбак, что успешно
+
+                                        if (yes) {
+                                            act.placesDatabaseManager.readFavCounter(placeItem.placeKey){
+
+                                                favCounter.value = it
+
+                                            }
+
+                                            iconFavColor.value =
+                                                WhiteDvij // При нажатии окрашиваем кнопку в темно-серый
+
+                                            // Выводим ТОСТ
+                                            Toast.makeText(
+                                                act,
+                                                act.getString(R.string.delete_from_fav),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+
+                                } else {
+
+                                    // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                    act.placesDatabaseManager.addFavouritePlace(placeItem.placeKey) { notInFav ->
+
+                                        // Если пришел колбак, что успешно
+
+                                        if (notInFav) {
+
+                                            act.placesDatabaseManager.readFavCounter(placeItem.placeKey){
+
+                                                favCounter.value = it
+
+                                            }
+
+                                            iconFavColor.value =
+                                                YellowDvij // При нажатии окрашиваем текст и иконку в черный
+
+                                            // Выводим ТОСТ
+                                            Toast.makeText(
+                                                act, act.getString(R.string.add_to_fav),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
+
+                            // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                            Toast
+                                .makeText(
+                                    act,
+                                    "Чтобы добавить заведение в избранные, тебе нужно авторизоваться",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
+                    }
+
 
                 }
 
@@ -726,7 +745,7 @@ class PlacesCard (val act: MainActivity) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 245.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                        .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ) {
@@ -736,12 +755,43 @@ class PlacesCard (val act: MainActivity) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp, bottomEnd = 15.dp, bottomStart = 15.dp),
+                        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 0.dp, bottomEnd = 0.dp, bottomStart = 0.dp),
                         elevation = CardDefaults.cardElevation(5.dp),
-                        colors = CardDefaults.cardColors(Grey100)
+                        colors = CardDefaults.cardColors(Grey_ForCards)
                     ) {
 
                         Column(modifier = Modifier.padding(20.dp)) {
+
+
+                            Row {
+                                androidx.compose.material3.Text(
+                                    text = "#Место",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                androidx.compose.material3.Text(
+                                    text = "#${placeItem.category}",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+                            }
+
+                            if (isAd){
+
+                                Spacer(modifier = Modifier.height(5.dp))
+
+                                androidx.compose.material3.Text(
+                                    text = "#Рекламный пост",
+                                    color = Grey_Text,
+                                    style = Typography.labelMedium
+                                )
+
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
 
                             // ----- НАЗВАНИЕ ЗАВЕДЕНИЯ --------
 
@@ -749,8 +799,8 @@ class PlacesCard (val act: MainActivity) {
 
                                 Text(
                                     text = placeItem.placeName,
-                                    style = Typography.titleLarge,
-                                    color = Grey10
+                                    style = Typography.titleMedium,
+                                    color = WhiteDvij
                                 )
 
                             }
@@ -758,63 +808,60 @@ class PlacesCard (val act: MainActivity) {
 
                             // ----- ГОРОД -----
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            if (placeItem.city != null && placeItem.address != null){
 
-                            if (placeItem.city != null){
+                                Spacer(modifier = Modifier.height(5.dp))
 
                                 Text(
-                                    text = placeItem.city,
-                                    style = Typography.bodyMedium,
-                                    color = Grey40
+                                    text = "${placeItem.city}, ${placeItem.address}",
+                                    style = Typography.labelMedium,
+                                    color = Grey_Text
                                 )
 
                             }
 
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // ---- АДРЕС -----
+                            if (nowIsOpen){
+                                Bubble(
+                                    buttonText = "Открыто до ${placeTimeOnToday[1]}"
+                                ) {}
+                            } else {
 
-                            if (placeItem.address != null){
+                                Bubble(buttonText = "Сейчас закрыто", typeButton = ATTENTION) {}
 
-                                Text(
-                                    text = placeItem.address,
-                                    style = Typography.bodyMedium,
-                                    color = Grey40
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+
+                            if (placeItem.placeDescription != null){
+
+                                androidx.compose.material3.Text(
+                                    text = placeItem.placeDescription,
+                                    style = Typography.bodySmall,
+                                    color = WhiteDvij
                                 )
 
                             }
 
-
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            // ----- ВРЕМЯ РАБОТЫ ------
-
-                            if (placeTimeOnToday[0] != "" && placeTimeOnToday[1] != "") {
-
-                                IconText(icon = R.drawable.ic_time, inputText = "${nowDay.capitalize()} - ${placeTimeOnToday[0]} - ${placeTimeOnToday[1]}")
-
-                            }
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Start
                             ) {
-                                Button(
-                                    onClick = {},
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                                    shape = RoundedCornerShape(50)
-                                ) {
+
+                                Row (verticalAlignment = Alignment.CenterVertically) {
 
                                     // ----- Иконка мероприятий ------
 
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_celebration),
                                         contentDescription = "",
-                                        modifier = Modifier.size(20.dp),
-                                        tint = Grey40
+                                        //modifier = Modifier.size(15.dp),
+                                        tint = YellowDvij
                                     )
 
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -822,31 +869,28 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик мероприятий ----------
 
                                     androidx.compose.material.Text(
-                                        text = when (placeItem.meetingCounter) {
-                                            "1" -> "${placeItem.meetingCounter} мероприятие"
-                                            "2","3","4" -> "${placeItem.meetingCounter} мероприятия"
-                                            else -> "${placeItem.meetingCounter} мероприятий"
+                                        text = if (placeItem.meetingCounter != null && placeItem.meetingCounter != "null"){
+                                            placeItem.meetingCounter
+                                        } else {
+                                            "0"
                                         },
-                                        style = Typography.labelSmall,
-                                        color = Grey40
+                                        style = Typography.labelMedium,
+                                        color = WhiteDvij
                                     )
+
                                 }
 
-                                Spacer(modifier = Modifier.width(10.dp))
+                                Spacer(modifier = Modifier.width(20.dp))
 
-                                Button(
-                                    onClick = {},
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                                    shape = RoundedCornerShape(50)
-                                ) {
+                                Row (verticalAlignment = Alignment.CenterVertically) {
 
                                     // ----- Иконка акций ------
 
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_fire),
                                         contentDescription = "",
-                                        modifier = Modifier.size(20.dp),
-                                        tint = Grey40
+                                        //modifier = Modifier.size(15.dp),
+                                        tint = YellowDvij
                                     )
 
                                     Spacer(modifier = Modifier.width(5.dp))
@@ -854,68 +898,124 @@ class PlacesCard (val act: MainActivity) {
                                     // ----------- Счетчик акций ----------
 
                                     androidx.compose.material.Text(
-                                        text = when (placeItem.stockCounter) {
-                                            "1" -> "${placeItem.stockCounter} акция"
-                                            "2","3","4" -> "${placeItem.stockCounter} акции"
-                                            else -> "${placeItem.stockCounter} акций"
+                                        text = if (placeItem.stockCounter != null && placeItem.stockCounter != "null"){
+                                            placeItem.stockCounter
+                                        } else {
+                                            "0"
                                         },
-                                        style = Typography.labelSmall,
-                                        color = Grey40
+
+                                        style = Typography.labelMedium,
+                                        color = WhiteDvij
                                     )
+
                                 }
-
                             }
 
-                            Spacer(modifier = Modifier.width(10.dp))
 
-                            Button(
-                                onClick = {},
-                                colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                                shape = RoundedCornerShape(50)
+
+                        }
+
+                        if (placeItem.owner == act.mAuth.uid){
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Grey_OnBackground).padding(20.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
 
-                                // ----- Иконка акций ------
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_visibility),
-                                    contentDescription = "",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Grey40
-                                )
-
-                                Spacer(modifier = Modifier.width(5.dp))
-
-                                // ----------- Счетчик акций ----------
+                                // ----- КНОПКА РЕДАКТИРОВАТЬ ------
 
                                 androidx.compose.material.Text(
-                                    text = when (placeItem.viewCounter) {
-                                        "null"-> "0 просмотров"
-                                        "1" -> "${placeItem.viewCounter} просмотр"
-                                        "2","3","4" -> "${placeItem.viewCounter} просмотра"
-                                        else -> "${placeItem.viewCounter} просмотров"
-                                    },
-                                    style = Typography.labelSmall,
-                                    color = Grey40
+                                    text = stringResource(id = R.string.edit),
+                                    style = Typography.bodySmall,
+                                    color = YellowDvij,
+                                    modifier = Modifier.clickable {
+
+                                        /*
+                                        filledStock.value = StockAdsClass(
+                                            image = stockInfo.value.image,
+                                            headline = stockInfo.value.headline,
+                                            description = stockInfo.value.description,
+                                            category = stockInfo.value.category,
+                                            keyStock = stockInfo.value.keyStock,
+                                            keyPlace = stockInfo.value.keyPlace,
+                                            keyCreator = stockInfo.value.keyCreator,
+                                            city = stockInfo.value.city,
+                                            startDate = stockInfo.value.startDate,
+                                            finishDate = stockInfo.value.finishDate,
+                                            inputHeadlinePlace = stockInfo.value.inputHeadlinePlace,
+                                            inputAddressPlace = stockInfo.value.inputAddressPlace,
+                                            createTime = stockInfo.value.createTime,
+                                            startDateNumber = stockInfo.value.startDateNumber,
+                                            finishDateNumber = stockInfo.value.finishDateNumber
+                                        )
+
+                                        if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
+
+                                            filledPlace.value = PlacesAdsClass(
+                                                placeName = stockItem.inputHeadlinePlace,
+                                                address = stockItem.inputAddressPlace
+                                            )
+
+                                            navController.navigate(EDIT_STOCK_SCREEN)
+
+                                        } else {
+
+                                            act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = stockItem.keyPlace) {
+
+                                                navController.navigate(EDIT_STOCK_SCREEN)
+
+                                            }
+
+                                        }*/
+                                    }
                                 )
-                            }
 
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            Button(
-                                onClick = {},
-                                colors = ButtonDefaults.buttonColors(backgroundColor = if (nowIsOpen) {
-                                    SuccessColor} else {Grey90}),
-                                shape = RoundedCornerShape(50)
-                            ) {
+                                // ------ КНОПКА УДАЛИТЬ -------
 
                                 androidx.compose.material.Text(
-                                    text = if (nowIsOpen) {"Сейчас открыто"} else {"Закрыто"},
-                                    style = Typography.labelSmall,
-                                    color = Grey40
+                                    text = stringResource(id = R.string.delete),
+                                    style = Typography.bodySmall,
+                                    color = AttentionRed,
+                                    modifier = Modifier.clickable { openConfirmChoose.value = true }
                                 )
+
                             }
 
                         }
+
+                        if (openConfirmChoose.value) {
+
+                            ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
+
+                                /*
+                                if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
+
+                                    act.stockDatabaseManager.deleteStockWithPlaceNote(
+                                        stockKey = stockInfo.value.keyStock!!,
+                                        imageUrl = stockInfo.value.image!!,
+                                        placeKey = stockInfo.value.keyPlace!!
+                                    ) {
+
+                                        if (it) {
+
+                                            Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
+                                            navController.navigate(STOCK_ROOT) {popUpTo(0)}
+
+                                        } else {
+
+                                            Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+
+                                        }
+
+                                    }
+
+                                }*/
+                            }
+                        }
+
                     }
                 }
             }

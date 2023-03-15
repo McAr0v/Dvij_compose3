@@ -18,10 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.constants.DARK
-import kz.dvij.dvij_compose3.constants.FOR_CARDS
-import kz.dvij.dvij_compose3.constants.PRIMARY
-import kz.dvij.dvij_compose3.constants.SECONDARY
+import kz.dvij.dvij_compose3.constants.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
 @Composable
@@ -43,6 +40,7 @@ fun Bubble (
                     PRIMARY -> YellowDvij
                     DARK -> Grey_OnBackground
                     FOR_CARDS -> Grey_ForCards
+                    ATTENTION -> AttentionRed
                     else -> Grey_Background
                 }
             )
@@ -52,6 +50,7 @@ fun Bubble (
                     PRIMARY -> YellowDvij
                     DARK -> Grey_OnBackground
                     FOR_CARDS -> Grey_ForCards
+                    ATTENTION -> AttentionRed
                     else -> YellowDvij
                 }, // цвет - для этого выше мы создавали переменные с цветом
                 shape = RoundedCornerShape(100) // скругление границ
@@ -83,8 +82,9 @@ fun Bubble (
             text = buttonText, // Текст приходит извне
             style = Typography.labelMedium, // стиль текста
             color = when (typeButton) {
-                PRIMARY -> Grey_OnBackground
+                PRIMARY, ATTENTION -> Grey_OnBackground
                 SECONDARY -> YellowDvij
+
                 else -> WhiteDvij
             }
         )

@@ -24,10 +24,11 @@ sealed class BottomNavigationItem(
     // создаем объекты меню согласно тем элементам, которые мы указали выше.
 
     object Profile: BottomNavigationItem(R.string.profile, R.drawable.ic_person, PROFILE_ROOT)
-    object Meetings: BottomNavigationItem(R.string.meetings, R.drawable.ic_meetings_2, MEETINGS_ROOT)
+    object Meetings: BottomNavigationItem(R.string.meetings, R.drawable.ic_celebration, MEETINGS_ROOT)
     object Places: BottomNavigationItem(R.string.places, R.drawable.ic_baseline_places, PLACES_ROOT)
     object Stock: BottomNavigationItem(R.string.stock, R.drawable.ic_fire, STOCK_ROOT)
 
+    //R.drawable.ic_meetings_2
 }
 
 // Константы путей navRoute. Так же используются в TabMenu и боковой навигации
