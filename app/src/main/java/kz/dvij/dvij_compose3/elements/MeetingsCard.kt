@@ -40,6 +40,7 @@ import kz.dvij.dvij_compose3.constants.PRIMARY
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.navigation.MEETING_VIEW
@@ -55,7 +56,7 @@ class MeetingsCard(val act: MainActivity) {
         meetingKey: MutableState<String>,
         isAd: Boolean = false,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100)) // Переменная полупрозрачного градиента
@@ -417,7 +418,7 @@ class MeetingsCard(val act: MainActivity) {
 
                                     if (meetingItem.placeKey == null || meetingItem.placeKey == ""){
 
-                                        filledPlace.value = PlacesAdsClass(
+                                        filledPlace.value = PlacesCardClass(
                                             placeName = meetingItem.headlinePlaceInput,
                                             address = meetingItem.addressPlaceInput
                                         )

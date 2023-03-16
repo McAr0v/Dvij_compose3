@@ -24,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class ChoosePlaceDialog (val act: MainActivity) {
@@ -31,7 +32,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
     // --------- САМ ВСПЛЫВАЮЩИЙ ДИАЛОГ С ВЫБОРОМ Заведений ------------
 
     @Composable
-    fun PlaceChooseDialog (placesList: MutableState<List<PlacesAdsClass>>, chosenOutPlace: MutableState<PlacesAdsClass>, ifChoose: MutableState<Boolean>, onDismiss: ()-> Unit){
+    fun PlaceChooseDialog (placesList: MutableState<List<PlacesCardClass>>, chosenOutPlace: MutableState<PlacesCardClass>, ifChoose: MutableState<Boolean>, onDismiss: ()-> Unit){
 
 
         // ------ САМ ДИАЛОГ ---------
@@ -189,7 +190,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
     }
 
     @Composable
-    fun placeSelectButton(chosenOutPlace: MutableState<PlacesAdsClass>, onClick: ()-> Unit): String? {
+    fun placeSelectButton(chosenOutPlace: MutableState<PlacesCardClass>, onClick: ()-> Unit): String? {
 
         Button(
             onClick = {

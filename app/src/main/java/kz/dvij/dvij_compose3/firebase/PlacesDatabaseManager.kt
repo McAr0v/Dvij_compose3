@@ -221,13 +221,9 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
 
 
+
+
                     if (place != null && getFilter != null){
-
-                        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay, place)
-
-                        val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
-
-                        // Считываем количество мероприятий у этого заведения
 
                         val filledFinishPlace = PlacesCardClass(
                             logo = place.logo,
@@ -262,6 +258,14 @@ class PlacesDatabaseManager (val act: MainActivity) {
                             sundayCloseTime = place.sundayCloseTime
 
                         )
+
+                        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay, filledFinishPlace)
+
+                        val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
+
+                        // Считываем количество мероприятий у этого заведения
+
+
 
                         when (typeFilter) {
 
@@ -432,20 +436,20 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
         return when (day) {
 
-            "понедельник", "Monday" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!)
-            "вторник", "Tuesday"  -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!)
-            "среда", "Wednesday" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!)
-            "четверг", "Thursday" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!)
-            "пятница", "Friday" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!)
-            "суббота", "Saturday" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!)
-            "воскресенье", "Sunday" -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!)
+            "понедельник" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!) // , "Monday"
+            "вторник"  -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!) // , "Tuesday"
+            "среда" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!) // , "Wednesday"
+            "четверг" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!) // , "Thursday"
+            "пятница" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!) // , "Friday"
+            "суббота" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!) //, "Saturday"
+            "воскресенье" -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!) //, "Sunday"
             else -> listOf("00:00", "00:00")
 
         }
 
     }
 
-    fun returnWrightTimeOnCurrentDayInStandartClass (day: String, placeInfo: PlacesAdsClass): List<String>{
+    fun returnWrightTimeOnCurrentDayInStandartClass (day: String, placeInfo: PlacesCardClass): List<String>{
 
         return when (day) {
 
@@ -618,14 +622,14 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ МОИХ ЗАВЕДЕНИЙ --------
 
-    fun readPlaceMyDataFromDb(placesList: MutableState<List<PlacesAdsClass>>){
+    fun readPlaceMyDataFromDb(placesList: MutableState<List<PlacesCardClass>>){
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val placeArray = ArrayList<PlacesAdsClass>()
+                val placeArray = ArrayList<PlacesCardClass>()
 
                 for (item in snapshot.children){
 
@@ -638,12 +642,62 @@ class PlacesDatabaseManager (val act: MainActivity) {
                             .child("placeData") // добираемся до следующей папки внутри УКПользователя - папка с данными о заведении
                             .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведения
 
-                        if (place != null) {placeArray.add(place)} //  если заведение не нал, то добавляем в список-черновик
+                        // считываем данные для счетчика - количество добавивших в избранное
+                        val placeFavCounter = item.child("AddedToFavorites").childrenCount
+
+                        // считываем данные для счетчика - количество мероприятий, ссылающихся на это заведение
+                        val placeMeetingsCounter = item.child("AddedMeetings").childrenCount
+
+                        // считываем данные для счетчика - количество акций, ссылающихся на это заведение
+                        val placeStockCounter = item.child("AddedStocks").childrenCount
+
+                        // считываем данные для счетчика - количество просмотров объявления
+                        val placeViewCount = item
+                            .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
+                        if (place != null) {
+
+                            val finishPlace = PlacesCardClass(
+                                logo = place.logo,
+                                placeName = place.placeName,
+                                placeDescription = place.placeDescription,
+                                phone = place.phone,
+                                whatsapp = place.whatsapp,
+                                telegram = place.telegram,
+                                instagram = place.instagram,
+                                category = place.category,
+                                city = place.city,
+                                address = place.address,
+                                placeKey = place.placeKey,
+                                owner = place.owner,
+                                meetingCounter = placeMeetingsCounter.toString(),
+                                stockCounter = placeStockCounter.toString(),
+                                favCounter = placeFavCounter.toString(),
+                                viewCounter = placeViewCount.toString(),
+                                mondayOpenTime = place.mondayOpenTime,
+                                mondayCloseTime = place.mondayCloseTime,
+                                tuesdayOpenTime = place.tuesdayOpenTime,
+                                tuesdayCloseTime = place.tuesdayCloseTime,
+                                wednesdayOpenTime = place.wednesdayOpenTime,
+                                wednesdayCloseTime = place.wednesdayCloseTime,
+                                thursdayOpenTime = place.thursdayOpenTime,
+                                thursdayCloseTime = place.thursdayCloseTime,
+                                fridayOpenTime = place.fridayOpenTime,
+                                fridayCloseTime = place.fridayCloseTime,
+                                saturdayOpenTime = place.saturdayOpenTime,
+                                saturdayCloseTime = place.saturdayCloseTime,
+                                sundayOpenTime = place.sundayOpenTime,
+                                sundayCloseTime = place.sundayCloseTime
+
+                            )
+
+                            placeArray.add(finishPlace)
+                        } //  если заведение не нал, то добавляем в список-черновик
                     }
                 }
 
                 if (placeArray.isEmpty()){
-                    placesList.value = listOf(default) // если в списке ничего нет, то добавляем заведение по умолчанию
+                    placesList.value = listOf(defaultForCard) // если в списке ничего нет, то добавляем заведение по умолчанию
                 } else {
                     placesList.value = placeArray // если список не пустой, то возвращаем мои заведения с БД
                 }
@@ -687,14 +741,14 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ------- ФУНКЦИЯ СЧИТЫВАНИЯ ИЗБРАННЫХ Заведений --------
 
-    fun readPlacesFavDataFromDb(placesList: MutableState<List<PlacesAdsClass>>){
+    fun readPlacesFavDataFromDb(placesList: MutableState<List<PlacesCardClass>>){
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
             // функция при изменении данных в БД
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val placeArray = ArrayList<PlacesAdsClass>()
+                val placeArray = ArrayList<PlacesCardClass>()
 
                 for (item in snapshot.children){
 
@@ -714,21 +768,68 @@ class PlacesDatabaseManager (val act: MainActivity) {
                             .child(auth.uid!!) // ищем папку с ключом пользователя
                             .getValue(String::class.java) // забираем данные из БД если они есть
 
+                        // считываем данные для счетчика - количество добавивших в избранное
+                        val placeFavCounter = item.child("AddedToFavorites").childrenCount
+
+                        // считываем данные для счетчика - количество мероприятий, ссылающихся на это заведение
+                        val placeMeetingsCounter = item.child("AddedMeetings").childrenCount
+
+                        // считываем данные для счетчика - количество акций, ссылающихся на это заведение
+                        val placeStockCounter = item.child("AddedStocks").childrenCount
+
+                        // считываем данные для счетчика - количество просмотров объявления
+                        val placeViewCount = item
+                            .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
                         // сравниваем ключи
 
                         if (placeFav == auth.uid) {
                             // если ключи совпали, проверяем заведение на нал
                             if (place != null) {
 
+                                val finishPlace = PlacesCardClass(
+                                    logo = place.logo,
+                                    placeName = place.placeName,
+                                    placeDescription = place.placeDescription,
+                                    phone = place.phone,
+                                    whatsapp = place.whatsapp,
+                                    telegram = place.telegram,
+                                    instagram = place.instagram,
+                                    category = place.category,
+                                    city = place.city,
+                                    address = place.address,
+                                    placeKey = place.placeKey,
+                                    owner = place.owner,
+                                    meetingCounter = placeMeetingsCounter.toString(),
+                                    stockCounter = placeStockCounter.toString(),
+                                    favCounter = placeFavCounter.toString(),
+                                    viewCounter = placeViewCount.toString(),
+                                    mondayOpenTime = place.mondayOpenTime,
+                                    mondayCloseTime = place.mondayCloseTime,
+                                    tuesdayOpenTime = place.tuesdayOpenTime,
+                                    tuesdayCloseTime = place.tuesdayCloseTime,
+                                    wednesdayOpenTime = place.wednesdayOpenTime,
+                                    wednesdayCloseTime = place.wednesdayCloseTime,
+                                    thursdayOpenTime = place.thursdayOpenTime,
+                                    thursdayCloseTime = place.thursdayCloseTime,
+                                    fridayOpenTime = place.fridayOpenTime,
+                                    fridayCloseTime = place.fridayCloseTime,
+                                    saturdayOpenTime = place.saturdayOpenTime,
+                                    saturdayCloseTime = place.saturdayCloseTime,
+                                    sundayOpenTime = place.sundayOpenTime,
+                                    sundayCloseTime = place.sundayCloseTime
+
+                                )
+
                                 //  если заведение не нал, то добавляем в список-черновик
-                                placeArray.add(place)
+                                placeArray.add(finishPlace)
                             }
                         }
                     }
                 }
 
                 if (placeArray.isEmpty()){
-                    placesList.value = listOf(default) // если в списке ничего нет, то добавляем заведение по умолчанию
+                    placesList.value = listOf(defaultForCard) // если в списке ничего нет, то добавляем заведение по умолчанию
                 } else {
                     placesList.value = placeArray // если список не пустой, то возвращаем избранные заведения с БД
                 }
@@ -741,7 +842,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ ВОЗВРАЩАЮЩАЯ СПИСОК СЧЕТЧИКОВ --------
 
-    fun readOnePlaceFromDataBase(placeInfo: MutableState<PlacesAdsClass>, key: String, callback: (result: List<Int>)-> Unit){
+    fun readOnePlaceFromDataBase(placeInfo: MutableState<PlacesCardClass>, key: String, callback: (result: List<Int>)-> Unit){
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
@@ -758,7 +859,13 @@ class PlacesDatabaseManager (val act: MainActivity) {
                         .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведеиня
 
                     // считываем данные для счетчика - количество добавивших в избранное
-                    val placeFav = item.child("AddedToFavorites").childrenCount
+                    val placeFavCounter = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество мероприятий, ссылающихся на это заведение
+                    val placeMeetingsCounter = item.child("AddedMeetings").childrenCount
+
+                    // считываем данные для счетчика - количество акций, ссылающихся на это заведение
+                    val placeStockCounter = item.child("AddedStocks").childrenCount
 
                     // считываем данные для счетчика - количество просмотров объявления
                     val placeViewCount = item
@@ -767,14 +874,48 @@ class PlacesDatabaseManager (val act: MainActivity) {
                     // если мероприятие не нал и ключ завдения совпадает с ключем из БД, то...
                     if (place != null && place.placeKey == key) {
 
+                        val finishPlace = PlacesCardClass(
+                            logo = place.logo,
+                            placeName = place.placeName,
+                            placeDescription = place.placeDescription,
+                            phone = place.phone,
+                            whatsapp = place.whatsapp,
+                            telegram = place.telegram,
+                            instagram = place.instagram,
+                            category = place.category,
+                            city = place.city,
+                            address = place.address,
+                            placeKey = place.placeKey,
+                            owner = place.owner,
+                            meetingCounter = placeMeetingsCounter.toString(),
+                            stockCounter = placeStockCounter.toString(),
+                            favCounter = placeFavCounter.toString(),
+                            viewCounter = placeViewCount.toString(),
+                            mondayOpenTime = place.mondayOpenTime,
+                            mondayCloseTime = place.mondayCloseTime,
+                            tuesdayOpenTime = place.tuesdayOpenTime,
+                            tuesdayCloseTime = place.tuesdayCloseTime,
+                            wednesdayOpenTime = place.wednesdayOpenTime,
+                            wednesdayCloseTime = place.wednesdayCloseTime,
+                            thursdayOpenTime = place.thursdayOpenTime,
+                            thursdayCloseTime = place.thursdayCloseTime,
+                            fridayOpenTime = place.fridayOpenTime,
+                            fridayCloseTime = place.fridayCloseTime,
+                            saturdayOpenTime = place.saturdayOpenTime,
+                            saturdayCloseTime = place.saturdayCloseTime,
+                            sundayOpenTime = place.sundayOpenTime,
+                            sundayCloseTime = place.sundayCloseTime
+
+                        )
+
                         // передаем в переменную нужное заведение
 
-                        placeInfo.value = place
+                        placeInfo.value = finishPlace
 
                         // если счетчик просмотров заведение не нал, то...
                         if (placeViewCount != null) {
                             // Возвращаем калбак в виде списка счетчиков
-                            callback (listOf(placeFav.toInt(), placeViewCount.toInt()))
+                            callback (listOf(placeFavCounter.toInt(), placeViewCount.toInt()))
                         }
                     }
                 }
@@ -785,7 +926,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
     // ---- ФУНКЦИЯ СЧИТЫВАНИЯ ДАННЫХ О КОНКРЕТНОМ ЗАВЕДЕНИИ ВОЗВРАЩАЮЩАЯ ДАТА КЛАСС --------
 
-    fun readOnePlaceFromDataBaseReturnDataClass(key: String, callback: (result: PlacesAdsClass)-> Unit){
+    fun readOnePlaceFromDataBaseReturnDataClass(key: String, callback: (result: PlacesCardClass)-> Unit){
 
         placeDatabase.addListenerForSingleValueEvent(object: ValueEventListener{
 
@@ -801,10 +942,58 @@ class PlacesDatabaseManager (val act: MainActivity) {
                         .child("placeData") // добираесся до следующей папки внутри - папка с данными о заведении
                         .getValue(PlacesAdsClass::class.java) // забираем данные из БД в виде нашего класса заведеиня
 
+                    // считываем данные для счетчика - количество добавивших в избранное
+                    val placeFavCounter = item.child("AddedToFavorites").childrenCount
+
+                    // считываем данные для счетчика - количество мероприятий, ссылающихся на это заведение
+                    val placeMeetingsCounter = item.child("AddedMeetings").childrenCount
+
+                    // считываем данные для счетчика - количество акций, ссылающихся на это заведение
+                    val placeStockCounter = item.child("AddedStocks").childrenCount
+
+                    // считываем данные для счетчика - количество просмотров объявления
+                    val placeViewCount = item
+                        .child("viewCounter").child("viewCounter").getValue(Int::class.java)
+
                     // если мероприятие не нал и ключ завдения совпадает с ключем из БД, то...
                     if (place != null && place.placeKey == key) {
 
-                        callback (place)
+
+                        val finishPlace = PlacesCardClass(
+                            logo = place.logo,
+                            placeName = place.placeName,
+                            placeDescription = place.placeDescription,
+                            phone = place.phone,
+                            whatsapp = place.whatsapp,
+                            telegram = place.telegram,
+                            instagram = place.instagram,
+                            category = place.category,
+                            city = place.city,
+                            address = place.address,
+                            placeKey = place.placeKey,
+                            owner = place.owner,
+                            meetingCounter = placeMeetingsCounter.toString(),
+                            stockCounter = placeStockCounter.toString(),
+                            favCounter = placeFavCounter.toString(),
+                            viewCounter = placeViewCount.toString(),
+                            mondayOpenTime = place.mondayOpenTime,
+                            mondayCloseTime = place.mondayCloseTime,
+                            tuesdayOpenTime = place.tuesdayOpenTime,
+                            tuesdayCloseTime = place.tuesdayCloseTime,
+                            wednesdayOpenTime = place.wednesdayOpenTime,
+                            wednesdayCloseTime = place.wednesdayCloseTime,
+                            thursdayOpenTime = place.thursdayOpenTime,
+                            thursdayCloseTime = place.thursdayCloseTime,
+                            fridayOpenTime = place.fridayOpenTime,
+                            fridayCloseTime = place.fridayCloseTime,
+                            saturdayOpenTime = place.saturdayOpenTime,
+                            saturdayCloseTime = place.saturdayCloseTime,
+                            sundayOpenTime = place.sundayOpenTime,
+                            sundayCloseTime = place.sundayCloseTime
+
+                        )
+
+                        callback (finishPlace)
                     }
                 }
             }

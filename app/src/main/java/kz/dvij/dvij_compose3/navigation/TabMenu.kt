@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.tapesscreens.*
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -54,7 +55,7 @@ fun TabMenu (
     placeIsOpenForFilter: MutableState<Boolean>? = null,
     placeSortingForFilter: MutableState<String>? = null,
     filledMeeting: MutableState<MeetingsAdsClass>? = null,
-    filledPlace: MutableState<PlacesAdsClass>? = null,
+    filledPlace: MutableState<PlacesCardClass>? = null,
     filledStock: MutableState<StockAdsClass>? = null
 ){
 
@@ -159,10 +160,11 @@ fun TabMenu (
                             cityForFilter = cityForFilter!!,
                             placeSortingForFilter = placeSortingForFilter!!,
                             placeCategoryForFilter = placeCategoryForFilter!!,
-                            placeIsOpenForFilter = placeIsOpenForFilter!!
+                            placeIsOpenForFilter = placeIsOpenForFilter!!,
+                            filledPlaceInfoFromAct = filledPlace!!
                         ) } // заведения Лента
-                        1 -> placesKey?.let { activity.placesScreens.PlacesFavScreen(navController = navController, placeKey = it) } // заведения Избранные
-                        else -> placesKey?.let { activity.placesScreens.PlacesMyScreen(navController = navController, placeKey = it) } // заведения Мои
+                        1 -> placesKey?.let { activity.placesScreens.PlacesFavScreen(navController = navController, placeKey = it, filledPlaceInfoFromAct = filledPlace!!) } // заведения Избранные
+                        else -> placesKey?.let { activity.placesScreens.PlacesMyScreen(navController = navController, placeKey = it, filledPlaceInfoFromAct = filledPlace!!) } // заведения Мои
                     }
                 }
                 else -> {

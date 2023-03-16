@@ -41,7 +41,7 @@ import java.time.format.DateTimeFormatter
 class PlacesCard (val act: MainActivity) {
 
     @Composable
-    fun PlaceCardSmall (navController: NavController, placeItem: PlacesAdsClass, placeKey: MutableState<String>) {
+    fun PlaceCardSmall (navController: NavController, placeItem: PlacesCardClass, placeKey: MutableState<String>) {
 
         val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
         val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
@@ -253,7 +253,7 @@ class PlacesCard (val act: MainActivity) {
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+            mutableStateOf(PlacesCardClass())
         }
 
         // Переменная счетчика людей, добавивших в избранное заведение
@@ -532,6 +532,7 @@ class PlacesCard (val act: MainActivity) {
         navController: NavController,
         placeItem: PlacesCardClass,
         placeKeyFromAct: MutableState<String>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>,
         isAd: Boolean = false
     ) {
 
@@ -568,7 +569,7 @@ class PlacesCard (val act: MainActivity) {
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+            mutableStateOf(PlacesCardClass())
         }
 
         // Переменная счетчика людей, добавивших в избранное заведение
@@ -933,43 +934,18 @@ class PlacesCard (val act: MainActivity) {
                                     color = YellowDvij,
                                     modifier = Modifier.clickable {
 
-                                        /*
-                                        filledStock.value = StockAdsClass(
-                                            image = stockInfo.value.image,
-                                            headline = stockInfo.value.headline,
-                                            description = stockInfo.value.description,
-                                            category = stockInfo.value.category,
-                                            keyStock = stockInfo.value.keyStock,
-                                            keyPlace = stockInfo.value.keyPlace,
-                                            keyCreator = stockInfo.value.keyCreator,
-                                            city = stockInfo.value.city,
-                                            startDate = stockInfo.value.startDate,
-                                            finishDate = stockInfo.value.finishDate,
-                                            inputHeadlinePlace = stockInfo.value.inputHeadlinePlace,
-                                            inputAddressPlace = stockInfo.value.inputAddressPlace,
-                                            createTime = stockInfo.value.createTime,
-                                            startDateNumber = stockInfo.value.startDateNumber,
-                                            finishDateNumber = stockInfo.value.finishDateNumber
-                                        )
+                                        // Считываем данные о заведении
+                                        placeInfo.value.placeKey?.let {
+                                            act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
 
-                                        if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
+                                                // если пришел дата класс заведения, присваеваем его в переменную на МАИН АКТИВИТИ
+                                                filledPlaceInfoFromAct.value = place
 
-                                            filledPlace.value = PlacesAdsClass(
-                                                placeName = stockItem.inputHeadlinePlace,
-                                                address = stockItem.inputAddressPlace
-                                            )
-
-                                            navController.navigate(EDIT_STOCK_SCREEN)
-
-                                        } else {
-
-                                            act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = stockItem.keyPlace) {
-
-                                                navController.navigate(EDIT_STOCK_SCREEN)
+                                                // Переходим на страницу редактирования
+                                                navController.navigate(EDIT_PLACES_SCREEN)
 
                                             }
-
-                                        }*/
+                                        }
                                     }
                                 )
 
@@ -990,36 +966,20 @@ class PlacesCard (val act: MainActivity) {
 
                             ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
-                                /*
-                                if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
+                                placeInfo.value.placeKey?.let {
+                                    placeInfo.value.logo?.let { it1 ->
+                                        act.placesDatabaseManager.deletePlace(it, it1){
 
-                                    act.stockDatabaseManager.deleteStockWithPlaceNote(
-                                        stockKey = stockInfo.value.keyStock!!,
-                                        imageUrl = stockInfo.value.image!!,
-                                        placeKey = stockInfo.value.keyPlace!!
-                                    ) {
-
-                                        if (it) {
-
-                                            Log.d ("MyLog", "Удалилась и картинка и сама акция и запись у заведения")
-                                            navController.navigate(STOCK_ROOT) {popUpTo(0)}
-
-                                        } else {
-
-                                            Log.d ("MyLog", "Почемуто акция не удалилась не удалилось")
+                                            navController.navigate(PLACES_ROOT) {popUpTo(0)}
 
                                         }
-
                                     }
-
-                                }*/
+                                }
                             }
                         }
-
                     }
                 }
             }
         }
     }
-
 }

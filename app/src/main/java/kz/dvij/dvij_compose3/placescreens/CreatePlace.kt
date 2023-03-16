@@ -32,6 +32,7 @@ import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.functions.checkDataOnCreatePlace
@@ -60,7 +61,7 @@ class CreatePlace (val act: MainActivity) {
         citiesList: MutableState<List<CitiesList>>, // список городов
         filledUserInfo: UserInfoClass = UserInfoClass(), // данные пользователя с БД
         // Заполненое заведение, подаваемое извне. Если не передать, значения по умолчанию:
-        filledPlace: PlacesAdsClass = PlacesAdsClass(
+        filledPlace: PlacesCardClass = PlacesCardClass(
             placeName = "",
             placeKey = "",
             logo = "",

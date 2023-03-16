@@ -34,6 +34,7 @@ import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.EDIT_STOCK_SCREEN
@@ -48,7 +49,13 @@ class StockViewScreen (val act: MainActivity) {
 
     @SuppressLint("NotConstructor")
     @Composable
-    fun StockViewScreen (key: String, navController: NavController, placeKey: MutableState<String>, filledStockInfoFromAct: MutableState<StockAdsClass>, filledPlaceInfoFromAct: MutableState<PlacesAdsClass>) {
+    fun StockViewScreen (
+        key: String,
+        navController: NavController,
+        placeKey: MutableState<String>,
+        filledStockInfoFromAct: MutableState<StockAdsClass>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
+    ) {
 
         // Переменная, которая содержит в себе информацию об акции
         val stockInfo = remember {
@@ -77,7 +84,7 @@ class StockViewScreen (val act: MainActivity) {
 
         // Переменная, которая содержит информацию о заведении-организаторе
         val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+            mutableStateOf(PlacesCardClass())
         }
 
         // --- ПЕРЕМЕННЫЕ ДИАЛОГОВ ---
@@ -380,15 +387,21 @@ class StockViewScreen (val act: MainActivity) {
                                 // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 
                                 if (
-                                    stockInfo.value.keyPlace != "Empty"
-                                    && stockInfo.value.keyPlace != ""
-                                    && stockInfo.value.keyPlace != "null"
-                                    && stockInfo.value.keyPlace != null
-                                    && placeInfo.value.placeKey != "Empty"
-                                    && placeInfo.value.placeKey != ""
-                                    && placeInfo.value.placeKey != "null"
-                                    && placeInfo.value.placeKey != null
+                                    placeInfo.value.placeName != "Empty"
+                                    && placeInfo.value.placeName != ""
+                                    && placeInfo.value.placeName != "null"
+                                    && placeInfo.value.placeName != null
+                                    && placeInfo.value.address != "Empty"
+                                    && placeInfo.value.address != ""
+                                    && placeInfo.value.address != "null"
+                                    && placeInfo.value.address != null
+
                                 ) {
+
+                                    Log.d(
+                                        "MyLog",
+                                        "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
+                                    )
 
                                     Text(
                                         text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
@@ -396,7 +409,19 @@ class StockViewScreen (val act: MainActivity) {
                                         color = WhiteDvij
                                     )
 
-                                } else {
+                                }
+
+                                if (
+                                    stockInfo.value.inputHeadlinePlace != "Empty"
+                                    && stockInfo.value.inputHeadlinePlace != ""
+                                    && stockInfo.value.inputHeadlinePlace != "null"
+                                    && stockInfo.value.inputHeadlinePlace != null
+                                    && stockInfo.value.inputAddressPlace != "Empty"
+                                    && stockInfo.value.inputAddressPlace != ""
+                                    && stockInfo.value.inputAddressPlace != "null"
+                                    && stockInfo.value.inputAddressPlace != null
+
+                                ) {
 
                                     Text(
                                         text = "${stockInfo.value.inputHeadlinePlace}, ${stockInfo.value.inputAddressPlace}",
@@ -473,7 +498,7 @@ class StockViewScreen (val act: MainActivity) {
 
                                                 } else {
 
-                                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                                    filledPlaceInfoFromAct.value = PlacesCardClass(
                                                         placeName = stock.inputHeadlinePlace,
                                                         address = stock.inputAddressPlace
                                                     )

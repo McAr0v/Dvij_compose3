@@ -51,7 +51,7 @@ class PlaceViewScreen (val act: MainActivity) {
         navController: NavController,
         meetingKey: MutableState<String>, // КЛЮЧ МЕРОПРИЯТИЯ ДЛЯ ПЕРЕХОДА НА КЛИК ПО КАРТОЧКЕ МЕРОПРИЯТИЯ
         stockKey: MutableState<String>, // КЛЮЧ АКЦИЙ для перехода на клик по карточке Акции
-        filledPlaceInfoFromAct: MutableState<PlacesAdsClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
         filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>, // ЗАПОЛНЕННЫЕ ДАННЫЕ О ЗАВЕДЕНИИ ДЛЯ ПЕРЕХОДА НА РЕДАКТИРОВАНИЕ
         filledStockInfoFromAct: MutableState<StockAdsClass>
     ){
@@ -70,7 +70,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
         // Переменная, которая содержит в себе информацию о заведении
         val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+            mutableStateOf(PlacesCardClass())
         }
 
         // Переменная, отвечающая за цвет кнопки избранных

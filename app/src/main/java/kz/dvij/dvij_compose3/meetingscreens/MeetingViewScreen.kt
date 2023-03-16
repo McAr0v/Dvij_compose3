@@ -25,6 +25,7 @@ import kz.dvij.dvij_compose3.constants.*
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
+import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
@@ -43,7 +44,7 @@ class MeetingViewScreen(val act: MainActivity) {
         navController: NavController,
         placeKey: MutableState<String>,
         filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>,
-        filledPlaceInfoFromAct: MutableState<PlacesAdsClass>
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ){
 
 
@@ -74,7 +75,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
         // Переменная, которая содержит информацию о заведении-организаторе
         val placeInfo = remember {
-            mutableStateOf(PlacesAdsClass())
+            mutableStateOf(PlacesCardClass())
         }
 
         val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
@@ -365,15 +366,21 @@ class MeetingViewScreen(val act: MainActivity) {
                                 // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 
                                 if (
-                                    meetingInfo.value.placeKey != "Empty"
-                                    && meetingInfo.value.placeKey != ""
-                                    && meetingInfo.value.placeKey != "null"
-                                    && meetingInfo.value.placeKey != null
-                                    && placeInfo.value.placeKey != "Empty"
-                                    && placeInfo.value.placeKey != ""
-                                    && placeInfo.value.placeKey != "null"
-                                    && placeInfo.value.placeKey != null
+                                    placeInfo.value.placeName != "Empty"
+                                    && placeInfo.value.placeName != ""
+                                    && placeInfo.value.placeName != "null"
+                                    && placeInfo.value.placeName != null
+                                    && placeInfo.value.address != "Empty"
+                                    && placeInfo.value.address != ""
+                                    && placeInfo.value.address != "null"
+                                    && placeInfo.value.address != null
+
                                 ) {
+
+                                    Log.d(
+                                        "MyLog",
+                                        "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
+                                    )
 
                                     Text(
                                         text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
@@ -381,7 +388,19 @@ class MeetingViewScreen(val act: MainActivity) {
                                         color = WhiteDvij
                                     )
 
-                                } else {
+                                }
+
+                                if (
+                                    meetingInfo.value.headlinePlaceInput != "Empty"
+                                    && meetingInfo.value.headlinePlaceInput != ""
+                                    && meetingInfo.value.headlinePlaceInput != "null"
+                                    && meetingInfo.value.headlinePlaceInput != null
+                                    && meetingInfo.value.addressPlaceInput != "Empty"
+                                    && meetingInfo.value.addressPlaceInput != ""
+                                    && meetingInfo.value.addressPlaceInput != "null"
+                                    && meetingInfo.value.addressPlaceInput != null
+
+                                ){
 
                                     Text(
                                         text = "${meetingInfo.value.headlinePlaceInput}, ${meetingInfo.value.addressPlaceInput}",
@@ -569,7 +588,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                                                 } else {
 
-                                                    filledPlaceInfoFromAct.value = PlacesAdsClass(
+                                                    filledPlaceInfoFromAct.value = PlacesCardClass(
                                                         placeName = meeting.headlinePlaceInput,
                                                         address = meeting.addressPlaceInput
                                                     )

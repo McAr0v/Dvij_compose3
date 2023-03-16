@@ -77,7 +77,7 @@ class CreateStock (val act: MainActivity) {
 
         ),
         // Заполненое заведение, подаваемое извне. Если не передать, значения по умолчанию:
-        filledPlace: PlacesAdsClass = PlacesAdsClass(
+        filledPlace: PlacesCardClass = PlacesCardClass(
             placeName = "Выбери заведение",
             placeKey = ""
         ),
@@ -122,7 +122,7 @@ class CreateStock (val act: MainActivity) {
 
         // Список мест
         val placesList = remember {
-            mutableStateOf(listOf<PlacesAdsClass>())
+            mutableStateOf(listOf<PlacesCardClass>())
         }
 
         // --------- ПЕРЕМЕННЫЕ ДЛЯ ВЫБОРА КАТЕГОРИИ АКЦИИ ------------
@@ -199,7 +199,7 @@ class CreateStock (val act: MainActivity) {
             // ЕСЛИ ЕСТЬ НАЗВАНИЕ, ТО ТОГДА ЭТО ЗАВЕДЕНИЕ, ВВЕДЕННОЕ ВРУЧНУЮ!
 
             if (chosenPlace.value.placeName != ""){
-                chosenPlace.value = PlacesAdsClass(
+                chosenPlace.value = PlacesCardClass(
                     placeName = "Выбери заведение",
                     placeKey = ""
                 )
@@ -421,7 +421,7 @@ class CreateStock (val act: MainActivity) {
 
                             // если выбираем ввести вручную, а уже выбрано заведение из списка
                             // то сбрасываем выбранное заведение из списка
-                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
+                            chosenPlace.value = PlacesCardClass(placeName = "Выбери заведение", placeKey = "")
                         }
                     },
 
@@ -729,7 +729,7 @@ class CreateStock (val act: MainActivity) {
                                             chosenStockCategoryCreate.value = "Выбери категорию"
                                             chosenCityCreateWithoutUser.value = "Выбери город"
 
-                                            chosenPlace.value = PlacesAdsClass(
+                                            chosenPlace.value = PlacesCardClass(
 
                                                 logo = "",
                                                 placeKey = "",
@@ -875,7 +875,7 @@ class CreateStock (val act: MainActivity) {
                                                 chosenStockCategoryCreate.value = "Выбери категорию"
                                                 chosenCityCreateWithoutUser.value = "Выбери город"
 
-                                                chosenPlace.value = PlacesAdsClass(
+                                                chosenPlace.value = PlacesCardClass(
 
                                                     logo = "",
                                                     placeKey = "",

@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -414,12 +411,12 @@ class FilterDialog (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_OnBackground, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -441,7 +438,7 @@ class FilterDialog (val act: MainActivity) {
                     Text(
                         text = "Фильтр", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)
                     ) // занять всю оставшуюся ширину
 
@@ -452,7 +449,7 @@ class FilterDialog (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
@@ -468,7 +465,12 @@ class FilterDialog (val act: MainActivity) {
 
                     // ----- ГОРОД ------
 
-                    SpacerTextWithLine(headline = "Город")
+                    Text(
+                        text = "Город",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -488,12 +490,15 @@ class FilterDialog (val act: MainActivity) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
 
                     // ----- КАТЕГОРИЯ --------
 
-                    SpacerTextWithLine(headline = "Категория")
+                    Text(
+                        text = "Категория",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                    )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -518,14 +523,38 @@ class FilterDialog (val act: MainActivity) {
 
                 // ----- КАТЕГОРИЯ --------
 
-                SpacerTextWithLine(headline = "Сейчас открыто")
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
 
-                Checkbox(checked = placeIsOpenForFilter.value, onCheckedChange = {placeIsOpenForFilter.value = it})
+                    Checkbox(
+                        checked = placeIsOpenForFilter.value,
+                        onCheckedChange = {placeIsOpenForFilter.value = it},
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = YellowDvij,
+                            uncheckedColor = WhiteDvij,
+                            checkmarkColor = Grey_OnBackground
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = "Сейчас открыто",
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
+                    )
+                }
+
+
 
 
                 // ------- СОРТИРОВКА --------------
 
-                SpacerTextWithLine(headline = "Сортировка")
+                Text(
+                    text = "Сортировка",
+                    style = Typography.bodySmall,
+                    color = WhiteDvij,
+                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                )
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
 
@@ -545,36 +574,30 @@ class FilterDialog (val act: MainActivity) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
 
                 // ---- КНОПКИ ПРИНЯТЬ И СБРОСИТЬ
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                ButtonCustom(buttonText = "Применить фильтр") {
 
-                    Button(onClick = { onDismiss() }) {
-                        Text(text = "Применить", color = Grey00)
-                    }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Button(
-                        onClick = {
-
-                            val query = filterFunctions.createPlaceFilter()
-
-                            val removeQuery = filterFunctions.splitFilter(query)
-
-                            placeCategoryForFilter.value = removeQuery[1]
-                            cityForFilter.value = removeQuery[0]
-
-                        }
-                    ) {
-                        Text(text = "Сбросить фильтр", color = Grey00)
-                    }
+                    onDismiss()
 
                 }
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                ButtonCustom(buttonText = "Сбросить фильтр", typeButton = SECONDARY) {
+
+                    val query = filterFunctions.createPlaceFilter()
+
+                    val removeQuery = filterFunctions.splitFilter(query)
+
+                    placeCategoryForFilter.value = removeQuery[1]
+                    cityForFilter.value = removeQuery[0]
+                    placeIsOpenForFilter.value = false
+
+                }
 
                 // ------- ДИАЛОГ ВЫБОРА ГОРОДА ---------
 

@@ -22,10 +22,7 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.filters.FilterFunctions
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.MeetingsCardClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 import java.util.*
@@ -58,7 +55,7 @@ class MeetingsScreens (val act: MainActivity) {
         meetingFinishDateForFilter: MutableState<String>,
         meetingSortingForFilter: MutableState<String>,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
         Column {
 
@@ -95,7 +92,7 @@ class MeetingsScreens (val act: MainActivity) {
         meetingFinishDateForFilter: MutableState<String>,
         meetingSortingForFilter: MutableState<String>,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ){
 
         // ----- СПИСКИ -----
@@ -246,7 +243,7 @@ class MeetingsScreens (val act: MainActivity) {
         navController: NavController,
         meetingKey: MutableState<String>,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ){
 
         // инициализируем пустой список мероприятий
@@ -389,7 +386,7 @@ class MeetingsScreens (val act: MainActivity) {
         navController: NavController,
         meetingKey: MutableState<String>,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ){
 
         // Инициализируем список мероприятий

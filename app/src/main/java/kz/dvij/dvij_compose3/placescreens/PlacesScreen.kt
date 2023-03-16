@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesCardClass
@@ -58,7 +59,8 @@ class PlacesScreens (val act: MainActivity) {
         cityForFilter: MutableState<String>,
         placeCategoryForFilter: MutableState<String>,
         placeIsOpenForFilter: MutableState<Boolean>,
-        placeSortingForFilter: MutableState<String>
+        placeSortingForFilter: MutableState<String>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ) {
 
         Column {
@@ -71,7 +73,8 @@ class PlacesScreens (val act: MainActivity) {
                 cityForFilter = cityForFilter,
                 placeCategoryForFilter = placeCategoryForFilter,
                 placeIsOpenForFilter = placeIsOpenForFilter,
-                placeSortingForFilter = placeSortingForFilter
+                placeSortingForFilter = placeSortingForFilter,
+                filledPlace = filledPlaceInfoFromAct
             )
 
         }
@@ -88,7 +91,8 @@ class PlacesScreens (val act: MainActivity) {
         cityForFilter: MutableState<String>,
         placeCategoryForFilter: MutableState<String>,
         placeIsOpenForFilter: MutableState<Boolean>,
-        placeSortingForFilter: MutableState<String>
+        placeSortingForFilter: MutableState<String>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ) {
 
         // инициализируем список заведений
@@ -136,7 +140,7 @@ class PlacesScreens (val act: MainActivity) {
 
             Column (
                 modifier = Modifier
-                    .background(Grey95)
+                    .background(Grey_Background)
                     .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
@@ -153,7 +157,7 @@ class PlacesScreens (val act: MainActivity) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Grey95),
+                            .background(Grey_Background),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ){
@@ -167,13 +171,11 @@ class PlacesScreens (val act: MainActivity) {
                                 act.placesCard.PlaceCardForNewClass(
                                     navController = navController,
                                     placeKeyFromAct = placeKey,
-                                    placeItem = item
+                                    placeItem = item,
+                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct
                                 )
 
                             }
-
-
-                            //act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
 
                         }
                     }
@@ -183,8 +185,8 @@ class PlacesScreens (val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
 
                 } else {
@@ -200,7 +202,7 @@ class PlacesScreens (val act: MainActivity) {
                         // крутилка индикатор
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -211,8 +213,8 @@ class PlacesScreens (val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -225,7 +227,8 @@ class PlacesScreens (val act: MainActivity) {
             FloatingPlaceFilterButton(
                 city = cityForFilter.value,
                 category = placeCategoryForFilter.value,
-                typeOfFilter = typeFilter
+                typeOfFilter = typeFilter,
+                isOpen = placeIsOpenForFilter.value
             ) {
                 openFilterDialog.value = true
             }
@@ -236,13 +239,18 @@ class PlacesScreens (val act: MainActivity) {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlacesFavScreen(navController: NavController, placeKey: MutableState<String>) {
+    fun PlacesFavScreen(
+        navController: NavController,
+        placeKey: MutableState<String>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
+    ) {
 
         // Инициализируем список заведений
 
         val favPlacesList = remember {
-            mutableStateOf(listOf<PlacesAdsClass>())
+            mutableStateOf(listOf<PlacesCardClass>())
         }
 
         // Считываем с базы данных избранные заведения
@@ -254,7 +262,7 @@ class PlacesScreens (val act: MainActivity) {
 
         Column (
             modifier = Modifier
-                .background(Grey95)
+                .background(Grey_Background)
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
@@ -262,54 +270,18 @@ class PlacesScreens (val act: MainActivity) {
             verticalArrangement = Arrangement.Center
         ) {
 
-            // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
+            if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
-            if (favPlacesList.value.isNotEmpty() && favPlacesList.value != listOf(default)){
+            // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Grey95),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ){
-
-                    // Шаблон для каждого заведения
-
-                    items(favPlacesList.value){ item ->
-                        act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
-                    }
-                }
-            } else if (favPlacesList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
-
-                // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)) {
 
                 Text(
-                    text = stringResource(id = R.string.empty_meeting),
-                    style = Typography.bodyMedium,
-                    color = Grey10
-                )
-
-            } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
-
-                // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
-
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.sign_in_illustration
-                    ),
-                    contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                    modifier = Modifier.size(200.dp)
-                )
-
-
-                Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                Text(
-                    modifier = Modifier.padding(20.dp),
                     text = "Чтобы добавить заведение в этот раздел, тебе нужно авторизоваться",
-                    style = Typography.bodyMedium,
-                    color = Grey10,
+                    style = Typography.bodySmall,
+                    color = WhiteDvij,
                     textAlign = TextAlign.Center
                 )
 
@@ -317,39 +289,51 @@ class PlacesScreens (val act: MainActivity) {
 
                 // ------------------- КНОПКА ВОЙТИ ---------------------------------
 
-                Button(
-
-                    onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                    modifier = Modifier
-                        .fillMaxWidth() // кнопка на всю ширину
-                        .height(50.dp) // высота - 50
-                        .padding(horizontal = 20.dp),
-                    shape = RoundedCornerShape(50), // скругление углов
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = PrimaryColor, // цвет кнопки
-                        contentColor = Grey100 // цвет контента на кнопке
-                    )
-                )
-                {
-
-                    // СОДЕРЖИМОЕ КНОПКИ
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_login), // иконка
-                        contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                        tint = Grey100 // цвет иконки
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
-
-                    Text(
-                        text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                        style = Typography.labelMedium // стиль текста
-                    )
+                ButtonCustom(
+                    buttonText = stringResource(id = R.string.to_login)
+                ) {
+                    navController.navigate(LOG_IN_ROOT)
                 }
 
-            } else {
+            }
+
+        } else if (favPlacesList.value.isNotEmpty() && favPlacesList.value != listOf(defaultForCard)){
+
+                // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ --------
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey_Background),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+
+                    // Шаблон для каждого заведения
+
+                    if (favPlacesList.value.isNotEmpty() && favPlacesList.value != listOf(defaultForCard)){
+
+                        items(favPlacesList.value){ item ->
+                            act.placesCard.PlaceCardForNewClass(
+                                navController = navController,
+                                placeItem = item,
+                                placeKeyFromAct = placeKey,
+                                filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                            )
+                        }
+                    }
+                }
+            }  else if (favPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+
+                // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+
+                Text(
+                    text = stringResource(id = R.string.empty_meeting),
+                    style = Typography.bodySmall,
+                    color = WhiteDvij
+                )
+
+            }  else {
 
                 // ---- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
@@ -360,7 +344,7 @@ class PlacesScreens (val act: MainActivity) {
                 ) {
 
                     CircularProgressIndicator(
-                        color = PrimaryColor,
+                        color = YellowDvij,
                         strokeWidth = 3.dp,
                         modifier = Modifier.size(40.dp)
                     )
@@ -369,8 +353,8 @@ class PlacesScreens (val act: MainActivity) {
 
                     Text(
                         text = stringResource(id = R.string.ss_loading),
-                        style = Typography.bodyMedium,
-                        color = Grey10
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
                     )
                 }
             }
@@ -378,13 +362,18 @@ class PlacesScreens (val act: MainActivity) {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun PlacesMyScreen(navController: NavController, placeKey: MutableState<String>) {
+    fun PlacesMyScreen(
+        navController: NavController,
+        placeKey: MutableState<String>,
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
+    ) {
 
         // инициализируем пустой список заведений
 
         val myPlacesList = remember {
-            mutableStateOf(listOf<PlacesAdsClass>())
+            mutableStateOf(listOf<PlacesCardClass>())
         }
 
         // считываем с БД мои заведения
@@ -399,7 +388,7 @@ class PlacesScreens (val act: MainActivity) {
 
             Column (
                 modifier = Modifier
-                    .background(Grey95)
+                    .background(Grey_Background)
                     .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(),
@@ -409,54 +398,18 @@ class PlacesScreens (val act: MainActivity) {
 
                 // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ Заведения ---------
 
-                if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
+                if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
-                    // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
+                // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Grey95),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ){
-
-                        // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
-
-                        items(myPlacesList.value){ item ->
-                            act.placesCard.PlaceCard(navController = navController, placeItem = item, placeKey = placeKey)
-                        }
-                    }
-                } else if (myPlacesList.value == listOf(default) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
-
-                    // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)) {
 
                     Text(
-                        text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodyMedium,
-                        color = Grey10
-                    )
-
-                } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
-
-                    // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
-
-                    Image(
-                        painter = painterResource(
-                            id = R.drawable.sign_in_illustration
-                        ),
-                        contentDescription = stringResource(id = R.string.cd_illustration), // описание для слабовидящих
-                        modifier = Modifier.size(200.dp)
-                    )
-
-
-                    Spacer(modifier = Modifier.height(20.dp)) // разделитель
-
-                    Text(
-                        modifier = Modifier.padding(20.dp),
                         text = "Чтобы создать свое заведение, тебе нужно авторизоваться",
-                        style = Typography.bodyMedium,
-                        color = Grey10,
+                        style = Typography.bodySmall,
+                        color = WhiteDvij,
                         textAlign = TextAlign.Center
                     )
 
@@ -464,37 +417,46 @@ class PlacesScreens (val act: MainActivity) {
 
                     // ------------------- КНОПКА ВОЙТИ ---------------------------------
 
-                    Button(
-
-                        onClick = { navController.navigate(LOG_IN_ROOT) },
-
-                        modifier = Modifier
-                            .fillMaxWidth() // кнопка на всю ширину
-                            .height(50.dp) // высота - 50
-                            .padding(horizontal = 20.dp),
-                        shape = RoundedCornerShape(50), // скругление углов
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = PrimaryColor, // цвет кнопки
-                            contentColor = Grey100 // цвет контента на кнопке
-                        )
-                    )
-                    {
-
-                        // СОДЕРЖИМОЕ КНОПКИ
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_login), // иконка
-                            contentDescription = stringResource(id = R.string.cd_icon), // описание для слабовидящих
-                            tint = Grey100 // цвет иконки
-                        )
-
-                        Spacer(modifier = Modifier.width(10.dp)) // разделитель между текстом и иконкой
-
-                        Text(
-                            text = stringResource(id = R.string.to_login), // если свитч другой, то текст "Войти",
-                            style = Typography.labelMedium // стиль текста
-                        )
+                    ButtonCustom(
+                        buttonText = stringResource(id = R.string.to_login)
+                    ) {
+                        navController.navigate(LOG_IN_ROOT)
                     }
+
+                }
+
+            } else if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
+
+                    // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Grey_Background),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ){
+
+                        // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
+
+                        items(myPlacesList.value){ item ->
+                            act.placesCard.PlaceCardForNewClass(
+                                navController = navController,
+                                placeItem = item,
+                                placeKeyFromAct = placeKey,
+                                filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                            )
+                        }
+                    }
+                } else if (myPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+
+                    // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+
+                    Text(
+                        text = stringResource(id = R.string.empty_meeting),
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
+                    )
 
                 } else {
 
@@ -507,7 +469,7 @@ class PlacesScreens (val act: MainActivity) {
                     ) {
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -516,8 +478,8 @@ class PlacesScreens (val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }

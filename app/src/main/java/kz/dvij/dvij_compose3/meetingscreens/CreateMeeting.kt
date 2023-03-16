@@ -82,7 +82,7 @@ class CreateMeeting(private val act: MainActivity) {
             ownerKey = ""
         ),
         // Заполненое заведение, подаваемое извне. Если не передать, значения по умолчанию:
-        filledPlace: PlacesAdsClass = PlacesAdsClass(
+        filledPlace: PlacesCardClass = PlacesCardClass(
             placeName = "Выбери заведение",
             placeKey = ""
         ),
@@ -214,7 +214,7 @@ class CreateMeeting(private val act: MainActivity) {
 
         // Список мест
         val placesList = remember {
-            mutableStateOf(listOf<PlacesAdsClass>())
+            mutableStateOf(listOf<PlacesCardClass>())
         }
 
 
@@ -255,7 +255,7 @@ class CreateMeeting(private val act: MainActivity) {
             // ЕСЛИ ЕСТЬ НАЗВАНИЕ, ТО ТОГДА ЭТО ЗАВЕДЕНИЕ, ВВЕДЕННОЕ ВРУЧНУЮ!
 
             if (chosenPlace.value.placeName != ""){
-                chosenPlace.value = PlacesAdsClass(
+                chosenPlace.value = PlacesCardClass(
                     placeName = "Выбери заведение",
                     placeKey = ""
                 )
@@ -504,7 +504,7 @@ class CreateMeeting(private val act: MainActivity) {
 
                             // если выбираем ввести вручную, а уже выбрано заведение из списка
                             // то сбрасываем выбранное заведение из списка
-                            chosenPlace.value = PlacesAdsClass(placeName = "Выбери заведение", placeKey = "")
+                            chosenPlace.value = PlacesCardClass(placeName = "Выбери заведение", placeKey = "")
                         }
                     },
 
@@ -928,7 +928,7 @@ class CreateMeeting(private val act: MainActivity) {
                                             dataResult = ""
                                             timeStartResult = ""
                                             timeFinishResult = ""
-                                            chosenPlace.value = PlacesAdsClass(
+                                            chosenPlace.value = PlacesCardClass(
 
                                                 logo = "",
                                                 placeKey = "",

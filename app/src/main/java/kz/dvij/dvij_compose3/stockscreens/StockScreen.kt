@@ -63,7 +63,7 @@ class StockScreen(val act: MainActivity) {
         stockFinishDateForFilter: MutableState<String>,
         stockSortingForFilter: MutableState<String>,
         filledStockInfoFromAct: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         Column {
@@ -98,7 +98,7 @@ class StockScreen(val act: MainActivity) {
         stockFinishDateForFilter: MutableState<String>,
         stockSortingForFilter: MutableState<String>,
         filledStockInfoFromAct: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         // инициализируем список акций
@@ -249,7 +249,7 @@ class StockScreen(val act: MainActivity) {
         navController: NavController,
         stockKey: MutableState<String>,
         filledStockInfoFromAct: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         // инициализируем пустой список акций
@@ -387,7 +387,7 @@ class StockScreen(val act: MainActivity) {
         navController: NavController,
         stockKey: MutableState<String>,
         filledStockInfoFromAct: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         // Инициализируем список акций

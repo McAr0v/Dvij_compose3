@@ -31,10 +31,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.DARK
 import kz.dvij.dvij_compose3.constants.FOR_CARDS
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.StockAdsClass
-import kz.dvij.dvij_compose3.firebase.StockCardClass
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.*
 import kz.dvij.dvij_compose3.ui.theme.*
 
@@ -48,7 +45,7 @@ class StockCard (val act: MainActivity) {
         stockKey: MutableState<String>,
         isAd: Boolean = false,
         filledStock: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesAdsClass>
+        filledPlace: MutableState<PlacesCardClass>
     ) {
 
         val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
@@ -414,7 +411,7 @@ class StockCard (val act: MainActivity) {
 
                                     if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
 
-                                        filledPlace.value = PlacesAdsClass(
+                                        filledPlace.value = PlacesCardClass(
                                             placeName = stockItem.inputHeadlinePlace,
                                             address = stockItem.inputAddressPlace
                                         )

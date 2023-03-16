@@ -236,38 +236,57 @@ fun FloatingPlaceFilterButton(
     city: String = "Выбери город",
     category: String = "Выбери категорию",
     typeOfFilter: String,
+    isOpen: Boolean,
     onClick: () -> Unit
 ){
 
     val counter = when (typeOfFilter){
 
         "cityCategory" -> {
-            " (2)"
+            if (isOpen){
+                " (3)"
+            } else {" (2)" }
+
         }
 
         "city" -> {
-            " (1)"
+            if (isOpen){
+                " (2)"
+            } else {" (1)"}
+
         }
 
         "category" -> {
-            " (1)"
+            if (isOpen){
+                " (2)"
+            } else {" (1)"}
+
         }
 
         "noFilter" -> {
-            ""
+            if (isOpen){
+                " (1)"
+            } else {""}
+
         }
 
         else -> {""}
     }
 
     val containerColor = remember {
-        mutableStateOf(SuccessColor)
+        mutableStateOf(YellowDvij)
     }
 
-    if (city != "Выбери город" || category != "Выбери категорию") {
-        containerColor.value = SuccessColor
+    val contentColor = remember {
+        mutableStateOf(Grey_OnBackground)
+    }
+
+    if (city != "Выбери город" || category != "Выбери категорию" || isOpen) {
+        containerColor.value = YellowDvij
+        contentColor.value = Grey_OnBackground
     } else {
-        containerColor.value = Grey90
+        containerColor.value = Grey_ForCards
+        contentColor.value = WhiteDvij
     }
 
     // помещаем кнопку в BOX
@@ -286,7 +305,7 @@ fun FloatingPlaceFilterButton(
                 onClick()
             },
             shape = CircleShape, // форма кнопки
-            contentColor = Grey00, // цвет содержимого кнопки
+            contentColor = contentColor.value, // цвет содержимого кнопки
             containerColor = containerColor.value, // цвет фона кнопки
             modifier = Modifier
                 .padding(16.dp) // отступы
@@ -299,7 +318,7 @@ fun FloatingPlaceFilterButton(
                 modifier = Modifier.padding(15.dp)
             ){
 
-                Text(text = "Фильтр$counter", color = Grey00)
+                Text(text = "Фильтр$counter", color = contentColor.value)
 
                 Spacer(modifier = Modifier.width(10.dp))
 
