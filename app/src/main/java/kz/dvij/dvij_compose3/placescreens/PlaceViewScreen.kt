@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,10 +30,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.constants.ATTENTION
-import kz.dvij.dvij_compose3.constants.DARK
-import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
-import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
+import kz.dvij.dvij_compose3.constants.*
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.EDIT_PLACES_SCREEN
@@ -175,11 +173,6 @@ class PlaceViewScreen (val act: MainActivity) {
             }
         }
 
-
-
-
-
-
         // ---------- КОНТЕНТ СТРАНИЦЫ --------------
 
         LazyColumn(
@@ -258,10 +251,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                                                 if (yes) {
 
-                                                    iconTextFavColor.value =
-                                                        Grey40 // При нажатии окрашиваем текст и иконку в белый
-                                                    buttonFavColor.value =
-                                                        Grey80 // При нажатии окрашиваем кнопку в темно-серый
+                                                    iconTextFavColor.value = WhiteDvij // При нажатии окрашиваем текст и иконку в белый
 
                                                     act.placesDatabaseManager.readFavCounter(
                                                         placeInfo.value.placeKey!!
@@ -290,10 +280,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                                                 if (notInFav) {
 
-                                                    iconTextFavColor.value =
-                                                        PrimaryColor // При нажатии окрашиваем текст и иконку в черный
-                                                    buttonFavColor.value =
-                                                        Grey90_2 // Окрашиваем кнопку в главный цвет
+                                                    iconTextFavColor.value = YellowDvij // При нажатии окрашиваем текст и иконку в черный
 
                                                     act.placesDatabaseManager.readFavCounter(
                                                         placeInfo.value.placeKey!!
@@ -412,9 +399,13 @@ class PlaceViewScreen (val act: MainActivity) {
                                         )
                                     }
 
-                                    val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday.value[0], placeTimeOnToday.value[1])
+                                    if (placeTimeOnToday.value != listOf<String>()){
 
-                                    /*if (nowIsOpen){
+                                        val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday.value[0], placeTimeOnToday.value[1])
+
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        if (nowIsOpen){
                                         Bubble(
                                             buttonText = "Открыто до ${placeTimeOnToday.value[1]}"
                                         ) {}
@@ -422,449 +413,152 @@ class PlaceViewScreen (val act: MainActivity) {
 
                                         Bubble(buttonText = "Сейчас закрыто", typeButton = ATTENTION) {}
 
-                                    }*/
+                                        }
+                                    }
 
+                                    if (placeInfo.value.placeDescription != null && placeInfo.value.placeDescription != "" && placeInfo.value.placeDescription != "null") {
 
-                                }
-                            }
-                        }
-                    }
-                }
+                                        Spacer(modifier = Modifier.height(20.dp))
 
-
-
-                // --------- КОНТЕНТ ПОД КАРТИНКОЙ ----------
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Top
-
-                ) {
-
-                    // ------ КНОПКА РЕДАКТИРОВАТЬ ------
-
-                    if (placeInfo.value.owner == act.mAuth.uid){
-
-                        // ----- ЕСЛИ КЛЮЧ АВТОРА СОВПОДАЕТ С МОИ КЛЮЧОМ, ТО ДОСТУПНА КНОПКА РЕДАКТИРОВАТЬ ------
-
-                        Button(
-
-                            onClick = {
-
-                                // Считываем данные о заведении
-                                placeInfo.value.placeKey?.let {
-                                    act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
-
-                                        // если пришел дата класс заведения, присваеваем его в переменную на МАИН АКТИВИТИ
-                                        filledPlaceInfoFromAct.value = place
-
-                                        // Переходим на страницу редактирования
-                                        navController.navigate(EDIT_PLACES_SCREEN)
+                                        Text(
+                                            text = placeInfo.value.placeDescription!!,
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
 
                                     }
+
+                                    Spacer(modifier = Modifier.height(30.dp))
+
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(
+                                                width = 2.dp,
+                                                color = YellowDvij,
+                                                shape = RoundedCornerShape(
+                                                    topStart = 15.dp,
+                                                    topEnd = 15.dp,
+                                                    bottomStart = 15.dp,
+                                                    bottomEnd = 0.dp
+                                                )
+                                            )
+                                            .background(
+                                                color = Grey_OnBackground,
+                                                shape = RoundedCornerShape(
+                                                    topStart = 15.dp,
+                                                    topEnd = 15.dp,
+                                                    bottomStart = 15.dp,
+                                                    bottomEnd = 0.dp
+                                                )
+                                            )
+                                            .padding(20.dp)
+                                        ,
+                                        horizontalAlignment = Alignment.Start,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = "Контакты заведения",
+                                            style = Typography.bodyLarge,
+                                            color = WhiteDvij
+                                        )
+
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        Row (modifier = Modifier.fillMaxSize()){
+
+                                            // ----- КНОПКА ПОЗВОНИТЬ --------
+
+                                            if (placeInfo.value.phone != null && placeInfo.value.phone != "7") {
+
+                                                SocialButtonCustom(icon = R.drawable.ic_phone) {
+                                                    act.callAndWhatsapp.makeACall(placeInfo.value.phone!!)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+
+                                            }
+
+                                            // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+
+                                            if (
+                                                placeInfo.value.whatsapp != null
+                                                && placeInfo.value.whatsapp != "7"
+                                                && placeInfo.value.whatsapp != ""
+                                                && placeInfo.value.whatsapp != "+7"
+                                                && placeInfo.value.whatsapp != "+77"
+                                            ) {
+
+                                                SocialButtonCustom(icon = R.drawable.whatsapp) {
+                                                    act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+
+                                            }
+
+                                            // ---- КНОПКА ПЕРЕХОДА В ИНСТАГРАМ -----------
+
+                                            if (
+                                                placeInfo.value.instagram != null
+                                                && placeInfo.value.instagram != "null"
+                                                && placeInfo.value.instagram != ""
+                                            ) {
+
+                                                SocialButtonCustom(icon = R.drawable.instagram) {
+                                                    act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!, INSTAGRAM_URL)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+
+                                            }
+
+                                            // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
+
+                                            if (
+                                                placeInfo.value.telegram != null
+                                                && placeInfo.value.telegram != "null"
+                                                && placeInfo.value.telegram != ""
+                                            ) {
+
+                                                SocialButtonCustom(icon = R.drawable.telegram) {
+                                                    act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!, TELEGRAM_URL)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(30.dp))
+
+                                    Text(
+                                        text = "Режим работы",
+                                        style = Typography.bodyLarge,
+                                        color = WhiteDvij
+                                    )
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    if (placeInfo.value != PlacesCardClass()){
+
+                                        WorkTimePlace(placeInfo = placeInfo.value, today = nowDay)
+
+                                    }
+
                                 }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth() // кнопка на всю ширину
-                                .height(50.dp)// высота - 50
-                                .padding(horizontal = 30.dp), // отступы от краев
-                            shape = RoundedCornerShape(50), // скругление углов
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = SuccessColor, // цвет кнопки
-                                contentColor = Grey100 // цвет контента на кнопке
-                            )
-                        ) {
-                            Text(
-                                text = "Редактировать",
-                                style = Typography.labelMedium
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.ic_publish),
-                                contentDescription = stringResource(id = R.string.cd_publish_button),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // ------ КНОПКА УДАЛЕНИЯ ------
-
-                        Button(
-
-                            onClick = {
-
-                                openConfirmChoose.value = true
-
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth() // кнопка на всю ширину
-                                .height(50.dp)// высота - 50
-                                .padding(horizontal = 30.dp), // отступы от краев
-                            shape = RoundedCornerShape(50), // скругление углов
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = SuccessColor, // цвет кнопки
-                                contentColor = Grey100 // цвет контента на кнопке
-                            )
-                        ) {
-                            Text(
-                                text = "Удалить",
-                                style = Typography.labelMedium
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.ic_publish),
-                                contentDescription = "Кнопка удалить",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-
-
-
-                    // -------- НАЗВАНИЕ ЗАВЕДЕНИЯ ----------
-
-                    if (placeInfo.value.placeName != null && placeInfo.value.placeName != "" && placeInfo.value.placeName != "null") {
-
-                        Text(
-                            text = placeInfo.value.placeName!!,
-                            style = Typography.titleLarge,
-                            color = Grey10
-                        )
-                    }
-
-                    // ------- ГОРОД ------------
-
-                    if (placeInfo.value.city != null && placeInfo.value.city != "" && placeInfo.value.city != "null" && placeInfo.value.city != "Выбери город") {
-
-                        Text(
-                            text = placeInfo.value.city!!,
-                            style = Typography.bodyMedium,
-                            color = Grey40
-                        )
-                    }
-
-                    // ------- АДРЕС ------------
-
-                    if (placeInfo.value.address != null && placeInfo.value.address != "" && placeInfo.value.address != "null") {
-
-                        Text(
-                            text = placeInfo.value.address!!,
-                            style = Typography.bodyMedium,
-                            color = Grey40
-                        )
-                    }
-
-                    // --------- КАТЕГОРИЯ, СЧЕТЧИКИ, ИЗБРАННОЕ -------------
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 20.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-
-                        // -------- КАТЕГОРИЯ заведения ----------
-
-
-                        if (placeInfo.value.category != null && placeInfo.value.category != "" && placeInfo.value.category != "null" && placeInfo.value.category != "Выбери категорию") {
-
-                            Button(
-                                onClick = {
-                                    Toast
-                                        .makeText(act, "Сделать функцию", Toast.LENGTH_SHORT)
-                                        .show()
-                                },
-
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = PrimaryColor,
-                                    contentColor = Grey95
-                                ),
-
-                                shape = RoundedCornerShape(30.dp)
-                            ) {
-                                Text(
-                                    text = placeInfo.value.category!!,
-                                    style = Typography.labelMedium
-                                )
                             }
                         }
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-
-                        // --------- СЧЕТЧИК КОЛИЧЕСТВА ПРОСМОТРОВ ------------
-
-
-                        Button(
-                            onClick = {
-                                Toast.makeText(
-                                    act, "Количество просмотров завдения",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Grey90),
-                            shape = RoundedCornerShape(50)
-                        ) {
-
-                            // ----- Иконка просмотра ------
-
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.ic_visibility),
-                                contentDescription = stringResource(id = R.string.cd_counter_view_meeting),
-                                modifier = Modifier.size(20.dp),
-                                tint = Grey40
-                            )
-
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            // ----------- Счетчик просмотров ----------
-
-                            Text(
-                                text = viewCounter.value.toString(),
-                                style = Typography.labelMedium,
-                                color = Grey40
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-
-                        // -------- ИЗБРАННЫЕ ---------
-
-
-                        Button(
-                            onClick = {
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = buttonFavColor.value),
-                            shape = RoundedCornerShape(50)
-                        ) {
-
-                            // --- Иконка СЕРДЕЧКО -----
-
-                            Icon(
-                                imageVector = Icons.Filled.Favorite, // сам векторный файл иконки
-                                contentDescription = stringResource(id = R.string.cd_add_to_fav), // описание для слабовидящих
-                                modifier = Modifier
-                                    .size(20.dp), // размер иконки
-                                tint = iconTextFavColor.value // Цвет иконки
-                            )
-
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            // ------ Счетчик добавлено в избранное
-
-                            Text(
-                                text = favCounter.value.toString(),
-                                style = Typography.labelMedium,
-                                color = Grey40
-                            )
-                        }
-                    }
-
-
-                    // --------- ДАТА И ВРЕМЯ -----------
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-
-                        // ---- ВРЕМЯ -----
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.5f)
-                        ) {
-
-                            // сделать РЕЖИМ РАБОТЫ
-
-                            if (placeTimeOnToday.value != listOf<String>()){
-
-                                HeadlineAndDesc(
-                                    headline = "${placeTimeOnToday.value[0]} - ${placeTimeOnToday.value[1]}",
-                                    desc = nowDay //
-                                )
-
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-
-
-                    // ----- РАЗДЕЛ СВЯЗАТЬСЯ С ОРГАНИЗАТОРОМ -----
-
-                    SpacerTextWithLine(headline = "Контакты заведения")
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(modifier = Modifier.fillMaxSize()) {
-
-                        // ----- КНОПКА ПОЗВОНИТЬ --------
-
-                        if (placeInfo.value.phone != null && placeInfo.value.phone != "7" && placeInfo.value.phone != "+77" && placeInfo.value.phone != "" && placeInfo.value.phone != "null") {
-
-                            IconButton(
-                                onClick = { act.callAndWhatsapp.makeACall(placeInfo.value.phone!!) }, // функция набора номера
-                                modifier = Modifier.background(
-                                    Grey90,
-                                    shape = RoundedCornerShape(50)
-                                )
-                            ) {
-
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(id = R.drawable.ic_phone),
-                                    contentDescription = "",
-                                    tint = Grey10
-                                )
-
-                            }
-
-                            Spacer(
-                                modifier = Modifier
-                                    .width(10.dp)
-                            )
-
-                        }
-
-                        // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
-
-                        if (placeInfo.value.whatsapp != null && placeInfo.value.whatsapp != "7" && placeInfo.value.whatsapp != "+77" && placeInfo.value.whatsapp != "" && placeInfo.value.whatsapp != "null") {
-
-                            IconButton(
-                                onClick = { act.callAndWhatsapp.writeInWhatsapp(placeInfo.value.whatsapp!!) }, // Функция перехода в ватсапп
-                                modifier = Modifier.background(
-                                    Grey90,
-                                    shape = RoundedCornerShape(50)
-                                )
-                            ) {
-
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(id = R.drawable.whatsapp),
-                                    contentDescription = stringResource(id = R.string.social_whatsapp),
-                                    tint = Grey10
-                                )
-
-                            }
-
-                            Spacer(
-                                modifier = Modifier
-                                    .width(10.dp)
-                            )
-
-                        }
-
-                        // ---- КНОПКА НАПИСАТЬ В ИНСТАГРАМ -----------
-
-                        if (placeInfo.value.instagram != null && placeInfo.value.instagram != "" && placeInfo.value.instagram != "null") {
-
-                            IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.instagram!!, INSTAGRAM_URL) }, // Функция перейти на инстаграм
-                                modifier = Modifier.background(
-                                    Grey90,
-                                    shape = RoundedCornerShape(50)
-                                )
-                            ) {
-
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(id = R.drawable.instagram),
-                                    contentDescription = stringResource(id = R.string.social_instagram),
-                                    tint = Grey10
-                                )
-
-                            }
-
-                            Spacer(
-                                modifier = Modifier
-                                    .width(10.dp)
-                            )
-
-                        }
-
-                        // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
-
-                        if (placeInfo.value.telegram != null && placeInfo.value.telegram != "" && placeInfo.value.telegram != "null") {
-
-                            IconButton(
-                                onClick = { act.callAndWhatsapp.goToInstagramOrTelegram(placeInfo.value.telegram!!, TELEGRAM_URL) }, // Функция написать в телеграм
-                                modifier = Modifier.background(
-                                    Grey90,
-                                    shape = RoundedCornerShape(50)
-                                )
-                            ) {
-
-                                androidx.compose.material.Icon(
-                                    painter = painterResource(id = R.drawable.telegram),
-                                    contentDescription = stringResource(id = R.string.social_telegram),
-                                    tint = Grey10
-                                )
-
-                            }
-
-                            Spacer(
-                                modifier = Modifier
-                                    .width(10.dp)
-                            )
-
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    SpacerTextWithLine(headline = "Создатель")
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // КАРТОЧКА СОЗДАТЕЛЯ
-
-                    if (placeInfo.value.owner != null && placeInfo.value.owner != "null" && placeInfo.value.owner != ""){
-
-                        ownerCard.OwnerCardView(userKey = placeInfo.value.owner!!)
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                    }
-
-
-
-                    // ---------- ОПИСАНИЕ -------------
-
-
-
-                    if (placeInfo.value.placeDescription != null && placeInfo.value.placeDescription != "" && placeInfo.value.placeDescription != "null") {
-
-                        Text(
-                            text = "О заведении",
-                            style = Typography.titleMedium,
-                            color = Grey10
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        Text(
-                            text = placeInfo.value.placeDescription!!,
-                            style = Typography.bodyMedium,
-                            color = Grey10
-                        )
                     }
                 }
-
 
             }
 
@@ -876,8 +570,10 @@ class PlaceViewScreen (val act: MainActivity) {
                     modifier = Modifier.padding(horizontal = 20.dp),
                     text = "Мероприятия этого заведения",
                     style = Typography.titleMedium,
-                    color = Grey10
+                    color = WhiteDvij
                 )
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
             if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(defaultMeeting)){
@@ -910,8 +606,8 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         Text(
                             text = "У этого места пока нет мероприятий",
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -935,7 +631,7 @@ class PlaceViewScreen (val act: MainActivity) {
                         // крутилка индикатор
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -946,8 +642,8 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
@@ -977,12 +673,17 @@ class PlaceViewScreen (val act: MainActivity) {
 
                 // ---- АКЦИИ ЭТОГО ЗАВЕДЕНИЯ -----
 
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Text(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     text = "Акции этого заведения",
                     style = Typography.titleMedium,
-                    color = Grey10
+                    color = WhiteDvij
                 )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
             }
 
             if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStock)){
@@ -1034,7 +735,7 @@ class PlaceViewScreen (val act: MainActivity) {
                         // крутилка индикатор
 
                         CircularProgressIndicator(
-                            color = PrimaryColor,
+                            color = YellowDvij,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -1045,11 +746,69 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         Text(
                             text = stringResource(id = R.string.ss_loading),
-                            style = Typography.bodyMedium,
-                            color = Grey10
+                            style = Typography.bodySmall,
+                            color = WhiteDvij
                         )
 
                     }
+                }
+            }
+
+            item {
+
+                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp)) {
+
+                    if (placeInfo.value.owner != null && placeInfo.value.owner != "null" && placeInfo.value.owner != ""){
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        ownerCard.OwnerCardView(userKey = placeInfo.value.owner!!)
+
+                    }
+
+                }
+
+            }
+
+            item {
+                if (placeInfo.value.owner == act.mAuth.uid){
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Column(modifier = Modifier.padding(20.dp)) {
+
+                        ButtonCustom(buttonText = "Редактировать") {
+
+                            // Считываем данные о заведении
+                            placeInfo.value.placeKey?.let {
+                                act.placesDatabaseManager.readOnePlaceFromDataBaseReturnDataClass(it){ place ->
+
+                                    // если пришел дата класс заведения, присваеваем его в переменную на МАИН АКТИВИТИ
+                                    filledPlaceInfoFromAct.value = place
+
+                                    // Переходим на страницу редактирования
+                                    navController.navigate(EDIT_PLACES_SCREEN)
+
+                                }
+                            }
+
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        ButtonCustom(
+                            buttonText = "Удалить",
+                            typeButton = ATTENTION,
+                            leftIcon = R.drawable.ic_close
+                        ) {
+                            openConfirmChoose.value = true
+                        }
+
+                    }
+
+
+
+
                 }
             }
         }
