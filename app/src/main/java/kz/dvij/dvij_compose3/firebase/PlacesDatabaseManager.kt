@@ -436,13 +436,13 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
         return when (day) {
 
-            "понедельник" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!) // , "Monday"
-            "вторник"  -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!) // , "Tuesday"
-            "среда" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!) // , "Wednesday"
-            "четверг" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!) // , "Thursday"
-            "пятница" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!) // , "Friday"
-            "суббота" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!) //, "Saturday"
-            "воскресенье" -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!) //, "Sunday"
+            "понедельник", "Monday" -> listOf(placeInfo.mondayOpenTime!!, placeInfo.mondayCloseTime!!) //
+            "вторник", "Tuesday" -> listOf(placeInfo.tuesdayOpenTime!!, placeInfo.tuesdayCloseTime!!) //
+            "среда", "Wednesday" -> listOf(placeInfo.wednesdayOpenTime!!, placeInfo.wednesdayCloseTime!!) //
+            "четверг", "Thursday" -> listOf(placeInfo.thursdayOpenTime!!, placeInfo.thursdayCloseTime!!) //
+            "пятница", "Friday" -> listOf(placeInfo.fridayOpenTime!!, placeInfo.fridayCloseTime!!) //
+            "суббота", "Saturday" -> listOf(placeInfo.saturdayOpenTime!!, placeInfo.saturdayCloseTime!!) //
+            "воскресенье", "Sunday" -> listOf(placeInfo.sundayOpenTime!!, placeInfo.sundayCloseTime!!) //
             else -> listOf("00:00", "00:00")
 
         }
@@ -655,7 +655,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
                         val placeViewCount = item
                             .child("viewCounter").child("viewCounter").getValue(Int::class.java)
 
-                        if (place != null) {
+                        if (place != null && place.owner == auth.uid) {
 
                             val finishPlace = PlacesCardClass(
                                 logo = place.logo,
@@ -687,7 +687,8 @@ class PlacesDatabaseManager (val act: MainActivity) {
                                 saturdayOpenTime = place.saturdayOpenTime,
                                 saturdayCloseTime = place.saturdayCloseTime,
                                 sundayOpenTime = place.sundayOpenTime,
-                                sundayCloseTime = place.sundayCloseTime
+                                sundayCloseTime = place.sundayCloseTime,
+                                createPlaceTime = place.createPlaceTime
 
                             )
 
@@ -817,7 +818,8 @@ class PlacesDatabaseManager (val act: MainActivity) {
                                     saturdayOpenTime = place.saturdayOpenTime,
                                     saturdayCloseTime = place.saturdayCloseTime,
                                     sundayOpenTime = place.sundayOpenTime,
-                                    sundayCloseTime = place.sundayCloseTime
+                                    sundayCloseTime = place.sundayCloseTime,
+                                    createPlaceTime = place.createPlaceTime
 
                                 )
 

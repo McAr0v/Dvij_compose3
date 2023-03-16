@@ -744,7 +744,7 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                             .child("viewCounter")
                             .child("viewCounter").getValue(Int::class.java)
 
-                        if (meeting != null) {
+                        if (meeting != null && meeting.ownerKey == auth.uid) {
 
                             val finishCardMeeting = MeetingsCardClass(
 

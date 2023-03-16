@@ -244,7 +244,8 @@ class PlacesScreens (val act: MainActivity) {
     fun PlacesFavScreen(
         navController: NavController,
         placeKey: MutableState<String>,
-        filledPlaceInfoFromAct: MutableState<PlacesCardClass>
+        filledPlaceInfoFromAct: MutableState<PlacesCardClass>,
+        //placeIsOpenForFilter: MutableState<Boolean>,
     ) {
 
         // Инициализируем список заведений
@@ -425,7 +426,17 @@ class PlacesScreens (val act: MainActivity) {
 
                 }
 
-            } else if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
+            } else if (myPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
+
+                    // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
+
+                    Text(
+                        text = stringResource(id = R.string.empty_meeting),
+                        style = Typography.bodySmall,
+                        color = WhiteDvij
+                    )
+
+                } else if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
 
                     // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -439,25 +450,21 @@ class PlacesScreens (val act: MainActivity) {
 
                         // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
 
-                        items(myPlacesList.value){ item ->
-                            act.placesCard.PlaceCardForNewClass(
-                                navController = navController,
-                                placeItem = item,
-                                placeKeyFromAct = placeKey,
-                                filledPlaceInfoFromAct = filledPlaceInfoFromAct
-                            )
+                        if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(defaultForCard)){
+
+                            items(myPlacesList.value){ item ->
+                                act.placesCard.PlaceCardForNewClass(
+                                    navController = navController,
+                                    placeItem = item,
+                                    placeKeyFromAct = placeKey,
+                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                                )
+                            }
+
                         }
+
+
                     }
-                } else if (myPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
-
-                    // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
-
-                    Text(
-                        text = stringResource(id = R.string.empty_meeting),
-                        style = Typography.bodySmall,
-                        color = WhiteDvij
-                    )
-
                 } else {
 
                     // ------- ЕСЛИ ИДЕТ ЗАГРУЗКА ---------
