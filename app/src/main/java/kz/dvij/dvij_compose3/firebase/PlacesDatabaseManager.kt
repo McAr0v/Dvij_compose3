@@ -75,6 +75,8 @@ class PlacesDatabaseManager (val act: MainActivity) {
             }
     }
 
+
+
     // --- ФУНКЦИЯ УДАЛЕНИЯ Заведения----------
 
     fun deletePlace(key: String, imageUrl: String, callback: (result: Boolean)-> Unit){

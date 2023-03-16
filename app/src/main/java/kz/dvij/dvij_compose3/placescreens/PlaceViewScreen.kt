@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -28,6 +29,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.ATTENTION
+import kz.dvij.dvij_compose3.constants.DARK
 import kz.dvij.dvij_compose3.constants.INSTAGRAM_URL
 import kz.dvij.dvij_compose3.constants.TELEGRAM_URL
 import kz.dvij.dvij_compose3.elements.*
@@ -66,6 +69,8 @@ class PlaceViewScreen (val act: MainActivity) {
 
 
 
+
+
         //val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
 
         // Переменная, которая содержит в себе информацию о заведении
@@ -80,17 +85,17 @@ class PlaceViewScreen (val act: MainActivity) {
 
         // Переменная, отвечающая за цвет иконки избранных
         val iconTextFavColor = remember {
-            mutableStateOf(Grey10)
+            mutableStateOf(WhiteDvij)
         }
 
         // Переменная счетчика людей, добавивших в избранное заведение
         val favCounter = remember {
-            mutableStateOf(0)
+            mutableStateOf(placeInfo.value.favCounter)
         }
 
         // Переменная счетчика просмотра заведения
         val viewCounter = remember {
-            mutableStateOf(0)
+            mutableStateOf(placeInfo.value.viewCounter)
         }
 
         // инициализируем список мероприятий этого заведения
@@ -124,8 +129,8 @@ class PlaceViewScreen (val act: MainActivity) {
 
             placeTimeOnToday.value = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay,placeInfo.value)
 
-            favCounter.value = it[0] // данные из списка - количество добавивших в избранное
-            viewCounter.value = it[1] // данные из списка - количество просмотров заведения
+            favCounter.value = it[0].toString() // данные из списка - количество добавивших в избранное
+            viewCounter.value = it[1].toString() // данные из списка - количество просмотров заведения
 
         }
 
@@ -134,11 +139,9 @@ class PlaceViewScreen (val act: MainActivity) {
         if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
             act.placesDatabaseManager.favIconPlace(key) {
                 if (it) {
-                    buttonFavColor.value = Grey90_2
-                    iconTextFavColor.value = PrimaryColor
+                    iconTextFavColor.value = YellowDvij
                 } else {
-                    buttonFavColor.value = Grey90
-                    iconTextFavColor.value = Grey40
+                    iconTextFavColor.value = WhiteDvij
                 }
             }
         }
@@ -175,28 +178,260 @@ class PlaceViewScreen (val act: MainActivity) {
 
 
 
+
+
         // ---------- КОНТЕНТ СТРАНИЦЫ --------------
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Grey95),
+                .background(Grey_Background),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
         ) {
 
             item {
 
-                // ------- КАРТИНКА Заведения ----------
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp)) {
 
-                AsyncImage(
-                    model = placeInfo.value.logo,
-                    contentDescription = "Логотип заведения",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp),
-                    contentScale = ContentScale.Crop
-                )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+
+                        // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
+
+                        if (placeInfo.value.logo != null) {
+
+                            // ------- КАРТИНКА Заведения ----------
+
+                            AsyncImage(
+                                model = placeInfo.value.logo,
+                                contentDescription = "Логотип заведения",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(260.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+
+                            // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
+
+                            Bubble(
+                                buttonText = viewCounter.value.toString(),
+                                leftIcon = R.drawable.ic_visibility,
+                                typeButton = DARK
+                            ) {
+                                Toast.makeText(act, "Количество просмотров акции", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            Bubble(
+                                buttonText = favCounter.value.toString(),
+                                rightIcon = R.drawable.ic_fav,
+                                typeButton = DARK,
+                                rightIconColor = iconTextFavColor.value
+                            ) {
+
+                                // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это заведение -----
+                                // Если не авторизован, условие else
+
+                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                    act.placesDatabaseManager.favIconPlace(key) { inFav ->
+
+                                        // Если уже добавлено в избранные, то при нажатии убираем из избранных
+
+                                        if (inFav) {
+
+                                            // Убираем из избранных
+                                            act.placesDatabaseManager.removeFavouritePlace(key) { yes ->
+
+                                                // Если пришел колбак, что успешно
+
+                                                if (yes) {
+
+                                                    iconTextFavColor.value =
+                                                        Grey40 // При нажатии окрашиваем текст и иконку в белый
+                                                    buttonFavColor.value =
+                                                        Grey80 // При нажатии окрашиваем кнопку в темно-серый
+
+                                                    act.placesDatabaseManager.readFavCounter(
+                                                        placeInfo.value.placeKey!!
+                                                    ) { fav ->
+
+                                                        favCounter.value = fav
+
+                                                    }
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(
+                                                        act,
+                                                        act.getString(R.string.delete_from_fav),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+
+                                        } else {
+
+                                            // Если не добавлено в избранные, то при нажатии добавляем в избранные
+
+                                            act.placesDatabaseManager.addFavouritePlace(key) { notInFav ->
+
+                                                // Если пришел колбак, что успешно
+
+                                                if (notInFav) {
+
+                                                    iconTextFavColor.value =
+                                                        PrimaryColor // При нажатии окрашиваем текст и иконку в черный
+                                                    buttonFavColor.value =
+                                                        Grey90_2 // Окрашиваем кнопку в главный цвет
+
+                                                    act.placesDatabaseManager.readFavCounter(
+                                                        placeInfo.value.placeKey!!
+                                                    ) { fav ->
+
+                                                        favCounter.value = fav
+
+                                                    }
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(
+                                                        act, act.getString(R.string.add_to_fav),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                } else {
+
+                                    // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                    Toast
+                                        .makeText(
+                                            act,
+                                            "Чтобы добавить заведение в избранные, тебе нужно авторизоваться",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                            }
+                        }
+
+
+                        // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+
+                            // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                            androidx.compose.material3.Card(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(
+                                    topStart = 30.dp,
+                                    topEnd = 0.dp,
+                                    bottomEnd = 0.dp,
+                                    bottomStart = 0.dp
+                                ),
+                                elevation = CardDefaults.cardElevation(5.dp),
+                                colors = CardDefaults.cardColors(Grey_Background)
+                            ) {
+
+                                Column(
+                                    modifier = Modifier.padding(
+                                        vertical = 30.dp,
+                                        horizontal = 20.dp
+                                    )
+                                ) {
+
+
+                                    Row {
+                                        Text(
+                                            text = "#Место",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
+
+                                        Spacer(modifier = Modifier.width(10.dp))
+
+                                        Text(
+                                            text = "#${placeInfo.value.category}",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    // -------- НАЗВАНИЕ АКЦИИ ----------
+
+                                    if (placeInfo.value.placeName != null && placeInfo.value.placeName != "null" && placeInfo.value.placeName != "") {
+
+                                        Text(
+                                            text = placeInfo.value.placeName!!,
+                                            style = Typography.titleMedium,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+
+
+                                    if (
+                                        placeInfo.value.city != null
+                                        && placeInfo.value.city != "null"
+                                        && placeInfo.value.city != ""
+                                        && placeInfo.value.address != null
+                                        && placeInfo.value.address != "null"
+                                        && placeInfo.value.address != ""
+                                    ) {
+
+                                        Text(
+                                            text = "${placeInfo.value.city}, ${placeInfo.value.address}",
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday.value[0], placeTimeOnToday.value[1])
+
+                                    /*if (nowIsOpen){
+                                        Bubble(
+                                            buttonText = "Открыто до ${placeTimeOnToday.value[1]}"
+                                        ) {}
+                                    } else {
+
+                                        Bubble(buttonText = "Сейчас закрыто", typeButton = ATTENTION) {}
+
+                                    }*/
+
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+
 
                 // --------- КОНТЕНТ ПОД КАРТИНКОЙ ----------
 
@@ -412,79 +647,6 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         Button(
                             onClick = {
-
-                                // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это заведение -----
-                                // Если не авторизован, условие else
-
-                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                    act.placesDatabaseManager.favIconPlace(key) { inFav ->
-
-                                        // Если уже добавлено в избранные, то при нажатии убираем из избранных
-
-                                        if (inFav) {
-
-                                            // Убираем из избранных
-                                            act.placesDatabaseManager.removeFavouritePlace(key) { yes ->
-
-                                                // Если пришел колбак, что успешно
-
-                                                if (yes) {
-
-                                                    iconTextFavColor.value =
-                                                        Grey40 // При нажатии окрашиваем текст и иконку в белый
-                                                    buttonFavColor.value =
-                                                        Grey80 // При нажатии окрашиваем кнопку в темно-серый
-                                                    favCounter.value = favCounter.value - 1
-
-                                                    // Выводим ТОСТ
-                                                    Toast.makeText(
-                                                        act,
-                                                        act.getString(R.string.delete_from_fav),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                            }
-
-                                        } else {
-
-                                            // Если не добавлено в избранные, то при нажатии добавляем в избранные
-
-                                            act.placesDatabaseManager.addFavouritePlace(key) { notInFav ->
-
-                                                // Если пришел колбак, что успешно
-
-                                                if (notInFav) {
-
-                                                    iconTextFavColor.value =
-                                                        PrimaryColor // При нажатии окрашиваем текст и иконку в черный
-                                                    buttonFavColor.value =
-                                                        Grey90_2 // Окрашиваем кнопку в главный цвет
-
-                                                    favCounter.value++
-
-                                                    // Выводим ТОСТ
-                                                    Toast.makeText(
-                                                        act, act.getString(R.string.add_to_fav),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                } else {
-
-                                    // Если пользователь не авторизован, то ему выводим ТОСТ
-
-                                    Toast
-                                        .makeText(
-                                            act,
-                                            "Чтобы добавить заведение в избранные, тебе нужно авторизоваться",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
-                                }
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor = buttonFavColor.value),
                             shape = RoundedCornerShape(50)
