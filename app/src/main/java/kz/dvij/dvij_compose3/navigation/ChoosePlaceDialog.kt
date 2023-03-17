@@ -47,12 +47,12 @@ class ChoosePlaceDialog (val act: MainActivity) {
                 modifier = Modifier
                     .border(
                         2.dp, // толщина границы
-                        color = Grey80, // цвет границы
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        color = YellowDvij, // цвет границы
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .background(
-                        Grey95, // цвет фона
-                        shape = RoundedCornerShape(20.dp) // скругление углов
+                        Grey_Background, // цвет фона
+                        shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                     .padding(20.dp) // отступы
                     .fillMaxWidth() // занять всю ширину
@@ -73,7 +73,7 @@ class ChoosePlaceDialog (val act: MainActivity) {
                     Text(
                         text = "Выбери заведение", // текст заголовка
                         style = Typography.titleMedium, // стиль заголовка
-                        color = Grey10, // цвет заголовка
+                        color = WhiteDvij, // цвет заголовка
                         modifier = Modifier.weight(1f)) // занять всю оставшуюся ширину
 
                     Spacer(modifier = Modifier.height(20.dp)) // разделител
@@ -83,15 +83,15 @@ class ChoosePlaceDialog (val act: MainActivity) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_close), // сама иконка
                         contentDescription = stringResource(id = R.string.close_page), // описание для слабовидяших
-                        tint = Grey10, // цвет иконки
+                        tint = WhiteDvij, // цвет иконки
                         modifier = Modifier.clickable { onDismiss() } // действие на нажатие
                     )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (placesList.value != listOf<PlacesAdsClass>(
-                        PlacesAdsClass(
+                if (placesList.value != listOf<PlacesCardClass>(
+                        PlacesCardClass(
                             logo=null,
                             placeName=null,
                             placeDescription= "Default",
@@ -127,8 +127,8 @@ class ChoosePlaceDialog (val act: MainActivity) {
                         modifier = Modifier
                             .fillMaxWidth() // занять ширину
                             .background(
-                                Grey100, // цвет фона
-                                shape = RoundedCornerShape(10.dp) // скругление углов
+                                Grey_OnBackground, // цвет фона
+                                shape = RoundedCornerShape(15.dp) // скругление углов
                             )
                             .padding(20.dp), // отступ
                         verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка
@@ -156,8 +156,8 @@ class ChoosePlaceDialog (val act: MainActivity) {
                             ) {
                                 Text(
                                     text = place.placeName!!, // само название города
-                                    color = Grey40, // цвет текста
-                                    style = Typography.bodyMedium // стиль текста
+                                    color = WhiteDvij, // цвет текста
+                                    style = Typography.bodySmall // стиль текста
                                 )
                             }
                         }
@@ -170,8 +170,8 @@ class ChoosePlaceDialog (val act: MainActivity) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                Grey100, // цвет фона
-                                shape = RoundedCornerShape(10.dp) // скругление углов
+                                Grey_OnBackground, // цвет фона
+                                shape = RoundedCornerShape(15.dp) // скругление углов
                     )
                             .padding(20.dp), // отступ
                         verticalArrangement = Arrangement.spacedBy(20.dp) // расстояние между элементами списка)
@@ -179,8 +179,8 @@ class ChoosePlaceDialog (val act: MainActivity) {
 
                         Text(
                             text = "У тебя еще нет созданных заведений", // само название города
-                            color = Grey40, // цвет текста
-                            style = Typography.bodyMedium // стиль текста
+                            color = WhiteDvij, // цвет текста
+                            style = Typography.bodySmall // стиль текста
                         )
 
                     }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.ATTENTION
 import kz.dvij.dvij_compose3.dialogs.CategoriesList
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.*
@@ -170,7 +171,7 @@ class CreatePlace (val act: MainActivity) {
         Column(
             modifier = Modifier
                 .fillMaxSize() // занять весь размер экрана
-                .background(Grey95) // цвет фона
+                .background(Grey_Background) // цвет фона
                 .verticalScroll(rememberScrollState()) // говорим, что колонка скролится вверх и вниз
                 .padding(top = 0.dp, end = 20.dp, start = 20.dp, bottom = 20.dp) // паддинги
             ,
@@ -180,7 +181,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ----- ЛОГОТИП ---------
 
-            SpacerTextWithLine(headline = "Логотип заведения") // подпись перед формой
+            Text(
+                text = "Логотип заведения",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val image1 = if (filledPlace.logo != null && filledPlace.logo != "" && createOrEdit != "0"){
 
@@ -197,7 +203,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ---- НАЗВАНИЕ ЗАВЕДЕНИЯ -------
 
-            SpacerTextWithLine(headline = "Название заведения") // подпись перед формой
+            Text(
+                text = "Название заведения",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val headline = if (filledPlace.placeName != null && filledPlace.placeName != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
@@ -210,7 +221,12 @@ class CreatePlace (val act: MainActivity) {
 
             // --- КАТЕГОРИЯ ЗАВЕДЕНИЯ ------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_category)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.cm_category),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             if (filledPlace.category != null && filledPlace.category != "Выбери категорию" && filledPlace.category != "" && createOrEdit != "0") {
                 // Если при редактировании есть категория, передаем ее в кнопку
@@ -244,7 +260,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ---- ГОРОД ------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.city_with_star)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.city_with_star),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             // Если при редактировании в заведении есть город
 
@@ -296,7 +317,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ----- АДРЕС -----
 
-            SpacerTextWithLine(headline = "Адрес") // подпись перед формой
+            Text(
+                text = "Адрес",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val address = if (filledPlace.address != null && filledPlace.address != "" && createOrEdit != "0"){
                 // Если при редактировании есть заголовок, заполняем его в форму
@@ -309,7 +335,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ---- ТЕЛЕФОН ------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_phone)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.cm_phone),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val phone = if (phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77" && phoneNumberFromDb != "" && phoneNumberFromDb != null && createOrEdit != "0"){
 
@@ -331,7 +362,12 @@ class CreatePlace (val act: MainActivity) {
 
             // --- ФОРМА WHATSAPP ----
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_whatsapp)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.social_whatsapp),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val whatsapp = if (phoneNumberWhatsappFromDb != null && phoneNumberWhatsappFromDb != "+7" && phoneNumberWhatsappFromDb != "+77" && phoneNumberWhatsappFromDb != "" && createOrEdit != "0"){
 
@@ -353,7 +389,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ----- ИНСТАГРАМ -----
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.social_instagram)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.social_instagram),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val instagram = if (filledPlace.instagram != "" && filledPlace.instagram != null && createOrEdit != "0") {
 
@@ -376,7 +417,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ----- ТЕЛЕГРАМ ---------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.social_telegram)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.social_telegram),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val telegram = if (filledPlace.telegram != "" && filledPlace.telegram != null && createOrEdit != "0") {
 
@@ -395,6 +441,84 @@ class CreatePlace (val act: MainActivity) {
 
             }
 
+            Text(
+                text = "Режим работы",
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp)
+            )
+
+            Text(
+                text = "Если выходной, оставь поле пустым",
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            val timeWorkMonday = createTimeWorkPlace(startTime = filledPlace.mondayOpenTime!!, finishTime = filledPlace.mondayOpenTime, dayName = "Понедельник", createOrEdit)
+            Text(
+                text = "${timeWorkMonday[0]} - ${timeWorkMonday[1]}",
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            /*val timeWorkTuesday = createTimeWorkPlace("Вторник")
+            Text(
+                text = timeWorkTuesday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            val timeWorkWednesday = createTimeWorkPlace("Среда")
+            Text(
+                text = timeWorkWednesday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            val timeWorkThursday = createTimeWorkPlace("Четверг")
+            Text(
+                text = timeWorkThursday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            val timeWorkFriday = createTimeWorkPlace("Пятница")
+            Text(
+                text = timeWorkFriday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            val timeWorkSaturday = createTimeWorkPlace("Суббота")
+            Text(
+                text = timeWorkSaturday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            val timeWorkSunday = createTimeWorkPlace("Воскресенье")
+            Text(
+                text = timeWorkSunday[0],
+                style = Typography.labelMedium,
+                color = Grey_Text,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )*/
 
             // ---- ПОНЕДЕЛЬНИК ------
 
@@ -580,7 +704,12 @@ class CreatePlace (val act: MainActivity) {
 
             // ---- ОПИСАНИЕ --------
 
-            SpacerTextWithLine(headline = stringResource(id = R.string.cm_description)) // подпись перед формой
+            Text(
+                text = stringResource(id = R.string.cm_description),
+                style = Typography.bodySmall,
+                color = WhiteDvij,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+            )
 
             val description = if (filledPlace.placeDescription != "" && filledPlace.placeDescription != null && createOrEdit != "0"){
 
@@ -602,102 +731,228 @@ class CreatePlace (val act: MainActivity) {
 
             // ------ КНОПКА ОПУБЛИКОВАТЬ -----------
 
-            Button(
+            ButtonCustom(buttonText = "Опубликовать") {
 
-                onClick = {
 
-                    val currentTime = System.currentTimeMillis()/1000
+                val currentTime = System.currentTimeMillis()/1000
 
-                    // действие на нажатие
+                // действие на нажатие
 
-                    // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
+                // --- ФУНКЦИЯ ПРОВЕРКИ НА ЗАПОЛНЕНИЕ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---------
 
-                    val checkData = checkDataOnCreatePlace(
-                        image1 = image1,
-                        headline = headline,
-                        phone = phone,
-                        description = description,
-                        category = category,
-                        city = city,
-                        address = address,
-                        imageUriFromDb = filledPlace.logo ?: "",
-                        mondayOT = mondayOpenTimeResult,
-                        mondayCT = mondayCloseTimeResult,
-                        tuesdayOT = tuesdayOpenTimeResult,
-                        tuesdayCT = tuesdayCloseTimeResult,
-                        wednesdayOT = wednesdayOpenTimeResult,
-                        wednesdayCT = wednesdayCloseTimeResult,
-                        thursdayOT = thursdayOpenTimeResult,
-                        thursdayCT = thursdayCloseTimeResult,
-                        fridayOT = fridayOpenTimeResult,
-                        fridayCT = fridayCloseTimeResult,
-                        saturdayOT = saturdayOpenTimeResult,
-                        saturdayCT = saturdayCloseTimeResult,
-                        sundayOT = sundayOpenTimeResult,
-                        sundayCT = sundayCloseTimeResult
-                    )
+                val checkData = checkDataOnCreatePlace(
+                    image1 = image1,
+                    headline = headline,
+                    phone = phone,
+                    description = description,
+                    category = category,
+                    city = city,
+                    address = address,
+                    imageUriFromDb = filledPlace.logo ?: "",
+                    mondayOT = mondayOpenTimeResult,
+                    mondayCT = mondayCloseTimeResult,
+                    tuesdayOT = tuesdayOpenTimeResult,
+                    tuesdayCT = tuesdayCloseTimeResult,
+                    wednesdayOT = wednesdayOpenTimeResult,
+                    wednesdayCT = wednesdayCloseTimeResult,
+                    thursdayOT = thursdayOpenTimeResult,
+                    thursdayCT = thursdayCloseTimeResult,
+                    fridayOT = fridayOpenTimeResult,
+                    fridayCT = fridayCloseTimeResult,
+                    saturdayOT = saturdayOpenTimeResult,
+                    saturdayCT = saturdayCloseTimeResult,
+                    sundayOT = sundayOpenTimeResult,
+                    sundayCT = sundayCloseTimeResult
+                )
 
-                    if (checkData != 0) {
+                if (checkData != 0) {
 
-                        // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
+                    // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
 
-                        Toast.makeText(act, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(act, act.resources.getString(checkData), Toast.LENGTH_SHORT).show()
 
-                    } else if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                } else if (ContextCompat.checkSelfPermission(act, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
-                        // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
+                    // так же проверка, если нет разрешения на запись картинок в память, то запрос на эти права
 
-                        ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
+                    ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 888)
 
-                    } else {
+                } else {
 
-                        // если все права есть и все обязательные поля заполнены
+                    // если все права есть и все обязательные поля заполнены
 
-                        openLoading.value = true // открываем диалог загрузки
+                    openLoading.value = true // открываем диалог загрузки
 
-                        // запускаем корутину
+                    // запускаем корутину
 
-                        GlobalScope.launch(Dispatchers.IO){
+                    GlobalScope.launch(Dispatchers.IO){
 
-                            // ЕСЛИ ИЗОБРАЖЕНИЕ НЕ НАЛ - ТАКОЕ ВОЗМОЖНО ТОЛЬКО ПРИ РЕДАКТИРОВАНИИ
+                        // ЕСЛИ ИЗОБРАЖЕНИЕ НЕ НАЛ - ТАКОЕ ВОЗМОЖНО ТОЛЬКО ПРИ РЕДАКТИРОВАНИИ
 
-                            if (image1 == null){
+                        if (image1 == null){
+
+                            GlobalScope.launch(Dispatchers.Main) {
+
+                                // заполняем заведение
+
+                                val filledPlaceForDb = PlacesAdsClass(
+
+                                    logo = filledPlace.logo,
+                                    placeName = headline,
+                                    placeDescription = description,
+                                    phone = phone,
+                                    whatsapp = whatsapp,
+                                    telegram = telegram,
+                                    instagram = instagram,
+                                    category = category,
+                                    city = city,
+                                    address = address,
+                                    placeKey = filledPlace.placeKey,
+                                    owner = filledPlace.owner,
+                                    mondayOpenTime = mondayOpenTimeResult,
+                                    mondayCloseTime = mondayCloseTimeResult,
+                                    tuesdayOpenTime = tuesdayOpenTimeResult,
+                                    tuesdayCloseTime = tuesdayCloseTimeResult,
+                                    wednesdayOpenTime = wednesdayOpenTimeResult,
+                                    wednesdayCloseTime = wednesdayCloseTimeResult,
+                                    thursdayOpenTime = thursdayOpenTimeResult,
+                                    thursdayCloseTime = thursdayCloseTimeResult,
+                                    fridayOpenTime = fridayOpenTimeResult,
+                                    fridayCloseTime = fridayCloseTimeResult,
+                                    saturdayOpenTime = saturdayOpenTimeResult,
+                                    saturdayCloseTime = saturdayCloseTimeResult,
+                                    sundayOpenTime = sundayOpenTimeResult,
+                                    sundayCloseTime = sundayCloseTimeResult,
+                                    createPlaceTime = filledPlace.createPlaceTime
+
+                                )
+
+                                // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                if (auth.uid != null) {
+
+                                    // Если зарегистрирован, то запускаем функцию публикации заведения
+
+                                    placesDatabaseManager.publishPlace(filledPlaceForDb) { result ->
+
+                                        // в качестве колбака придет булин. Если опубликовано заведение то:
+
+                                        if (result) {
+
+                                            navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
+
+                                            // показываем ТОСТ
+                                            Toast.makeText(
+                                                act,
+                                                "Твое заведение успешно опубликовано",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        } else {
+
+                                            // если произошла ошибка и заведение не опубликовалось то:
+
+                                            // Показываем тост
+                                            Toast.makeText(
+                                                act,
+                                                act.resources.getString(R.string.error_text),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+
+                            // ---- В СЛУЧАЕ, ЕСЛИ ЕСТЬ ВЫБРАННАЯ ИЗ ГАЛЕРЕИ КАРТИНКА -------
+
+                            // запускаем сжатие изображения
+                            val compressedImage = act.photoHelper.compressImage(act, image1)
+
+                            // после сжатия запускаем функцию загрузки сжатого фото в Storage
+
+                            act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
+
+                                // Запускаем корутину и публикуем заведение
 
                                 GlobalScope.launch(Dispatchers.Main) {
 
                                     // заполняем заведение
 
-                                    val filledPlaceForDb = PlacesAdsClass(
+                                    val filledPlaceForDb = if(createOrEdit == "0"){
 
-                                        logo = filledPlace.logo,
-                                        placeName = headline,
-                                        placeDescription = description,
-                                        phone = phone,
-                                        whatsapp = whatsapp,
-                                        telegram = telegram,
-                                        instagram = instagram,
-                                        category = category,
-                                        city = city,
-                                        address = address,
-                                        placeKey = filledPlace.placeKey,
-                                        owner = filledPlace.owner,
-                                        mondayOpenTime = mondayOpenTimeResult,
-                                        mondayCloseTime = mondayCloseTimeResult,
-                                        tuesdayOpenTime = tuesdayOpenTimeResult,
-                                        tuesdayCloseTime = tuesdayCloseTimeResult,
-                                        wednesdayOpenTime = wednesdayOpenTimeResult,
-                                        wednesdayCloseTime = wednesdayCloseTimeResult,
-                                        thursdayOpenTime = thursdayOpenTimeResult,
-                                        thursdayCloseTime = thursdayCloseTimeResult,
-                                        fridayOpenTime = fridayOpenTimeResult,
-                                        fridayCloseTime = fridayCloseTimeResult,
-                                        saturdayOpenTime = saturdayOpenTimeResult,
-                                        saturdayCloseTime = saturdayCloseTimeResult,
-                                        sundayOpenTime = sundayOpenTimeResult,
-                                        sundayCloseTime = sundayCloseTimeResult,
-                                        createPlaceTime = filledPlace.createPlaceTime
+                                        // ---- ЕСЛИ СОЗДАНИЕ ---------
 
-                                    )
+                                        PlacesAdsClass(
+
+                                            logo = it,
+                                            placeName = headline,
+                                            placeDescription = description,
+                                            phone = phone,
+                                            whatsapp = whatsapp,
+                                            telegram = telegram,
+                                            instagram = instagram,
+                                            category = category,
+                                            city = city,
+                                            address = address,
+                                            placeKey = placesDatabaseManager.placeDatabase.push().key,
+                                            owner = auth.uid,
+                                            mondayOpenTime = mondayOpenTimeResult,
+                                            mondayCloseTime = mondayCloseTimeResult,
+                                            tuesdayOpenTime = tuesdayOpenTimeResult,
+                                            tuesdayCloseTime = tuesdayCloseTimeResult,
+                                            wednesdayOpenTime = wednesdayOpenTimeResult,
+                                            wednesdayCloseTime = wednesdayCloseTimeResult,
+                                            thursdayOpenTime = thursdayOpenTimeResult,
+                                            thursdayCloseTime = thursdayCloseTimeResult,
+                                            fridayOpenTime = fridayOpenTimeResult,
+                                            fridayCloseTime = fridayCloseTimeResult,
+                                            saturdayOpenTime = saturdayOpenTimeResult,
+                                            saturdayCloseTime = saturdayCloseTimeResult,
+                                            sundayOpenTime = sundayOpenTimeResult,
+                                            sundayCloseTime = sundayCloseTimeResult,
+                                            createPlaceTime = currentTime.toString()
+
+                                        )
+
+                                    } else {
+
+                                        // ---- ЕСЛИ РЕДАКТИРОВАНИЕ --------
+
+                                        PlacesAdsClass(
+
+                                            logo = it,
+                                            placeName = headline,
+                                            placeDescription = description,
+                                            phone = phone,
+                                            whatsapp = whatsapp,
+                                            telegram = telegram,
+                                            instagram = instagram,
+                                            category = category,
+                                            city = city,
+                                            address = address,
+                                            placeKey = filledPlace.placeKey,
+                                            owner = filledPlace.owner,
+                                            mondayOpenTime = mondayOpenTimeResult,
+                                            mondayCloseTime = mondayCloseTimeResult,
+                                            tuesdayOpenTime = tuesdayOpenTimeResult,
+                                            tuesdayCloseTime = tuesdayCloseTimeResult,
+                                            wednesdayOpenTime = wednesdayOpenTimeResult,
+                                            wednesdayCloseTime = wednesdayCloseTimeResult,
+                                            thursdayOpenTime = thursdayOpenTimeResult,
+                                            thursdayCloseTime = thursdayCloseTimeResult,
+                                            fridayOpenTime = fridayOpenTimeResult,
+                                            fridayCloseTime = fridayCloseTimeResult,
+                                            saturdayOpenTime = saturdayOpenTimeResult,
+                                            saturdayCloseTime = saturdayCloseTimeResult,
+                                            sundayOpenTime = sundayOpenTimeResult,
+                                            sundayCloseTime = sundayCloseTimeResult,
+                                            createPlaceTime = filledPlace.createPlaceTime
+
+                                        )
+
+                                    }
 
                                     // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
@@ -714,12 +969,28 @@ class CreatePlace (val act: MainActivity) {
                                                 navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
 
                                                 // показываем ТОСТ
-                                                Toast.makeText(
-                                                    act,
-                                                    "Твое заведение успешно опубликовано",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
 
+                                                if (createOrEdit == "0"){
+
+                                                    // --- ЕСЛИ СОЗДАНИЕ ----
+
+                                                    Toast.makeText(
+                                                        act,
+                                                        "Твое заведение успешно опубликовано",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else {
+
+                                                    // ------ ЕСЛИ РЕДАКТИРОВАНИЕ ----
+
+                                                    Toast.makeText(
+                                                        act,
+                                                        "Твое заведение успешно отредактировано",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
                                             } else {
 
                                                 // если произошла ошибка и заведение не опубликовалось то:
@@ -735,189 +1006,17 @@ class CreatePlace (val act: MainActivity) {
                                         }
                                     }
                                 }
-                            } else {
-
-                                // ---- В СЛУЧАЕ, ЕСЛИ ЕСТЬ ВЫБРАННАЯ ИЗ ГАЛЕРЕИ КАРТИНКА -------
-
-                                // запускаем сжатие изображения
-                                val compressedImage = act.photoHelper.compressImage(act, image1)
-
-                                // после сжатия запускаем функцию загрузки сжатого фото в Storage
-
-                                act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
-
-                                    // Запускаем корутину и публикуем заведение
-
-                                    GlobalScope.launch(Dispatchers.Main) {
-
-                                        // заполняем заведение
-
-                                        val filledPlaceForDb = if(createOrEdit == "0"){
-
-                                            // ---- ЕСЛИ СОЗДАНИЕ ---------
-
-                                            PlacesAdsClass(
-
-                                                logo = it,
-                                                placeName = headline,
-                                                placeDescription = description,
-                                                phone = phone,
-                                                whatsapp = whatsapp,
-                                                telegram = telegram,
-                                                instagram = instagram,
-                                                category = category,
-                                                city = city,
-                                                address = address,
-                                                placeKey = placesDatabaseManager.placeDatabase.push().key,
-                                                owner = auth.uid,
-                                                mondayOpenTime = mondayOpenTimeResult,
-                                                mondayCloseTime = mondayCloseTimeResult,
-                                                tuesdayOpenTime = tuesdayOpenTimeResult,
-                                                tuesdayCloseTime = tuesdayCloseTimeResult,
-                                                wednesdayOpenTime = wednesdayOpenTimeResult,
-                                                wednesdayCloseTime = wednesdayCloseTimeResult,
-                                                thursdayOpenTime = thursdayOpenTimeResult,
-                                                thursdayCloseTime = thursdayCloseTimeResult,
-                                                fridayOpenTime = fridayOpenTimeResult,
-                                                fridayCloseTime = fridayCloseTimeResult,
-                                                saturdayOpenTime = saturdayOpenTimeResult,
-                                                saturdayCloseTime = saturdayCloseTimeResult,
-                                                sundayOpenTime = sundayOpenTimeResult,
-                                                sundayCloseTime = sundayCloseTimeResult,
-                                                createPlaceTime = currentTime.toString()
-
-                                            )
-
-                                        } else {
-
-                                            // ---- ЕСЛИ РЕДАКТИРОВАНИЕ --------
-
-                                            PlacesAdsClass(
-
-                                                logo = it,
-                                                placeName = headline,
-                                                placeDescription = description,
-                                                phone = phone,
-                                                whatsapp = whatsapp,
-                                                telegram = telegram,
-                                                instagram = instagram,
-                                                category = category,
-                                                city = city,
-                                                address = address,
-                                                placeKey = filledPlace.placeKey,
-                                                owner = filledPlace.owner,
-                                                mondayOpenTime = mondayOpenTimeResult,
-                                                mondayCloseTime = mondayCloseTimeResult,
-                                                tuesdayOpenTime = tuesdayOpenTimeResult,
-                                                tuesdayCloseTime = tuesdayCloseTimeResult,
-                                                wednesdayOpenTime = wednesdayOpenTimeResult,
-                                                wednesdayCloseTime = wednesdayCloseTimeResult,
-                                                thursdayOpenTime = thursdayOpenTimeResult,
-                                                thursdayCloseTime = thursdayCloseTimeResult,
-                                                fridayOpenTime = fridayOpenTimeResult,
-                                                fridayCloseTime = fridayCloseTimeResult,
-                                                saturdayOpenTime = saturdayOpenTimeResult,
-                                                saturdayCloseTime = saturdayCloseTimeResult,
-                                                sundayOpenTime = sundayOpenTimeResult,
-                                                sundayCloseTime = sundayCloseTimeResult,
-                                                createPlaceTime = filledPlace.createPlaceTime
-
-                                            )
-
-                                        }
-
-                                        // Делаем дополнительную проверку - пользователь зарегистрирован или нет
-
-                                        if (auth.uid != null) {
-
-                                            // Если зарегистрирован, то запускаем функцию публикации заведения
-
-                                            placesDatabaseManager.publishPlace(filledPlaceForDb) { result ->
-
-                                                // в качестве колбака придет булин. Если опубликовано заведение то:
-
-                                                if (result) {
-
-                                                    navController.navigate(PLACES_ROOT) {popUpTo(0)} // переходим на страницу заведений
-
-                                                    // показываем ТОСТ
-
-                                                    if (createOrEdit == "0"){
-
-                                                        // --- ЕСЛИ СОЗДАНИЕ ----
-
-                                                        Toast.makeText(
-                                                            act,
-                                                            "Твое заведение успешно опубликовано",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-
-                                                    } else {
-
-                                                        // ------ ЕСЛИ РЕДАКТИРОВАНИЕ ----
-
-                                                        Toast.makeText(
-                                                            act,
-                                                            "Твое заведение успешно отредактировано",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-
-                                                    }
-                                                } else {
-
-                                                    // если произошла ошибка и заведение не опубликовалось то:
-
-                                                    // Показываем тост
-                                                    Toast.makeText(
-                                                        act,
-                                                        act.resources.getString(R.string.error_text),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth() // кнопка на всю ширину
-                    .height(50.dp),// высота - 50
-                shape = RoundedCornerShape(50), // скругление углов
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = SuccessColor, // цвет кнопки
-                    contentColor = Grey100 // цвет контента на кнопке
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.push_button),
-                    style = Typography.labelMedium
-                )
+                }
 
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_publish),
-                    contentDescription = stringResource(id = R.string.cd_publish_button),
-                    modifier = Modifier.size(20.dp)
-                )
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            TextButton(
-                onClick = { Toast.makeText(act, "СДЕЛАТЬ ДИАЛОГ - ДЕЙСТВИТЕЛЬНО ХОТИТЕ ВЫЙТИ?", Toast.LENGTH_SHORT).show() },
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(id = R.string.cansel_button),
-                    style = Typography.labelMedium,
-                    color = Grey40
-                )
+            ButtonCustom(buttonText = "Отменить", typeButton = ATTENTION, leftIcon = R.drawable.ic_close) {
+                Toast.makeText(act, "СДЕЛАТЬ ДИАЛОГ - ДЕЙСТВИТЕЛЬНО ХОТИТЕ ВЫЙТИ?", Toast.LENGTH_SHORT).show()
             }
         }
 

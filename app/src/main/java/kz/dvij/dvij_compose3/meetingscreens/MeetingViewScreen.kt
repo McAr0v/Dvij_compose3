@@ -564,7 +564,7 @@ class MeetingViewScreen(val act: MainActivity) {
 
                                     Spacer(modifier = Modifier.height(30.dp))
 
-                                    ownerCard.OwnerCardView(userKey = meetingInfo.value.ownerKey!!)
+                                    ownerCard.OwnerCardView(userKey = meetingInfo.value.ownerKey!!, "Создатель мероприятия")
 
                                 }
 

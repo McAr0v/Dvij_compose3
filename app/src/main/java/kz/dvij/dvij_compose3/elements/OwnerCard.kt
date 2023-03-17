@@ -31,7 +31,7 @@ import kz.dvij.dvij_compose3.ui.theme.*
 class OwnerCard (val act: MainActivity) {
 
     @Composable
-    fun OwnerCardView (userKey: String){
+    fun OwnerCardView (userKey: String, description: String){
         
         val userInfo = remember {
             mutableStateOf(UserInfoClass())
@@ -109,7 +109,7 @@ class OwnerCard (val act: MainActivity) {
                     // --------- АДРЕС -------------
 
                     androidx.compose.material3.Text(
-                        text = "Создатель мероприятия",
+                        text = description,
                         style = Typography.labelMedium,
                         color = Grey_Text
                     )

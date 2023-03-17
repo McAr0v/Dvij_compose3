@@ -52,7 +52,7 @@ class PlacesCard (val act: MainActivity) {
         act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
-                iconFavColor.value = PrimaryColor
+                iconFavColor.value = YellowDvij
             } else {
                 // Если колбак фалс, то в обычный цвет
                 iconFavColor.value = Grey10
@@ -232,7 +232,7 @@ class PlacesCard (val act: MainActivity) {
         act.placesDatabaseManager.favIconPlace(placeItem.placeKey!!){
             // Если колбак тру, то окрашиваем иконку в нужный цвет
             if (it){
-                iconFavColor.value = PrimaryColor
+                iconFavColor.value = YellowDvij
             } else {
                 // Если колбак фалс, то в обычный цвет
                 iconFavColor.value = Grey10

@@ -473,7 +473,7 @@ class StockViewScreen (val act: MainActivity) {
 
                                     Spacer(modifier = Modifier.height(30.dp))
 
-                                    ownerCard.OwnerCardView(userKey = stockInfo.value.keyCreator!!)
+                                    ownerCard.OwnerCardView(userKey = stockInfo.value.keyCreator!!, "Создатель акции")
 
                                 }
 

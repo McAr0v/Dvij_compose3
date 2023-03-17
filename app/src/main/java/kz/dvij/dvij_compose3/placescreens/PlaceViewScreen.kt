@@ -762,7 +762,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        ownerCard.OwnerCardView(userKey = placeInfo.value.owner!!)
+                        ownerCard.OwnerCardView(userKey = placeInfo.value.owner!!, "Создатель места")
 
                     }
 

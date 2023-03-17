@@ -56,7 +56,7 @@ val Grey100_30 = Color(0x50171717)
 
 val GradientPrimary = Brush.verticalGradient(
     colors = listOf(
-        PrimaryColor,
+        YellowDvij,
         Primary100
     )
 )

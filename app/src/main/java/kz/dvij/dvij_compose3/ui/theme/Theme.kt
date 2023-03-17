@@ -14,7 +14,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 private val NightDvijThemeColors = darkColorScheme(
-    primary = PrimaryColor,
+    primary = YellowDvij,
     secondary = Primary100,
     tertiary = Primary100,
 
@@ -28,7 +28,7 @@ private val NightDvijThemeColors = darkColorScheme(
 )
 
 private val LightDvijThemeColors = lightColorScheme(
-    primary = PrimaryColor,
+    primary = YellowDvij,
     secondary = Primary100,
     tertiary = Primary100,
 

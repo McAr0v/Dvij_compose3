@@ -1007,6 +1007,84 @@ fun fieldTextComponent(placeHolder: String, inputText: String? = ""): String {
 
 }
 
+@Composable
+fun fieldTimeComponent(
+    time: String,
+    mask: String = "XX:XX - XX:XX",
+    maskNumber: Char = 'X',
+    onTimeChanged: (String) -> Unit
+): String {
+
+    val focusColor = remember { mutableStateOf(Grey_Text) } // изначальный цвет фокуса
+    val focusManager =
+        LocalFocusManager.current // инициализируем фокус на форме. Нужно, чтобы потом снимать фокус с формы
+
+    TextField(
+        value = time, // значение поля
+
+        onValueChange = { it -> onTimeChanged(it.take(mask.count { it == maskNumber })) },
+
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number, // тип клавиатуры
+            imeAction = ImeAction.Done // кнопка действия
+        ),
+
+        visualTransformation = PhoneVisualTransformation(
+            mask,
+            maskNumber
+        ), // визуальное изменение. Передаем маску и символ, который нужно заменять в маске
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { focus -> // зависимость цвета границы от действия - есть фокус на поле, или нет
+                if (focus.isFocused) focusColor.value =
+                    YellowDvij // если есть, то в переменные с цветами передать цвет брендовый
+                else focusColor.value =
+                    Grey_Text // если нет, то в переменные с цветами передать серый
+            }
+            .border( // настройки самих границ
+                2.dp, // толщина границы
+                color = focusColor.value, // цвет - для этого выше мы создавали переменные с цветом
+                shape = RoundedCornerShape(15.dp) // скругление границ
+            ),
+
+        singleLine = true, // говорим, что в поле только 1 строка
+
+        keyboardActions = KeyboardActions(
+            // При нажатии на кнопку onDone - снимает фокус с формы
+            onDone = {
+                focusManager.clearFocus()
+            }
+        ),
+
+        textStyle = Typography.bodySmall, // стиль текста
+
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            // цвета
+            textColor = WhiteDvij,
+            placeholderColor = Grey_Text,
+            cursorColor = WhiteDvij,
+            errorCursorColor = AttentionRed,
+            focusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            unfocusedBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            errorBorderColor = Grey_Background, // нужен, чтобы не отображалась снизу стандартная граница
+            //backgroundColor = Grey_Background,
+
+        ),
+
+        placeholder = {
+            Text(
+                text = mask,
+                style = Typography.bodySmall
+            )
+        }
+
+    )
+
+    //return time
+    return time
+}
+
 
 
 
