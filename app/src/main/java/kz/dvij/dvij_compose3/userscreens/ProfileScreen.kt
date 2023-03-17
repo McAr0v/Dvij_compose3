@@ -46,6 +46,8 @@ fun ProfileScreen (
     userInfo: MutableState<UserInfoClass>
 ) {
 
+    val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
     // ------ Считываем данные о пользователе -----
 
     if (activity.mAuth.uid != null){
@@ -62,301 +64,315 @@ fun ProfileScreen (
 
     if (user!=null && user.isEmailVerified) {
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(Grey_Background)
-            .verticalScroll(rememberScrollState())
-        ){
+        if (userInfo.value != UserInfoClass() && !openLoading.value){
 
-            Box(modifier = Modifier
-                .fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxSize()
                 .background(Grey_Background)
-                .fillMaxSize()) {
+                .verticalScroll(rememberScrollState())
+            ){
 
-                // --- ЕСЛИ ЕСТЬ ФОТОГРАФИЯ В ГУГЛ ПРОФИЛЕ И НЕ ЗАГРУЖЕНА СВОЯ АВАТАРКА ----
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Grey_Background)
+                    .fillMaxSize()) {
 
-                if (user.photoUrl != null && userInfo.value.avatar == "") {
+                    // --- ЕСЛИ ЕСТЬ ФОТОГРАФИЯ В ГУГЛ ПРОФИЛЕ И НЕ ЗАГРУЖЕНА СВОЯ АВАТАРКА ----
 
-                    AsyncImage(
-                        model = user.photoUrl,
-                        contentDescription = stringResource(id = R.string.cd_avatar),
-                        imageLoader = ImageLoader(activity),
-                        modifier = Modifier
-                            .height(300.dp),
-                        contentScale = ContentScale.Crop,
-                    )
+                    if (user.photoUrl != null && userInfo.value.avatar == "") {
 
-                } else if (userInfo.value.avatar != "") {
+                        AsyncImage(
+                            model = user.photoUrl,
+                            contentDescription = stringResource(id = R.string.cd_avatar),
+                            imageLoader = ImageLoader(activity),
+                            modifier = Modifier
+                                .height(300.dp),
+                            contentScale = ContentScale.Crop,
+                        )
 
-                    // ----- ЕСЛИ ЗАГРУЖЕНА СВОЯ АВАТАРКА -----
+                    } else if (userInfo.value.avatar != "") {
 
-                    AsyncImage(
-                        model = userInfo.value.avatar,
-                        contentDescription = stringResource(id = R.string.cd_avatar),
-                        modifier = Modifier
-                            .height(300.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                        // ----- ЕСЛИ ЗАГРУЖЕНА СВОЯ АВАТАРКА -----
 
-                } else {
+                        AsyncImage(
+                            model = userInfo.value.avatar,
+                            contentDescription = stringResource(id = R.string.cd_avatar),
+                            modifier = Modifier
+                                .height(300.dp),
+                            contentScale = ContentScale.Crop
+                        )
 
-                    // ----- ЕСЛИ НЕТ АВАТАРКИ ------
+                    } else {
 
-                    Image(
+                        // ----- ЕСЛИ НЕТ АВАТАРКИ ------
+
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp),
+                            painter = painterResource(id = R.drawable.no_user_image),
+                            contentDescription = stringResource(id = R.string.cd_avatar),
+                            contentScale = ContentScale.Crop,
+                            alignment = Alignment.Center
+                        )
+
+                    }
+
+                    // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(300.dp),
-                        painter = painterResource(id = R.drawable.no_user_image),
-                        contentDescription = stringResource(id = R.string.cd_avatar),
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxSize()
-                        .padding(top = 280.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-
-                    // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
-
-                    androidx.compose.material3.Card(
-                        modifier = Modifier
                             .fillMaxSize()
-                            .background(
-                                Grey_Background,
-                                shape = RoundedCornerShape(topStart = 150.dp, topEnd = 0.dp)
-                            ),
-                        shape = RoundedCornerShape(
-                            topStart = 30.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp,
-                            bottomStart = 0.dp
-                        ),
-                        elevation = CardDefaults.cardElevation(5.dp),
-                        colors = CardDefaults.cardColors(Grey_Background)
+                            .padding(top = 280.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.Start
                     ) {
 
-                        Column(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 30.dp, horizontal = 20.dp)
+                        // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                        androidx.compose.material3.Card(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Grey_Background,
+                                    shape = RoundedCornerShape(topStart = 150.dp, topEnd = 0.dp)
+                                ),
+                            shape = RoundedCornerShape(
+                                topStart = 30.dp,
+                                topEnd = 0.dp,
+                                bottomEnd = 0.dp,
+                                bottomStart = 0.dp
+                            ),
+                            elevation = CardDefaults.cardElevation(5.dp),
+                            colors = CardDefaults.cardColors(Grey_Background)
                         ) {
 
-
-                            // --- КОЛОНКА С ИМЕНЕМ, ГОРОД, РЕДАКТИРОВАТЬ -----
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                            Column(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 30.dp, horizontal = 20.dp)
                             ) {
 
-                                Column {
 
-                                    // ----- ИМЯ И ФАМИЛИЯ -----
+                                // --- КОЛОНКА С ИМЕНЕМ, ГОРОД, РЕДАКТИРОВАТЬ -----
 
-                                    if (userInfo.value.name != "" && userInfo.value.surname != "") {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
 
-                                        androidx.compose.material3.Text(
-                                            text = "${userInfo.value.name} ${userInfo.value.surname}",
-                                            style = Typography.titleSmall,
-                                            color = WhiteDvij
-                                        )
+                                    Column {
 
-                                    } else if (userInfo.value.name == "" && userInfo.value.surname == "") {
+                                        // ----- ИМЯ И ФАМИЛИЯ -----
 
-                                        user.displayName?.let { name ->
+                                        if (userInfo.value.name != "" && userInfo.value.surname != "") {
+
                                             androidx.compose.material3.Text(
-                                                text = name,
+                                                text = "${userInfo.value.name} ${userInfo.value.surname}",
                                                 style = Typography.titleSmall,
                                                 color = WhiteDvij
                                             )
+
+                                        } else if (userInfo.value.name == "" && userInfo.value.surname == "") {
+
+                                            user.displayName?.let { name ->
+                                                androidx.compose.material3.Text(
+                                                    text = name,
+                                                    style = Typography.titleSmall,
+                                                    color = WhiteDvij
+                                                )
+                                            }
+
+                                        } else {
+
+                                            androidx.compose.material3.Text(
+                                                text = "Новый пользователь",
+                                                style = Typography.titleSmall,
+                                                color = WhiteDvij
+                                            )
+
                                         }
 
-                                    } else {
+                                        // ------ ГОРОД -------
 
-                                        androidx.compose.material3.Text(
-                                            text = "Новый пользователь",
-                                            style = Typography.titleSmall,
-                                            color = WhiteDvij
-                                        )
+                                        if (userInfo.value.city != "Выбери город" && userInfo.value.city != null) {
 
-                                    }
+                                            userInfo.value.city?.let { city ->
+                                                androidx.compose.material3.Text(
+                                                    text = city,
+                                                    style = Typography.bodySmall,
+                                                    color = Grey_Text
+                                                )
+                                            }
 
-                                    // ------ ГОРОД -------
+                                        } else {
 
-                                    if (userInfo.value.city != "Выбери город" && userInfo.value.city != null) {
-
-                                        userInfo.value.city?.let { city ->
                                             androidx.compose.material3.Text(
-                                                text = city,
+                                                text = "Город не выбран",
                                                 style = Typography.bodySmall,
                                                 color = Grey_Text
                                             )
+
                                         }
+                                    }
+
+
+                                    // ----- КНОПКА РЕДАКТИРОВАТЬ ------
+
+                                    SocialButtonCustom(icon = R.drawable.ic_edit) {
+
+                                        openLoading.value = true
+
+                                        navController.navigate(CREATE_USER_INFO_SCREEN)
+
+                                    }
+
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+
+                                // --- ТЕЛЕФОН -----
+
+                                TextAndDesc(
+                                    headline = if (userInfo.value.phoneNumber != "7"){
+
+                                        "+7${userInfo.value.phoneNumber}"
 
                                     } else {
 
-                                        androidx.compose.material3.Text(
-                                            text = "Город не выбран",
-                                            style = Typography.bodySmall,
-                                            color = Grey_Text
-                                        )
+                                        "Телефон не указан"
 
+                                    },
+                                    description = "Телефон для звонков",
+                                    size = "Small"
+                                )
+
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // --- Email -----
+
+                                TextAndDesc(
+                                    headline = if (user.email != null){
+
+                                        user.email!!
+
+                                    } else {
+
+                                        "Email не указан"
+
+                                    },
+                                    description = "Email для входа в аккаунт",
+                                    size = "Small"
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // --- Whatsapp -----
+
+                                TextAndDesc(
+                                    headline = if (userInfo.value.whatsapp != "7"){
+
+                                        "+7${userInfo.value.whatsapp}"
+
+                                    } else {
+
+                                        "Телефон не указан"
+
+                                    },
+                                    description = "Whatsapp",
+                                    size = "Small"
+                                )
+
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // --- Instagram -----
+
+                                TextAndDesc(
+                                    headline = if (userInfo.value.instagram != ""){
+
+                                        userInfo.value.instagram!!
+
+                                    } else {
+
+                                        "Instagram не указан"
+
+                                    },
+                                    description = "Instagram",
+                                    size = "Small"
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // --- Telegram -----
+
+                                TextAndDesc(
+                                    headline = if (userInfo.value.telegram != ""){
+
+                                        userInfo.value.telegram!!
+
+                                    } else {
+
+                                        "Telegram не указан"
+
+                                    },
+                                    description = "Telegram",
+                                    size = "Small"
+                                )
+
+                                Spacer(modifier = Modifier.height(30.dp))
+
+
+                                // ---- КНОПКА ВЫЙТИ ИЗ АККАУНТА -----
+
+                                ButtonCustom(
+                                    buttonText = stringResource(id = R.string.sign_out_button),
+                                    typeButton = SECONDARY,
+                                    rightIcon = R.drawable.ic_logout
+                                ) {
+
+                                    // функции на нажатие
+
+                                    try {
+
+                                        navController.navigate(MEETINGS_ROOT) { popUpTo(0) } // после выхода отправляем на страницу мероприятий
+
+                                        accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
+
+                                        activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
+
+
+                                    } catch (e: ApiException) {
+                                        Log.d("MyLog", "ApiError: ${e.message}")
                                     }
+
+                                    // показываем ТОСТ что все готово
+
+                                    Toast.makeText(
+                                        activity,
+                                        activity.getString(R.string.sign_out_success),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
                                 }
-
-
-                                // ----- КНОПКА РЕДАКТИРОВАТЬ ------
-
-                                SocialButtonCustom(icon = R.drawable.ic_edit) {
-
-                                    navController.navigate(CREATE_USER_INFO_SCREEN)
-
-                                }
-
-                            }
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-
-                            // --- ТЕЛЕФОН -----
-
-                            TextAndDesc(
-                                headline = if (userInfo.value.phoneNumber != "7"){
-
-                                    "+7${userInfo.value.phoneNumber}"
-
-                                } else {
-
-                                    "Телефон не указан"
-
-                                },
-                                description = "Телефон для звонков",
-                                size = "Small"
-                            )
-
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            // --- Email -----
-
-                            TextAndDesc(
-                                headline = if (user.email != null){
-
-                                    user.email!!
-
-                                } else {
-
-                                    "Email не указан"
-
-                                },
-                                description = "Email для входа в аккаунт",
-                                size = "Small"
-                            )
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            // --- Whatsapp -----
-
-                            TextAndDesc(
-                                headline = if (userInfo.value.whatsapp != "7"){
-
-                                    "+7${userInfo.value.whatsapp}"
-
-                                } else {
-
-                                    "Телефон не указан"
-
-                                },
-                                description = "Whatsapp",
-                                size = "Small"
-                            )
-
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            // --- Instagram -----
-
-                            TextAndDesc(
-                                headline = if (userInfo.value.instagram != ""){
-
-                                    userInfo.value.instagram!!
-
-                                } else {
-
-                                    "Instagram не указан"
-
-                                },
-                                description = "Instagram",
-                                size = "Small"
-                            )
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            // --- Telegram -----
-
-                            TextAndDesc(
-                                headline = if (userInfo.value.telegram != ""){
-
-                                    userInfo.value.telegram!!
-
-                                } else {
-
-                                    "Telegram не указан"
-
-                                },
-                                description = "Telegram",
-                                size = "Small"
-                            )
-
-                            Spacer(modifier = Modifier.height(30.dp))
-
-
-                            // ---- КНОПКА ВЫЙТИ ИЗ АККАУНТА -----
-
-                            ButtonCustom(
-                                buttonText = stringResource(id = R.string.sign_out_button),
-                                typeButton = SECONDARY,
-                                rightIcon = R.drawable.ic_logout
-                            ) {
-
-                                // функции на нажатие
-
-                                try {
-
-                                    navController.navigate(MEETINGS_ROOT) { popUpTo(0) } // после выхода отправляем на страницу мероприятий
-
-                                    accountHelper.signOutGoogle() // выход из аккауна, если вошел через Google
-
-                                    activity.mAuth.signOut() // выход из аккаунта, если вошел по Email
-
-
-                                } catch (e: ApiException) {
-                                    Log.d("MyLog", "ApiError: ${e.message}")
-                                }
-
-                                // показываем ТОСТ что все готово
-
-                                Toast.makeText(
-                                    activity,
-                                    activity.getString(R.string.sign_out_success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
                             }
                         }
                     }
                 }
             }
+
+        } else {
+
+            Column(modifier = Modifier.fillMaxSize().background(Grey100)) {
+                LoadingScreen("Идет загрузка")
+            }
+
         }
+
+
     }
 
     // -------- ЕСЛИ USER ЗАРЕГИСТРИРОВАН НО НЕ ПОДТВЕРДИЛ ПОЧТУ ----------

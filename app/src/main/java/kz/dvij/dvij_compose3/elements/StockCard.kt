@@ -45,7 +45,8 @@ class StockCard (val act: MainActivity) {
         stockKey: MutableState<String>,
         isAd: Boolean = false,
         filledStock: MutableState<StockAdsClass>,
-        filledPlace: MutableState<PlacesCardClass>
+        filledPlace: MutableState<PlacesCardClass>,
+        openLoading: MutableState<Boolean>
     ) {
 
         val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
@@ -102,6 +103,8 @@ class StockCard (val act: MainActivity) {
                     shape = if (isAd) RoundedCornerShape(15.dp) else RoundedCornerShape(0.dp)
                 )
                 .clickable {
+
+                    openLoading.value = true
 
                     // При клике на карточку - передаем на Main Activity keyStock. Ключ берем из дата класса акции
 
@@ -391,6 +394,8 @@ class StockCard (val act: MainActivity) {
                                 color = YellowDvij,
                                 modifier = Modifier.clickable {
 
+                                    openLoading.value = true
+
                                     filledStock.value = StockAdsClass(
                                         image = stockInfo.value.image,
                                         headline = stockInfo.value.headline,
@@ -448,6 +453,8 @@ class StockCard (val act: MainActivity) {
                         ConfirmDialog(onDismiss = { openConfirmChoose.value = false }) {
 
                             if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
+
+                                openLoading.value = true
 
                                 act.stockDatabaseManager.deleteStockWithPlaceNote(
                                     stockKey = stockInfo.value.keyStock!!,

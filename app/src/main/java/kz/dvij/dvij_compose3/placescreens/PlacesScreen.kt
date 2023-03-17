@@ -1,5 +1,6 @@
 package kz.dvij.dvij_compose3.placescreens
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -10,10 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,10 +19,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
+import kz.dvij.dvij_compose3.elements.LoadingScreen
 import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
@@ -83,6 +86,8 @@ class PlacesScreens (val act: MainActivity) {
 
     // ----- ЛЕНТА ЗАВЕДЕНИЙ -------
 
+    @SuppressLint("CoroutineCreationDuringComposition")
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun PlacesTapeScreen(
@@ -115,12 +120,16 @@ class PlacesScreens (val act: MainActivity) {
 
         }
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
+
+
+
         val filter = act.filterFunctions.createPlaceFilter(cityForFilter.value, placeCategoryForFilter.value)
 
         val removeQuery = act.filterFunctions.splitFilter(filter)
 
         val typeFilter = act.filterFunctions.getTypeOfPlaceFilter(removeQuery)
-
 
 
         // обращаемся к базе данных и записываем в список заведений заведения
@@ -172,7 +181,8 @@ class PlacesScreens (val act: MainActivity) {
                                     navController = navController,
                                     placeKeyFromAct = placeKey,
                                     placeItem = item,
-                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct,
+                                    openLoadingState = openLoading
                                 )
 
                             }
@@ -235,6 +245,12 @@ class PlacesScreens (val act: MainActivity) {
 
         }
 
+        if (openLoading.value){
+
+            LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+        }
+
 
     }
 
@@ -247,6 +263,10 @@ class PlacesScreens (val act: MainActivity) {
         filledPlaceInfoFromAct: MutableState<PlacesCardClass>,
         //placeIsOpenForFilter: MutableState<Boolean>,
     ) {
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
+
 
         // Инициализируем список заведений
 
@@ -270,6 +290,12 @@ class PlacesScreens (val act: MainActivity) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+
+            if (openLoading.value){
+
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+            }
 
             if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
@@ -319,7 +345,8 @@ class PlacesScreens (val act: MainActivity) {
                                 navController = navController,
                                 placeItem = item,
                                 placeKeyFromAct = placeKey,
-                                filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                                filledPlaceInfoFromAct = filledPlaceInfoFromAct,
+                                openLoadingState = openLoading
                             )
                         }
                     }
@@ -371,6 +398,10 @@ class PlacesScreens (val act: MainActivity) {
         filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ) {
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
+
+
         // инициализируем пустой список заведений
 
         val myPlacesList = remember {
@@ -385,6 +416,8 @@ class PlacesScreens (val act: MainActivity) {
 
         Surface(modifier = Modifier.fillMaxSize()) {
 
+
+
             // ------- САМ КОНТЕНТ СТРАНИЦЫ ----------
 
             Column (
@@ -396,6 +429,8 @@ class PlacesScreens (val act: MainActivity) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+
 
                 // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ Заведения ---------
 
@@ -457,7 +492,8 @@ class PlacesScreens (val act: MainActivity) {
                                     navController = navController,
                                     placeItem = item,
                                     placeKeyFromAct = placeKey,
-                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct
+                                    filledPlaceInfoFromAct = filledPlaceInfoFromAct,
+                                    openLoadingState = openLoading
                                 )
                             }
 
@@ -498,6 +534,16 @@ class PlacesScreens (val act: MainActivity) {
             if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
                 FloatingButton { navController.navigate(CREATE_PLACES_SCREEN) }
             }
+
+
+
         }
+
+        if (openLoading.value){
+
+            LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+        }
+
     }
 }

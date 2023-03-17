@@ -57,6 +57,8 @@ class StockViewScreen (val act: MainActivity) {
         filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ) {
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
         // Переменная, которая содержит в себе информацию об акции
         val stockInfo = remember {
             mutableStateOf(StockAdsClass())
@@ -129,6 +131,8 @@ class StockViewScreen (val act: MainActivity) {
 
                 if (stockInfo.value.keyStock != null && stockInfo.value.keyPlace != null && stockInfo.value.image != null) {
 
+                    openLoading.value = true
+
                     act.stockDatabaseManager.deleteStockWithPlaceNote(
                         stockKey = stockInfo.value.keyStock!!,
                         imageUrl = stockInfo.value.image!!,
@@ -152,376 +156,382 @@ class StockViewScreen (val act: MainActivity) {
             }
         }
 
+        if (stockInfo.value != StockAdsClass() && !openLoading.value){
 
-        // ---------- КОНТЕНТ СТРАНИЦЫ --------------
+            // ---------- КОНТЕНТ СТРАНИЦЫ --------------
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .background(Grey_Background)
-        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .background(Grey_Background)
+            ) {
 
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp)) {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp)) {
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-
-                    // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
-
-                    if (stockInfo.value.image != null) {
-                        AsyncImage(
-                            model = stockInfo.value.image, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
-                            contentDescription = "Изображение акции", // описание изображения для слабовидящих
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(260.dp), // заполнить картинкой весь контейнер
-                            contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
-                        )
-                    }
-
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 
-                        // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
+                        // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
 
-                        Bubble(
-                            buttonText = viewCounter.value.toString(),
-                            leftIcon = R.drawable.ic_visibility,
-                            typeButton = DARK
-                        ) {
-                            Toast.makeText(act, "Количество просмотров акции", Toast.LENGTH_SHORT)
-                                .show()
+                        if (stockInfo.value.image != null) {
+                            AsyncImage(
+                                model = stockInfo.value.image, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
+                                contentDescription = "Изображение акции", // описание изображения для слабовидящих
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(260.dp), // заполнить картинкой весь контейнер
+                                contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
+                            )
                         }
 
-                        Bubble(
-                            buttonText = favCounter.value.toString(),
-                            rightIcon = R.drawable.ic_fav,
-                            typeButton = DARK,
-                            rightIconColor = iconTextFavColor.value
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
-                            // --- Если клиент авторизован, проверяем, добавлена ли уже в избранное эта акция -----
-                            // Если не авторизован, условие else
+                            // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
 
-                            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                act.stockDatabaseManager.favIconStock(key) {
+                            Bubble(
+                                buttonText = viewCounter.value.toString(),
+                                leftIcon = R.drawable.ic_visibility,
+                                typeButton = DARK
+                            ) {
+                                Toast.makeText(act, "Количество просмотров акции", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
 
-                                    // Если уже добавлено в избранные, то при нажатии убираем из избранных
+                            Bubble(
+                                buttonText = favCounter.value.toString(),
+                                rightIcon = R.drawable.ic_fav,
+                                typeButton = DARK,
+                                rightIconColor = iconTextFavColor.value
+                            ) {
 
-                                    if (it) {
+                                // --- Если клиент авторизован, проверяем, добавлена ли уже в избранное эта акция -----
+                                // Если не авторизован, условие else
 
-                                        // Убираем из избранных
+                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                    act.stockDatabaseManager.favIconStock(key) {
 
-                                        act.stockDatabaseManager.removeFavouriteStock(key) { remove ->
+                                        // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
-                                            // Если пришел колбак, что успешно
+                                        if (it) {
 
-                                            if (remove) {
+                                            // Убираем из избранных
 
-                                                act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
+                                            act.stockDatabaseManager.removeFavouriteStock(key) { remove ->
 
-                                                    favCounter.value = favCount
+                                                // Если пришел колбак, что успешно
 
+                                                if (remove) {
+
+                                                    act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
+
+                                                        favCounter.value = favCount
+
+                                                    }
+
+                                                    iconTextFavColor.value =
+                                                        WhiteDvij // При нажатии окрашиваем текст и иконку в белый
+                                                    buttonFavColor.value =
+                                                        Grey_Background // При нажатии окрашиваем кнопку в темно-серый
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(
+                                                        act, act.getString(R.string.delete_from_fav),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
                                                 }
-
-                                                iconTextFavColor.value =
-                                                    WhiteDvij // При нажатии окрашиваем текст и иконку в белый
-                                                buttonFavColor.value =
-                                                    Grey_Background // При нажатии окрашиваем кнопку в темно-серый
-
-                                                // Выводим ТОСТ
-                                                Toast.makeText(
-                                                    act, act.getString(R.string.delete_from_fav),
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
                                             }
-                                        }
 
-                                    } else {
+                                        } else {
 
-                                        // Если не добавлено в избранные, то при нажатии добавляем в избранные
+                                            // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.stockDatabaseManager.addFavouriteStock(key) { addToFav ->
+                                            act.stockDatabaseManager.addFavouriteStock(key) { addToFav ->
 
-                                            // Если пришел колбак, что успешно
+                                                // Если пришел колбак, что успешно
 
-                                            if (addToFav) {
+                                                if (addToFav) {
 
-                                                act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
+                                                    act.stockDatabaseManager.readFavCounter(stockInfo.value.keyStock!!){ favCount->
 
-                                                    favCounter.value = favCount
+                                                        favCounter.value = favCount
+
+                                                    }
+
+                                                    iconTextFavColor.value =
+                                                        YellowDvij // При нажатии окрашиваем текст и иконку в черный
+                                                    buttonFavColor.value =
+                                                        Grey_Background // Окрашиваем кнопку в главный цвет
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(
+                                                        act, act.getString(R.string.add_to_fav),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
 
                                                 }
-
-                                                iconTextFavColor.value =
-                                                    YellowDvij // При нажатии окрашиваем текст и иконку в черный
-                                                buttonFavColor.value =
-                                                    Grey_Background // Окрашиваем кнопку в главный цвет
-
-                                                // Выводим ТОСТ
-                                                Toast.makeText(
-                                                    act, act.getString(R.string.add_to_fav),
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
                                             }
                                         }
                                     }
+
+                                } else {
+
+                                    // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                    Toast
+                                        .makeText(
+                                            act,
+                                            "Чтобы добавить акцию в избранные, тебе нужно авторизоваться",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
-
-                            } else {
-
-                                // Если пользователь не авторизован, то ему выводим ТОСТ
-
-                                Toast
-                                    .makeText(
-                                        act,
-                                        "Чтобы добавить акцию в избранные, тебе нужно авторизоваться",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
                             }
                         }
-                    }
 
 
-                    // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+                        // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
-                    ) {
-
-                        // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
-
-                        androidx.compose.material3.Card(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            shape = RoundedCornerShape(
-                                topStart = 30.dp,
-                                topEnd = 0.dp,
-                                bottomEnd = 0.dp,
-                                bottomStart = 0.dp
-                            ),
-                            elevation = CardDefaults.cardElevation(5.dp),
-                            colors = CardDefaults.cardColors(Grey_Background)
+                                .fillMaxWidth()
+                                .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
                         ) {
 
-                            Column(
-                                modifier = Modifier.padding(
-                                    vertical = 30.dp,
-                                    horizontal = 20.dp
-                                )
+                            // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
+
+                            androidx.compose.material3.Card(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(
+                                    topStart = 30.dp,
+                                    topEnd = 0.dp,
+                                    bottomEnd = 0.dp,
+                                    bottomStart = 0.dp
+                                ),
+                                elevation = CardDefaults.cardElevation(5.dp),
+                                colors = CardDefaults.cardColors(Grey_Background)
                             ) {
 
-                                Row {
-                                    Text(
-                                        text = "#Акция",
-                                        color = Grey_Text,
-                                        style = Typography.labelMedium
+                                Column(
+                                    modifier = Modifier.padding(
+                                        vertical = 30.dp,
+                                        horizontal = 20.dp
                                     )
-
-                                    Spacer(modifier = Modifier.width(10.dp))
-
-                                    Text(
-                                        text = "#${stockInfo.value.category}",
-                                        color = Grey_Text,
-                                        style = Typography.labelMedium
-                                    )
-                                }
-
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                // -------- НАЗВАНИЕ АКЦИИ ----------
-
-                                if (stockInfo.value.headline != null && stockInfo.value.headline != "null" && stockInfo.value.headline != "") {
-
-                                    Text(
-                                        text = stockInfo.value.headline!!,
-                                        style = Typography.titleMedium,
-                                        color = WhiteDvij
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                if (
-                                    stockInfo.value.startDate != null
-                                    && stockInfo.value.finishDate != null
-                                    && stockInfo.value.startDate != "null"
-                                    && stockInfo.value.finishDate != ""
                                 ) {
 
-                                    Bubble(
-                                        buttonText = "${stockInfo.value.startDate} - ${stockInfo.value.finishDate}"
-                                    ) {}
+                                    Row {
+                                        Text(
+                                            text = "#Акция",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
 
-                                }
+                                        Spacer(modifier = Modifier.width(10.dp))
 
-                                Spacer(modifier = Modifier.height(20.dp))
+                                        Text(
+                                            text = "#${stockInfo.value.category}",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
+                                    }
 
 
-                                // ------- ГОРОД ------------
+                                    Spacer(modifier = Modifier.height(10.dp))
 
-                                if (stockInfo.value.city != null && stockInfo.value.city != "null" && stockInfo.value.city != "") {
+                                    // -------- НАЗВАНИЕ АКЦИИ ----------
 
-                                    Text(
-                                        text = stockInfo.value.city!!,
-                                        style = Typography.labelMedium,
-                                        color = WhiteDvij
-                                    )
-                                }
+                                    if (stockInfo.value.headline != null && stockInfo.value.headline != "null" && stockInfo.value.headline != "") {
 
-                                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
-
-                                if (
-                                    placeInfo.value.placeName != "Empty"
-                                    && placeInfo.value.placeName != ""
-                                    && placeInfo.value.placeName != "null"
-                                    && placeInfo.value.placeName != null
-                                    && placeInfo.value.address != "Empty"
-                                    && placeInfo.value.address != ""
-                                    && placeInfo.value.address != "null"
-                                    && placeInfo.value.address != null
-
-                                ) {
-
-                                    Log.d(
-                                        "MyLog",
-                                        "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
-                                    )
-
-                                    Text(
-                                        text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-
-                                }
-
-                                if (
-                                    stockInfo.value.inputHeadlinePlace != "Empty"
-                                    && stockInfo.value.inputHeadlinePlace != ""
-                                    && stockInfo.value.inputHeadlinePlace != "null"
-                                    && stockInfo.value.inputHeadlinePlace != null
-                                    && stockInfo.value.inputAddressPlace != "Empty"
-                                    && stockInfo.value.inputAddressPlace != ""
-                                    && stockInfo.value.inputAddressPlace != "null"
-                                    && stockInfo.value.inputAddressPlace != null
-
-                                ) {
-
-                                    Text(
-                                        text = "${stockInfo.value.inputHeadlinePlace}, ${stockInfo.value.inputAddressPlace}",
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                if (stockInfo.value.description != null && stockInfo.value.description != "null" && stockInfo.value.description != "") {
-
-                                    Text(
-                                        text = stockInfo.value.description!!,
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
-
-                                if (
-                                    stockInfo.value.keyPlace != "Empty"
-                                    && stockInfo.value.keyPlace != ""
-                                    && stockInfo.value.keyPlace != "null"
-                                    && stockInfo.value.keyPlace != null
-                                    && placeInfo.value.placeKey != "Empty"
-                                    && placeInfo.value.placeKey != ""
-                                    && placeInfo.value.placeKey != "null"
-                                    && placeInfo.value.placeKey != null
-                                ) {
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    placeCard.PlaceCardSmall(
-                                        navController = navController,
-                                        placeItem = placeInfo.value,
-                                        placeKey = placeKey
-                                    )
-
-                                }
-
-                                // КАРТОЧКА СОЗДАТЕЛЯ
-
-                                if (stockInfo.value.keyCreator != null && stockInfo.value.keyCreator != "null" && stockInfo.value.keyCreator != "") {
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    ownerCard.OwnerCardView(userKey = stockInfo.value.keyCreator!!, "Создатель акции")
-
-                                }
-
-                                // КНОПКА РЕДАКТИРОВАТЬ
-
-                                if (act.mAuth.uid != null && stockInfo.value.keyCreator == act.mAuth.uid) {
-
-                                    Spacer(modifier = Modifier.height(40.dp))
-
-                                    ButtonCustom(
-                                        buttonText = "Редактировать",
-                                        leftIcon = R.drawable.ic_edit
-                                    ) {
-                                        stockInfo.value.keyStock?.let {
-                                            act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(
-                                                it
-                                            ) { stock ->
-
-                                                if (stock.keyPlace != null && stock.keyPlace != "null" && stock.keyPlace != "") {
-
-                                                    filledPlaceInfoFromAct.value = placeInfo.value
-
-                                                } else {
-
-                                                    filledPlaceInfoFromAct.value = PlacesCardClass(
-                                                        placeName = stock.inputHeadlinePlace,
-                                                        address = stock.inputAddressPlace
-                                                    )
-
-                                                }
-
-                                                filledStockInfoFromAct.value = stock
-                                                navController.navigate(EDIT_STOCK_SCREEN)
-
-                                            }
-                                        }
+                                        Text(
+                                            text = stockInfo.value.headline!!,
+                                            style = Typography.titleMedium,
+                                            color = WhiteDvij
+                                        )
                                     }
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
-                                    // ------ КНОПКА УДАЛЕНИЯ ------
-
-                                    ButtonCustom(
-                                        buttonText = "Удалить",
-                                        typeButton = ATTENTION,
-                                        leftIcon = R.drawable.ic_close
+                                    if (
+                                        stockInfo.value.startDate != null
+                                        && stockInfo.value.finishDate != null
+                                        && stockInfo.value.startDate != "null"
+                                        && stockInfo.value.finishDate != ""
                                     ) {
-                                        openConfirmChoose.value = true
+
+                                        Bubble(
+                                            buttonText = "${stockInfo.value.startDate} - ${stockInfo.value.finishDate}"
+                                        ) {}
+
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                                    // ------- ГОРОД ------------
+
+                                    if (stockInfo.value.city != null && stockInfo.value.city != "null" && stockInfo.value.city != "") {
+
+                                        Text(
+                                            text = stockInfo.value.city!!,
+                                            style = Typography.labelMedium,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
+
+                                    if (
+                                        placeInfo.value.placeName != "Empty"
+                                        && placeInfo.value.placeName != ""
+                                        && placeInfo.value.placeName != "null"
+                                        && placeInfo.value.placeName != null
+                                        && placeInfo.value.address != "Empty"
+                                        && placeInfo.value.address != ""
+                                        && placeInfo.value.address != "null"
+                                        && placeInfo.value.address != null
+
+                                    ) {
+
+                                        Log.d(
+                                            "MyLog",
+                                            "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
+                                        )
+
+                                        Text(
+                                            text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
+
+                                    }
+
+                                    if (
+                                        stockInfo.value.inputHeadlinePlace != "Empty"
+                                        && stockInfo.value.inputHeadlinePlace != ""
+                                        && stockInfo.value.inputHeadlinePlace != "null"
+                                        && stockInfo.value.inputHeadlinePlace != null
+                                        && stockInfo.value.inputAddressPlace != "Empty"
+                                        && stockInfo.value.inputAddressPlace != ""
+                                        && stockInfo.value.inputAddressPlace != "null"
+                                        && stockInfo.value.inputAddressPlace != null
+
+                                    ) {
+
+                                        Text(
+                                            text = "${stockInfo.value.inputHeadlinePlace}, ${stockInfo.value.inputAddressPlace}",
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
+
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    if (stockInfo.value.description != null && stockInfo.value.description != "null" && stockInfo.value.description != "") {
+
+                                        Text(
+                                            text = stockInfo.value.description!!,
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
+
+                                    if (
+                                        stockInfo.value.keyPlace != "Empty"
+                                        && stockInfo.value.keyPlace != ""
+                                        && stockInfo.value.keyPlace != "null"
+                                        && stockInfo.value.keyPlace != null
+                                        && placeInfo.value.placeKey != "Empty"
+                                        && placeInfo.value.placeKey != ""
+                                        && placeInfo.value.placeKey != "null"
+                                        && placeInfo.value.placeKey != null
+                                    ) {
+
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+                                        placeCard.PlaceCardSmall(
+                                            navController = navController,
+                                            placeItem = placeInfo.value,
+                                            placeKey = placeKey,
+                                            openLoading = openLoading
+                                        )
+
+                                    }
+
+                                    // КАРТОЧКА СОЗДАТЕЛЯ
+
+                                    if (stockInfo.value.keyCreator != null && stockInfo.value.keyCreator != "null" && stockInfo.value.keyCreator != "") {
+
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+                                        ownerCard.OwnerCardView(userKey = stockInfo.value.keyCreator!!, "Создатель акции")
+
+                                    }
+
+                                    // КНОПКА РЕДАКТИРОВАТЬ
+
+                                    if (act.mAuth.uid != null && stockInfo.value.keyCreator == act.mAuth.uid) {
+
+                                        Spacer(modifier = Modifier.height(40.dp))
+
+                                        ButtonCustom(
+                                            buttonText = "Редактировать",
+                                            leftIcon = R.drawable.ic_edit
+                                        ) {
+
+                                            openLoading.value = true
+
+                                            stockInfo.value.keyStock?.let {
+                                                act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(
+                                                    it
+                                                ) { stock ->
+
+                                                    if (stock.keyPlace != null && stock.keyPlace != "null" && stock.keyPlace != "") {
+
+                                                        filledPlaceInfoFromAct.value = placeInfo.value
+
+                                                    } else {
+
+                                                        filledPlaceInfoFromAct.value = PlacesCardClass(
+                                                            placeName = stock.inputHeadlinePlace,
+                                                            address = stock.inputAddressPlace
+                                                        )
+
+                                                    }
+
+                                                    filledStockInfoFromAct.value = stock
+                                                    navController.navigate(EDIT_STOCK_SCREEN)
+
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        // ------ КНОПКА УДАЛЕНИЯ ------
+
+                                        ButtonCustom(
+                                            buttonText = "Удалить",
+                                            typeButton = ATTENTION,
+                                            leftIcon = R.drawable.ic_close
+                                        ) {
+                                            openConfirmChoose.value = true
+                                        }
                                     }
                                 }
                             }
@@ -529,7 +539,16 @@ class StockViewScreen (val act: MainActivity) {
                     }
                 }
             }
+
+        } else {
+
+            Column(modifier = Modifier.fillMaxSize().background(Grey100)) {
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+            }
+
         }
+
+
     }
 
 }

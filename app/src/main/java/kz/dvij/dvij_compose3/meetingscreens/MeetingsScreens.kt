@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
+import kz.dvij.dvij_compose3.elements.LoadingScreen
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.*
@@ -135,6 +136,7 @@ class MeetingsScreens (val act: MainActivity) {
 
         }
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
 
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -176,7 +178,8 @@ class MeetingsScreens (val act: MainActivity) {
                                     meetingItem = item,
                                     meetingKey = meetingKey,
                                     filledMeeting = filledMeeting,
-                                    filledPlace = filledPlace
+                                    filledPlace = filledPlace,
+                                    openLoadingState = openLoading
                                 )
 
                             }
@@ -233,7 +236,15 @@ class MeetingsScreens (val act: MainActivity) {
             }
 
 
+
         }
+
+        if (openLoading.value){
+
+            LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+        }
+
     }
 
     // --- СТРАНИЦА МОИХ МЕРОПРИЯТИЙ -----
@@ -245,6 +256,8 @@ class MeetingsScreens (val act: MainActivity) {
         filledMeeting: MutableState<MeetingsAdsClass>,
         filledPlace: MutableState<PlacesCardClass>
     ){
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
         // инициализируем пустой список мероприятий
 
@@ -297,7 +310,8 @@ class MeetingsScreens (val act: MainActivity) {
                                     meetingItem = item,
                                     meetingKey = meetingKey,
                                     filledMeeting = filledMeeting,
-                                    filledPlace = filledPlace
+                                    filledPlace = filledPlace,
+                                    openLoadingState = openLoading
                                 )
 
                             }
@@ -376,6 +390,12 @@ class MeetingsScreens (val act: MainActivity) {
                     navController.navigate(CREATE_MEETINGS_SCREEN)
                 }
             }
+
+            if (openLoading.value){
+
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+            }
         }
     }
 
@@ -388,6 +408,8 @@ class MeetingsScreens (val act: MainActivity) {
         filledMeeting: MutableState<MeetingsAdsClass>,
         filledPlace: MutableState<PlacesCardClass>
     ){
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
         // Инициализируем список мероприятий
 
@@ -412,6 +434,12 @@ class MeetingsScreens (val act: MainActivity) {
             verticalArrangement = Arrangement.Center
         ) {
 
+            if (openLoading.value){
+
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+            }
+
             // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
 
             if (favMeetingsList.value.isNotEmpty() && favMeetingsList.value != listOf(defaultCardMeeting) && act.mAuth.currentUser != null){
@@ -434,7 +462,8 @@ class MeetingsScreens (val act: MainActivity) {
                                 meetingItem = item,
                                 meetingKey = meetingKey,
                                 filledMeeting = filledMeeting,
-                                filledPlace = filledPlace
+                                filledPlace = filledPlace,
+                                openLoadingState = openLoading
                             )
                         }
 

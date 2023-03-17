@@ -89,6 +89,7 @@ fun ConfirmDialog(onDismiss: () -> Unit, onClick: () -> Unit) {
 
             ButtonCustom(buttonText = "Да, удалить", typeButton = SECONDARY) {
                 onClick()
+                onDismiss()
             }
 
             /*// ---- КНОПКИ -------

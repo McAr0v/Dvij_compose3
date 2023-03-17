@@ -18,8 +18,8 @@ fun LoadingScreen (messageText: String) {
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .background(Grey100_95), // полупрозрачный фон
-        verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
+            .background(Grey_OnBackground).padding(40.dp), // полупрозрачный фон
+        verticalAlignment = Alignment.Bottom, // выравнивание по вертикали
         horizontalArrangement = Arrangement.Center // выравнивание по горизонтали
     ) {
 

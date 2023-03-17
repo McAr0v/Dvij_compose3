@@ -23,10 +23,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.*
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesCardClass
-import kz.dvij.dvij_compose3.firebase.PlacesDatabaseManager
+import kz.dvij.dvij_compose3.firebase.*
 import kz.dvij.dvij_compose3.navigation.EDIT_MEETINGS_SCREEN
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.*
@@ -46,6 +43,8 @@ class MeetingViewScreen(val act: MainActivity) {
         filledMeetingInfoFromAct: MutableState<MeetingsAdsClass>,
         filledPlaceInfoFromAct: MutableState<PlacesCardClass>
     ){
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
 
         // Переменная, которая содержит в себе информацию о мероприятии
@@ -119,6 +118,8 @@ class MeetingViewScreen(val act: MainActivity) {
 
                 if (meetingInfo.value.key != null && meetingInfo.value.placeKey != null && meetingInfo.value.image1 != null){
 
+                    openLoading.value = true
+
                     act.meetingDatabaseManager.deleteMeetingWithPlaceNote(
                         meetingKey = meetingInfo.value.key!!,
                         placeKey = meetingInfo.value.placeKey!!,
@@ -140,477 +141,487 @@ class MeetingViewScreen(val act: MainActivity) {
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .background(Grey_Background)
-        ) {
+        if (meetingInfo.value != MeetingsAdsClass() && openLoading.value != true){
 
-            Card( modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp) ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .background(Grey_Background)
+            ) {
 
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                ){
+                Card( modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp) ) {
 
-                    // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                    ){
 
-                    if (meetingInfo.value.image1 !=null){
-                        AsyncImage(
-                            model = meetingInfo.value.image1, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
-                            contentDescription = stringResource(id = R.string.cd_meeting_image), // описание изображения для слабовидящих
+                        // ------- КАРТИНКА МЕРОПРИЯТИЯ ----------
+
+                        if (meetingInfo.value.image1 !=null){
+                            AsyncImage(
+                                model = meetingInfo.value.image1, // БЕРЕМ ИЗОБРАЖЕНИЕ ИЗ ПРИНЯТНОГО МЕРОПРИЯТИЯ ИЗ БД
+                                contentDescription = stringResource(id = R.string.cd_meeting_image), // описание изображения для слабовидящих
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(260.dp), // заполнить картинкой весь контейнер
+                                contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
+                            )
+                        }
+
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(260.dp), // заполнить картинкой весь контейнер
-                            contentScale = ContentScale.Crop // обрезать картинку, что не вмещается
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-
-                        // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
-
-                        Bubble(
-                            buttonText = viewCounter.value.toString(),
-                            leftIcon = R.drawable.ic_visibility,
-                            typeButton = DARK
-                        ) {
-                            Toast.makeText(act,act.getString(R.string.meeting_view_counter),Toast.LENGTH_SHORT).show()
-                        }
-
-                        Bubble(
-                            buttonText = favCounter.value.toString(),
-                            rightIcon = R.drawable.ic_fav,
-                            typeButton = DARK,
-                            rightIconColor = iconTextFavColor.value
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
-                            // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это мероприятие -----
-                            // Если не авторизован, условие else
+                            // ЗДЕСЬ ЛАЙКИ И ПРОСМОТРЫ
 
-                            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                                act.meetingDatabaseManager.favIconMeeting(meetingKey.value) {
+                            Bubble(
+                                buttonText = viewCounter.value.toString(),
+                                leftIcon = R.drawable.ic_visibility,
+                                typeButton = DARK
+                            ) {
+                                Toast.makeText(act,act.getString(R.string.meeting_view_counter),Toast.LENGTH_SHORT).show()
+                            }
 
-                                    // Если уже добавлено в избранные, то при нажатии убираем из избранных
+                            Bubble(
+                                buttonText = favCounter.value.toString(),
+                                rightIcon = R.drawable.ic_fav,
+                                typeButton = DARK,
+                                rightIconColor = iconTextFavColor.value
+                            ) {
 
-                                    if (it) {
+                                // --- Если клиент авторизован, проверяем, добавлено ли уже в избранное это мероприятие -----
+                                // Если не авторизован, условие else
 
-                                        // Убираем из избранных
-                                        act.meetingDatabaseManager.removeFavouriteMeeting(meetingKey.value) { result ->
+                                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                                    act.meetingDatabaseManager.favIconMeeting(meetingKey.value) {
 
-                                            // Если пришел колбак, что успешно
+                                        // Если уже добавлено в избранные, то при нажатии убираем из избранных
 
-                                            if (result) {
+                                        if (it) {
 
-                                                //favCounterBackground.value = Grey_ForCardsFav
+                                            // Убираем из избранных
+                                            act.meetingDatabaseManager.removeFavouriteMeeting(meetingKey.value) { result ->
 
-                                                act.meetingDatabaseManager.readFavCounter(meetingKey.value){ counter ->
-                                                    favCounter.value = counter
+                                                // Если пришел колбак, что успешно
+
+                                                if (result) {
+
+                                                    //favCounterBackground.value = Grey_ForCardsFav
+
+                                                    act.meetingDatabaseManager.readFavCounter(meetingKey.value){ counter ->
+                                                        favCounter.value = counter
+                                                    }
+
+                                                    iconTextFavColor.value = WhiteDvij
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(act,act.getString(R.string.delete_from_fav),Toast.LENGTH_SHORT).show()
                                                 }
-
-                                                iconTextFavColor.value = WhiteDvij
-
-                                                // Выводим ТОСТ
-                                                Toast.makeText(act,act.getString(R.string.delete_from_fav),Toast.LENGTH_SHORT).show()
                                             }
-                                        }
 
-                                    } else {
+                                        } else {
 
-                                        // Если не добавлено в избранные, то при нажатии добавляем в избранные
+                                            // Если не добавлено в избранные, то при нажатии добавляем в избранные
 
-                                        act.meetingDatabaseManager.addFavouriteMeeting(meetingKey.value) { inFav ->
+                                            act.meetingDatabaseManager.addFavouriteMeeting(meetingKey.value) { inFav ->
 
-                                            // Если пришел колбак, что успешно
+                                                // Если пришел колбак, что успешно
 
-                                            if (inFav) {
+                                                if (inFav) {
 
-                                                act.meetingDatabaseManager.readFavCounter(meetingKey.value){ counter ->
-                                                    favCounter.value = counter
+                                                    act.meetingDatabaseManager.readFavCounter(meetingKey.value){ counter ->
+                                                        favCounter.value = counter
+                                                    }
+
+                                                    iconTextFavColor.value = YellowDvij
+
+                                                    // Выводим ТОСТ
+                                                    Toast.makeText(act,act.getString(R.string.add_to_fav),Toast.LENGTH_SHORT).show()
+
                                                 }
-
-                                                iconTextFavColor.value = YellowDvij
-
-                                                // Выводим ТОСТ
-                                                Toast.makeText(act,act.getString(R.string.add_to_fav),Toast.LENGTH_SHORT).show()
-
                                             }
                                         }
                                     }
+
+                                } else {
+
+                                    // Если пользователь не авторизован, то ему выводим ТОСТ
+
+                                    Toast
+                                        .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
+                                        .show()
                                 }
-
-                            } else {
-
-                                // Если пользователь не авторизован, то ему выводим ТОСТ
-
-                                Toast
-                                    .makeText(act, act.getString(R.string.need_reg_meeting_to_fav), Toast.LENGTH_SHORT)
-                                    .show()
                             }
                         }
-                    }
 
-                    // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
+                        // -------- ОТСТУП ДЛЯ НАВИСАЮЩЕЙ КАРТОЧКИ ------------
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp)
-                            ,
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
-                    ) {
-
-                        // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
-
-                        androidx.compose.material3.Card(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            shape = RoundedCornerShape(
-                                topStart = 30.dp,
-                                topEnd = 0.dp,
-                                bottomEnd = 0.dp,
-                                bottomStart = 0.dp
-                            ),
-                            elevation = CardDefaults.cardElevation(5.dp),
-                            colors = CardDefaults.cardColors(Grey_Background)
+                                .fillMaxWidth()
+                                .padding(top = 235.dp, end = 0.dp, start = 0.dp, bottom = 0.dp)
+                            ,
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
                         ) {
 
-                            Column(modifier = Modifier.padding(vertical = 30.dp, horizontal = 20.dp)) {
+                            // ----------- НАВИСАЮЩАЯ КАРТОЧКА ----------------
 
-                                Row {
-                                    Text(
-                                        text = "#Мероприятие",
-                                        color = Grey_Text,
-                                        style = Typography.labelMedium
-                                    )
+                            androidx.compose.material3.Card(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                shape = RoundedCornerShape(
+                                    topStart = 30.dp,
+                                    topEnd = 0.dp,
+                                    bottomEnd = 0.dp,
+                                    bottomStart = 0.dp
+                                ),
+                                elevation = CardDefaults.cardElevation(5.dp),
+                                colors = CardDefaults.cardColors(Grey_Background)
+                            ) {
 
-                                    Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.padding(vertical = 30.dp, horizontal = 20.dp)) {
 
-                                    Text(
-                                        text = "#${meetingInfo.value.category}",
-                                        color = Grey_Text,
-                                        style = Typography.labelMedium
-                                    )
-                                }
+                                    Row {
+                                        Text(
+                                            text = "#Мероприятие",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                                        Spacer(modifier = Modifier.width(10.dp))
 
-                                // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
+                                        Text(
+                                            text = "#${meetingInfo.value.category}",
+                                            color = Grey_Text,
+                                            style = Typography.labelMedium
+                                        )
+                                    }
 
-                                if (meetingInfo.value.headline != null && meetingInfo.value.headline != "null" && meetingInfo.value.headline != "") {
+                                    Spacer(modifier = Modifier.height(10.dp))
 
-                                    Text(
-                                        text = meetingInfo.value.headline!!,
-                                        style = Typography.titleMedium,
-                                        color = WhiteDvij
-                                    )
-                                }
+                                    // -------- ЗАГОЛОВОК МЕРОПРИЯТИЯ ----------
 
-                                Spacer(modifier = Modifier.height(20.dp))
+                                    if (meetingInfo.value.headline != null && meetingInfo.value.headline != "null" && meetingInfo.value.headline != "") {
 
-                                Row {
+                                        Text(
+                                            text = meetingInfo.value.headline!!,
+                                            style = Typography.titleMedium,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    Row {
+
+                                        if (
+                                            meetingInfo.value.data != null
+                                            && meetingInfo.value.data != "null"
+                                            && meetingInfo.value.data != ""
+                                            && meetingInfo.value.data != "Выбери дату"
+                                        ){
+
+                                            Bubble(buttonText = meetingInfo.value.data!!) {}
+                                            Spacer(modifier = Modifier.width(10.dp))
+
+                                        }
+
+                                        if (
+                                            meetingInfo.value.startTime != null
+                                            && meetingInfo.value.finishTime != null
+                                            && meetingInfo.value.startTime != "null"
+                                            && meetingInfo.value.startTime != ""
+                                        ){
+
+                                            Bubble(
+                                                buttonText = if (
+                                                    meetingInfo.value.finishTime == ""
+                                                    || meetingInfo.value.finishTime == "Выбери время"
+                                                ){
+                                                    meetingInfo.value.startTime!!
+                                                } else {
+                                                    "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
+                                                }
+                                            ) {}
+
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    // ------- ГОРОД ------------
+
+                                    if (meetingInfo.value.city != null && meetingInfo.value.city != "null" && meetingInfo.value.city != "") {
+
+                                        Text(
+                                            text = meetingInfo.value.city!!,
+                                            style = Typography.labelMedium,
+                                            color = WhiteDvij
+                                        )
+                                    }
+
+                                    // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
 
                                     if (
-                                        meetingInfo.value.data != null
-                                        && meetingInfo.value.data != "null"
-                                        && meetingInfo.value.data != ""
-                                        && meetingInfo.value.data != "Выбери дату"
-                                    ){
+                                        placeInfo.value.placeName != "Empty"
+                                        && placeInfo.value.placeName != ""
+                                        && placeInfo.value.placeName != "null"
+                                        && placeInfo.value.placeName != null
+                                        && placeInfo.value.address != "Empty"
+                                        && placeInfo.value.address != ""
+                                        && placeInfo.value.address != "null"
+                                        && placeInfo.value.address != null
 
-                                        Bubble(buttonText = meetingInfo.value.data!!) {}
-                                        Spacer(modifier = Modifier.width(10.dp))
+                                    ) {
+
+                                        Log.d(
+                                            "MyLog",
+                                            "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
+                                        )
+
+                                        Text(
+                                            text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
 
                                     }
 
                                     if (
-                                        meetingInfo.value.startTime != null
-                                        && meetingInfo.value.finishTime != null
-                                        && meetingInfo.value.startTime != "null"
-                                        && meetingInfo.value.startTime != ""
+                                        meetingInfo.value.headlinePlaceInput != "Empty"
+                                        && meetingInfo.value.headlinePlaceInput != ""
+                                        && meetingInfo.value.headlinePlaceInput != "null"
+                                        && meetingInfo.value.headlinePlaceInput != null
+                                        && meetingInfo.value.addressPlaceInput != "Empty"
+                                        && meetingInfo.value.addressPlaceInput != ""
+                                        && meetingInfo.value.addressPlaceInput != "null"
+                                        && meetingInfo.value.addressPlaceInput != null
+
+                                    ){
+
+                                        Text(
+                                            text = "${meetingInfo.value.headlinePlaceInput}, ${meetingInfo.value.addressPlaceInput}",
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
+
+                                    }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    if (
+                                        meetingInfo.value.price != null
+                                        && meetingInfo.value.price != "null"
                                     ){
 
                                         Bubble(
-                                            buttonText = if (
-                                                meetingInfo.value.finishTime == ""
-                                                || meetingInfo.value.finishTime == "Выбери время"
-                                            ){
-                                                meetingInfo.value.startTime!!
+                                            buttonText = if (meetingInfo.value.price == ""){
+                                                stringResource(id = R.string.free_price)
                                             } else {
-                                                "${meetingInfo.value.startTime} - ${meetingInfo.value.finishTime}"
+                                                "${meetingInfo.value.price} тенге"
                                             }
                                         ) {}
 
                                     }
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                // ------- ГОРОД ------------
-
-                                if (meetingInfo.value.city != null && meetingInfo.value.city != "null" && meetingInfo.value.city != "") {
-
-                                    Text(
-                                        text = meetingInfo.value.city!!,
-                                        style = Typography.labelMedium,
-                                        color = WhiteDvij
-                                    )
-                                }
-
-                                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
-
-                                if (
-                                    placeInfo.value.placeName != "Empty"
-                                    && placeInfo.value.placeName != ""
-                                    && placeInfo.value.placeName != "null"
-                                    && placeInfo.value.placeName != null
-                                    && placeInfo.value.address != "Empty"
-                                    && placeInfo.value.address != ""
-                                    && placeInfo.value.address != "null"
-                                    && placeInfo.value.address != null
-
-                                ) {
-
-                                    Log.d(
-                                        "MyLog",
-                                        "name - (${placeInfo.value.placeName}), address - (${placeInfo.value.address})"
-                                    )
-
-                                    Text(
-                                        text = "${placeInfo.value.placeName}, ${placeInfo.value.address}",
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-
-                                }
-
-                                if (
-                                    meetingInfo.value.headlinePlaceInput != "Empty"
-                                    && meetingInfo.value.headlinePlaceInput != ""
-                                    && meetingInfo.value.headlinePlaceInput != "null"
-                                    && meetingInfo.value.headlinePlaceInput != null
-                                    && meetingInfo.value.addressPlaceInput != "Empty"
-                                    && meetingInfo.value.addressPlaceInput != ""
-                                    && meetingInfo.value.addressPlaceInput != "null"
-                                    && meetingInfo.value.addressPlaceInput != null
-
-                                ){
-
-                                    Text(
-                                        text = "${meetingInfo.value.headlinePlaceInput}, ${meetingInfo.value.addressPlaceInput}",
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                if (
-                                    meetingInfo.value.price != null
-                                    && meetingInfo.value.price != "null"
-                                ){
-
-                                    Bubble(
-                                        buttonText = if (meetingInfo.value.price == ""){
-                                            stringResource(id = R.string.free_price)
-                                        } else {
-                                            "${meetingInfo.value.price} тенге"
-                                        }
-                                    ) {}
-
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                if (meetingInfo.value.description !=null && meetingInfo.value.description != "null" && meetingInfo.value.description != "" ){
-
-                                    Text(
-                                        text = meetingInfo.value.description!!,
-                                        style = Typography.bodySmall,
-                                        color = WhiteDvij
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-
-                                // ------ ЗАБРОНИРОВАТЬ БИЛЕТЫ -----
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .border(
-                                            width = 2.dp,
-                                            color = YellowDvij,
-                                            shape = RoundedCornerShape(
-                                                topStart = 15.dp,
-                                                topEnd = 15.dp,
-                                                bottomStart = 15.dp,
-                                                bottomEnd = 0.dp
-                                            )
-                                        )
-                                        .background(
-                                            color = Grey_OnBackground,
-                                            shape = RoundedCornerShape(
-                                                topStart = 15.dp,
-                                                topEnd = 15.dp,
-                                                bottomStart = 15.dp,
-                                                bottomEnd = 0.dp
-                                            )
-                                        )
-                                        .padding(20.dp)
-                                    ,
-                                    horizontalAlignment = Alignment.Start,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(
-                                        text = "Купить билеты",
-                                        style = Typography.bodyLarge,
-                                        color = WhiteDvij
-                                    )
 
                                     Spacer(modifier = Modifier.height(20.dp))
 
-                                    Row (modifier = Modifier.fillMaxSize()){
+                                    if (meetingInfo.value.description !=null && meetingInfo.value.description != "null" && meetingInfo.value.description != "" ){
 
-                                        // ----- КНОПКА ПОЗВОНИТЬ --------
-
-                                        if (meetingInfo.value.phone != null && meetingInfo.value.phone != "7") {
-
-                                            SocialButtonCustom(icon = R.drawable.ic_phone) {
-                                                act.callAndWhatsapp.makeACall(meetingInfo.value.phone!!)
-                                            }
-
-                                            Spacer(modifier = Modifier
-                                                .width(10.dp)
-                                            )
-
-                                        }
-
-                                        // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
-
-                                        if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7" && meetingInfo.value.whatsapp != "" && meetingInfo.value.whatsapp != "+7" && meetingInfo.value.whatsapp != "+77") {
-
-                                            SocialButtonCustom(icon = R.drawable.whatsapp) {
-                                                act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!)
-                                            }
-
-                                            Spacer(modifier = Modifier
-                                                .width(10.dp)
-                                            )
-
-                                        }
-
-                                        // ---- КНОПКА ПЕРЕХОДА В ИНСТАГРАМ -----------
-
-                                        if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != "null" && meetingInfo.value.instagram != "") {
-
-                                            SocialButtonCustom(icon = R.drawable.instagram) {
-                                                act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!, INSTAGRAM_URL)
-                                            }
-
-                                            Spacer(modifier = Modifier
-                                                .width(10.dp)
-                                            )
-
-                                        }
-
-                                        // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
-
-                                        if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != "null" && meetingInfo.value.telegram != "") {
-
-                                            SocialButtonCustom(icon = R.drawable.telegram) {
-                                                act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!, TELEGRAM_URL)
-                                            }
-
-                                            Spacer(modifier = Modifier
-                                                .width(10.dp)
-                                            )
-                                        }
+                                        Text(
+                                            text = meetingInfo.value.description!!,
+                                            style = Typography.bodySmall,
+                                            color = WhiteDvij
+                                        )
                                     }
-                                }
+
+                                    Spacer(modifier = Modifier.height(20.dp))
 
 
+                                    // ------ ЗАБРОНИРОВАТЬ БИЛЕТЫ -----
 
-                                // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
-
-                                if (
-                                    meetingInfo.value.placeKey != "Empty"
-                                    && meetingInfo.value.placeKey != ""
-                                    && meetingInfo.value.placeKey != "null"
-                                    && meetingInfo.value.placeKey != null
-                                    && placeInfo.value.placeKey != "Empty"
-                                    && placeInfo.value.placeKey != ""
-                                    && placeInfo.value.placeKey != "null"
-                                    && placeInfo.value.placeKey != null
-                                ) {
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    placeCard.PlaceCardSmall(navController = navController, placeItem = placeInfo.value, placeKey = placeKey)
-
-                                }
-
-                                // КАРТОЧКА СОЗДАТЕЛЯ
-
-                                if (meetingInfo.value.ownerKey != null && meetingInfo.value.ownerKey != "null" && meetingInfo.value.ownerKey != ""){
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    ownerCard.OwnerCardView(userKey = meetingInfo.value.ownerKey!!, "Создатель мероприятия")
-
-                                }
-
-                                // КНОПКА РЕДАКТИРОВАТЬ
-
-                                if (act.mAuth.uid != null && meetingInfo.value.ownerKey == act.mAuth.uid){
-
-                                    Spacer(modifier = Modifier.height(40.dp))
-
-                                    ButtonCustom(
-                                        buttonText = "Редактировать",
-                                        leftIcon = R.drawable.ic_edit
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .border(
+                                                width = 2.dp,
+                                                color = YellowDvij,
+                                                shape = RoundedCornerShape(
+                                                    topStart = 15.dp,
+                                                    topEnd = 15.dp,
+                                                    bottomStart = 15.dp,
+                                                    bottomEnd = 0.dp
+                                                )
+                                            )
+                                            .background(
+                                                color = Grey_OnBackground,
+                                                shape = RoundedCornerShape(
+                                                    topStart = 15.dp,
+                                                    topEnd = 15.dp,
+                                                    bottomStart = 15.dp,
+                                                    bottomEnd = 0.dp
+                                                )
+                                            )
+                                            .padding(20.dp)
+                                        ,
+                                        horizontalAlignment = Alignment.Start,
+                                        verticalArrangement = Arrangement.Center
                                     ) {
+                                        Text(
+                                            text = "Купить билеты",
+                                            style = Typography.bodyLarge,
+                                            color = WhiteDvij
+                                        )
 
-                                        meetingInfo.value.key?.let {
-                                            act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
+                                        Spacer(modifier = Modifier.height(20.dp))
 
-                                                if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
+                                        Row (modifier = Modifier.fillMaxSize()){
 
-                                                    filledPlaceInfoFromAct.value = placeInfo.value
+                                            // ----- КНОПКА ПОЗВОНИТЬ --------
 
-                                                } else {
+                                            if (meetingInfo.value.phone != null && meetingInfo.value.phone != "7") {
 
-                                                    filledPlaceInfoFromAct.value = PlacesCardClass(
-                                                        placeName = meeting.headlinePlaceInput,
-                                                        address = meeting.addressPlaceInput
-                                                    )
+                                                SocialButtonCustom(icon = R.drawable.ic_phone) {
+                                                    act.callAndWhatsapp.makeACall(meetingInfo.value.phone!!)
                                                 }
 
-                                                filledMeetingInfoFromAct.value = meeting
-                                                navController.navigate(EDIT_MEETINGS_SCREEN)
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
 
+                                            }
+
+                                            // ---- КНОПКА НАПИСАТЬ В ВАТСАП -----------
+
+                                            if (meetingInfo.value.whatsapp != null && meetingInfo.value.whatsapp != "7" && meetingInfo.value.whatsapp != "" && meetingInfo.value.whatsapp != "+7" && meetingInfo.value.whatsapp != "+77") {
+
+                                                SocialButtonCustom(icon = R.drawable.whatsapp) {
+                                                    act.callAndWhatsapp.writeInWhatsapp(meetingInfo.value.whatsapp!!)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+
+                                            }
+
+                                            // ---- КНОПКА ПЕРЕХОДА В ИНСТАГРАМ -----------
+
+                                            if (meetingInfo.value.instagram != null && meetingInfo.value.instagram != "null" && meetingInfo.value.instagram != "") {
+
+                                                SocialButtonCustom(icon = R.drawable.instagram) {
+                                                    act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.instagram!!, INSTAGRAM_URL)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
+
+                                            }
+
+                                            // ---- КНОПКА НАПИСАТЬ В ТЕЛЕГРАМ -----------
+
+                                            if (meetingInfo.value.telegram != null && meetingInfo.value.telegram != "null" && meetingInfo.value.telegram != "") {
+
+                                                SocialButtonCustom(icon = R.drawable.telegram) {
+                                                    act.callAndWhatsapp.goToInstagramOrTelegram(meetingInfo.value.telegram!!, TELEGRAM_URL)
+                                                }
+
+                                                Spacer(modifier = Modifier
+                                                    .width(10.dp)
+                                                )
                                             }
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.height(20.dp))
 
-                                    // ------ КНОПКА УДАЛЕНИЯ ------
 
-                                    ButtonCustom(
-                                        buttonText = "Удалить",
-                                        typeButton = ATTENTION,
-                                        leftIcon = R.drawable.ic_close
+                                    // ----- КАРТОЧКА ЗАВЕДЕНИЯ ----------
+
+                                    if (
+                                        meetingInfo.value.placeKey != "Empty"
+                                        && meetingInfo.value.placeKey != ""
+                                        && meetingInfo.value.placeKey != "null"
+                                        && meetingInfo.value.placeKey != null
+                                        && placeInfo.value.placeKey != "Empty"
+                                        && placeInfo.value.placeKey != ""
+                                        && placeInfo.value.placeKey != "null"
+                                        && placeInfo.value.placeKey != null
                                     ) {
-                                        openConfirmChoose.value = true
+
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+                                        placeCard.PlaceCardSmall(
+                                            navController = navController,
+                                            placeItem = placeInfo.value,
+                                            placeKey = placeKey,
+                                            openLoading = openLoading
+                                        )
+
+                                    }
+
+                                    // КАРТОЧКА СОЗДАТЕЛЯ
+
+                                    if (meetingInfo.value.ownerKey != null && meetingInfo.value.ownerKey != "null" && meetingInfo.value.ownerKey != ""){
+
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+                                        ownerCard.OwnerCardView(userKey = meetingInfo.value.ownerKey!!, "Создатель мероприятия")
+
+                                    }
+
+                                    // КНОПКА РЕДАКТИРОВАТЬ
+
+                                    if (act.mAuth.uid != null && meetingInfo.value.ownerKey == act.mAuth.uid){
+
+                                        Spacer(modifier = Modifier.height(40.dp))
+
+                                        ButtonCustom(
+                                            buttonText = "Редактировать",
+                                            leftIcon = R.drawable.ic_edit
+                                        ) {
+
+                                            openLoading.value = true
+
+                                            meetingInfo.value.key?.let {
+                                                act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(it){meeting ->
+
+                                                    if (meeting.placeKey != null && meeting.placeKey != "null" && meeting.placeKey != "") {
+
+                                                        filledPlaceInfoFromAct.value = placeInfo.value
+
+                                                    } else {
+
+                                                        filledPlaceInfoFromAct.value = PlacesCardClass(
+                                                            placeName = meeting.headlinePlaceInput,
+                                                            address = meeting.addressPlaceInput
+                                                        )
+                                                    }
+
+                                                    filledMeetingInfoFromAct.value = meeting
+                                                    navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        // ------ КНОПКА УДАЛЕНИЯ ------
+
+                                        ButtonCustom(
+                                            buttonText = "Удалить",
+                                            typeButton = ATTENTION,
+                                            leftIcon = R.drawable.ic_close
+                                        ) {
+                                            openConfirmChoose.value = true
+                                        }
                                     }
                                 }
                             }
@@ -618,6 +629,14 @@ class MeetingViewScreen(val act: MainActivity) {
                     }
                 }
             }
+
+        } else {
+
+            Column(modifier = Modifier.fillMaxSize().background(Grey100)) {
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+            }
+
         }
+
     }
 }

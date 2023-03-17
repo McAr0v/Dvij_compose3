@@ -26,6 +26,7 @@ import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.FilterDialog
+import kz.dvij.dvij_compose3.elements.LoadingScreen
 import kz.dvij.dvij_compose3.elements.StockCard
 import kz.dvij.dvij_compose3.filters.FilterFunctions
 import kz.dvij.dvij_compose3.firebase.*
@@ -108,6 +109,8 @@ class StockScreen(val act: MainActivity) {
 
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
         val filter = filterFunctions.createStockFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value, stockFinishDateForFilter.value)
 
         val removeQuery = filterFunctions.splitFilter(filter)
@@ -180,7 +183,8 @@ class StockScreen(val act: MainActivity) {
                                     stockItem = item,
                                     stockKey = stockKey,
                                     filledPlace = filledPlace,
-                                    filledStock = filledStockInfoFromAct
+                                    filledStock = filledStockInfoFromAct,
+                                    openLoading = openLoading
                                 )
                             }
 
@@ -241,6 +245,12 @@ class StockScreen(val act: MainActivity) {
                 openFilterDialog.value = true
             }
 
+            if (openLoading.value){
+
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+            }
+
         }
     }
 
@@ -252,6 +262,7 @@ class StockScreen(val act: MainActivity) {
         filledPlace: MutableState<PlacesCardClass>
     ) {
 
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
         // инициализируем пустой список акций
 
             val myStockList = remember {
@@ -303,7 +314,8 @@ class StockScreen(val act: MainActivity) {
                                         stockItem = item,
                                         stockKey = stockKey,
                                         filledPlace = filledPlace,
-                                        filledStock = filledStockInfoFromAct
+                                        filledStock = filledStockInfoFromAct,
+                                        openLoading = openLoading
                                     )
 
                                 }
@@ -379,6 +391,13 @@ class StockScreen(val act: MainActivity) {
                 if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
                     FloatingButton { navController.navigate(CREATE_STOCK_SCREEN) }
                 }
+
+                if (openLoading.value){
+
+                    LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+                }
+
             }
     }
 
@@ -389,6 +408,9 @@ class StockScreen(val act: MainActivity) {
         filledStockInfoFromAct: MutableState<StockAdsClass>,
         filledPlace: MutableState<PlacesCardClass>
     ) {
+
+        val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
 
         // Инициализируем список акций
 
@@ -413,6 +435,12 @@ class StockScreen(val act: MainActivity) {
             verticalArrangement = Arrangement.Center
         ) {
 
+            if (openLoading.value){
+
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
+            }
+
             // --------- ЕСЛИ СПИСОК НЕ ПУСТОЙ ----------
 
             if (favStockList.value.isNotEmpty() && favStockList.value != listOf(defaultStockCard)){
@@ -435,7 +463,8 @@ class StockScreen(val act: MainActivity) {
                                 stockItem = item,
                                 stockKey = stockKey,
                                 filledPlace = filledPlace,
-                                filledStock = filledStockInfoFromAct
+                                filledStock = filledStockInfoFromAct,
+                                openLoading = openLoading
                             )
 
                         }

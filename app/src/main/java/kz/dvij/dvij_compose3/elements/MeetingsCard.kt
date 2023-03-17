@@ -56,7 +56,8 @@ class MeetingsCard(val act: MainActivity) {
         meetingKey: MutableState<String>,
         isAd: Boolean = false,
         filledMeeting: MutableState<MeetingsAdsClass>,
-        filledPlace: MutableState<PlacesCardClass>
+        filledPlace: MutableState<PlacesCardClass>,
+        openLoadingState: MutableState<Boolean>
     ) {
 
         val linear = Brush.verticalGradient(listOf(Grey100_50, Grey100)) // Переменная полупрозрачного градиента
@@ -99,6 +100,8 @@ class MeetingsCard(val act: MainActivity) {
                     shape = if (isAd) RoundedCornerShape(15.dp) else RoundedCornerShape(0.dp)
                 )
                 .clickable {
+
+                    openLoadingState.value = true
 
                     // При клике на карточку - передаем на Main Activity meetingKey. Ключ берем из дата класса мероприятия
 
@@ -393,6 +396,8 @@ class MeetingsCard(val act: MainActivity) {
                                 color = YellowDvij,
                                 modifier = Modifier.clickable {
 
+                                    openLoadingState.value = true
+
                                     filledMeeting.value = MeetingsAdsClass(
                                         key = meetingItem.key,
                                         category = meetingItem.category,
@@ -458,10 +463,13 @@ class MeetingsCard(val act: MainActivity) {
 
                             if (meetingItem.placeKey != null && meetingItem.image1 != null){
 
+                                openLoadingState.value = true
+
                                 act.meetingDatabaseManager.deleteMeetingWithPlaceNote(
                                     meetingKey = meetingItem.key,
                                     placeKey = meetingItem.placeKey,
                                     imageUrl = meetingItem.image1
+
                                 ) {
 
                                     if (it) {
