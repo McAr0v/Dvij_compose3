@@ -13,21 +13,7 @@ fun checkDataOnCreatePlace (
     category: String,
     city: String,
     address: String,
-    imageUriFromDb: String,
-    mondayOT: String,
-    mondayCT: String,
-    tuesdayOT: String,
-    tuesdayCT: String,
-    wednesdayOT: String,
-    wednesdayCT: String,
-    thursdayOT: String,
-    thursdayCT: String,
-    fridayOT: String,
-    fridayCT: String,
-    saturdayOT: String,
-    saturdayCT: String,
-    sundayOT: String,
-    sundayCT: String,
+    imageUriFromDb: String
 
 
 
@@ -40,12 +26,6 @@ fun checkDataOnCreatePlace (
     if (image1 == null && imageUriFromDb == "") {
 
         result = R.string.cp_no_image
-
-    }
-
-    if (mondayOT == "" || mondayCT == "" || tuesdayOT == "" || tuesdayCT == "" || wednesdayOT == "" || wednesdayCT == "" || thursdayOT == "" || thursdayCT == "" || fridayOT == "" || fridayCT == "" || saturdayOT == "" || saturdayCT == "" || sundayOT == "" || sundayCT == ""){
-
-        result = R.string.cp_no_time
 
     }
 

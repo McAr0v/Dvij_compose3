@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.pickers.timePicker
+import kz.dvij.dvij_compose3.pickers.timePickerInPlaceCreate
 import kz.dvij.dvij_compose3.ui.theme.Grey_Text
 import kz.dvij.dvij_compose3.ui.theme.Typography
 import kz.dvij.dvij_compose3.ui.theme.WhiteDvij
@@ -83,7 +84,6 @@ fun createTimeWorkPlace (
     var startTimeNumberResult by rememberSaveable { mutableStateOf(startTime) }
     var finishTimeNumberResult by rememberSaveable { mutableStateOf(finishTime) }
 
-    var filledTime by rememberSaveable { mutableStateOf(listOf(startTimeNumberResult, finishTimeNumberResult)) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -93,50 +93,53 @@ fun createTimeWorkPlace (
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Column(modifier = Modifier.weight(0.33f)) {
+            Column(modifier = Modifier.weight(0.3f)) {
 
-                /*ButtonCustom(buttonText = dayName, typeButton = SECONDARY) {
-
-                }*/
 
                 Text(
                     text = dayName,
-                    style = Typography.bodySmall,
+                    style = Typography.labelMedium,
                     color = WhiteDvij
                 )
 
             }
 
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(5.dp))
 
-            Column(modifier = Modifier.weight(0.33f)) {
+            Column(modifier = Modifier.weight(0.4f)) {
 
                 startTimeNumberResult = if (startTime != "" && createOrEdit != "0"){
 
-                    timePicker(startTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                    timePickerInPlaceCreate(startTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
                 } else {
 
-                    timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                    timePickerInPlaceCreate() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
                 }
-
-                //fieldTimeComponent(time = filledTime, onTimeChanged = { filledTime = it })
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(4.dp))
 
-            Column(modifier = Modifier.weight(0.33f)) {
+            Text(
+                text = " - ",
+                style = Typography.bodySmall,
+                color = WhiteDvij
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Column(modifier = Modifier.weight(0.4f)) {
                 //fieldTimeComponent(time = filledTime, onTimeChanged = { filledTime = it })
 
                 finishTimeNumberResult = if (finishTime != "" && createOrEdit != "0"){
 
-                    timePicker(finishTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                    timePickerInPlaceCreate(finishTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
                 } else {
 
-                    timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                    timePickerInPlaceCreate() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
 
                 }
 
@@ -146,6 +149,6 @@ fun createTimeWorkPlace (
 
     }
 
-    return filledTime
+    return listOf(startTimeNumberResult, finishTimeNumberResult)
 
 }

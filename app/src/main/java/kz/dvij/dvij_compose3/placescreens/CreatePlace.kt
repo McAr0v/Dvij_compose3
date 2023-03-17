@@ -455,252 +455,124 @@ class CreatePlace (val act: MainActivity) {
                 modifier = Modifier.padding(bottom = 20.dp)
             )
 
-            val timeWorkMonday = createTimeWorkPlace(startTime = filledPlace.mondayOpenTime!!, finishTime = filledPlace.mondayOpenTime, dayName = "Понедельник", createOrEdit)
-            Text(
-                text = "${timeWorkMonday[0]} - ${timeWorkMonday[1]}",
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+            val timeWorkMonday = if (
+                filledPlace.mondayOpenTime != ""
+                && filledPlace.mondayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.mondayCloseTime != null
+                && filledPlace.mondayCloseTime != ""
+
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.mondayOpenTime, finishTime = filledPlace.mondayCloseTime, dayName = "Понедельник", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Понедельник", createOrEdit = createOrEdit)
+            }
+
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            /*val timeWorkTuesday = createTimeWorkPlace("Вторник")
-            Text(
-                text = timeWorkTuesday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+            val timeWorkTuesday = if (
+                filledPlace.tuesdayOpenTime != ""
+                && filledPlace.tuesdayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.tuesdayCloseTime != null
+                && filledPlace.tuesdayCloseTime != ""
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.tuesdayOpenTime, finishTime = filledPlace.tuesdayCloseTime, dayName = "Вторник", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Вторник", createOrEdit = createOrEdit)
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            val timeWorkWednesday = createTimeWorkPlace("Среда")
-            Text(
-                text = timeWorkWednesday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+
+            val timeWorkWednesday = if (
+                filledPlace.wednesdayOpenTime != ""
+                && filledPlace.wednesdayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.wednesdayCloseTime != null
+                && filledPlace.wednesdayCloseTime != ""
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.wednesdayOpenTime, finishTime = filledPlace.wednesdayCloseTime, dayName = "Среда", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Среда", createOrEdit = createOrEdit)
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            val timeWorkThursday = createTimeWorkPlace("Четверг")
-            Text(
-                text = timeWorkThursday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+
+            val timeWorkThursday = if (
+                filledPlace.thursdayOpenTime != ""
+                && filledPlace.thursdayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.thursdayCloseTime != null
+                && filledPlace.thursdayCloseTime != ""
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.thursdayOpenTime, finishTime = filledPlace.thursdayCloseTime, dayName = "Четверг", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Четверг", createOrEdit = createOrEdit)
+            }
+
             Spacer(modifier = Modifier.height(10.dp))
 
-            val timeWorkFriday = createTimeWorkPlace("Пятница")
-            Text(
-                text = timeWorkFriday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+            val timeWorkFriday = if (
+                filledPlace.fridayOpenTime != ""
+                && filledPlace.fridayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.fridayCloseTime != null
+                && filledPlace.fridayCloseTime != ""
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.fridayOpenTime, finishTime = filledPlace.fridayCloseTime, dayName = "Пятница", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Пятница", createOrEdit = createOrEdit)
+            }
+
             Spacer(modifier = Modifier.height(10.dp))
 
-            val timeWorkSaturday = createTimeWorkPlace("Суббота")
-            Text(
-                text = timeWorkSaturday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+
+            val timeWorkSaturday = if (
+                filledPlace.saturdayOpenTime != ""
+                && filledPlace.saturdayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.saturdayCloseTime != null
+                && filledPlace.saturdayCloseTime != ""
+            ){
+
+                createTimeWorkPlace(startTime = filledPlace.saturdayOpenTime, finishTime = filledPlace.saturdayCloseTime, dayName = "Суббота", createOrEdit)
+
+            } else {
+                createTimeWorkPlace(dayName = "Суббота", createOrEdit = createOrEdit)
+            }
+
             Spacer(modifier = Modifier.height(10.dp))
 
-            val timeWorkSunday = createTimeWorkPlace("Воскресенье")
-            Text(
-                text = timeWorkSunday[0],
-                style = Typography.labelMedium,
-                color = Grey_Text,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )*/
+            val timeWorkSunday = if (
+                filledPlace.sundayOpenTime != ""
+                && filledPlace.sundayOpenTime != null
+                && createOrEdit != "0"
+                && filledPlace.sundayCloseTime != null
+                && filledPlace.sundayCloseTime != ""
+            ){
 
-            // ---- ПОНЕДЕЛЬНИК ------
-
-            SpacerTextWithLine(headline = "Понедельник начало") // подпись перед формой
-
-            val mondayOpenTimeResult = if (filledPlace.mondayOpenTime != "" && filledPlace.mondayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.mondayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
+                createTimeWorkPlace(startTime = filledPlace.sundayOpenTime, finishTime = filledPlace.sundayCloseTime, dayName = "Воскресенье", createOrEdit)
 
             } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
+                createTimeWorkPlace(dayName = "Воскресенье", createOrEdit = createOrEdit)
             }
 
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
+            Spacer(modifier = Modifier.height(10.dp))
 
-            val mondayCloseTimeResult = if (filledPlace.mondayCloseTime != "" && filledPlace.mondayCloseTime != null && createOrEdit != "0"){
 
-                timePicker(filledPlace.mondayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Вторник ------
-
-            SpacerTextWithLine(headline = "Вторник начало") // подпись перед формой
-
-            val tuesdayOpenTimeResult = if (filledPlace.tuesdayOpenTime != "" && filledPlace.tuesdayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.tuesdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val tuesdayCloseTimeResult = if (filledPlace.tuesdayCloseTime != "" && filledPlace.tuesdayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.tuesdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Среда ------
-
-            SpacerTextWithLine(headline = "Среда начало") // подпись перед формой
-
-            val wednesdayOpenTimeResult = if (filledPlace.wednesdayOpenTime != "" && filledPlace.wednesdayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.wednesdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val wednesdayCloseTimeResult = if (filledPlace.wednesdayCloseTime != "" && filledPlace.wednesdayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.wednesdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Четверг ------
-
-            SpacerTextWithLine(headline = "Четверг начало") // подпись перед формой
-
-            val thursdayOpenTimeResult = if (filledPlace.thursdayOpenTime != "" && filledPlace.thursdayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.thursdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val thursdayCloseTimeResult = if (filledPlace.thursdayCloseTime != "" && filledPlace.thursdayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.thursdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Пятница ------
-
-            SpacerTextWithLine(headline = "Пятница начало") // подпись перед формой
-
-            val fridayOpenTimeResult = if (filledPlace.fridayOpenTime != "" && filledPlace.fridayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.fridayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val fridayCloseTimeResult = if (filledPlace.fridayCloseTime != "" && filledPlace.fridayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.fridayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Суббота ------
-
-            SpacerTextWithLine(headline = "Суббота начало") // подпись перед формой
-
-            val saturdayOpenTimeResult = if (filledPlace.saturdayOpenTime != "" && filledPlace.saturdayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.saturdayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val saturdayCloseTimeResult = if (filledPlace.saturdayCloseTime != "" && filledPlace.saturdayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.saturdayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
-
-            // ---- Воскресенье ------
-
-            SpacerTextWithLine(headline = "Воскресенье начало") // подпись перед формой
-
-            val sundayOpenTimeResult = if (filledPlace.sundayOpenTime != "" && filledPlace.sundayOpenTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.sundayOpenTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker() // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            }
-
-            SpacerTextWithLine(headline = "Закрываемся в") // подпись перед формой
-
-            val sundayCloseTimeResult = if (filledPlace.sundayCloseTime != "" && filledPlace.sundayCloseTime != null && createOrEdit != "0"){
-
-                timePicker(filledPlace.sundayCloseTime) // ВЫБОР ВРЕМЕНИ - Когда открывается заведение
-
-            } else {
-
-                timePicker()
-
-            }
 
             // ---- ОПИСАНИЕ --------
 
@@ -749,20 +621,6 @@ class CreatePlace (val act: MainActivity) {
                     city = city,
                     address = address,
                     imageUriFromDb = filledPlace.logo ?: "",
-                    mondayOT = mondayOpenTimeResult,
-                    mondayCT = mondayCloseTimeResult,
-                    tuesdayOT = tuesdayOpenTimeResult,
-                    tuesdayCT = tuesdayCloseTimeResult,
-                    wednesdayOT = wednesdayOpenTimeResult,
-                    wednesdayCT = wednesdayCloseTimeResult,
-                    thursdayOT = thursdayOpenTimeResult,
-                    thursdayCT = thursdayCloseTimeResult,
-                    fridayOT = fridayOpenTimeResult,
-                    fridayCT = fridayCloseTimeResult,
-                    saturdayOT = saturdayOpenTimeResult,
-                    saturdayCT = saturdayCloseTimeResult,
-                    sundayOT = sundayOpenTimeResult,
-                    sundayCT = sundayCloseTimeResult
                 )
 
                 if (checkData != 0) {
@@ -809,20 +667,20 @@ class CreatePlace (val act: MainActivity) {
                                     address = address,
                                     placeKey = filledPlace.placeKey,
                                     owner = filledPlace.owner,
-                                    mondayOpenTime = mondayOpenTimeResult,
-                                    mondayCloseTime = mondayCloseTimeResult,
-                                    tuesdayOpenTime = tuesdayOpenTimeResult,
-                                    tuesdayCloseTime = tuesdayCloseTimeResult,
-                                    wednesdayOpenTime = wednesdayOpenTimeResult,
-                                    wednesdayCloseTime = wednesdayCloseTimeResult,
-                                    thursdayOpenTime = thursdayOpenTimeResult,
-                                    thursdayCloseTime = thursdayCloseTimeResult,
-                                    fridayOpenTime = fridayOpenTimeResult,
-                                    fridayCloseTime = fridayCloseTimeResult,
-                                    saturdayOpenTime = saturdayOpenTimeResult,
-                                    saturdayCloseTime = saturdayCloseTimeResult,
-                                    sundayOpenTime = sundayOpenTimeResult,
-                                    sundayCloseTime = sundayCloseTimeResult,
+                                    mondayOpenTime = timeWorkMonday[0],
+                                    mondayCloseTime = timeWorkMonday[1],
+                                    tuesdayOpenTime = timeWorkTuesday[0],
+                                    tuesdayCloseTime = timeWorkTuesday[1],
+                                    wednesdayOpenTime = timeWorkWednesday[0],
+                                    wednesdayCloseTime = timeWorkWednesday[1],
+                                    thursdayOpenTime = timeWorkThursday[0],
+                                    thursdayCloseTime = timeWorkThursday[1],
+                                    fridayOpenTime = timeWorkFriday[0],
+                                    fridayCloseTime = timeWorkFriday[1],
+                                    saturdayOpenTime = timeWorkSaturday[0],
+                                    saturdayCloseTime = timeWorkSaturday[1],
+                                    sundayOpenTime = timeWorkSunday[0],
+                                    sundayCloseTime = timeWorkSunday[1],
                                     createPlaceTime = filledPlace.createPlaceTime
 
                                 )
@@ -898,20 +756,20 @@ class CreatePlace (val act: MainActivity) {
                                             address = address,
                                             placeKey = placesDatabaseManager.placeDatabase.push().key,
                                             owner = auth.uid,
-                                            mondayOpenTime = mondayOpenTimeResult,
-                                            mondayCloseTime = mondayCloseTimeResult,
-                                            tuesdayOpenTime = tuesdayOpenTimeResult,
-                                            tuesdayCloseTime = tuesdayCloseTimeResult,
-                                            wednesdayOpenTime = wednesdayOpenTimeResult,
-                                            wednesdayCloseTime = wednesdayCloseTimeResult,
-                                            thursdayOpenTime = thursdayOpenTimeResult,
-                                            thursdayCloseTime = thursdayCloseTimeResult,
-                                            fridayOpenTime = fridayOpenTimeResult,
-                                            fridayCloseTime = fridayCloseTimeResult,
-                                            saturdayOpenTime = saturdayOpenTimeResult,
-                                            saturdayCloseTime = saturdayCloseTimeResult,
-                                            sundayOpenTime = sundayOpenTimeResult,
-                                            sundayCloseTime = sundayCloseTimeResult,
+                                            mondayOpenTime = timeWorkMonday[0],
+                                            mondayCloseTime = timeWorkMonday[1],
+                                            tuesdayOpenTime = timeWorkTuesday[0],
+                                            tuesdayCloseTime = timeWorkTuesday[1],
+                                            wednesdayOpenTime = timeWorkWednesday[0],
+                                            wednesdayCloseTime = timeWorkWednesday[1],
+                                            thursdayOpenTime = timeWorkThursday[0],
+                                            thursdayCloseTime = timeWorkThursday[1],
+                                            fridayOpenTime = timeWorkFriday[0],
+                                            fridayCloseTime = timeWorkFriday[1],
+                                            saturdayOpenTime = timeWorkSaturday[0],
+                                            saturdayCloseTime = timeWorkSaturday[1],
+                                            sundayOpenTime = timeWorkSunday[0],
+                                            sundayCloseTime = timeWorkSunday[1],
                                             createPlaceTime = currentTime.toString()
 
                                         )
@@ -934,20 +792,20 @@ class CreatePlace (val act: MainActivity) {
                                             address = address,
                                             placeKey = filledPlace.placeKey,
                                             owner = filledPlace.owner,
-                                            mondayOpenTime = mondayOpenTimeResult,
-                                            mondayCloseTime = mondayCloseTimeResult,
-                                            tuesdayOpenTime = tuesdayOpenTimeResult,
-                                            tuesdayCloseTime = tuesdayCloseTimeResult,
-                                            wednesdayOpenTime = wednesdayOpenTimeResult,
-                                            wednesdayCloseTime = wednesdayCloseTimeResult,
-                                            thursdayOpenTime = thursdayOpenTimeResult,
-                                            thursdayCloseTime = thursdayCloseTimeResult,
-                                            fridayOpenTime = fridayOpenTimeResult,
-                                            fridayCloseTime = fridayCloseTimeResult,
-                                            saturdayOpenTime = saturdayOpenTimeResult,
-                                            saturdayCloseTime = saturdayCloseTimeResult,
-                                            sundayOpenTime = sundayOpenTimeResult,
-                                            sundayCloseTime = sundayCloseTimeResult,
+                                            mondayOpenTime = timeWorkMonday[0],
+                                            mondayCloseTime = timeWorkMonday[1],
+                                            tuesdayOpenTime = timeWorkTuesday[0],
+                                            tuesdayCloseTime = timeWorkTuesday[1],
+                                            wednesdayOpenTime = timeWorkWednesday[0],
+                                            wednesdayCloseTime = timeWorkWednesday[1],
+                                            thursdayOpenTime = timeWorkThursday[0],
+                                            thursdayCloseTime = timeWorkThursday[1],
+                                            fridayOpenTime = timeWorkFriday[0],
+                                            fridayCloseTime = timeWorkFriday[1],
+                                            saturdayOpenTime = timeWorkSaturday[0],
+                                            saturdayCloseTime = timeWorkSaturday[1],
+                                            sundayOpenTime = timeWorkSunday[0],
+                                            sundayCloseTime = timeWorkSunday[1],
                                             createPlaceTime = filledPlace.createPlaceTime
 
                                         )
