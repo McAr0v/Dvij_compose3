@@ -23,20 +23,30 @@ fun LoadingScreen (messageText: String) {
         horizontalArrangement = Arrangement.Center // выравнивание по горизонтали
     ) {
 
-        // ---- ЦИРКУЛЛИРУЮЩИЙ ИНДИКАТОР ------
+        Row(
+             // полупрозрачный фон
+            verticalAlignment = Alignment.CenterVertically, // выравнивание по вертикали
+            horizontalArrangement = Arrangement.Center // выравнивание по горизонтали
+        ){
 
-        CircularProgressIndicator(
-            color = YellowDvij, // цвет крутилки
-            strokeWidth = 3.dp, // толщина крутилки
-            modifier = Modifier.size(40.dp) // размер крутилки
-        )
+            // ---- ЦИРКУЛЛИРУЮЩИЙ ИНДИКАТОР ------
 
-        Spacer(modifier = Modifier.width(20.dp)) // разделитель между крутилкой и текстом
+            CircularProgressIndicator(
+                color = YellowDvij, // цвет крутилки
+                strokeWidth = 3.dp, // толщина крутилки
+                modifier = Modifier.size(40.dp) // размер крутилки
+            )
 
-        Text(
-            text = messageText, // текст рядом с крутилкой
-            style = Typography.bodySmall, // стиль текста
-            color = WhiteDvij // цвет
-        )
+            Spacer(modifier = Modifier.width(20.dp)) // разделитель между крутилкой и текстом
+
+            Text(
+                text = messageText, // текст рядом с крутилкой
+                style = Typography.bodySmall, // стиль текста
+                color = WhiteDvij // цвет
+            )
+
+        }
+
+
     }
 }

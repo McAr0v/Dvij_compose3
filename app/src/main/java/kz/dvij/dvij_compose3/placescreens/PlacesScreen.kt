@@ -201,9 +201,12 @@ class PlacesScreens (val act: MainActivity) {
 
                 } else {
 
+
                     // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
-                    Row(
+                    LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
+
+                    /*Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
@@ -227,21 +230,27 @@ class PlacesScreens (val act: MainActivity) {
                             color = WhiteDvij
                         )
 
-                    }
+                    }*/
                 }
             }
 
 
             // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
-            FloatingPlaceFilterButton(
-                city = cityForFilter.value,
-                category = placeCategoryForFilter.value,
-                typeOfFilter = typeFilter,
-                isOpen = placeIsOpenForFilter.value
-            ) {
-                openFilterDialog.value = true
+            if (!openLoading.value){
+
+                FloatingPlaceFilterButton(
+                    city = cityForFilter.value,
+                    category = placeCategoryForFilter.value,
+                    typeOfFilter = typeFilter,
+                    isOpen = placeIsOpenForFilter.value
+                ) {
+                    openFilterDialog.value = true
+                }
+
             }
+
+
 
         }
 
@@ -365,7 +374,10 @@ class PlacesScreens (val act: MainActivity) {
 
                 // ---- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
-                Row(
+
+                LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
+
+                /*Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -384,7 +396,7 @@ class PlacesScreens (val act: MainActivity) {
                         style = Typography.bodySmall,
                         color = WhiteDvij
                     )
-                }
+                }*/
             }
         }
 
@@ -463,6 +475,7 @@ class PlacesScreens (val act: MainActivity) {
 
             } else if (myPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
+
                     // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
                     Text(
@@ -472,6 +485,7 @@ class PlacesScreens (val act: MainActivity) {
                     )
 
                 } else if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
+
 
                     // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -486,6 +500,8 @@ class PlacesScreens (val act: MainActivity) {
                         // ШАБЛОН ДЛЯ КАЖДОГО ЭЛЕМЕНТА СПИСКА
 
                         if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(defaultForCard)){
+
+
 
                             items(myPlacesList.value){ item ->
                                 act.placesCard.PlaceCardForNewClass(
@@ -503,9 +519,11 @@ class PlacesScreens (val act: MainActivity) {
                     }
                 } else {
 
+                    LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
+
                     // ------- ЕСЛИ ИДЕТ ЗАГРУЗКА ---------
 
-                    Row(
+                    /*Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
@@ -525,17 +543,20 @@ class PlacesScreens (val act: MainActivity) {
                             color = WhiteDvij
                         )
 
-                    }
+                    }*/
+
                 }
             }
 
             // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ ЗАВЕДЕНИЯ --------------
 
-            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
-                FloatingButton { navController.navigate(CREATE_PLACES_SCREEN) }
+            if (!openLoading.value) {
+
+                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                    FloatingButton { navController.navigate(CREATE_PLACES_SCREEN) }
+                }
+
             }
-
-
 
         }
 

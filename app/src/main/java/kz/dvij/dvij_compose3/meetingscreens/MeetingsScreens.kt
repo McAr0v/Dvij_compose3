@@ -137,6 +137,7 @@ class MeetingsScreens (val act: MainActivity) {
         }
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val hideFilter = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
 
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -156,6 +157,8 @@ class MeetingsScreens (val act: MainActivity) {
                 // ---- ЕСЛИ ЗАГРУЗИЛИСЬ МЕРОПРИЯТИЯ С БД --------
 
                 if (meetingsList.value.isNotEmpty() && meetingsList.value != listOf(defaultCardMeeting)){
+
+                    hideFilter.value = false
 
                     // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -188,6 +191,8 @@ class MeetingsScreens (val act: MainActivity) {
                     }
                 } else if (meetingsList.value == listOf(defaultCardMeeting)){
 
+                    hideFilter.value = false
+
                     // ----- ЕСЛИ НЕТ МЕРОПРИЯТИЙ -------
 
                     Text(
@@ -198,9 +203,13 @@ class MeetingsScreens (val act: MainActivity) {
 
                 } else {
 
+                    hideFilter.value = true
+
                     // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
-                    Row(
+                    LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
+
+                    /*Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
@@ -220,22 +229,25 @@ class MeetingsScreens (val act: MainActivity) {
                             color = WhiteDvij
                         )
 
-                    }
+                    }*/
+
                 }
             }
 
             // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
-            FloatingMeetingFilterButton(
-                city = cityForFilter.value,
-                category = meetingCategoryForFilter.value,
-                date = meetingStartDateForFilter.value,
-                typeOfFilter = typeFilter
-            ) {
-                openFilterDialog.value = true
+            if (!hideFilter.value){
+
+                FloatingMeetingFilterButton(
+                    city = cityForFilter.value,
+                    category = meetingCategoryForFilter.value,
+                    date = meetingStartDateForFilter.value,
+                    typeOfFilter = typeFilter
+                ) {
+                    openFilterDialog.value = true
+                }
+
             }
-
-
 
         }
 
@@ -258,6 +270,8 @@ class MeetingsScreens (val act: MainActivity) {
     ){
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
+        val hideFilter = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
         // инициализируем пустой список мероприятий
 
@@ -288,6 +302,8 @@ class MeetingsScreens (val act: MainActivity) {
                 // ----- ЕСЛИ ЗАГРУЗИЛИСЬ МОИ МЕРОПРИЯТИЯ ---------
 
                 if (myMeetingsList.value.isNotEmpty() && myMeetingsList.value != listOf(defaultCardMeeting)){
+
+                    hideFilter.value = false
 
                     // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -320,6 +336,8 @@ class MeetingsScreens (val act: MainActivity) {
                     }
                 } else if (myMeetingsList.value == listOf(defaultCardMeeting) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
+                    hideFilter.value = false
+
                     // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
                     Text(
@@ -332,7 +350,9 @@ class MeetingsScreens (val act: MainActivity) {
 
                     // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)) {
 
                         Text(
                             text = stringResource(id = R.string.need_reg_meeting),
@@ -355,9 +375,12 @@ class MeetingsScreens (val act: MainActivity) {
 
                 } else {
 
+                    hideFilter.value = true
+                    LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
+
                     // ------- ЕСЛИ ИДЕТ ЗАГРУЗКА ---------
 
-                    Row(
+                    /*Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
@@ -377,13 +400,13 @@ class MeetingsScreens (val act: MainActivity) {
                             color = WhiteDvij
                         )
 
-                    }
+                    }*/
                 }
             }
 
             // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ МЕРОПРИЯТИЯ --------------
 
-            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+            if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified && !hideFilter.value) {
                 FloatingButton {
                     meetingKey.value = "0"
 
@@ -483,7 +506,9 @@ class MeetingsScreens (val act: MainActivity) {
 
                 // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)) {
 
                     Text(
                         text = stringResource(id = R.string.need_reg_meeting),
