@@ -264,6 +264,21 @@
     <string name="cp_no_address">Какой адрес у заведения?</string>
     <string name="cp_no_time">Заполни весь режим работы</string>
 
+    <string name="cp_no_start_time_monday">В понедельник выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_monday">В понедельник выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_tuesday">Во вторник выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_tuesday">Во вторник выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_wednesday">В среду выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_wednesday">В среду выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_thursday">В четверг выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_thursday">В четверг выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_friday">В пятницу выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_friday">В пятницу выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_saturday">В субботу выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_saturday">В субботу выбрано время открытия места, но не выбрано время закрытия места</string>
+    <string name="cp_no_start_time_sunday">В воскресенье выбрано время закрытия места, но не выбрано время открытия места</string>
+    <string name="cp_no_finish_time_sunday">В воскресенье выбрано время открытия места, но не выбрано время закрытия места</string>
+
     <!-- Создание акции -->
     <string name="cs_no_image">Нет картинки. Без нее никак не опубликовать акцию :(</string>
     <string name="cs_no_headline">Напиши заголовок акции</string>

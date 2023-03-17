@@ -125,7 +125,7 @@ class PlaceViewScreen (val act: MainActivity) {
 
         act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo, key){
 
-            placeTimeOnToday.value = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay,placeInfo.value)
+            placeTimeOnToday.value = act.placesDatabaseManager.returnWrightTimeOnCurrentDay(nowDay,placeInfo.value)
 
             favCounter.value = it[0].toString() // данные из списка - количество добавивших в избранное
             viewCounter.value = it[1].toString() // данные из списка - количество просмотров заведения

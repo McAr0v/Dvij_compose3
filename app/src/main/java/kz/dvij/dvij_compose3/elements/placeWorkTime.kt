@@ -25,45 +25,45 @@ fun WorkTimePlace (
 ) {
 
     Text(
-        text = "Понедельник - ${placeInfo.mondayOpenTime!!} - ${placeInfo.mondayCloseTime!!}",
-        style = if (today == "понедельник" || today == "Monday" ) Typography.bodySmall else Typography.bodyMedium,
+        text = if (placeInfo.mondayOpenTime == "" && placeInfo.mondayCloseTime == "") "Понедельник - выходной" else "Понедельник - ${placeInfo.mondayOpenTime!!} - ${placeInfo.mondayCloseTime!!}",
+        style = if (today == "понедельник" || today == "Monday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "понедельник" || today == "Monday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
 
     Text(
-        text = "Вторник - ${placeInfo.tuesdayOpenTime!!} - ${placeInfo.tuesdayCloseTime!!}",
+        text = if (placeInfo.tuesdayOpenTime == "" && placeInfo.tuesdayCloseTime == "") "Вторник - выходной" else "Вторник - ${placeInfo.tuesdayOpenTime!!} - ${placeInfo.tuesdayCloseTime!!}",
         style = if (today == "вторник" || today == "Tuesday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "вторник" || today == "Tuesday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
 
     Text(
-        text = "Среда - ${placeInfo.wednesdayOpenTime!!} - ${placeInfo.wednesdayCloseTime!!}",
+        text = if (placeInfo.wednesdayOpenTime == "" && placeInfo.wednesdayCloseTime == "") "Среда - выходной" else "Среда - ${placeInfo.wednesdayOpenTime!!} - ${placeInfo.wednesdayCloseTime!!}",
         style = if (today == "среда" || today == "Wednesday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "среда" || today == "Wednesday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
     Text(
-        text = "Четверг - ${placeInfo.thursdayOpenTime!!} - ${placeInfo.thursdayCloseTime!!}",
+        text = if (placeInfo.thursdayOpenTime == "" && placeInfo.thursdayCloseTime == "") "Четверг - выходной" else "Четверг - ${placeInfo.thursdayOpenTime!!} - ${placeInfo.thursdayCloseTime!!}",
         style = if (today == "четверг" || today == "Thursday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "четверг" || today == "Thursday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
     Text(
-        text = "Пятница - ${placeInfo.fridayOpenTime!!} - ${placeInfo.fridayCloseTime!!}",
+        text = if (placeInfo.fridayOpenTime == "" && placeInfo.fridayCloseTime == "") "Пятница - выходной" else "Пятница - ${placeInfo.fridayOpenTime!!} - ${placeInfo.fridayCloseTime!!}",
         style = if (today == "пятница" || today == "Friday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "пятница" || today == "Friday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
     Text(
-        text = "Суббота - ${placeInfo.saturdayOpenTime!!} - ${placeInfo.saturdayCloseTime!!}",
+        text = if (placeInfo.saturdayOpenTime == "" && placeInfo.saturdayCloseTime == "") "Суббота - выходной" else "Суббота - ${placeInfo.saturdayOpenTime!!} - ${placeInfo.saturdayCloseTime!!}",
         style = if (today == "суббота" || today == "Saturday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "суббота" || today == "Saturday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)
     )
     Text(
-        text = "Воскресение - ${placeInfo.sundayOpenTime!!} - ${placeInfo.sundayCloseTime!!}",
+        text = if (placeInfo.sundayOpenTime == "" && placeInfo.sundayCloseTime == "") "Воскресенье - выходной" else "Воскресенье - ${placeInfo.sundayOpenTime!!} - ${placeInfo.sundayCloseTime!!}",
         style = if (today == "воскресенье" || today == "Sunday" ) Typography.bodyMedium else Typography.bodySmall,
         color = if (today == "воскресенье" || today == "Sunday" ) WhiteDvij else Grey_Text,
         modifier = Modifier.padding(bottom = 5.dp)

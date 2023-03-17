@@ -261,7 +261,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
                         )
 
-                        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDayInStandartClass(nowDay, filledFinishPlace)
+                        val placeTimeOnToday = act.placesDatabaseManager.returnWrightTimeOnCurrentDay(nowDay, filledFinishPlace)
 
                         val nowIsOpen = act.placesDatabaseManager.nowIsOpenPlace(nowTime, placeTimeOnToday[0], placeTimeOnToday[1])
 
@@ -473,19 +473,27 @@ class PlacesDatabaseManager (val act: MainActivity) {
 
         val nowInNumber = getTimeNumber(nowTime).toInt()
 
-        val startInNumber = getTimeNumber(startTime).toInt()
-        val finishInNUmber = getTimeNumber(finishTime).toInt()
+        result = if (startTime != "" && finishTime != ""){
 
-        result = if (startInNumber>finishInNUmber){
+            val startInNumber = getTimeNumber(startTime).toInt()
+            val finishInNUmber = getTimeNumber(finishTime).toInt()
 
-            // если заведение работает за полночь, то финишное время будет меньше начального
-            val currentFinishTime = finishInNUmber + 2400
+            if (startInNumber>finishInNUmber){
 
-            nowInNumber in (startInNumber + 1) until currentFinishTime // startInNumber<nowInNumber && nowInNumber<currentFinishTime
+                // если заведение работает за полночь, то финишное время будет меньше начального
+                val currentFinishTime = finishInNUmber + 2400
+
+                nowInNumber in (startInNumber + 1) until currentFinishTime // startInNumber<nowInNumber && nowInNumber<currentFinishTime
+
+            } else {
+
+                nowInNumber in (startInNumber + 1) until finishInNUmber // startInNumber < nowInNumber && nowInNumber < finishInNUmber
+
+            }
 
         } else {
 
-            nowInNumber in (startInNumber + 1) until finishInNUmber // startInNumber < nowInNumber && nowInNumber < finishInNUmber
+            false
 
         }
 

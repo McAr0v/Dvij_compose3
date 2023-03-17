@@ -13,7 +13,22 @@ fun checkDataOnCreatePlace (
     category: String,
     city: String,
     address: String,
-    imageUriFromDb: String
+    imageUriFromDb: String,
+    mondayST: String,
+    mondayFT: String,
+    tuesdayST: String,
+    tuesdayFT: String,
+    wednesdayST: String,
+    wednesdayFT: String,
+    thursdayST: String,
+    thursdayFT: String,
+    fridayST: String,
+    fridayFT: String,
+    saturdayST: String,
+    saturdayFT: String,
+    sundayST: String,
+    sundayFT: String,
+
 
 
 
@@ -55,5 +70,91 @@ fun checkDataOnCreatePlace (
         }
 
     }
+
+    if (mondayST == "" && mondayFT != ""){
+
+        result = R.string.cp_no_start_time_monday
+
+    }
+
+    if (mondayST != "" && mondayFT == ""){
+
+        result = R.string.cp_no_finish_time_monday
+
+    }
+
+    if (tuesdayST == "" && tuesdayFT != ""){
+
+        result = R.string.cp_no_start_time_tuesday
+
+    }
+
+    if (tuesdayST != "" && tuesdayFT == ""){
+
+        result = R.string.cp_no_finish_time_tuesday
+
+    }
+
+    if ( wednesdayST == "" &&  wednesdayFT != ""){
+
+        result = R.string.cp_no_start_time_wednesday
+
+    }
+
+    if ( wednesdayST != "" &&  wednesdayFT == ""){
+
+        result = R.string.cp_no_finish_time_wednesday
+
+    }
+
+    if (thursdayST == "" && thursdayFT != ""){
+
+        result = R.string.cp_no_start_time_thursday
+
+    }
+
+    if (thursdayST != "" && thursdayFT == ""){
+
+        result = R.string.cp_no_finish_time_thursday
+
+    }
+
+    if (fridayST == "" && fridayFT != ""){
+
+        result = R.string.cp_no_start_time_friday
+
+    }
+
+    if (fridayST != "" && fridayFT == ""){
+
+        result = R.string.cp_no_finish_time_friday
+
+    }
+
+    if (saturdayST == "" && saturdayFT != ""){
+
+        result = R.string.cp_no_start_time_saturday
+
+    }
+
+    if (saturdayST != "" && saturdayFT == ""){
+
+        result = R.string.cp_no_finish_time_saturday
+
+    }
+
+    if (sundayST == "" && sundayFT != ""){
+
+        result = R.string.cp_no_start_time_sunday
+
+    }
+
+    if (sundayST != "" && sundayFT == ""){
+
+        result = R.string.cp_no_finish_time_sunday
+
+    }
+
     return result
 }
+

@@ -449,7 +449,7 @@ class CreatePlace (val act: MainActivity) {
             )
 
             Text(
-                text = "Если выходной, оставь поле пустым",
+                text = "Если выходной, оставь время не заполненным",
                 style = Typography.labelMedium,
                 color = Grey_Text,
                 modifier = Modifier.padding(bottom = 20.dp)
@@ -621,8 +621,22 @@ class CreatePlace (val act: MainActivity) {
                     city = city,
                     address = address,
                     imageUriFromDb = filledPlace.logo ?: "",
+                    mondayST = timeWorkMonday[0],
+                    mondayFT = timeWorkMonday[1],
+                    tuesdayST = timeWorkTuesday[0],
+                    tuesdayFT = timeWorkTuesday[1],
+                    wednesdayST = timeWorkWednesday[0],
+                    wednesdayFT = timeWorkWednesday[1],
+                    thursdayST = timeWorkThursday[0],
+                    thursdayFT = timeWorkThursday[1],
+                    fridayST = timeWorkFriday[0],
+                    fridayFT = timeWorkFriday[1],
+                    saturdayST = timeWorkSaturday[0],
+                    saturdayFT = timeWorkSaturday[1],
+                    sundayST = timeWorkSunday[0],
+                    sundayFT = timeWorkSunday[1]
                 )
-
+                
                 if (checkData != 0) {
 
                     // если checkData вернет какое либо число, то это число будет ID сообщения в тосте
