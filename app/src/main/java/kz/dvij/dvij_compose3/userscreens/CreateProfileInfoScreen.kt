@@ -363,6 +363,24 @@ class CreateProfileInfoScreen (val act: MainActivity) {
 
                                 // В качестве колбака придет ссылка на изображение в Storage
 
+                                if (filledUserInfo.avatar != null && filledUserInfo.avatar != ""){
+
+                                    act.photoHelper.deleteUserImage(filledUserInfo.avatar){
+
+                                        if (it) {
+
+                                            Log.d ("MyLog", "Старая аватарка удалена")
+
+                                        } else {
+
+                                            Log.d ("MyLog", "Старая аватарка НЕ удалена")
+
+                                        }
+
+                                    }
+
+                                }
+
                                 // Запускаем корутину и публикуем данные пользователя
 
                                 GlobalScope.launch(Dispatchers.Main) {

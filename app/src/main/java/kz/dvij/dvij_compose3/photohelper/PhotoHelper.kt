@@ -129,6 +129,24 @@ class PhotoHelper (val act: MainActivity) {
 
     }
 
+    fun deleteUserImage (imageUrl: String, callback: (result: Boolean) -> Unit){
+
+        storageUser.storage.getReferenceFromUrl(imageUrl).delete().addOnCompleteListener {
+
+            if (it.isSuccessful) {
+
+                callback (true)
+
+            } else {
+
+                callback (false)
+
+            }
+
+        }
+
+    }
+
 
 
     // ------ ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЯ -------
