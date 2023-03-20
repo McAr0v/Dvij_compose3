@@ -121,6 +121,7 @@ class PlacesScreens (val act: MainActivity) {
         }
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val closeFilter = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
 
 
@@ -157,9 +158,13 @@ class PlacesScreens (val act: MainActivity) {
                 verticalArrangement = Arrangement.Center
             ) {
 
+
+
                 // ---- ЕСЛИ ЗАГРУЗИЛИСЬ Заведения С БД --------
 
                 if (placeList.value.isNotEmpty() && placeList.value != listOf(defaultForCard)){
+
+                    closeFilter.value = false
 
                     // ---- ЛЕНИВАЯ КОЛОНКА --------
 
@@ -191,6 +196,8 @@ class PlacesScreens (val act: MainActivity) {
                     }
                 } else if (placeList.value == listOf(defaultForCard)){
 
+                    closeFilter.value = false
+
                     // ----- ЕСЛИ НЕТ ЗАВЕДЕНИЙ -------
 
                     Text(
@@ -200,6 +207,8 @@ class PlacesScreens (val act: MainActivity) {
                     )
 
                 } else {
+
+                    closeFilter.value = true
 
 
                     // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
@@ -237,7 +246,7 @@ class PlacesScreens (val act: MainActivity) {
 
             // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
-            if (!openLoading.value){
+            if (!openLoading.value && closeFilter.value == false){
 
                 FloatingPlaceFilterButton(
                     city = cityForFilter.value,
@@ -256,6 +265,7 @@ class PlacesScreens (val act: MainActivity) {
 
         if (openLoading.value){
 
+            closeFilter.value = true
             LoadingScreen(act.resources.getString(R.string.ss_loading))
 
         }
@@ -402,6 +412,7 @@ class PlacesScreens (val act: MainActivity) {
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun PlacesMyScreen(
@@ -411,6 +422,8 @@ class PlacesScreens (val act: MainActivity) {
     ) {
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val closeButtonCreate = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+
 
 
 
@@ -448,6 +461,8 @@ class PlacesScreens (val act: MainActivity) {
 
                 if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
+                    closeButtonCreate.value = true
+
                 // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
                 Column(modifier = Modifier
@@ -476,6 +491,7 @@ class PlacesScreens (val act: MainActivity) {
             } else if (myPlacesList.value == listOf(defaultForCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
 
+                closeButtonCreate.value = false
                     // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
                     Text(
@@ -486,6 +502,7 @@ class PlacesScreens (val act: MainActivity) {
 
                 } else if (myPlacesList.value.isNotEmpty() && myPlacesList.value != listOf(default)){
 
+                    closeButtonCreate.value = false
 
                     // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
@@ -519,6 +536,8 @@ class PlacesScreens (val act: MainActivity) {
                     }
                 } else {
 
+                    closeButtonCreate.value = true
+
                     LoadingScreen(messageText = stringResource(id = R.string.ss_loading))
 
                     // ------- ЕСЛИ ИДЕТ ЗАГРУЗКА ---------
@@ -550,7 +569,7 @@ class PlacesScreens (val act: MainActivity) {
 
             // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ ЗАВЕДЕНИЯ --------------
 
-            if (!openLoading.value) {
+            if (!openLoading.value && closeButtonCreate.value != true) {
 
                 if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
                     FloatingButton { navController.navigate(CREATE_PLACES_SCREEN) }

@@ -141,7 +141,7 @@ class MeetingViewScreen(val act: MainActivity) {
             }
         }
 
-        if (meetingInfo.value != MeetingsAdsClass() && openLoading.value != true){
+        if (meetingInfo.value != MeetingsAdsClass() && !openLoading.value){
 
             Column(
                 modifier = Modifier

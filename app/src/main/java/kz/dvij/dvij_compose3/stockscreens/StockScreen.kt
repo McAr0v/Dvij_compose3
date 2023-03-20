@@ -110,6 +110,7 @@ class StockScreen(val act: MainActivity) {
         val openFilterDialog = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val closeFilter = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
 
         val filter = filterFunctions.createStockFilter(cityForFilter.value, stockCategoryForFilter.value, stockStartDateForFilter.value, stockFinishDateForFilter.value)
 
@@ -162,6 +163,7 @@ class StockScreen(val act: MainActivity) {
 
                 if (stockList.value.isNotEmpty() && stockList.value != listOf(defaultStockCard)){
 
+                    closeFilter.value = false
                     // ---- ЛЕНИВАЯ КОЛОНКА --------
 
                     LazyColumn(
@@ -193,6 +195,8 @@ class StockScreen(val act: MainActivity) {
                     }
                 } else if (stockList.value == listOf(defaultStockCard)){
 
+                    closeFilter.value = false
+
                     // ----- ЕСЛИ НЕТ АКЦИЙ -------
 
                     Text(
@@ -203,9 +207,12 @@ class StockScreen(val act: MainActivity) {
 
                 } else {
 
+                    closeFilter.value = true
+
+                    LoadingScreen(messageText = "Идет загрузка")
                     // -------- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
-                    Row(
+                    /*Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
@@ -229,21 +236,26 @@ class StockScreen(val act: MainActivity) {
                             color = WhiteDvij
                         )
 
-                    }
+                    }*/
                 }
             }
 
             // -------- ПЛАВАЮЩАЯ КНОПКА ФИЛЬТРА --------------
 
-            FloatingStockFilterButton(
-                typeOfFilter = typeFilter,
-                city = cityForFilter.value,
-                category = stockCategoryForFilter.value,
-                startDate = stockStartDateForFilter.value,
-                finishDate = stockFinishDateForFilter.value
-            ) {
-                openFilterDialog.value = true
+            if (!closeFilter.value && !openLoading.value) {
+
+                FloatingStockFilterButton(
+                    typeOfFilter = typeFilter,
+                    city = cityForFilter.value,
+                    category = stockCategoryForFilter.value,
+                    startDate = stockStartDateForFilter.value,
+                    finishDate = stockFinishDateForFilter.value
+                ) {
+                    openFilterDialog.value = true
+                }
+
             }
+
 
             if (openLoading.value){
 
@@ -263,6 +275,7 @@ class StockScreen(val act: MainActivity) {
     ) {
 
         val openLoading = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
+        val closeCreateButton = remember {mutableStateOf(false)} // диалог ИДЕТ ЗАГРУЗКА
         // инициализируем пустой список акций
 
             val myStockList = remember {
@@ -293,6 +306,7 @@ class StockScreen(val act: MainActivity) {
 
                     if (myStockList.value.isNotEmpty() && myStockList.value != listOf(defaultStockCard)){
 
+                        closeCreateButton.value = false
                         // ЗАПУСКАЕМ ЛЕНИВУЮ КОЛОНКУ
 
                         LazyColumn(
@@ -325,6 +339,7 @@ class StockScreen(val act: MainActivity) {
                         }
                     } else if (myStockList.value == listOf(defaultStockCard) && act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified){
 
+                        closeCreateButton.value = false
                         // ----- ЕСЛИ СПИСОК ПУСТ, НО ПОЛЬЗОВАТЕЛЬ ЗАРЕГИСТРИРОВАН ----------
 
                         Text(
@@ -335,9 +350,12 @@ class StockScreen(val act: MainActivity) {
 
                     } else if (act.mAuth.currentUser == null || !act.mAuth.currentUser!!.isEmailVerified){
 
+                        closeCreateButton.value = true
                         // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)) {
 
                             Text(
                                 text = "Чтобы создать свою акцию, тебе нужно авторизоваться",
@@ -360,9 +378,13 @@ class StockScreen(val act: MainActivity) {
 
                     } else {
 
+                        closeCreateButton.value = true
+
+                        LoadingScreen(messageText = "Идет загрузка")
+
                         // ------- ЕСЛИ ИДЕТ ЗАГРУЗКА ---------
 
-                        Row(
+                        /*Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
@@ -382,13 +404,18 @@ class StockScreen(val act: MainActivity) {
                                 color = WhiteDvij
                             )
 
-                        }
+                        }*/
                     }
                 }
 
                 // -------- ПЛАВАЮЩАЯ КНОПКА СОЗДАНИЯ АКЦИИ --------------
 
-                if (act.mAuth.currentUser != null && act.mAuth.currentUser!!.isEmailVerified) {
+                if (
+                    act.mAuth.currentUser != null
+                    && act.mAuth.currentUser!!.isEmailVerified
+                    && !closeCreateButton.value
+                    && !openLoading.value
+                ) {
                     FloatingButton { navController.navigate(CREATE_STOCK_SCREEN) }
                 }
 
@@ -485,7 +512,9 @@ class StockScreen(val act: MainActivity) {
 
                 // ---- ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН ИЛИ НЕ ПОДТВЕРДИЛ ИМЕЙЛ
 
-                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)) {
 
                     Text(
                         text = "Чтобы добавить акцию в этот раздел, тебе нужно авторизоваться",
@@ -508,9 +537,11 @@ class StockScreen(val act: MainActivity) {
 
             } else {
 
+                LoadingScreen(act.resources.getString(R.string.ss_loading))
+
                 // ---- ЕСЛИ ИДЕТ ЗАГРУЗКА ----------
 
-                Row(
+                /*Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -529,7 +560,7 @@ class StockScreen(val act: MainActivity) {
                         style = Typography.bodySmall,
                         color = WhiteDvij
                     )
-                }
+                }*/
             }
         }
     }

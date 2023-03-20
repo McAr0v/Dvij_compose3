@@ -146,6 +146,8 @@ class StockViewScreen (val act: MainActivity) {
 
                         } else {
 
+                            openLoading.value = false
+
                             Log.d("MyLog", "Почемуто акция не удалилась не удалилось")
 
                         }
