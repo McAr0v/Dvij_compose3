@@ -398,7 +398,60 @@ class MeetingsCard(val act: MainActivity) {
 
                                     openLoadingState.value = true
 
-                                    filledMeeting.value = MeetingsAdsClass(
+                                    act.meetingDatabaseManager.readOneMeetingFromDBReturnClass(meetingItem.key){
+
+                                        if (it != MeetingsAdsClass()){
+
+                                            filledMeeting.value = it
+
+                                            if (it.placeKey == null || it.placeKey == ""){
+
+                                                filledPlace.value = PlacesCardClass(
+                                                    placeName = meetingItem.headlinePlaceInput,
+                                                    address = meetingItem.addressPlaceInput
+                                                )
+
+                                                navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                            } else {
+
+                                                act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = it.placeKey) {
+
+                                                    navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                    /*act.meetingDatabaseManager.readOneMeetingFromDataBase(meetingInfo = filledMeeting, key = meetingItem.key){
+
+                                        if (meetingItem.placeKey == null || meetingItem.placeKey == ""){
+
+                                            filledPlace.value = PlacesCardClass(
+                                                placeName = meetingItem.headlinePlaceInput,
+                                                address = meetingItem.addressPlaceInput
+                                            )
+
+                                            navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                        } else {
+
+                                            act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = meetingItem.placeKey) {
+
+                                                navController.navigate(EDIT_MEETINGS_SCREEN)
+
+                                            }
+
+                                        }
+
+
+                                    }*/
+
+                                    /*filledMeeting.value = MeetingsAdsClass(
                                         key = meetingItem.key,
                                         category = meetingItem.category,
                                         headline = meetingItem.headline,
@@ -419,26 +472,9 @@ class MeetingsCard(val act: MainActivity) {
                                         ownerKey = meetingItem.ownerKey,
                                         dateInNumber = meetingItem.dateInNumber,
                                         createdTime = meetingItem.createdTime
-                                    )
+                                    )*/
 
-                                    if (meetingItem.placeKey == null || meetingItem.placeKey == ""){
 
-                                        filledPlace.value = PlacesCardClass(
-                                            placeName = meetingItem.headlinePlaceInput,
-                                            address = meetingItem.addressPlaceInput
-                                        )
-
-                                        navController.navigate(EDIT_MEETINGS_SCREEN)
-
-                                    } else {
-
-                                        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = meetingItem.placeKey) {
-
-                                            navController.navigate(EDIT_MEETINGS_SCREEN)
-
-                                        }
-
-                                    }
 
                                 }
                             )

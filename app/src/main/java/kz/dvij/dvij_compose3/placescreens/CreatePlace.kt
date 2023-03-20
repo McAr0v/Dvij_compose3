@@ -3,6 +3,7 @@ package kz.dvij.dvij_compose3.placescreens
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -659,7 +660,7 @@ class CreatePlace (val act: MainActivity) {
 
                     GlobalScope.launch(Dispatchers.IO){
 
-                        // ЕСЛИ ИЗОБРАЖЕНИЕ НЕ НАЛ - ТАКОЕ ВОЗМОЖНО ТОЛЬКО ПРИ РЕДАКТИРОВАНИИ
+                        // ЕСЛИ ИЗОБРАЖЕНИЕ НАЛ - ТАКОЕ ВОЗМОЖНО ТОЛЬКО ПРИ РЕДАКТИРОВАНИИ
 
                         if (image1 == null){
 
@@ -737,6 +738,7 @@ class CreatePlace (val act: MainActivity) {
                             }
                         } else {
 
+
                             // ---- В СЛУЧАЕ, ЕСЛИ ЕСТЬ ВЫБРАННАЯ ИЗ ГАЛЕРЕИ КАРТИНКА -------
 
                             // запускаем сжатие изображения
@@ -745,6 +747,26 @@ class CreatePlace (val act: MainActivity) {
                             // после сжатия запускаем функцию загрузки сжатого фото в Storage
 
                             act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", PLACES_ROOT){
+
+                                if (filledPlace.logo != null && filledPlace.logo != ""){
+
+
+
+                                    act.photoHelper.deletePlaceImage(filledPlace.logo){
+
+                                        if (it){
+
+                                            Log.d("MyLog", "Старое лого заведения удалилось")
+
+                                        } else {
+
+                                            Log.d("MyLog", "Старое лого заведения НЕ удалилось")
+
+                                        }
+
+                                    }
+
+                                }
 
                                 // Запускаем корутину и публикуем заведение
 

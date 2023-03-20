@@ -883,108 +883,218 @@ class CreateMeeting(private val act: MainActivity) {
 
                     GlobalScope.launch(Dispatchers.IO){
 
-                        if (image1 == null && createOrEdit != "0") {
-                            // такое условие возможно только при редактировании
+                        // Если это страница редактирования
 
-                            GlobalScope.launch(Dispatchers.Main) {
+                        if (createOrEdit != "0"){
 
-                                // заполняем мероприятие
+                            // Если пользователь не загрузил новое изображение
 
-                                val finishFilledMeeting = MeetingsAdsClass(
-                                    key = filledMeeting.key, // генерируем уникальный ключ мероприятия
-                                    category = category,
-                                    headline = headline,
-                                    description = description,
-                                    price = price,
-                                    phone = phone,
-                                    whatsapp = whatsapp,
-                                    data = dataResult,
-                                    startTime = timeStartResult,
-                                    finishTime = timeFinishResult,
-                                    image1 = filledMeeting.image1,
-                                    city = city,
-                                    instagram = instagram,
-                                    telegram = telegram,
-                                    placeKey = chosenPlace.value.placeKey ?: "",
-                                    headlinePlaceInput = finishHeadlinePlace,
-                                    addressPlaceInput = finishAddressPlace,
-                                    ownerKey = act.mAuth.uid,
-                                    createdTime = filledMeeting.createdTime,
-                                    dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
-                                )
+                            if (image1 == null){
 
-                                // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+                                GlobalScope.launch(Dispatchers.Main) {
 
-                                if (auth.uid != null) {
+                                    // заполняем мероприятие
 
-                                    // Если зарегистрирован, то запускаем функцию публикации мероприятия
+                                    val finishFilledMeeting = MeetingsAdsClass(
+                                        key = filledMeeting.key,
+                                        category = category,
+                                        headline = headline,
+                                        description = description,
+                                        price = price,
+                                        phone = phone,
+                                        whatsapp = whatsapp,
+                                        data = dataResult,
+                                        startTime = timeStartResult,
+                                        finishTime = timeFinishResult,
+                                        image1 = filledMeeting.image1,
+                                        city = city,
+                                        instagram = instagram,
+                                        telegram = telegram,
+                                        placeKey = chosenPlace.value.placeKey ?: "",
+                                        headlinePlaceInput = finishHeadlinePlace,
+                                        addressPlaceInput = finishAddressPlace,
+                                        ownerKey = act.mAuth.uid,
+                                        createdTime = filledMeeting.createdTime,
+                                        dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
+                                    )
 
-                                    meetingDatabaseManager.publishMeeting(finishFilledMeeting){ result ->
+                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
 
-                                        // в качестве колбака придет булин. Если опубликовано мероприятие то:
+                                    if (auth.uid != null) {
 
-                                        if (result){
+                                        // Если зарегистрирован, то запускаем функцию публикации мероприятия
 
-                                            dataResult = ""
-                                            timeStartResult = ""
-                                            timeFinishResult = ""
-                                            chosenPlace.value = PlacesCardClass(
+                                        meetingDatabaseManager.publishMeeting(finishFilledMeeting){ result ->
 
-                                                logo = "",
-                                                placeKey = "",
-                                                placeName = "Выбери заведение",
-                                                placeDescription = "",
-                                                phone = "",
-                                                whatsapp = "",
-                                                telegram = "",
-                                                instagram = "",
-                                                category = "",
-                                                city = "",
-                                                address = "",
-                                                owner = "",
-                                                mondayOpenTime = "",
-                                                mondayCloseTime = "",
-                                                tuesdayOpenTime = "",
-                                                tuesdayCloseTime = "",
-                                                wednesdayOpenTime = "",
-                                                wednesdayCloseTime = "",
-                                                thursdayOpenTime = "",
-                                                thursdayCloseTime = "",
-                                                fridayOpenTime = "",
-                                                fridayCloseTime = "",
-                                                saturdayOpenTime = "",
-                                                saturdayCloseTime = "",
-                                                sundayOpenTime = "",
-                                                sundayCloseTime = ""
+                                            // в качестве колбака придет булин. Если опубликовано мероприятие то:
 
-                                            )
+                                            if (result){
 
-                                            navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
+                                                dataResult = ""
+                                                timeStartResult = ""
+                                                timeFinishResult = ""
+                                                chosenPlace.value = PlacesCardClass(
 
-                                            // показываем ТОСТ
-                                            Toast.makeText(
-                                                activity,
-                                                "Твое мероприятие успешно отредактировано",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                                    logo = "",
+                                                    placeKey = "",
+                                                    placeName = "Выбери заведение",
+                                                    placeDescription = "",
+                                                    phone = "",
+                                                    whatsapp = "",
+                                                    telegram = "",
+                                                    instagram = "",
+                                                    category = "",
+                                                    city = "",
+                                                    address = "",
+                                                    owner = "",
+                                                    mondayOpenTime = "",
+                                                    mondayCloseTime = "",
+                                                    tuesdayOpenTime = "",
+                                                    tuesdayCloseTime = "",
+                                                    wednesdayOpenTime = "",
+                                                    wednesdayCloseTime = "",
+                                                    thursdayOpenTime = "",
+                                                    thursdayCloseTime = "",
+                                                    fridayOpenTime = "",
+                                                    fridayCloseTime = "",
+                                                    saturdayOpenTime = "",
+                                                    saturdayCloseTime = "",
+                                                    sundayOpenTime = "",
+                                                    sundayCloseTime = ""
 
-                                        } else {
+                                                )
 
-                                            // если произошла ошибка и мероприятие не опубликовалось то:
+                                                navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
 
-                                            // Показываем тост
-                                            Toast.makeText(
-                                                activity,
-                                                act.resources.getString(R.string.error_text),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                                // показываем ТОСТ
+                                                Toast.makeText(
+                                                    activity,
+                                                    "Твое мероприятие успешно отредактировано",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
 
+                                            } else {
+
+                                                // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                                // Показываем тост
+                                                Toast.makeText(
+                                                    activity,
+                                                    act.resources.getString(R.string.error_text),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                            }
                                         }
                                     }
                                 }
+
+                            } else {
+
+                                // Если при редактировании пользователь загрузил фото
+
+                                if (filledMeeting.image1 != null && filledMeeting.image1 != ""){
+
+                                    act.photoHelper.deleteMeetingImage(filledMeeting.image1){
+
+                                        if (it){
+
+                                            Log.d ("MyLog", "Старая картинка при редактировании удалена")
+
+                                        } else {
+
+                                            Log.d ("MyLog", "Старая картинка при редактировании почемуто не удалилась")
+
+                                        }
+
+                                    }
+
+                                }
+
+                                // запускаем сжатие изображения
+                                val compressedImage = activity.photoHelper.compressImage(activity, image1)
+
+                                // после сжатия запускаем функцию загрузки сжатого фото в Storage
+
+                                activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
+
+                                    // В качестве колбака придет ссылка на изображение в Storage
+
+                                    // Запускаем корутину и публикуем мероприятие
+
+                                    GlobalScope.launch(Dispatchers.Main) {
+
+                                        // заполняем мероприятие
+
+                                        val finishFilledMeeting = MeetingsAdsClass(
+                                            key = filledMeeting.key,
+                                            category = category,
+                                            headline = headline,
+                                            description = description,
+                                            price = price,
+                                            phone = phone,
+                                            whatsapp = whatsapp,
+                                            data = dataResult,
+                                            startTime = timeStartResult,
+                                            finishTime = timeFinishResult,
+                                            image1 = it,
+                                            city = city,
+                                            instagram = instagram,
+                                            telegram = telegram,
+                                            placeKey = chosenPlace.value.placeKey ?: "",
+                                            headlinePlaceInput = finishHeadlinePlace,
+                                            addressPlaceInput = finishAddressPlace,
+                                            ownerKey = act.mAuth.uid,
+                                            createdTime = filledMeeting.createdTime,
+                                            dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
+                                        )
+
+                                        // Делаем дополнительную проверку - пользователь зарегистрирован или нет
+
+                                        if (auth.uid != null) {
+
+                                            // Если зарегистрирован, то запускаем функцию публикации мероприятия
+
+                                            meetingDatabaseManager.publishMeeting(finishFilledMeeting){ result ->
+
+                                                // в качестве колбака придет булин. Если опубликовано мероприятие то:
+
+                                                if (result){
+
+                                                    navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
+
+                                                    // показываем ТОСТ
+
+                                                    Toast.makeText(
+                                                        activity,
+                                                        "Твое мероприятие успешно отредактировано",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+
+                                                } else {
+
+                                                    // если произошла ошибка и мероприятие не опубликовалось то:
+
+                                                    // Показываем тост
+                                                    Toast.makeText(
+                                                        activity,
+                                                        act.resources.getString(R.string.error_text),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
                             }
 
                         } else if (createOrEdit == "0"){
+
+                            // если страница создания
 
                             // запускаем сжатие изображения
                             val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
@@ -1041,155 +1151,11 @@ class CreateMeeting(private val act: MainActivity) {
 
                                                 // показываем ТОСТ
 
-                                                if (createOrEdit != "0"){
-
-                                                    // Если это редактирование
-
-                                                    Toast.makeText(
-                                                        activity,
-                                                        "Твое мероприятие успешно отредактировано",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                } else {
-
-                                                    // Если это создание
-
-                                                    Toast.makeText(
-                                                        activity,
-                                                        act.resources.getString(R.string.cm_success),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                }
-
-
-                                            } else {
-
-                                                // если произошла ошибка и мероприятие не опубликовалось то:
-
-                                                // Показываем тост
                                                 Toast.makeText(
                                                     activity,
-                                                    act.resources.getString(R.string.error_text),
+                                                    act.resources.getString(R.string.cm_success),
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-
-                            // запускаем сжатие изображения
-                            val compressedImage = activity.photoHelper.compressImage(activity, image1!!)
-
-                            // после сжатия запускаем функцию загрузки сжатого фото в Storage
-
-                            activity.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", MEETINGS_ROOT){
-
-                                // В качестве колбака придет ссылка на изображение в Storage
-
-                                // Запускаем корутину и публикуем мероприятие
-
-                                GlobalScope.launch(Dispatchers.Main) {
-
-                                    // заполняем мероприятие
-
-                                    val finishFilledMeeting = if (createOrEdit != "0") {
-
-                                        // Если это страница редактирования
-
-                                        MeetingsAdsClass(
-                                            key = filledMeeting.key,
-                                            category = category,
-                                            headline = headline,
-                                            description = description,
-                                            price = price,
-                                            phone = phone,
-                                            whatsapp = whatsapp,
-                                            data = dataResult,
-                                            startTime = timeStartResult,
-                                            finishTime = timeFinishResult,
-                                            image1 = it,
-                                            city = city,
-                                            instagram = instagram,
-                                            telegram = telegram,
-                                            placeKey = chosenPlace.value.placeKey ?: "",
-                                            headlinePlaceInput = finishHeadlinePlace,
-                                            addressPlaceInput = finishAddressPlace,
-                                            ownerKey = act.mAuth.uid,
-                                            createdTime = filledMeeting.createdTime,
-                                            dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
-                                        )
-
-                                    } else {
-
-                                        // Если это страница создания
-
-                                        MeetingsAdsClass(
-                                            key = meetingDatabaseManager.meetingDatabase.push().key, // генерируем уникальный ключ мероприятия
-                                            category = category,
-                                            headline = headline,
-                                            description = description,
-                                            price = price,
-                                            phone = phone,
-                                            whatsapp = whatsapp,
-                                            data = dataResult,
-                                            startTime = timeStartResult,
-                                            finishTime = timeFinishResult,
-                                            image1 = it,
-                                            city = city,
-                                            instagram = instagram,
-                                            telegram = telegram,
-                                            placeKey = chosenPlace.value.placeKey ?: "",
-                                            headlinePlaceInput = finishHeadlinePlace,
-                                            addressPlaceInput = finishAddressPlace,
-                                            ownerKey = act.mAuth.uid,
-                                            createdTime = currentTime.toString(),
-                                            dateInNumber = filterFunctions.getSplitDataFromDb(dataResult)
-                                        )
-
-                                    }
-
-                                    // Делаем дополнительную проверку - пользователь зарегистрирован или нет
-
-                                    if (auth.uid != null) {
-
-                                        // Если зарегистрирован, то запускаем функцию публикации мероприятия
-
-                                        meetingDatabaseManager.publishMeeting(finishFilledMeeting){ result ->
-
-                                            // в качестве колбака придет булин. Если опубликовано мероприятие то:
-
-                                            if (result){
-
-                                                navController.navigate(MEETINGS_ROOT) {popUpTo(0)} // переходим на страницу мероприятий
-
-                                                // показываем ТОСТ
-
-                                                if (createOrEdit != "0"){
-
-                                                    // Если это редактирование
-
-                                                    Toast.makeText(
-                                                        activity,
-                                                        "Твое мероприятие успешно отредактировано",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                } else {
-
-                                                    // Если это создание
-
-                                                    Toast.makeText(
-                                                        activity,
-                                                        act.resources.getString(R.string.cm_success),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-
-                                                }
 
 
                                             } else {
@@ -1211,7 +1177,6 @@ class CreateMeeting(private val act: MainActivity) {
                         }
                     }
                 }
-
             }
 
             Spacer(modifier = Modifier.height(20.dp))

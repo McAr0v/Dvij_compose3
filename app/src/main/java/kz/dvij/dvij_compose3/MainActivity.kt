@@ -495,7 +495,7 @@ class MainActivity : ComponentActivity() {
                         // --- СТРАНИЦЫ МЕРОПРИЯТИЙ -----
 
                         composable(MEETINGS_ROOT) {meetingsScreens.MeetingsScreen(navController = navController, meetingKey = meetingKey, cityForFilter = cityName, meetingCategoryForFilter = meetingCategoryForFilter, meetingStartDateForFilter = meetingStartDateForFilter, meetingFinishDateForFilter = meetingFinishDateForFilter, meetingSortingForFilter = meetingSortingForFilter, filledMeeting = meetingInfo, filledPlace = placeInfo)}
-                        composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = meetingKey.value, filledPlace = placeInfo.value)}
+                        composable(EDIT_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, filledMeeting = meetingInfo.value, createOrEdit = "1", filledPlace = placeInfo.value)}
                         composable(CREATE_MEETINGS_SCREEN) { createMeeting.CreateMeetingScreen(navController = navController, citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
                         composable(MEETING_VIEW) {meetingViewScreen.MeetingViewScreen(meetingKey, navController, placeKey, meetingInfo, placeInfo)}
 
@@ -510,7 +510,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(STOCK_ROOT) { stockScreen.StockScreen(navController, this@MainActivity, stockKey = stockKey, cityForFilter = cityName, stockCategoryForFilter = stockCategoryForFilter, stockStartDateForFilter = stockStartDateForFilter, stockFinishDateForFilter = stockFinishDateForFilter, stockSortingForFilter = stockSortingForFilter, filledStockInfoFromAct = stockInfo, filledPlace = placeInfo)}
                         composable(CREATE_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, createOrEdit = "0")}
-                        composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, stockKey.value)}
+                        composable(EDIT_STOCK_SCREEN) {createStock.CreateStockScreen(navController = navController,citiesList = citiesList, filledUserInfo = userInfo.value, filledStock = stockInfo.value, filledPlace = placeInfo.value, createOrEdit = "1")}
                         composable(STOCK_VIEW) {stockViewScreen.StockViewScreen(key = stockKey.value, navController = navController, placeKey = placeKey, stockInfo, placeInfo)}
 
                         // ----- СТРАНИЦЫ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -----

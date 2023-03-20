@@ -798,7 +798,25 @@ class CreateStock (val act: MainActivity) {
                             act.photoHelper.uploadPhoto(compressedImage!!, "TestCompressImage", "image/jpg", STOCK_ROOT){
 
 
-                                Log.d("MyLog", it)
+                                if (filledStock.image != null && filledStock.image != ""){
+
+                                    act.photoHelper.deleteStockImage(filledStock.image){
+
+                                        if (it){
+
+                                            Log.d("MyLog", "Старая картинка акции удалена")
+
+                                        } else {
+
+                                            Log.d("MyLog", "Старая картинка акции НЕ удалена")
+
+                                        }
+
+                                    }
+
+                                }
+
+
                                 // В качестве колбака придет ссылка на изображение в Storage
 
                                 // Запускаем корутину и публикуем акцию

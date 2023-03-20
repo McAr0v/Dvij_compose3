@@ -928,6 +928,10 @@ class PlacesDatabaseManager (val act: MainActivity) {
                         if (placeViewCount != null) {
                             // Возвращаем калбак в виде списка счетчиков
                             callback (listOf(placeFavCounter.toInt(), placeViewCount.toInt()))
+                        } else {
+
+                            callback (listOf(placeFavCounter.toInt(), 0))
+
                         }
                     }
                 }

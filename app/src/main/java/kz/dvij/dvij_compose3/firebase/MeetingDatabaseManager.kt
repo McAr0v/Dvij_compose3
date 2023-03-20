@@ -76,6 +76,8 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         if (meetingCount != null) {
                             // Возвращаем калбак в виде списка счетчиков
                             callback (listOf(meetingFav.toInt(), meetingCount.toInt()))
+                        } else {
+                            callback(listOf(meetingFav.toInt(), 0))
                         }
                     }
                 }
@@ -108,6 +110,10 @@ class MeetingDatabaseManager (private val activity: MainActivity) {
                         // передаем в переменную нужное мероприятие
 
                         callback (meeting)
+
+                    } else {
+
+                        MeetingsAdsClass()
 
                     }
                 }

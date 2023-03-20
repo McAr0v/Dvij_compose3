@@ -396,7 +396,42 @@ class StockCard (val act: MainActivity) {
 
                                     openLoading.value = true
 
-                                    filledStock.value = StockAdsClass(
+                                    act.stockDatabaseManager.readOneStockFromDataBaseReturnClass(stockItem.keyStock){
+
+                                        if (it != StockAdsClass()){
+
+                                            filledStock.value = it
+
+                                            if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
+
+                                                filledPlace.value = PlacesCardClass(
+                                                    placeName = stockItem.inputHeadlinePlace,
+                                                    address = stockItem.inputAddressPlace
+                                                )
+
+                                                navController.navigate(EDIT_STOCK_SCREEN)
+
+                                            } else {
+
+                                                Log.d ("MyLog", "читает заведение")
+
+                                                act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = stockItem.keyPlace) {
+
+                                                    navController.navigate(EDIT_STOCK_SCREEN)
+
+                                                }
+
+                                            }
+
+                                        } else {
+
+                                            Log.d ("MyLog", "Чтот пошло не так и акция не загрузилась с бд")
+
+                                        }
+
+                                    }
+
+                                    /*filledStock.value = StockAdsClass(
                                         image = stockInfo.value.image,
                                         headline = stockInfo.value.headline,
                                         description = stockInfo.value.description,
@@ -412,26 +447,9 @@ class StockCard (val act: MainActivity) {
                                         createTime = stockInfo.value.createTime,
                                         startDateNumber = stockInfo.value.startDateNumber,
                                         finishDateNumber = stockInfo.value.finishDateNumber
-                                    )
+                                    )*/
 
-                                    if (stockItem.keyPlace == null || stockItem.keyPlace == ""){
 
-                                        filledPlace.value = PlacesCardClass(
-                                            placeName = stockItem.inputHeadlinePlace,
-                                            address = stockItem.inputAddressPlace
-                                        )
-
-                                        navController.navigate(EDIT_STOCK_SCREEN)
-
-                                    } else {
-
-                                        act.placesDatabaseManager.readOnePlaceFromDataBase(placeInfo = filledPlace, key = stockItem.keyPlace) {
-
-                                            navController.navigate(EDIT_STOCK_SCREEN)
-
-                                        }
-
-                                    }
                                 }
                             )
 
