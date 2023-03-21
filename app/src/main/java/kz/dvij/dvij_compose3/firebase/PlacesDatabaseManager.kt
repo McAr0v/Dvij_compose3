@@ -500,7 +500,7 @@ class PlacesDatabaseManager (val act: MainActivity) {
         return result
     }
 
-    private fun getTimeNumber (date: String): String {
+    fun getTimeNumber (date: String): String {
 
         val split = date.split(":")
 

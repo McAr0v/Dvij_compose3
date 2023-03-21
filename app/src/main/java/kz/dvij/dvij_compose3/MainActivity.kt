@@ -438,6 +438,7 @@ class MainActivity : ComponentActivity() {
                                     MEETING_VIEW -> R.string.meetings
                                     PLACE_VIEW -> R.string.places
                                     STOCK_VIEW -> R.string.stock
+                                    BUGS_LIST_ROOT -> R.string.bugs_list_name
                                     else -> R.string.app_name
                                 }
                                 ),
@@ -463,6 +464,12 @@ class MainActivity : ComponentActivity() {
                             navController = navController, // Передаем NavController
                             scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
                         )
+
+                        if (mAuth.uid == "oPgbRuznYcYkneErcqmCSY6Fdsg1"){
+
+                            sideComponents.AdminSideNavigation(navController = navController, scaffoldState = scaffoldState)
+
+                        }
 
                         sideComponents.SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
 
@@ -531,7 +538,8 @@ class MainActivity : ComponentActivity() {
                         composable(ABOUT_ROOT) { AboutScreen()}
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
-                        composable(BUGS_ROOT) { BugsScreen() }
+                        composable(BUGS_ROOT) { BugsScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
+                        composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController) }
 
                     }
                 }

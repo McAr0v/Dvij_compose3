@@ -482,7 +482,8 @@ fun fieldHeadlineComponent (
 
 @Composable
 fun fieldDescriptionComponent (
-    description: String = ""
+    description: String = "",
+    placeHolder: String = ""
 ): String {
 
     // переменная text возвращает значение при вызове функции
@@ -574,7 +575,7 @@ fun fieldDescriptionComponent (
         placeholder = {
             // подсказка для пользователей
             Text(
-                text = stringResource(id = R.string.input_description), // значение подсказки
+                text = if (placeHolder == "") stringResource(id = R.string.input_description) else placeHolder, // значение подсказки
                 style = Typography.bodySmall // стиль текста в холдере
             )
         },
@@ -792,7 +793,11 @@ fun fieldPriceComponent (
 
 @SuppressLint("ServiceCast")
 @Composable
-fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = ""): String {
+fun fieldInstagramComponent (
+    act: MainActivity,
+    icon: Int, inputText: String? = "",
+    placeHolder: String = ""
+): String {
 
     // создаем переменную текст - это значение функция возвращает
 
@@ -893,7 +898,7 @@ fun fieldInstagramComponent (act: MainActivity, icon: Int, inputText: String? = 
         placeholder = {
             // подсказка для пользователей
             Text(
-                text = stringResource(id = R.string.input_username), // значение подсказки
+                text = if (placeHolder == "") stringResource(id = R.string.input_username) else placeHolder, // значение подсказки
                 style = Typography.bodySmall // стиль текста в холдере
             )
         },

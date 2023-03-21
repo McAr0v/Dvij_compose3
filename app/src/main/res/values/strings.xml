@@ -9,6 +9,7 @@
     <string name="meetings">Мероприятия</string> <!-- Подтвержденная строчка -->
     <string name="places">Места</string> <!-- Подтвержденная строчка -->
     <string name="stock">Акции</string> <!-- Подтвержденная строчка -->
+    <string name="bugs_list_name">Присланные ошибки</string> <!-- Подтвержденная строчка -->
 
     <!-- Табы -->
 
@@ -23,6 +24,7 @@
     <string name="side_private_policy">Политика конфиденциальности</string> <!-- Подтвержденная строчка -->
     <string name="side_ad">Реклама</string> <!-- Подтвержденная строчка -->
     <string name="side_report_bug">Сообщить об ошибке</string> <!-- Подтвержденная строчка -->
+    <string name="side_bug_list">Присланные ошибки</string> <!-- Подтвержденная строчка -->
     <string name="subscribe">Подпишись на Движ</string> <!-- Подтвержденная строчка -->
 
     <string name="city_with_star">Город*</string>
@@ -43,6 +45,7 @@
     <string name="cd_private_policy">Перейти на страницу "Политика конфиденциальности"</string> <!-- Подтвержденная строчка -->
     <string name="cd_ads">Перейти на страницу "Реклама"</string> <!-- Подтвержденная строчка -->
     <string name="cd_bugs">Перейти на страницу "Сообщить об ошибке"</string> <!-- Подтвержденная строчка -->
+    <string name="cd_bugs_list">Перейти на страницу "Список багов"</string> <!-- Подтвержденная строчка -->
     <string name="cd_go_back">Иконка "Вернуться назад"</string> <!-- Подтвержденная строчка -->
     <string name="cd_side_menu">Открыть боковое меню</string> <!-- Подтвержденная строчка -->
     <string name="cd_avatar">Аватарка пользователя</string> <!-- Подтвержденная строчка -->
@@ -255,6 +258,24 @@
     <string name="cm_start_in">Начинаем в</string>
 
     <string name="cm_choose_place">Выбери заведение или введи название и адрес места</string>
+
+    <!-- Экран сообщить об ошибке -->
+
+    <string name="bug_text">Дорогой пользователь!</string>
+    <string name="bug_text1">Мы каждый день работаем над тем, чтобы наше приложение работало правильно и было удобно для каждого!</string>
+    <string name="bug_text2">Если ты обнаружил ошибку или у тебя есть предложение по улучшению проекта, обязательно напиши нам, заполнив все поля ниже.</string>
+    <string name="bug_text3">Спасибо тебе, что стараешься нам помочь! Да прибудет с тобой сила! :)</string>
+    <string name="bug_say">Сообщить об ошибке</string>
+
+    <string name="bug_no_email">Обязательно заполни свой Email</string>
+    <string name="bug_no_text">Нет описания ошибки. Как мы разберемся?</string>
+    <string name="bug_no_subject">Не заполнена тема ошибки</string>
+
+
+
+
+
+
 
     <!-- Создание заведения -->
     <string name="cp_no_place_name">Как называется твое заведение?</string>

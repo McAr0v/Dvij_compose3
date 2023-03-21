@@ -21,12 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.constants.DARK
-import kz.dvij.dvij_compose3.constants.FOR_CARDS
-import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.SocialButtonCustom
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
@@ -429,4 +425,70 @@ class SideComponents (private val act: MainActivity) {
             }
         }
     }
+
+    @Composable
+    fun AdminSideNavigation(
+        navController: NavController, // принимаем НавКонтроллер
+        scaffoldState: ScaffoldState // Принимаем состояние скаффолда для реализации закрытия бокового меню после нажатия на элемент
+    ) {
+        // Инициализируем список элементов бокового меню
+        val adminNavigationItemsList = listOf(
+            SideNavigationItems.BugsList,
+        )
+
+        val coroutineScope = rememberCoroutineScope() // инициализируем корутину
+        val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
+        val currentRoute = navBackStackEntry?.destination?.route // получаем доступ к корню открытой страницы
+
+        LazyColumn(
+            Modifier
+                .background(color = Grey_OnBackground)
+                .padding(vertical = 10.dp)
+        ) {
+            // Помещаем все в "ленивую" колонку
+
+            // Начинаем создавать элемент меню
+
+            items(adminNavigationItemsList) { item -> // для каждого итема в списке sideNavigationItemsList
+
+                // Создаем строку (иконка и текст должны идти друг за другом по горизонтали)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth() // строка должна занимать всю ширину
+                        .clickable {
+                            // действие на клик
+                            navController.navigate(item.navRoute) // открываем нужную страницу
+
+                            // запускаем в корутине действие, чтобы после нажатия на элемент, боковое меню закрывалось
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
+                        }
+                        .padding(vertical = 10.dp, horizontal = 20.dp), // паддинги элементов
+                    verticalAlignment = Alignment.CenterVertically // вертикальное выравнивание элементов по центру
+                ) {
+
+                    // Иконка возле текста
+                    Icon(
+                        tint = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij, // цвет иконки
+                        painter = painterResource(id = item.icon), // задаем иконку, прописанную в sealed class
+                        contentDescription = stringResource(id = item.contentDescription) // описание для слабовидящих - вшито тоже в sealed class
+                    )
+
+                    // разделитель между текстом и иконкой
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    // Сам текст "Кнопки"
+                    Text(
+                        text = stringResource(id = item.title), // берем заголовок
+                        style = Typography.bodyMedium, // Стиль текста
+                        modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                        color = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij // цвет текста
+                    )
+                }
+            }
+        }
+    }
+
 }

@@ -35,12 +35,21 @@ sealed class SideNavigationItems (
         navRoute = BUGS_ROOT,
         contentDescription = R.string.cd_bugs
             )
+
+    object BugsList: SideNavigationItems (
+        title = R.string.side_bug_list,
+        icon = R.drawable.ic_bug,
+        navRoute = BUGS_LIST_ROOT,
+        contentDescription = R.string.cd_bugs_list
+    )
+
 }
 
 const val ABOUT_ROOT = "About"
 const val POLICY_ROOT = "Private_Policy"
 const val ADS_ROOT = "Ads"
 const val BUGS_ROOT = "Bugs"
+const val BUGS_LIST_ROOT = "Bugs_List_Root"
 const val REG_ROOT = "RegRoot"
 const val LOG_IN_ROOT = "LoginRoot"
 const val THANK_YOU_PAGE_ROOT = "thankYou"
