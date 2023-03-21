@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,6 +27,7 @@ class BugCard() {
     @SuppressLint("NotConstructor")
     @Composable
     fun BugCard (
+        bugInfoFromAct: MutableState<BugsAdsClass>,
         bugItem: BugsAdsClass,
         navController: NavController
     ){
@@ -37,24 +40,80 @@ class BugCard() {
                     color = Grey_ForCards,
                     shape = RoundedCornerShape(15.dp)
                 )
-                .clickable { }
+                .clickable {
+                    bugInfoFromAct.value = bugItem
+                    // navController.navigate()
+                }
                 .padding(20.dp)
 
         ) {
 
-            if (bugItem.ticketNumber != null && bugItem.ticketNumber != ""){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-                Text(
-                    text = bugItem.ticketNumber,
-                    color = Grey_Text,
-                    style = Typography.labelMedium
-                )
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+                ) {
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    if (bugItem.ticketNumber != null && bugItem.ticketNumber != ""){
+
+                        Text(
+                            text = bugItem.ticketNumber,
+                            color = Grey_Text,
+                            style = Typography.labelMedium
+                        )
+
+                    }
+
+                    if (
+                        bugItem.publishDate != null
+                        && bugItem.publishDate != ""
+                        && bugItem.publishTime != null
+                        && bugItem.publishTime != ""
+                    ){
+
+                        Text(
+                            text = "${bugItem.publishDate} ${bugItem.publishTime}",
+                            color = Grey_Text,
+                            style = Typography.labelMedium
+                        )
+
+                    }
+                }
+
+                if (bugItem.status != null && bugItem.status != ""){
+
+                    Bubble(
+                        buttonText = when (bugItem.status){
+
+                            "new" -> "Новое сообщение"
+                            "in_work" -> "В работе"
+                            "done" -> "Выполнено"
+                            else -> "Отложено"
+
+                        },
+                        typeButton = when (bugItem.status){
+
+                            "new" -> ATTENTION
+                            "in_work" -> PRIMARY
+                            "done" -> DARK
+                            else -> "Not"
+
+                        }
+                    ) {}
+                }
 
             }
 
+
+
             if (bugItem.subject != null && bugItem.subject != ""){
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
                     text = bugItem.subject,
@@ -66,56 +125,17 @@ class BugCard() {
 
             }
 
-            if (bugItem.publishDate != null && bugItem.publishDate != ""){
-
-                Text(
-                    text = bugItem.publishDate,
-                    color = Grey_Text,
-                    style = Typography.labelMedium
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-            }
-
-            if (bugItem.status != null && bugItem.status != ""){
-
-                Bubble(
-                    buttonText = bugItem.status,
-                    typeButton = when (bugItem.status){
-
-                        "new" -> ATTENTION
-                        "in_work" -> PRIMARY
-                        "done" -> DARK
-                        else -> "Not"
-
-                    }
-                ) {
-
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-            }
-
             if (bugItem.text != null && bugItem.text != ""){
 
                 Text(
                     text = bugItem.text,
-                    color = Grey_Text,
-                    style = Typography.labelMedium
+                    color = WhiteDvij,
+                    style = Typography.bodySmall
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
             }
-
-
-
-
         }
-
-
     }
-
 }

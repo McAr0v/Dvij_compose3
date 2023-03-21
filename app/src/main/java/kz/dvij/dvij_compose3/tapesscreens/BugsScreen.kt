@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,6 +29,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.constants.PRIMARY
+import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.elements.*
 import kz.dvij.dvij_compose3.firebase.BugsAdsClass
 import kz.dvij.dvij_compose3.firebase.BugsDatabaseManager
@@ -51,6 +54,8 @@ fun BugsScreen(
     filledUserInfo: UserInfoClass = UserInfoClass(), // данные пользователя с БД
     navController: NavController
 ){
+
+
     val bugsDatabase = BugsDatabaseManager()
 
     val openLoading = remember { mutableStateOf(false) } // диалог ИДЕТ ЗАГРУЗКА
@@ -176,7 +181,13 @@ fun BugsScreen(
 }
 
 @Composable
-fun BugsListScreen (navController: NavController) {
+fun BugsListScreen (
+    navController: NavController,
+    bugInfoFromAct: MutableState<BugsAdsClass>,
+    act: MainActivity
+) {
+
+    val filterDialog = FilterDialog(act)
 
     val bugCard = BugCard()
 
@@ -186,7 +197,35 @@ fun BugsListScreen (navController: NavController) {
         mutableStateOf(listOf<BugsAdsClass>())
     }
 
-    bugsDatabase.readBugListFromDb(bugList, "new")
+    val bugFilter = remember {
+        mutableStateOf("Все сообщения")
+    }
+
+    val openFilterDialog = remember { mutableStateOf(false) }
+
+    val sortingList = listOf("Все сообщения", "Новые сообщения", "В работе", "Выполненные", "Отложено")
+
+
+    if (openFilterDialog.value){
+
+        filterDialog.SortingDialog(sorting = bugFilter, list = sortingList) {
+
+            openFilterDialog.value = false
+
+        }
+
+    }
+
+    bugsDatabase.readBugListFromDb(
+        bugList = bugList,
+        status = when (bugFilter.value){
+            "Все сообщения" -> "all"
+            "Новые сообщения" -> "new"
+            "В работе" -> "in_work"
+            "Выполненные" -> "done"
+            else -> "later"
+        }
+            )
 
     Column(
         modifier = Modifier
@@ -195,8 +234,17 @@ fun BugsListScreen (navController: NavController) {
             .fillMaxWidth()
             .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
+
+        ButtonCustom(
+            buttonText = bugFilter.value,
+            typeButton = if (bugFilter.value == "Все сообщения") SECONDARY else PRIMARY
+        ) {
+            openFilterDialog.value = true
+        }
+        
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (bugList.value.isNotEmpty() && bugList.value != listOf(BugsAdsClass()) ){
 
@@ -212,7 +260,11 @@ fun BugsListScreen (navController: NavController) {
 
                     items(bugList.value){ item ->
 
-                        bugCard.BugCard(bugItem = item, navController = navController)
+                        bugCard.BugCard(
+                            bugItem = item,
+                            navController = navController,
+                            bugInfoFromAct = bugInfoFromAct
+                        )
 
                     }
 
@@ -222,11 +274,18 @@ fun BugsListScreen (navController: NavController) {
 
         } else if (bugList.value == listOf(BugsAdsClass())){
 
-            Text(
-                text = stringResource(id = R.string.empty_meeting),
-                style = Typography.bodySmall,
-                color = WhiteDvij
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(id = R.string.empty_meeting),
+                    style = Typography.bodySmall,
+                    color = WhiteDvij
+                )
+            }
+
 
         } else {
 

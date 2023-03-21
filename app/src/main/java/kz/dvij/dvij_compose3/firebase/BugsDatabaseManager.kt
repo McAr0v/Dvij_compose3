@@ -75,7 +75,11 @@ class BugsDatabaseManager {
                             .child("bugData") // следующая папка с информацией об акции
                             .getValue(BugsAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
 
-                    if (bug != null && bug.status == status){
+                    if (bug != null && status == "all"){
+
+                        bugArray.add(bug)
+
+                    } else if (bug != null && bug.status == status){
 
                         bugArray.add(bug)
 

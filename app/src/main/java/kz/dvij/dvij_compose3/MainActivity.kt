@@ -180,6 +180,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
+            val bugInfo = remember {
+                mutableStateOf (BugsAdsClass())}
+
             // Данные о заведении. Используется для переходов на разные экраны
 
             val placeInfo = remember {
@@ -539,7 +542,7 @@ class MainActivity : ComponentActivity() {
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
-                        composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController) }
+                        composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController, bugInfoFromAct = bugInfo, act = this@MainActivity) }
 
                     }
                 }
