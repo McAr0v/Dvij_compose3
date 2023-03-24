@@ -136,6 +136,19 @@ class BugCard() {
                 Spacer(modifier = Modifier.height(10.dp))
 
             }
+
+            if (bugItem.senderEmail != null && bugItem.senderEmail != ""){
+
+                Text(
+                    text = bugItem.senderEmail,
+                    color = Grey_Text,
+                    style = Typography.labelMedium
+                )
+
+            }
+
+
+
         }
     }
 }
