@@ -44,23 +44,10 @@ class BugCard() {
         act: MainActivity
     ){
 
-        val status = remember{ mutableStateOf(bugItem.status) }
-        val bugInfo = remember{ mutableStateOf(BugsAdsClass()) }
         val chosenStatus = remember{ mutableStateOf("") }
         val openChangeStatus = remember { mutableStateOf(false) } // диалог ЗАВЕДЕНИЙ
         val bugsDatabase = BugsDatabaseManager()
         val openConfirmChoose = remember {mutableStateOf(false)} // диалог действительно хотите удалить?
-
-        /*if (bugItem.ticketNumber != null) {
-
-            bugsDatabase.readBugStatusFromDb(ticketNumber = bugItem.ticketNumber){
-
-                status.value = it
-
-            }
-
-        }*/
-
 
         Column(
             modifier = Modifier
@@ -303,17 +290,9 @@ class BugCard() {
                             ).show()
 
                         }
-
                     }
-
                 }
-
             }
-
-
-
-
-
         }
     }
 

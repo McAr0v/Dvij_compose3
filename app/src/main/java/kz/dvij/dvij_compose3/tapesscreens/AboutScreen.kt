@@ -8,13 +8,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kz.dvij.dvij_compose3.ui.theme.Grey_Background
 import kz.dvij.dvij_compose3.ui.theme.Primary10
 
 @Composable
 fun AboutScreen(){
     Column (
         modifier = Modifier
-            .background(Primary10)
+            .background(Grey_Background)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
