@@ -141,7 +141,7 @@ fun BugsScreen(
                         ticketNumber = bugsDatabase.bugsDatabase.push().key,
                         publishDate = nowDate,
                         publishTime = nowTime,
-                        status = "new"
+                        status = "Новые сообщения"
                     )
 
                     bugsDatabase.publishBug(filledBug){
@@ -203,7 +203,7 @@ fun BugsListScreen (
 
     val openFilterDialog = remember { mutableStateOf(false) }
 
-    val sortingList = listOf("Все сообщения", "Новые сообщения", "В работе", "Выполненные", "Отложено")
+    val sortingList = listOf("Все сообщения", "Новые сообщения", "В работе", "Выполненные", "Отложенные")
 
 
     if (openFilterDialog.value){
@@ -218,13 +218,7 @@ fun BugsListScreen (
 
     bugsDatabase.readBugListFromDb(
         bugList = bugList,
-        status = when (bugFilter.value){
-            "Все сообщения" -> "all"
-            "Новые сообщения" -> "new"
-            "В работе" -> "in_work"
-            "Выполненные" -> "done"
-            else -> "later"
-        }
+        status = bugFilter.value
             )
 
     Column(
@@ -263,7 +257,8 @@ fun BugsListScreen (
                         bugCard.BugCard(
                             bugItem = item,
                             navController = navController,
-                            bugInfoFromAct = bugInfoFromAct
+                            //bugInfoFromAct = bugInfoFromAct,
+                            act = act
                         )
 
                     }

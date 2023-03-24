@@ -52,7 +52,7 @@ class PlacesCard (val act: MainActivity) {
         openLoading: MutableState<Boolean>,
     ) {
 
-        val iconFavColor = remember{ mutableStateOf(Grey10) } // Переменная цвета иконки ИЗБРАННОЕ
+        val iconFavColor = remember{ mutableStateOf(WhiteDvij) } // Переменная цвета иконки ИЗБРАННОЕ
         val meetingCounter = remember{ mutableStateOf("") } // Счетчик количества мероприятий
         val stockCounter = remember{ mutableStateOf("") } // Счетчик количества акций
 
@@ -64,7 +64,7 @@ class PlacesCard (val act: MainActivity) {
                 iconFavColor.value = YellowDvij
             } else {
                 // Если колбак фалс, то в обычный цвет
-                iconFavColor.value = Grey10
+                iconFavColor.value = WhiteDvij
             }
         }
 

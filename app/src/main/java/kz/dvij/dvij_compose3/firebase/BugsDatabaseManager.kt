@@ -36,7 +36,7 @@ class BugsDatabaseManager {
 
     // --- ФУНКЦИЯ УДАЛЕНИЯ ----------
 
-    fun deleteBug(ticketNumber: String, imageUrl: String, callback: (result: Boolean)-> Unit){
+    fun deleteBug(ticketNumber: String, callback: (result: Boolean)-> Unit){
 
         bugsDatabase // записываем в базу данных
             .child(ticketNumber)
@@ -75,7 +75,7 @@ class BugsDatabaseManager {
                             .child("bugData") // следующая папка с информацией об акции
                             .getValue(BugsAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
 
-                    if (bug != null && status == "all"){
+                    if (bug != null && status == "Все сообщения"){
 
                         bugArray.add(bug)
 
@@ -98,6 +98,41 @@ class BugsDatabaseManager {
             override fun onCancelled(error: DatabaseError) {}
 
             }
+        )
+
+    }
+
+    fun readBugStatusFromDb(
+        ticketNumber: String,
+        callback: (result: String) -> Unit
+    ){
+
+        bugsDatabase.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val bugArray = ArrayList<BugsAdsClass>()
+
+                for (item in snapshot.children) {
+
+                    // создаем переменную stock, в которую в конце поместим наш ДАТАКЛАСС с акцией с БД
+
+                    val bug =
+                        item // это как бы первый слой иерархии в папке Stock. путь УНИКАЛЬНОГО КЛЮЧА АКЦИИ
+                            .child("bugData") // следующая папка с информацией об акции
+                            .getValue(BugsAdsClass::class.java) // забираем данные из БД в виде нашего класса акций
+
+                    if (bug != null && ticketNumber == bug.ticketNumber){
+
+                        callback (bug.status!!)
+
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+
+        }
         )
 
     }
