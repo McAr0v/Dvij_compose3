@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -179,9 +178,6 @@ class MainActivity : ComponentActivity() {
                 )
                 )
             }
-
-            val bugInfo = remember {
-                mutableStateOf (BugsAdsClass())}
 
             // Данные о заведении. Используется для переходов на разные экраны
 
@@ -419,32 +415,7 @@ class MainActivity : ComponentActivity() {
                             // в секцию верхнего меню вызываем наше созданное верхнее меню
 
                             TopBarInApp(
-                                topBarName = stringResource(id =
-                                //Заголовок меню постоянно меняется. Указываем, какие должны быть заголовки исходя из того,
-                                // какая страница открыта
-
-                                // Условие выбора заголовка
-                                when (currentRoute) {
-                                    null -> R.string.meetings
-                                    MEETINGS_ROOT -> R.string.meetings
-                                    PLACES_ROOT -> R.string.places
-                                    STOCK_ROOT -> R.string.stock
-                                    PROFILE_ROOT -> R.string.profile
-                                    ABOUT_ROOT -> R.string.side_about
-                                    POLICY_ROOT -> R.string.side_private_policy
-                                    ADS_ROOT -> R.string.side_ad
-                                    BUGS_ROOT -> R.string.side_report_bug
-                                    CREATE_MEETINGS_SCREEN -> R.string.create_meeting
-                                    EDIT_MEETINGS_SCREEN -> R.string.edit_meeting
-                                    CREATE_PLACES_SCREEN -> R.string.create_place
-                                    CREATE_STOCK_SCREEN -> R.string.create_stock
-                                    MEETING_VIEW -> R.string.meetings
-                                    PLACE_VIEW -> R.string.places
-                                    STOCK_VIEW -> R.string.stock
-                                    BUGS_LIST_ROOT -> R.string.bugs_list_name
-                                    else -> R.string.app_name
-                                }
-                                ),
+                                topBarRoute = currentRoute, // Заголовок меняется в зависимости от текущего пути. Функция определения названия внутри
                                 onNavigationIconClick = {
                                     // в действие на клик передаем корутину для запуска открытия бокового меню
                                     coroutineScope.launch { scaffoldState.drawerState.open() }
@@ -454,28 +425,17 @@ class MainActivity : ComponentActivity() {
                     }
                 },
 
-                drawerContent = { // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
+                drawerContent = {
 
-                        sideComponents.HeaderSideNavigation() // HEADER - Логотип
+                    // ---------- СОДЕРЖИМОЕ БОКОВОГО МЕНЮ ---------
 
-                        sideComponents.AvatarBoxSideNavigation(
-                            navController = navController, scaffoldState = scaffoldState, userInfo = userInfo) // Аватарка
-
-                        chooseCityNavigation.CityHeaderSideNavigation(cityName,citiesList) // Меню с выбором города находится теперь в отдельном классе
-
-                        sideComponents.BodySideNavigation( // вызываем тело бокового меню, где расположены перечень страниц
-                            navController = navController, // Передаем NavController
-                            scaffoldState // Передаем состояние Scaffold, для реализации функции автоматического закрывания бокового меню при нажатии на элемент
-                        )
-
-                        if (mAuth.uid == "oPgbRuznYcYkneErcqmCSY6Fdsg1"){
-
-                            sideComponents.AdminSideNavigation(navController = navController, scaffoldState = scaffoldState)
-
-                        }
-
-                        sideComponents.SubscribeBoxSideNavigation() // строка "ПОДПИШИСЬ НА ДВИЖ"
-
+                    sideComponents.AllSideComponents(
+                        navController = navController,
+                        scaffoldState = scaffoldState,
+                        userInfo = userInfo,
+                        cityName = cityName,
+                        citiesList = citiesList
+                    )
                 }
                 )
 
@@ -489,7 +449,8 @@ class MainActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(paddingValues)
-                        .fillMaxWidth())
+                        .fillMaxWidth()
+                        )
                 {
 
                     // Навигационный хост. Здесь мы казываем,
@@ -538,11 +499,16 @@ class MainActivity : ComponentActivity() {
 
                         // ---- ПРОЧИЕ СТРАНИЦЫ -------
 
-                        composable(ABOUT_ROOT) { AboutScreen()}
+                        composable(ABOUT_ROOT) { AboutScreen(navController = navController)}
+                        composable(CALLBACK_ROOT) { CallbackScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
+                        composable(CALLBACK_LIST_ROOT) { CallbackListScreen(
+                            navController = navController,
+                            act = this@MainActivity
+                        ) }
                         composable(POLICY_ROOT) { PrivatePolicyScreen()}
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
-                        composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController, bugInfoFromAct = bugInfo, act = this@MainActivity) }
+                        composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController, act = this@MainActivity) }
 
                     }
                 }

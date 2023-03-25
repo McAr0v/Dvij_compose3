@@ -21,7 +21,6 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.MainActivity
 import kz.dvij.dvij_compose3.firebase.MeetingsAdsClass
-import kz.dvij.dvij_compose3.firebase.PlacesAdsClass
 import kz.dvij.dvij_compose3.firebase.PlacesCardClass
 import kz.dvij.dvij_compose3.firebase.StockAdsClass
 import kz.dvij.dvij_compose3.tapesscreens.*

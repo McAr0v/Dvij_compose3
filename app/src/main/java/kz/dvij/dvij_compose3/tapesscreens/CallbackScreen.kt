@@ -1,25 +1,20 @@
 package kz.dvij.dvij_compose3.tapesscreens
 
-import android.content.Intent
 import android.os.Build
-import android.util.Log
+import android.telecom.Call
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -32,14 +27,10 @@ import kz.dvij.dvij_compose3.R
 import kz.dvij.dvij_compose3.constants.PRIMARY
 import kz.dvij.dvij_compose3.constants.SECONDARY
 import kz.dvij.dvij_compose3.elements.*
-import kz.dvij.dvij_compose3.firebase.BugsAdsClass
-import kz.dvij.dvij_compose3.firebase.BugsDatabaseManager
-import kz.dvij.dvij_compose3.firebase.StockCardClass
-import kz.dvij.dvij_compose3.firebase.UserInfoClass
-import kz.dvij.dvij_compose3.functions.checkDataOnCreateBugText
+import kz.dvij.dvij_compose3.firebase.*
+import kz.dvij.dvij_compose3.functions.checkDataOnCreateCallback
 import kz.dvij.dvij_compose3.navigation.MEETINGS_ROOT
 import kz.dvij.dvij_compose3.ui.theme.Grey_Background
-import kz.dvij.dvij_compose3.ui.theme.Primary70
 import kz.dvij.dvij_compose3.ui.theme.Typography
 import kz.dvij.dvij_compose3.ui.theme.WhiteDvij
 import java.time.ZoneId
@@ -49,14 +40,22 @@ import java.time.format.DateTimeFormatter
 @OptIn(DelicateCoroutinesApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BugsScreen(
+fun CallbackScreen(
     act: MainActivity,
     filledUserInfo: UserInfoClass = UserInfoClass(), // данные пользователя с БД
     navController: NavController
 ){
 
+    var phoneNumberFromDb by rememberSaveable {mutableStateOf(filledUserInfo.phoneNumber)}
+
+    // ПУСТОЙ ТЕЛЕФОН // Переменная, если нет телефона ни в пользователе, ни в мероприятии. ОБЫЧНО ТАК В РЕЖИМЕ СОЗДАНИЯ
+    var phoneNumber by rememberSaveable { mutableStateOf("7") }
+
+    val callbackCard = CallbackCard()
 
     val bugsDatabase = BugsDatabaseManager()
+
+    val callbackDatabase = CallbackDatabaseManager()
 
     val openLoading = remember { mutableStateOf(false) } // диалог ИДЕТ ЗАГРУЗКА
 
@@ -66,55 +65,55 @@ fun BugsScreen(
             .verticalScroll(rememberScrollState())
             .background(Grey_Background)
             .padding(horizontal = 20.dp, vertical = 30.dp),
-        
+
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
-        
+
     ) {
-        
-        Text(text = stringResource(id = kz.dvij.dvij_compose3.R.string.bug_say), color = WhiteDvij, style = Typography.titleLarge)
+
+        Text(text = stringResource(id = R.string.callback_headline), color = WhiteDvij, style = Typography.titleLarge)
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = stringResource(id = kz.dvij.dvij_compose3.R.string.bug_text), color = WhiteDvij, style = Typography.bodySmall)
+        Text(text = stringResource(id = R.string.callback_dear_friend), color = WhiteDvij, style = Typography.bodySmall)
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = stringResource(id = kz.dvij.dvij_compose3.R.string.bug_text1), color = WhiteDvij, style = Typography.bodySmall)
+        Text(text = stringResource(id = R.string.callback_text1), color = WhiteDvij, style = Typography.bodySmall)
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = stringResource(id = kz.dvij.dvij_compose3.R.string.bug_text2), color = WhiteDvij, style = Typography.bodySmall)
+        Text(text = stringResource(id = R.string.callback_text2), color = WhiteDvij, style = Typography.bodySmall)
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = stringResource(id = kz.dvij.dvij_compose3.R.string.bug_text3), color = WhiteDvij, style = Typography.bodySmall)
+        Text(text = stringResource(id = R.string.callback_text3), color = WhiteDvij, style = Typography.bodySmall)
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        val email = if (filledUserInfo.email != null && filledUserInfo.email != ""){
+        val phone = if (phoneNumberFromDb != null && phoneNumberFromDb != "" && phoneNumberFromDb != "+7" && phoneNumberFromDb != "+77") {
 
-            fieldEmailComponent(act = act, inputEmail = filledUserInfo.email)
+            fieldPhoneComponent(phone = phoneNumberFromDb!!, onPhoneChanged = { phoneNumberFromDb = it })
 
         } else {
 
-            fieldEmailComponent(act = act, inputEmail = filledUserInfo.email)
+            fieldPhoneComponent(phone = phoneNumber, onPhoneChanged = { phoneNumber = it })
 
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        val subject = fieldInstagramComponent(act = act, icon = kz.dvij.dvij_compose3.R.drawable.ic_email, placeHolder = "Напиши тему письма")
+        val subject = fieldInstagramComponent(act = act, icon = R.drawable.ic_email, placeHolder = "Напиши тему предложения")
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        val text = fieldDescriptionComponent(placeHolder = "Опиши свое предложение или причину ошибки")
+        val text = fieldDescriptionComponent(placeHolder = "Напиши свое предложение здесь")
 
         Spacer(modifier = Modifier.height(20.dp))
 
         ButtonCustom(buttonText = "Отправить") {
 
-            val check = checkDataOnCreateBugText(email = email, subject = subject, text = text)
+            val check = checkDataOnCreateCallback(phone = phone, subject = subject, text = text)
 
             if (check != 0) {
 
@@ -134,8 +133,8 @@ fun BugsScreen(
                     val nowTime = splitDate[2]
                     val nowDate = splitDate[0]
 
-                    val filledBug = BugsAdsClass(
-                        senderEmail = email,
+                    val filledCallback = CallbackAdsClass(
+                        senderPhone = phone,
                         subject = subject,
                         text = text,
                         ticketNumber = bugsDatabase.bugsDatabase.push().key,
@@ -144,7 +143,8 @@ fun BugsScreen(
                         status = "Новые сообщения"
                     )
 
-                    bugsDatabase.publishBug(filledBug){
+
+                    callbackDatabase.publishCallback(filledCallback = filledCallback) {
 
                         if (it) {
 
@@ -154,7 +154,7 @@ fun BugsScreen(
 
                             Toast.makeText(
                                 act,
-                                "Сообщение успешно отправлено!",
+                                "Сообщение успешно отправлено! С тобой обязательно свяжутся!",
                                 Toast.LENGTH_SHORT
                             ).show()
 
@@ -167,10 +167,14 @@ fun BugsScreen(
                             ).show()
 
                         }
+
                     }
+
                 }
             }
+
         }
+
     }
 
     if (openLoading.value) {
@@ -180,35 +184,37 @@ fun BugsScreen(
 }
 
 @Composable
-fun BugsListScreen (
+fun CallbackListScreen (
     navController: NavController,
     act: MainActivity
 ) {
 
     val filterDialog = FilterDialog(act)
 
+    val callbackCard = CallbackCard()
+
     val bugCard = BugCard()
 
-    val bugsDatabase = BugsDatabaseManager()
+    val callbackDatabase = CallbackDatabaseManager()
 
-    val bugList = remember {
-        mutableStateOf(listOf<BugsAdsClass>())
+    val callbackList = remember {
+        mutableStateOf(listOf<CallbackAdsClass>())
     }
 
-    val bugFilter = remember {
+    val callbackFilter = remember {
         mutableStateOf("Все сообщения")
     }
 
     val openFilterDialog = remember { mutableStateOf(false) }
 
-    val openLoading = remember { mutableStateOf(false) } // диалог ИДЕТ ЗАГРУЗКА
+    val sortingList = listOf("Все сообщения", "Новые сообщения", "В работе", "Получена договоренность", "Отложенные", "Не интересно")
 
-    val sortingList = listOf("Все сообщения", "Новые сообщения", "В работе", "Выполненные", "Отложенные")
+    val openLoading = remember { mutableStateOf(false) } // диалог ИДЕТ ЗАГРУЗКА
 
 
     if (openFilterDialog.value){
 
-        filterDialog.SortingDialog(sorting = bugFilter, list = sortingList) {
+        filterDialog.SortingDialog(sorting = callbackFilter, list = sortingList) {
 
             openFilterDialog.value = false
 
@@ -216,10 +222,10 @@ fun BugsListScreen (
 
     }
 
-    bugsDatabase.readBugListFromDb(
-        bugList = bugList,
-        status = bugFilter.value
-            )
+    callbackDatabase.readCallbackListFromDb(
+        callbackList = callbackList,
+        status = callbackFilter.value
+    )
 
     Column(
         modifier = Modifier
@@ -232,15 +238,15 @@ fun BugsListScreen (
     ) {
 
         ButtonCustom(
-            buttonText = bugFilter.value,
-            typeButton = if (bugFilter.value == "Все сообщения") SECONDARY else PRIMARY
+            buttonText = callbackFilter.value,
+            typeButton = if (callbackFilter.value == "Все сообщения") SECONDARY else PRIMARY
         ) {
             openFilterDialog.value = true
         }
-        
+
         Spacer(modifier = Modifier.height(10.dp))
 
-        if (bugList.value.isNotEmpty() && bugList.value != listOf(BugsAdsClass()) ){
+        if (callbackList.value.isNotEmpty() && callbackList.value != listOf(CallbackAdsClass()) ){
 
             LazyColumn(
                 modifier = Modifier
@@ -250,16 +256,11 @@ fun BugsListScreen (
                 verticalArrangement = Arrangement.Top
             ){
 
-                if (bugList.value.isNotEmpty() && bugList.value != listOf(BugsAdsClass()) ){
+                if (callbackList.value.isNotEmpty() && callbackList.value != listOf(CallbackAdsClass()) ){
 
-                    items(bugList.value){ item ->
+                    items(callbackList.value){ item ->
 
-                        bugCard.BugCard(
-                            bugItem = item,
-                            navController = navController,
-                            act = act,
-                            openLoadingState = openLoading
-                        )
+                        callbackCard.CallbackCard(callbackItem = item, navController = navController, act = act, openLoadingState = openLoading)
 
                     }
 
@@ -267,7 +268,7 @@ fun BugsListScreen (
 
             }
 
-        } else if (bugList.value == listOf(BugsAdsClass())){
+        } else if (callbackList.value == listOf(CallbackAdsClass())){
 
             Column(
                 modifier = Modifier.fillMaxSize(),

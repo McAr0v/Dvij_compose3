@@ -41,7 +41,8 @@ class BugCard() {
         //bugInfoFromAct: MutableState<BugsAdsClass>,
         bugItem: BugsAdsClass,
         navController: NavController,
-        act: MainActivity
+        act: MainActivity,
+        openLoadingState: MutableState<Boolean>
     ){
 
         val chosenStatus = remember{ mutableStateOf("") }
@@ -200,6 +201,8 @@ class BugCard() {
                         style = Typography.bodySmall,
                         modifier = Modifier.clickable {
 
+                            openLoadingState.value = true
+
                             val filledBug = BugsAdsClass (
 
                                 senderEmail = bugItem.senderEmail,
@@ -266,6 +269,8 @@ class BugCard() {
             if (openConfirmChoose.value) {
 
                 ConfirmDialog(onDismiss = { openConfirmChoose.value = false }){
+
+                    openLoadingState.value = true
 
                     bugsDatabase.deleteBug(ticketNumber = bugItem.ticketNumber!!){
 

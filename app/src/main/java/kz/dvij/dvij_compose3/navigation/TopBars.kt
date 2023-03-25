@@ -12,22 +12,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.functions.appBarNameFunction
 import kz.dvij.dvij_compose3.ui.theme.*
 
 // ДИЗАЙН ВЕРХНЕЙ ПАНЕЛИ
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TopBarInApp(
-    topBarName: String, // На вход должны получить заголовок панели
+    topBarRoute: String?, // На вход должны получить заголовок панели
     onNavigationIconClick: () -> Unit // Так же должны получить функцию, которая запускается при нажатии на кнопку меню
 ){
+    
+    val barName = appBarNameFunction(topBarRoute) // Получаем имя страницы в зависимости от названия пути
+    
     // Сама функция верхней панели
     TopAppBar(
 
         // работаем с заголовком
         title = {
             Text(
-                text = topBarName, // Передаем полученный заголовок панели
+                text = stringResource(id = barName), // Передаем полученный заголовок панели
                 color = WhiteDvij, // цвет заголовка
                 style = Typography.titleMedium, // Стиль текста заголовка
                 maxLines = 1, // максимальное количество строк

@@ -28,7 +28,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kz.dvij.dvij_compose3.R
-import kz.dvij.dvij_compose3.constants.FOR_CARDS
 import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.ui.theme.*
 

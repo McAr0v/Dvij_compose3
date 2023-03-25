@@ -23,12 +23,175 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.R
+import kz.dvij.dvij_compose3.dialogs.CitiesList
 import kz.dvij.dvij_compose3.elements.ButtonCustom
 import kz.dvij.dvij_compose3.elements.SocialButtonCustom
 import kz.dvij.dvij_compose3.firebase.UserInfoClass
 import kz.dvij.dvij_compose3.ui.theme.*
 
 class SideComponents (private val act: MainActivity) {
+
+    @Composable
+    fun AllSideComponents(
+        navController: NavController,
+        scaffoldState: ScaffoldState,
+        userInfo: MutableState<UserInfoClass>,
+        cityName: MutableState<String>,
+        citiesList: MutableState<List<CitiesList>>
+    ){
+
+        val chooseCityNavigation = act.chooseCityNavigation
+
+        // Инициализируем список элементов бокового меню
+        val sideNavigationItemsList = listOf(
+            SideNavigationItems.About,
+            SideNavigationItems.PrivatePolicy,
+            SideNavigationItems.Ads,
+            SideNavigationItems.Bugs,
+            SideNavigationItems.CallbackScreen
+        )
+
+        val coroutineScope = rememberCoroutineScope() // инициализируем корутину
+        val navBackStackEntry by navController.currentBackStackEntryAsState() // записываем в navBackStackEntry текущее состояние navController
+        val currentRoute = navBackStackEntry?.destination?.route // получаем доступ к корню открытой страницы
+
+        // Инициализируем список элементов бокового меню
+        val adminNavigationItemsList = listOf(
+            SideNavigationItems.BugsList,
+            SideNavigationItems.CallbackListScreen,
+        )
+
+        LazyColumn(modifier = Modifier
+            .background(Grey_OnBackground)
+            .fillMaxSize()){
+
+            item {
+
+                HeaderSideNavigation()
+
+            }
+
+            item {
+
+                AvatarBoxSideNavigation(navController = navController, scaffoldState = scaffoldState, userInfo = userInfo)
+
+            }
+
+            item {
+
+                chooseCityNavigation.CityHeaderSideNavigation(cityName,citiesList) // Меню с выбором города находится теперь в отдельном классе
+
+            }
+
+            if (act.mAuth.uid == "oPgbRuznYcYkneErcqmCSY6Fdsg1") {
+
+                item { Spacer(modifier = Modifier.height(20.dp)) }
+
+                item {
+
+                    androidx.compose.material.Text( // ЗАГОЛОВОК ГОРОД
+                        text = "Административная панель", // текст заголовка
+                        color = Grey_Text, // цвет заголовка
+                        style = Typography.labelMedium, // стиль заголовка
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+
+
+                    Spacer(modifier = Modifier.height(5.dp)) // разделитель между заголовком и городом
+
+                }
+
+                items(adminNavigationItemsList) { item -> // для каждого итема в списке sideNavigationItemsList
+
+                    // Создаем строку (иконка и текст должны идти друг за другом по горизонтали)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth() // строка должна занимать всю ширину
+                            .clickable {
+                                // действие на клик
+                                navController.navigate(item.navRoute) // открываем нужную страницу
+
+                                // запускаем в корутине действие, чтобы после нажатия на элемент, боковое меню закрывалось
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                            }
+                            .padding(vertical = 10.dp, horizontal = 20.dp), // паддинги элементов
+                        verticalAlignment = Alignment.CenterVertically // вертикальное выравнивание элементов по центру
+                    ) {
+
+                        // Иконка возле текста
+                        Icon(
+                            tint = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij, // цвет иконки
+                            painter = painterResource(id = item.icon), // задаем иконку, прописанную в sealed class
+                            contentDescription = stringResource(id = item.contentDescription) // описание для слабовидящих - вшито тоже в sealed class
+                        )
+
+                        // разделитель между текстом и иконкой
+                        Spacer(modifier = Modifier.width(15.dp))
+
+                        // Сам текст "Кнопки"
+                        Text(
+                            text = stringResource(id = item.title), // берем заголовок
+                            style = Typography.bodyMedium, // Стиль текста
+                            modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                            color = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij // цвет текста
+                        )
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(20.dp)) }
+
+            }
+
+            item { Spacer(modifier = Modifier.height(10.dp)) }
+
+            items(sideNavigationItemsList) { item -> // для каждого итема в списке sideNavigationItemsList
+
+                // Создаем строку (иконка и текст должны идти друг за другом по горизонтали)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth() // строка должна занимать всю ширину
+                        .clickable {
+                            // действие на клик
+                            navController.navigate(item.navRoute) // открываем нужную страницу
+
+                            // запускаем в корутине действие, чтобы после нажатия на элемент, боковое меню закрывалось
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
+                        }
+                        .padding(vertical = 10.dp, horizontal = 20.dp), // паддинги элементов
+                    verticalAlignment = Alignment.CenterVertically // вертикальное выравнивание элементов по центру
+                ) {
+
+                    // Иконка возле текста
+                    Icon(
+                        tint = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij, // цвет иконки
+                        painter = painterResource(id = item.icon), // задаем иконку, прописанную в sealed class
+                        contentDescription = stringResource(id = item.contentDescription) // описание для слабовидящих - вшито тоже в sealed class
+                    )
+
+                    // разделитель между текстом и иконкой
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    // Сам текст "Кнопки"
+                    Text(
+                        text = stringResource(id = item.title), // берем заголовок
+                        style = Typography.bodyMedium, // Стиль текста
+                        modifier = Modifier.weight(1f), // Текст займет всю оставшуюся ширину
+                        color = if (item.navRoute == currentRoute) YellowDvij else WhiteDvij // цвет текста
+                    )
+                }
+            }
+
+            item { SubscribeBoxSideNavigation() }
+
+        }
+
+    }
 
     @Composable
     fun HeaderSideNavigation(){
@@ -368,7 +531,8 @@ class SideComponents (private val act: MainActivity) {
             SideNavigationItems.About,
             SideNavigationItems.PrivatePolicy,
             SideNavigationItems.Ads,
-            SideNavigationItems.Bugs
+            SideNavigationItems.Bugs,
+            SideNavigationItems.CallbackScreen
         )
 
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину
@@ -379,6 +543,7 @@ class SideComponents (private val act: MainActivity) {
             Modifier
                 .background(color = Grey_OnBackground)
                 .padding(vertical = 10.dp)
+
         ) {
             // Помещаем все в "ленивую" колонку
 
@@ -434,6 +599,7 @@ class SideComponents (private val act: MainActivity) {
         // Инициализируем список элементов бокового меню
         val adminNavigationItemsList = listOf(
             SideNavigationItems.BugsList,
+            SideNavigationItems.CallbackListScreen,
         )
 
         val coroutineScope = rememberCoroutineScope() // инициализируем корутину

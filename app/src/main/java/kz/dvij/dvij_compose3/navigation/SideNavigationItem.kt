@@ -43,9 +43,25 @@ sealed class SideNavigationItems (
         contentDescription = R.string.cd_bugs_list
     )
 
+    object CallbackScreen: SideNavigationItems (
+        title = R.string.callback_headline,
+        icon = R.drawable.ic_callback,
+        navRoute = CALLBACK_ROOT,
+        contentDescription = R.string.cd_callback_screen
+    )
+
+    object CallbackListScreen: SideNavigationItems (
+        title = R.string.callback_list_headline,
+        icon = R.drawable.ic_callback,
+        navRoute = CALLBACK_LIST_ROOT,
+        contentDescription = R.string.cd_callback_list_screen
+    )
+
 }
 
 const val ABOUT_ROOT = "About"
+const val CALLBACK_ROOT = "Callback"
+const val CALLBACK_LIST_ROOT = "Callback_LIST"
 const val POLICY_ROOT = "Private_Policy"
 const val ADS_ROOT = "Ads"
 const val BUGS_ROOT = "Bugs"
