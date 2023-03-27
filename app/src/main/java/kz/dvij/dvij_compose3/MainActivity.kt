@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kz.dvij.dvij_compose3.accounthelper.AccountHelper
 import kz.dvij.dvij_compose3.accounthelper.REGISTRATION
 import kz.dvij.dvij_compose3.accounthelper.SIGN_IN
+import kz.dvij.dvij_compose3.adminpages.CityListScreen
 import kz.dvij.dvij_compose3.callandwhatsapp.CallAndWhatsapp
 import kz.dvij.dvij_compose3.meetingscreens.CreateMeeting
 import kz.dvij.dvij_compose3.placescreens.CreatePlace
@@ -90,6 +91,7 @@ class MainActivity : ComponentActivity() {
     private val createProfileInfoScreen = CreateProfileInfoScreen(this)
     val userDatabaseManager = UserDatabaseManager(this)
     val filterFunctions = FilterFunctions(this)
+    private val cityListScreen = CityListScreen(this)
 
     var googleSignInResultLauncher: ActivityResultLauncher<Intent>? = null
 
@@ -509,6 +511,8 @@ class MainActivity : ComponentActivity() {
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
                         composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController, act = this@MainActivity) }
+                        composable(CITIES_LIST_ROOT) { cityListScreen.CityListScreen(act = this@MainActivity) }
+
 
                     }
                 }

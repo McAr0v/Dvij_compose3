@@ -59,6 +59,7 @@ class SideComponents (private val act: MainActivity) {
         val adminNavigationItemsList = listOf(
             SideNavigationItems.BugsList,
             SideNavigationItems.CallbackListScreen,
+            SideNavigationItems.CityListScreen,
         )
 
         LazyColumn(modifier = Modifier

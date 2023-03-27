@@ -57,6 +57,13 @@ sealed class SideNavigationItems (
         contentDescription = R.string.cd_callback_list_screen
     )
 
+    object CityListScreen: SideNavigationItems (
+        title = R.string.city_list,
+        icon = R.drawable.ic_baseline_places,
+        navRoute = CITIES_LIST_ROOT,
+        contentDescription = R.string.cd_city_list_screen
+    )
+
 }
 
 const val ABOUT_ROOT = "About"
@@ -66,6 +73,7 @@ const val POLICY_ROOT = "Private_Policy"
 const val ADS_ROOT = "Ads"
 const val BUGS_ROOT = "Bugs"
 const val BUGS_LIST_ROOT = "Bugs_List_Root"
+const val CITIES_LIST_ROOT = "Cities_List_Root"
 const val REG_ROOT = "RegRoot"
 const val LOG_IN_ROOT = "LoginRoot"
 const val THANK_YOU_PAGE_ROOT = "thankYou"

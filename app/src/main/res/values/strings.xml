@@ -48,6 +48,7 @@
     <string name="cd_bugs_list">Перейти на страницу "Список багов"</string> <!-- Подтвержденная строчка -->
     <string name="cd_callback_screen">Перейти на страницу "Обратная связь"</string> <!-- Подтвержденная строчка -->
     <string name="cd_callback_list_screen">Перейти на страницу со списком обращений по обратной связи"</string> <!-- Подтвержденная строчка -->
+    <string name="cd_city_list_screen">Перейти на страницу со списком городов"</string> <!-- Подтвержденная строчка -->
     <string name="cd_go_back">Иконка "Вернуться назад"</string> <!-- Подтвержденная строчка -->
     <string name="cd_side_menu">Открыть боковое меню</string> <!-- Подтвержденная строчка -->
     <string name="cd_avatar">Аватарка пользователя</string> <!-- Подтвержденная строчка -->
@@ -280,9 +281,12 @@
 
     <string name="callback_headline">Обратная связь</string>
     <string name="callback_list_headline">Список предложений</string>
+
     <string name="callback_text_1">Мы всегда открыты к сотрудничеству, коллабарациям и предложениям!</string>
     <string name="callback_text_2">Если у тебя есть интересное предложение или идея по развитию приложения - обязательно свяжись с нами! </string>
     <string name="callback_text_3">Спасибо тебе, что пользуешься нашим приложением, дружище!</string>
+
+    <string name="city_list">Список городов</string>
 
     <!-- Экран сообщить об ошибке -->
 
