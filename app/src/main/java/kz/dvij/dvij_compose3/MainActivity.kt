@@ -511,7 +511,7 @@ class MainActivity : ComponentActivity() {
                         composable(ADS_ROOT) { AdsScreen() }
                         composable(BUGS_ROOT) { BugsScreen(act = this@MainActivity, filledUserInfo = userInfo.value, navController = navController) }
                         composable(BUGS_LIST_ROOT) { BugsListScreen(navController = navController, act = this@MainActivity) }
-                        composable(CITIES_LIST_ROOT) { cityListScreen.CityListScreen(act = this@MainActivity) }
+                        composable(CITIES_LIST_ROOT) { cityListScreen.CityListScreen(act = this@MainActivity, navController = navController) }
 
 
                     }

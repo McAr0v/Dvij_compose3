@@ -67,7 +67,7 @@ class ChooseCityNavigation (val act: MainActivity) {
                 if (cityArray.isEmpty()){
                     citiesList.value = listOf() // если список-черновик городов пустой, то добавить пустой список
                 } else {
-                    citiesList.value = cityArray // если есть города в списке-черновике, то их и возвращаем
+                    citiesList.value = cityArray.sortedBy { it.cityName } // если есть города в списке-черновике, то их и возвращаем
                 }
 
             }
@@ -77,6 +77,43 @@ class ChooseCityNavigation (val act: MainActivity) {
 
         }
         )
+    }
+
+    fun addCityInDb (filledCity: CitiesList, callback: (result: Boolean)-> Unit){
+
+        cityDatabase // записываем в базу данных
+            .child(filledCity.code ?: "empty")
+            .child("CityData") // помещаем в папку
+            .setValue(filledCity).addOnCompleteListener {
+
+                if (it.isSuccessful) {
+
+                    callback (true)
+
+                } else {
+                    // если не опубликовано, то возвращаем фалс
+                    callback (false)
+                }
+            }
+
+    }
+
+    fun deleteCityFromDb (cityCode: String, callback: (result: Boolean)-> Unit ) {
+
+        cityDatabase.child(cityCode).removeValue().addOnCompleteListener {
+
+            if (it.isSuccessful) {
+
+                callback (true)
+
+            } else {
+
+                callback (false)
+
+            }
+
+        }
+
     }
 
 
