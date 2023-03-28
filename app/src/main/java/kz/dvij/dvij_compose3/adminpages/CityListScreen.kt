@@ -3,10 +3,12 @@ package kz.dvij.dvij_compose3.adminpages
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -44,11 +46,8 @@ class CityListScreen(act: MainActivity) {
         val openAddDialog = remember { mutableStateOf(false) } // диалог создания города
         val openLoading = remember { mutableStateOf(false) } // диалог создания города
 
-        if (openLoading.value) {
 
-            LoadingScreen(messageText = "Идет загрузка")
 
-        }
 
         if (openAddDialog.value) {
 
@@ -61,16 +60,24 @@ class CityListScreen(act: MainActivity) {
 
         }
 
+        if (openLoading.value) {
+
+            LoadingScreen(messageText = "Идет загрузка")
+
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Grey_Background)
-                .padding(horizontal = 20.dp, vertical = 20.dp),
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ){
 
             item {
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 ButtonCustom(buttonText = "Добавить город") {
 
@@ -86,70 +93,123 @@ class CityListScreen(act: MainActivity) {
 
                 items(citiesList.value) { list ->
 
-                    Row (
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 5.dp)
-                            .background(Grey_OnBackground)
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ){
+                    val deleteSwitch = remember { mutableStateOf(false) }
 
-                        Text(
-                            text = list.cityName!!,
-                            color = WhiteDvij,
-                            style = Typography.bodySmall,
-                            modifier = Modifier.weight(0.4f)
-                        )
+                    if (!deleteSwitch.value){
 
-                        Spacer(modifier = Modifier.width(20.dp))
+                        Row (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 5.dp)
+                                .background(Grey_ForCards, shape = RoundedCornerShape(15.dp))
+                                .padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ){
 
-                        Text(
-                            text = list.code!!,
-                            color = WhiteDvij,
-                            style = Typography.bodySmall,
-                            modifier = Modifier.weight(0.4f)
-                        )
+                            Text(
+                                text = list.cityName!!,
+                                color = WhiteDvij,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.55f)
+                            )
 
-                        Spacer(modifier = Modifier.width(20.dp))
+                            Spacer(modifier = Modifier.width(20.dp))
 
-                        Text(
-                            text = "Удалить",
-                            color = AttentionRed,
-                            style = Typography.bodySmall,
-                            modifier = Modifier.weight(0.2f).clickable {
+                            Text(
+                                text = list.code!!,
+                                color = WhiteDvij,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.25f)
+                            )
 
+                            Spacer(modifier = Modifier.width(20.dp))
 
-                                act.chooseCityNavigation.deleteCityFromDb(list.code){
+                            Text(
+                                text = "Удалить",
+                                color = AttentionRed,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.2f).clickable {
 
-                                    if (it) {
-
-                                        navController.navigate(CITIES_LIST_ROOT)
-                                        Toast.makeText(act, "Город успешно удален", Toast.LENGTH_SHORT).show()
-
-                                    } else {
-
-                                        Toast.makeText(act, "Произошла ошибка. Город не удален", Toast.LENGTH_SHORT).show()
-
-                                    }
+                                    deleteSwitch.value = true
 
                                 }
+                            )
+
+                        }
+
+                    } else {
+
+                        Row (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 5.dp)
+                                .background(Grey_OnBackground, shape = RoundedCornerShape(15.dp))
+                                .border(width = 2.dp, color = YellowDvij, shape = RoundedCornerShape(15.dp))
+                                .padding(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ){
+
+                            Text(
+                                text = "Удалить ${list.cityName!!}?",
+                                color = WhiteDvij,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.7f)
+                            )
+
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            Text(
+                                text = "Да",
+                                color = YellowDvij,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.15f).clickable {
+
+                                    if (list.code != null) {
+
+                                        openLoading.value = true
+
+                                        act.chooseCityNavigation.deleteCityFromDb(list.code){
+
+                                            if (it) {
+
+                                                deleteSwitch.value = false
+                                                navController.navigate(CITIES_LIST_ROOT)
+                                                Toast.makeText(act, "Город успешно удален", Toast.LENGTH_SHORT).show()
+
+                                            } else {
+
+                                                openLoading.value = false
+                                                deleteSwitch.value = false
+                                                Toast.makeText(act, "Произошла ошибка. Город не удален", Toast.LENGTH_SHORT).show()
+
+                                            }
+
+                                        }
 
 
-                            }
-                        )
+                                    }
+                                }
+                            )
 
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            Text(
+                                text = "Нет",
+                                color = AttentionRed,
+                                style = Typography.bodySmall,
+                                modifier = Modifier.weight(0.15f).clickable {
+
+                                    deleteSwitch.value = false
+
+                                }
+                            )
+
+                        }
                     }
-
-
                 }
-
             }
-
-
         }
-
     }
-
 }

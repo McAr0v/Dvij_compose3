@@ -100,7 +100,7 @@ class CityAddDialog () {
 
                 Column(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp),
+                    .padding(bottom = 10.dp, top = 30.dp),
                 ) {
 
 
